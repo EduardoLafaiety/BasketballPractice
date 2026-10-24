@@ -1,0 +1,38 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "frontend",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "frontend", "run", "dev", "--", "--port", "5173", "--strictPort"],
+      "port": 5173
+    },
+    {
+      "name": "backend",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "backend", "run", "dev"],
+      "port": 3333
+    },
+    {
+      "name": "frontend-api",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "frontend", "run", "dev", "--", "--port", "5174", "--strictPort"],
+      "env": { "API_PROXY": "http://localhost:3334" },
+      "port": 5174
+    },
+    {
+      "name": "backend-melhorias",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "backend", "run", "dev"],
+      "env": { "PORT": "3335", "CORS_ORIGIN": "http://localhost:5175" },
+      "port": 3335
+    },
+    {
+      "name": "frontend-melhorias",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "frontend", "run", "dev", "--", "--port", "5175", "--strictPort"],
+      "env": { "API_PROXY": "http://localhost:3333" },
+      "port": 5175
+    }
+  ]
+}
