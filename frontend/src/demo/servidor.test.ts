@@ -54,6 +54,13 @@ describe('Servidor da demonstração', () => {
     await esperarZerado(get)
   })
 
+  it('tem os estilos de jogo, com todos os movimentos ligados ao catálogo', async () => {
+    const estilos = await get<{ id: string }[]>('/styles')
+    expect(estilos.length).toBeGreaterThanOrEqual(12)
+    const luka = await get<{ moves: { exercise: unknown }[] }>('/styles/luka-doncic')
+    expect(luka.moves.every((m) => m.exercise !== null)).toBe(true)
+  })
+
   it('responde com as mesmas validações e erros da API real', async () => {
     const invalida = await servidor.executar('POST', '/sessions', {
       performedAt: new Date().toISOString(),

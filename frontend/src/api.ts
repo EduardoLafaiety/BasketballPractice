@@ -6,10 +6,14 @@ import type {
   Conquista,
   DiaSemana,
   Drill,
+  Estilo,
+  EstiloResumo,
+  FatiaEstilo,
   InfoTeste,
   Meta,
   Metrica,
   ModeloRotina,
+  Posicao,
   NovaSessao,
   Progresso,
   Resumo,
@@ -525,6 +529,36 @@ export const api = {
     return salvo.id
   },
 
+  async estilos(): Promise<EstiloResumo[]> {
+    return (await request<EstiloResumoApi[]>('GET', '/styles')).map(paraEstiloResumo)
+  },
+
+  async estilo(id: string): Promise<Estilo> {
+    const r = await request<EstiloApi>('GET', `/styles/${encodeURIComponent(id)}`)
+    const bloco = (b: ExercicioEstiloApi) => ({
+      drillId: String(b.exerciseId),
+      nome: b.name,
+      categoria: CATEGORIA[b.category] ?? 'Condicionamento',
+      metrica: b.metric,
+    })
+    return {
+      ...paraEstiloResumo(r),
+      alturaCm: r.heightCm,
+      ritmo: r.pace,
+      resumo: r.summary,
+      mentalidade: r.mindset,
+      movimentos: r.moves.map((m) => ({
+        nome: m.name,
+        descricao: m.description,
+        dica: m.tip,
+        dose: m.dose,
+        minutos: m.minutes,
+        exercicio: m.exercise ? bloco(m.exercise) : null,
+      })),
+      sessao: r.session.map((b) => ({ ...bloco(b), minutos: b.minutes, dose: b.dose })),
+    }
+  },
+
   exportar: () => request<unknown>('GET', '/data/export'),
 
   importar: (dados: unknown) => request<ResultadoImportacao>('POST', '/data/import', dados),
@@ -558,6 +592,55 @@ export const api = {
     return salvo.id
   },
 }
+
+interface EstiloResumoApi {
+  id: string
+  name: string
+  group: 'guard' | 'forward' | 'center'
+  archetype: string
+  minutes: number
+  mix: Record<string, number>
+  moveCount?: number
+  moves?: unknown[]
+}
+
+interface ExercicioEstiloApi {
+  exerciseId: number
+  name: string
+  category: string
+  metric: Metrica
+}
+
+interface EstiloApi extends EstiloResumoApi {
+  heightCm: number
+  pace: string
+  summary: string
+  mindset: string
+  moves: {
+    name: string
+    description: string
+    tip: string
+    dose: string
+    minutes: number
+    exercise: ExercicioEstiloApi | null
+  }[]
+  session: (ExercicioEstiloApi & { minutes: number; dose: string })[]
+}
+
+const POSICAO: Record<EstiloResumoApi['group'], Posicao> = { guard: 'Armador', forward: 'Ala', center: 'Pivô' }
+
+const paraEstiloResumo = (r: EstiloResumoApi): EstiloResumo => ({
+  id: r.id,
+  nome: r.name,
+  posicao: POSICAO[r.group] ?? 'Ala',
+  arquetipo: r.archetype,
+  // A lista traz só a contagem; o detalhe traz os movimentos.
+  totalMovimentos: r.moveCount ?? r.moves?.length ?? 0,
+  minutos: r.minutes,
+  divisao: Object.entries(r.mix).map(
+    ([c, porcentagem]): FatiaEstilo => ({ categoria: CATEGORIA[c] ?? 'Condicionamento', porcentagem }),
+  ),
+})
 
 const PREFIXO_ROTINA = 'bp-rotina:'
 

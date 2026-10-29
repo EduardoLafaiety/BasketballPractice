@@ -313,6 +313,8 @@ BasketballPractice/
 │           ├── Entrar.tsx       login e cadastro
 │           ├── Inicio.tsx       resumo dos últimos 7 dias, sequência e treino de hoje
 │           ├── Treinos.tsx      catálogo com busca, filtros e criação de exercício
+│           ├── JogueComo.tsx    jogadores da NBA com filtro por posição
+│           ├── EstiloDetalhe.tsx  movimentos-assinatura e treino do estilo de um jogador
 │           ├── TreinoDetalhe.tsx cronômetro, contador ao vivo e registro de sessão
 │           ├── Gerador.tsx      gera um treino pelo tempo disponível e foco
 │           ├── SessaoGuiada.tsx executa um plano bloco a bloco e salva uma sessão só
@@ -356,6 +358,7 @@ BasketballPractice/
     │       ├── goals.ts         /api/goals
     │       ├── tests.ts         /api/tests (testes físicos)
     │       ├── plans.ts         /api/plans (modelos de rotina e gerador)
+    │       ├── styles.ts        /api/styles (estilos de jogo da aba Jogue como)
     │       ├── settings.ts      /api/settings
     │       └── data.ts          /api/data (exportar e importar)
     └── test/
@@ -467,6 +470,8 @@ Cada sessão devolvida traz também `fatigue`, `entries[].bestStreak` e `shots[]
 | --- | --- | --- | --- | --- |
 | GET | `/api/plans/templates` | sim | — | Rotinas semanais prontas (`days` de 0 a 6 com `{ exerciseId, name }`), montadas pelos nomes do catálogo padrão |
 | POST | `/api/plans/generate` | sim | `{ minutes (10–180), focus?: category[], warmup? (padrão true), seed? }` | `{ minutes, blocks: [{ exerciseId, name, category, metric, minutes }] }`. Aquecimento de 5 min (drible ou condicionamento) e blocos de ~10 min alternando as categorias do foco. A mesma `seed` gera o mesmo treino |
+| GET | `/api/styles` | sim | — | Estilos de jogo: `[{ id, name, group (guard, forward, center), archetype, moveCount, minutes, mix }]`. `mix` é a divisão da sessão por categoria em % (soma 100) |
+| GET | `/api/styles/:id` | sim | — | Estilo completo: `heightCm`, `pace`, `summary`, `mindset`, `moves: [{ name, description, tip, dose, minutes, exercise }]` e `session` (aquecimento, movimentos e lance livre, com `exerciseId`). Conteúdo no código (`routes/styles.ts`), ligado ao catálogo padrão pelo nome; `404` para id desconhecido |
 
 ### Preferências — [routes/settings.ts](../backend/src/routes/settings.ts)
 
