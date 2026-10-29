@@ -1,0 +1,61 @@
+import { expect, type APIRequestContext, type Page } from '@playwright/test'
+
+export const SENHA = 'Senha-dos-testes-e2e'
+
+/** E-mail que nenhum outro teste usa (eles rodam em paralelo contra o mesmo banco). */
+export const emailUnico = (rotulo: string) =>
+  `${rotulo}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}@e2e.test`
+
+/** Cria a conta direto na API (mais rápido que o formulário, que tem um teste só dele). */
+export async function novaConta(request: APIRequestContext, nome = 'Atleta E2E') {
+  const email = emailUnico('atleta')
+  const resposta = await request.post('/api/auth/register', { data: { name: nome, email, password: SENHA } })
+  expect(resposta.status()).toBe(201)
+  const { token } = (await resposta.json()) as { token: string }
+  return { email, token }
+}
+
+/** Abre o site já logado com o token (como se a pessoa tivesse entrado antes). */
+export async function entrarCom(page: Page, token: string) {
+  await page.addInitScript((t) => localStorage.setItem('bp.token', t), token)
+}
+
+export const autorizacao = (token: string) => ({ Authorization: `Bearer ${token}` })
+
+export async function idDoExercicio(request: APIRequestContext, token: string, nome: string) {
+  const lista = (await (await request.get('/api/exercises', { headers: autorizacao(token) })).json()) as {
+    id: number
+    name: string
+  }[]
+  const achado = lista.find((e) => e.name === nome)
+  if (!achado) throw new Error(`Exercício "${nome}" não está no catálogo`)
+  return achado.id
+}
+
+/** Registra uma sessão de agora pela API (para testes que precisam de histórico sem refazer a sessão na tela). */
+export async function registrarSessao(request: APIRequestContext, token: string, acertos: number, tentativas: number) {
+  const exerciseId = await idDoExercicio(request, token, 'Lance livre')
+  const resposta = await request.post('/api/sessions', {
+    headers: autorizacao(token),
+    data: {
+      performedAt: new Date().toISOString(),
+      durationMinutes: 30,
+      entries: [{ exerciseId, makes: acertos, attempts: tentativas }],
+    },
+  })
+  expect(resposta.status()).toBe(201)
+}
+
+/** Valor em destaque do cartão de número com esse rótulo (Início e Desempenho). */
+export const numero = (page: Page, rotulo: string) =>
+  page.locator('.stat').filter({ hasText: rotulo }).locator('strong')
+
+/** Aceita todas as confirmações e guarda as mensagens dos alertas, na ordem. */
+export function aceitarDialogos(page: Page) {
+  const mensagens: string[] = []
+  page.on('dialog', async (dialogo) => {
+    if (dialogo.type() === 'alert') mensagens.push(dialogo.message())
+    await dialogo.accept()
+  })
+  return mensagens
+}

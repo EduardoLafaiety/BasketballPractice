@@ -184,8 +184,11 @@ BasketballPractice/
 │       ├── pages/            uma página por rota
 │       ├── components/       quadra, gráficos, cartões e layout
 │       ├── ferramentas/      timer, contador, metrônomo, vídeo e calculadoras
+│       ├── demo/             versão de demonstração: a API rodando no navegador
 │       ├── api.ts            cliente da API
 │       └── store.ts          estado e cache
+├── e2e/                      testes de ponta a ponta (Playwright)
+├── .github/workflows/        testes e publicação da demonstração
 └── docs/
     ├── DOCUMENTACAO.md       documentação técnica completa
     └── screenshots/
@@ -200,7 +203,11 @@ BasketballPractice/
 | **API** | `cd backend && npm test` | `node:test` + PGlite | A API inteira contra um Postgres em memória: cadastro e login, tokens adulterados e vencidos, isolamento entre atletas em cada recurso, validações, sessões, estatísticas com fuso horário, mapa de arremessos, metas, conquistas, gerador, backup tudo-ou-nada e permissões de admin |
 | **Site** | `cd frontend && npm test` | Vitest + Testing Library | Cálculos, CSV, lembretes, cliente da API, quadra, contador, login e cadastro, rotas protegidas, painel admin, início, biblioteca e criação de exercícios, desempenho (totais, comparações, gráficos, mapa, excluir sessão), ferramentas (calculadoras, timer, metrônomo, contador de arremessos), sessão guiada, registro de treino, rotina, metas, gerador e configurações |
 
-Nenhum dos dois precisa de Docker nem de servidor rodando.
+| **Ponta a ponta** | `cd e2e && npm test` | Playwright + Chrome + Postgres 17 | O site de produção no navegador falando com a API real e um Postgres de verdade: cadastro, login e volta à página pedida, e-mail repetido, rotina do dia → sessão guiada → desempenho, metas e conquistas, exercício próprio que não pode ser excluído quando está em uso, meta semanal no fuso do atleta, tema salvo na conta, backup sem duplicar, painel admin e navegação no celular |
+
+Os testes da API e do site não precisam de Docker nem de servidor rodando. Os de ponta a ponta precisam do Postgres do Docker (`cd backend && npm run db:up`) e do Google Chrome instalado. Eles sobem sozinhos a API e o site em portas próprias (3410 e 4410) e usam um banco separado, `basketball_e2e`, recriado vazio a cada execução: o banco de desenvolvimento não é tocado. Na primeira vez, rode `npm install` dentro de `e2e`. O relatório de cada execução fica em `npm run report`.
+
+Os três rodam no GitHub Actions a cada push e pull request na `main` ([`testes.yml`](.github/workflows/testes.yml)).
 
 ## 📚 Documentação
 
@@ -209,7 +216,7 @@ A [documentação técnica](docs/DOCUMENTACAO.md) detalha a arquitetura, todas a
 ## 🗺️ Próximos passos
 
 - [x] Testes automatizados do frontend
-- [ ] Testes de ponta a ponta (navegador + API + banco)
+- [x] Testes de ponta a ponta (navegador + API + banco)
 - [ ] Notificações push com o app fechado
 - [ ] Edição de treinos salvos com séries e metas
 - [ ] Deploy em produção

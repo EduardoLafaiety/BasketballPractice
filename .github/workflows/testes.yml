@@ -1,0 +1,99 @@
+# Roda as três camadas de testes a cada push e pull request na main.
+name: Testes
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: testes-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  api:
+    name: API (node:test + PGlite)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+      - run: npm ci
+        working-directory: backend
+      - run: npm run typecheck
+        working-directory: backend
+      - run: npm test
+        working-directory: backend
+
+  site:
+    name: Site (Vitest)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: |
+            backend/package-lock.json
+            frontend/package-lock.json
+      # A demonstração (src/demo) importa as rotas do backend.
+      - run: npm ci
+        working-directory: backend
+      - run: npm ci
+        working-directory: frontend
+      - run: npm test
+        working-directory: frontend
+
+  e2e:
+    name: Ponta a ponta (Playwright + Postgres)
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: basketball
+          POSTGRES_PASSWORD: basketball
+          POSTGRES_DB: basketball
+        ports:
+          - 5433:5432
+        options: >-
+          --health-cmd "pg_isready -U basketball -d basketball"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: |
+            backend/package-lock.json
+            frontend/package-lock.json
+            e2e/package-lock.json
+      - run: npm ci
+        working-directory: backend
+      - run: npm ci
+        working-directory: frontend
+      - run: npm ci
+        working-directory: e2e
+      # Usa o Google Chrome que já vem no runner; nada de baixar navegador.
+      - run: npx playwright test
+        working-directory: e2e
+      - if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: relatorio-e2e
+          path: |
+            e2e/playwright-report
+            e2e/test-results
+          retention-days: 7
