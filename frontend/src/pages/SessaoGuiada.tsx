@@ -287,7 +287,7 @@ function Final({
 
   return (
     <>
-      <h1>Treino concluído 🏀</h1>
+      <h1>Treino concluído<span className="ponto">.</span></h1>
       <section className="stats">
         <div className="card stat"><strong>{minutos}</strong><span className="muted">minutos</span></div>
         <div className="card stat"><strong>{entradas.length}</strong><span className="muted">exercícios feitos</span></div>

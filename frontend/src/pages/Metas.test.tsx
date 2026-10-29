@@ -137,7 +137,7 @@ describe('Metas', () => {
 
     expect(await item('Atrasada')).toHaveTextContent('prazo vencido')
     expect(await item('Cumprida')).not.toHaveTextContent('prazo vencido')
-    expect(await item('Cumprida')).toHaveTextContent('✅')
+    expect(await item('Cumprida')).toHaveTextContent('Meta cumprida: Cumprida')
     expect(await item('Vence hoje')).not.toHaveTextContent('prazo vencido')
   })
 
@@ -171,6 +171,16 @@ describe('Testes físicos', () => {
     expect(screen.getByText(/Melhor marca:/)).toHaveTextContent('4,5 s')
     const recorde = screen.getByText('recorde').closest('li') as HTMLElement
     expect(recorde).toHaveTextContent('4,5 s')
+  })
+
+  it('com resultados empatados, marca como recorde só o primeiro que chegou nele', async () => {
+    abrirMetas({
+      'GET /tests': [resultado(7, 'impulsao', 61.5, '2026-10-25'), resultado(6, 'impulsao', 58, '2026-10-10'), resultado(5, 'impulsao', 61.5, '2026-10-01')],
+    })
+    expect(await screen.findByText(/Melhor marca:/)).toHaveTextContent('61,5 cm')
+    const recordes = screen.getAllByText('recorde')
+    expect(recordes).toHaveLength(1)
+    expect(recordes[0].closest('li')).toHaveTextContent('1 de out.')
   })
 
   it('aceita vírgula decimal e grava ao meio-dia local do dia escolhido', async () => {

@@ -24,11 +24,17 @@ export async function many<T>(db: Queryable, sql: string, params?: unknown[]) {
 
 // Código de erro do Postgres para violação de UNIQUE.
 export const UNIQUE_VIOLATION = '23505'
-// Apagar um registro ainda referenciado por uma FK com ON DELETE RESTRICT.
+// Apagar um registro ainda referenciado por uma FK com ON DELETE RESTRICT: o Postgres responde
+// 23503 (foreign_key_violation); o PGlite dos testes responde 23001 (restrict_violation).
 export const RESTRICT_VIOLATION = '23001'
+export const FOREIGN_KEY_VIOLATION = '23503'
 
 export const isPgError = (error: unknown, code: string) =>
   typeof error === 'object' && error !== null && (error as { code?: unknown }).code === code
+
+/** O DELETE falhou porque o registro ainda é usado por outra tabela. */
+export const isStillReferenced = (error: unknown) =>
+  isPgError(error, RESTRICT_VIOLATION) || isPgError(error, FOREIGN_KEY_VIOLATION)
 
 function fromPool(pool: pg.Pool): Database {
   return {

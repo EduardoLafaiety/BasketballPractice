@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState, type RefObject } from 'react'
+import Icone from '../components/Icone'
 import { formatarTamanho, listarVideos, removerVideo, salvarVideo, type Video as VideoSalvo } from '../lib/videos'
 
 const VELOCIDADES = [0.1, 0.25, 0.5, 1]
@@ -60,7 +61,8 @@ export default function Video() {
   return (
     <div className="ferramenta video">
       <p className="aviso-local meta">
-        🔒 Os vídeos ficam guardados só neste navegador e não são enviados para o servidor. Limpar os dados do site apaga os vídeos.
+        <Icone nome="cadeado" tamanho={14} />
+        Os vídeos ficam guardados só neste navegador e não são enviados para o servidor. Limpar os dados do site apaga os vídeos.
       </p>
 
       <Gravador aoGravar={guardar} />

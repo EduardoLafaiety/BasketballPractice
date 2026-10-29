@@ -123,7 +123,7 @@ function Lembretes({ config, atualizar }: { config: Config; atualizar: (c: Confi
             className="chip"
             type="button"
             disabled={permissao !== 'granted'}
-            onClick={() => void notificar('Hora do treino! 🏀', 'Assim chega o lembrete.')}
+            onClick={() => void notificar('Hora do treino!', 'Assim chega o lembrete.')}
           >
             Testar notificação
           </button>

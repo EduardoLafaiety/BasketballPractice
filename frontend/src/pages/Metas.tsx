@@ -209,7 +209,15 @@ function SecaoMetas() {
             return (
               <li key={m.id} className={`card meta-item ${m.concluida ? 'concluida' : ''}`}>
                 <div className="meta-topo">
-                  <strong>{m.concluida ? '✅ ' : ''}{m.titulo}</strong>
+                  <strong className="meta-titulo">
+                    {m.concluida && (
+                      <span className="meta-check" title="Meta cumprida">
+                        <Icone nome="check" tamanho={14} />
+                        <span className="escondido">Meta cumprida: </span>
+                      </span>
+                    )}
+                    {m.titulo}
+                  </strong>
                   <button className="remover" aria-label={`Excluir meta ${m.titulo}`} onClick={() => excluir(m)}>×</button>
                 </div>
                 <BarraProgresso valor={m.atual} alvo={m.alvo} rotulo={m.titulo} />
@@ -241,6 +249,14 @@ function SecaoTestes() {
   const melhor = doTipo.length
     ? (info?.melhor === 'lower' ? Math.min : Math.max)(...doTipo.map((t) => t.valor))
     : null
+  // Com resultados empatados, o recorde é de quem chegou primeiro nele.
+  const idRecorde = doTipo
+    .filter((t) => t.valor === melhor)
+    .reduce<(typeof doTipo)[number] | null>(
+      (primeiro, t) =>
+        !primeiro || t.data < primeiro.data || (t.data === primeiro.data && Number(t.id) < Number(primeiro.id)) ? t : primeiro,
+      null,
+    )?.id
 
   async function enviar(e: FormEvent) {
     e.preventDefault()
@@ -309,7 +325,7 @@ function SecaoTestes() {
                   <li key={t.id}>
                     <span>{formatarData(t.data)}</span>
                     <strong>{t.valor.toLocaleString('pt-BR')} {info?.unidade}</strong>
-                    {t.valor === melhor && <span className="tag">recorde</span>}
+                    {t.id === idRecorde && <span className="tag">recorde</span>}
                     <button
                       className="remover"
                       aria-label="Excluir resultado"

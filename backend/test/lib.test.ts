@@ -7,6 +7,7 @@ import { HttpError } from '../src/lib/http-error.js'
 import { hashPassword, verifyPassword } from '../src/lib/password.js'
 import { signToken, verifyToken } from '../src/lib/token.js'
 import { isoDate, parse } from '../src/lib/validate.js'
+import { isStillReferenced } from '../src/db/index.js'
 
 describe('Senhas', () => {
   it('não guarda a senha e usa um sal diferente a cada hash', async () => {
@@ -76,5 +77,15 @@ describe('Validação', () => {
         return true
       },
     )
+  })
+})
+
+describe('Erros do banco', () => {
+  it('reconhece exclusão barrada por FK tanto no Postgres (23503) quanto no PGlite (23001)', () => {
+    assert.equal(isStillReferenced({ code: '23503' }), true)
+    assert.equal(isStillReferenced({ code: '23001' }), true)
+    assert.equal(isStillReferenced({ code: '23505' }), false)
+    assert.equal(isStillReferenced(new Error('outro')), false)
+    assert.equal(isStillReferenced(null), false)
   })
 })

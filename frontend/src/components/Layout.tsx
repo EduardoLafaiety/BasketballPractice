@@ -34,10 +34,10 @@ function useLembretes(lembretes: Config['lembretes']) {
             // Já treinou hoje? Então não incomoda.
             const hoje = await api.resumo(diasAtras(0))
             if (hoje.sessoes === 0 && marcarLembrado(dataLocal(new Date())))
-              await notificar('Hora do treino! 🏀', 'Sua sessão de hoje ainda não foi registrada. Bora pra quadra?')
+              await notificar('Hora do treino!', 'Sua sessão de hoje ainda não foi registrada. Bora pra quadra?')
           } catch {
             // sem conexão: lembra mesmo assim
-            if (marcarLembrado(dataLocal(new Date()))) await notificar('Hora do treino! 🏀', 'Bora pra quadra?')
+            if (marcarLembrado(dataLocal(new Date()))) await notificar('Hora do treino!', 'Bora pra quadra?')
           }
         }
         agendar()

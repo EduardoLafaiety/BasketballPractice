@@ -716,3 +716,10 @@ section + section, .card + section { margin-top: 1.5rem; }
 .admin-tag { margin-left: 0.5rem; }
 .btn-perigo { color: var(--erro); }
 .btn-perigo:hover:not(:disabled) { border-color: var(--erro); }
+
+/* Ícones em linha de texto */
+.ponto { color: var(--laranja); }
+.aviso-local { display: flex; align-items: center; gap: 0.4rem; }
+.meta-titulo { display: inline-flex; align-items: center; gap: 0.5rem; }
+.meta-check { position: relative; flex-shrink: 0; width: 22px; height: 22px; display: grid; place-items: center; border-radius: 50%; background: var(--verde); color: var(--bg); }
+.meta-check .icone-svg { stroke-width: 2.6; }

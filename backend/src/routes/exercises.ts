@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { z } from 'zod'
-import { RESTRICT_VIOLATION, isPgError, many, one, type Database, type Queryable } from '../db/index.js'
+import { isStillReferenced, many, one, type Database, type Queryable } from '../db/index.js'
 import { HttpError, notFound } from '../lib/http-error.js'
 import { idParam, parse } from '../lib/validate.js'
 import { currentUser } from '../middleware/auth.js'
@@ -116,7 +116,7 @@ export function exercisesRouter(db: Database) {
     try {
       await db.query('DELETE FROM exercises WHERE id = $1', [id])
     } catch (error) {
-      if (isPgError(error, RESTRICT_VIOLATION)) {
+      if (isStillReferenced(error)) {
         throw new HttpError(409, 'Exercício está em uso por treinos ou registros')
       }
       throw error
