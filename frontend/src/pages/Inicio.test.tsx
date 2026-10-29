@@ -104,6 +104,24 @@ describe('Início', () => {
     expect(await screen.findByRole('link', { name: /dia seguido/ })).toHaveTextContent(/^1 dia seguido$/)
   })
 
+  it('sem sequência, não mostra “0 dias seguidos” e mantém só a próxima meta', async () => {
+    abrirInicio({
+      'GET /stats/progress': { streak: { current: 0, best: 5 }, achievements: [] },
+      'GET /goals': [meta({ id: 2, title: '100 cestas', kind: 'cestas_total', target: 100, current: 42 })],
+    })
+    const link = await screen.findByRole('link', { name: /Meta: 100 cestas/ })
+    expect(link).toHaveTextContent(/^Meta: 100 cestas \(42\/100\)$/)
+    expect(link).toHaveAttribute('href', '/metas')
+    expect(screen.queryByText(/dias? seguidos?/)).toBeNull()
+  })
+
+  it('sem sequência e sem meta pendente, não mostra nada', async () => {
+    abrirInicio({ 'GET /stats/progress': { streak: { current: 0, best: 5 }, achievements: [] } })
+    expect(await screen.findByText('95')).toBeInTheDocument()
+    expect(screen.queryByText(/dias? seguidos?/)).toBeNull()
+    expect(screen.queryByRole('link', { name: /Meta:/ })).toBeNull()
+  })
+
   it('lista o treino da rotina de hoje e leva à sessão do dia', async () => {
     abrirInicio(rotinaDe({ 3: [3, 1], 4: [2] }))
 

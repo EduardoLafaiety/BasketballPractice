@@ -32,12 +32,19 @@ export default function Inicio() {
         <QuadraFundo />
         <div className="hero-kicker">
           <p className="eyebrow">{DIAS[hoje]}</p>
-          {progresso && (
+          {progresso && progresso.sequenciaAtual > 0 ? (
             <Link to="/metas" className="sequencia-mini">
               <Icone nome="fogo" tamanho={16} />
               {progresso.sequenciaAtual} {progresso.sequenciaAtual === 1 ? 'dia seguido' : 'dias seguidos'}
               {proximaMeta && ` · meta: ${proximaMeta.titulo} (${proximaMeta.atual}/${proximaMeta.alvo})`}
             </Link>
+          ) : (
+            proximaMeta && (
+              <Link to="/metas" className="sequencia-mini">
+                <Icone nome="metas" tamanho={16} />
+                Meta: {proximaMeta.titulo} ({proximaMeta.atual}/{proximaMeta.alvo})
+              </Link>
+            )
           )}
         </div>
         <h1 className="hero-titulo">
