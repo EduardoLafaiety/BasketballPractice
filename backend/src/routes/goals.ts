@@ -35,6 +35,13 @@ export const goalSchema = z
     path: ['target'],
   })
 
+/** Usada também na importação de backup, para o arquivo não criar metas que a tela recusaria. */
+export function assertGoalExerciseKind(goal: z.infer<typeof goalSchema>) {
+  if (goal.exerciseId != null && !['aproveitamento', 'cestas_total'].includes(goal.kind)) {
+    throw new HttpError(400, 'Só metas de aproveitamento ou de cestas podem ser de um exercício')
+  }
+}
+
 type GoalRow = {
   id: number
   title: string
@@ -134,9 +141,7 @@ export function goalsRouter(db: Database) {
 
   const validate = async (body: z.infer<typeof goalSchema>, userId: number) => {
     if (body.exerciseId != null) await assertExercisesVisible(db, [body.exerciseId], userId)
-    if (body.exerciseId != null && !['aproveitamento', 'cestas_total'].includes(body.kind)) {
-      throw new HttpError(400, 'Só metas de aproveitamento ou de cestas podem ser de um exercício')
-    }
+    assertGoalExerciseKind(body)
   }
 
   router.get('/', async (req, res) => {

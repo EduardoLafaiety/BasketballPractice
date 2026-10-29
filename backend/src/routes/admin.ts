@@ -54,7 +54,13 @@ export function adminRouter(db: Database) {
     const { id } = parse(idParam, req.params)
     rejectSelf(req, id, 'excluir')
 
-    const { rowCount } = await db.query('DELETE FROM users WHERE id = $1', [id])
+    // Sessões e treinos saem antes da conta: a cascata apagaria primeiro os exercícios próprios do atleta, e o
+    // ON DELETE RESTRICT dos itens que ainda os usam barraria a exclusão inteira.
+    const rowCount = await db.transaction(async (tx) => {
+      await tx.query('DELETE FROM practice_sessions WHERE user_id = $1', [id])
+      await tx.query('DELETE FROM workouts WHERE user_id = $1', [id])
+      return (await tx.query('DELETE FROM users WHERE id = $1', [id])).rowCount
+    })
     if (!rowCount) throw notFound('Usuário')
     res.status(204).end()
   })

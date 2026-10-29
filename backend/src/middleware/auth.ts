@@ -11,13 +11,18 @@ declare global {
   }
 }
 
-export function requireAuth(req: Request, _res: Response, next: NextFunction) {
-  const [scheme, token] = req.headers.authorization?.split(' ') ?? []
-  const userId = scheme === 'Bearer' && token ? verifyToken(token) : null
-  if (!userId) throw new HttpError(401, 'Não autenticado')
+// Confere também se a conta ainda existe: o token de quem foi excluído vale até expirar, mas não dá mais acesso.
+export function requireAuth(db: Database) {
+  return async (req: Request, _res: Response, next: NextFunction) => {
+    const [scheme, token] = req.headers.authorization?.split(' ') ?? []
+    const userId = scheme === 'Bearer' && token ? verifyToken(token) : null
+    if (!userId || !(await one(db, 'SELECT 1 FROM users WHERE id = $1', [userId]))) {
+      throw new HttpError(401, 'Não autenticado')
+    }
 
-  req.userId = userId
-  next()
+    req.userId = userId
+    next()
+  }
 }
 
 // Use apenas em rotas protegidas por requireAuth.

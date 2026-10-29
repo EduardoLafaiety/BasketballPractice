@@ -6,7 +6,7 @@ import { idParam, parse } from '../lib/validate.js'
 import { currentUser } from '../middleware/auth.js'
 import { assertExercisesVisible } from './exercises.js'
 
-const workoutSchema = z.object({
+export const workoutSchema = z.object({
   name: z.string().trim().min(2).max(100),
   description: z.string().trim().max(1000).nullish(),
   exercises: z

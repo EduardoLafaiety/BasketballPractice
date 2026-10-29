@@ -18,6 +18,7 @@ import { workoutsRouter } from './routes/workouts.js'
 
 export function createApp(db: Database) {
   const app = express()
+  const auth = requireAuth(db)
 
   app.disable('x-powered-by')
   app.use(cors({ origin: config.corsOrigin }))
@@ -35,16 +36,16 @@ export function createApp(db: Database) {
   })
 
   app.use('/api/auth', authRouter(db))
-  app.use('/api/exercises', requireAuth, exercisesRouter(db))
-  app.use('/api/workouts', requireAuth, workoutsRouter(db))
-  app.use('/api/sessions', requireAuth, sessionsRouter(db))
-  app.use('/api/stats', requireAuth, statsRouter(db))
-  app.use('/api/goals', requireAuth, goalsRouter(db))
-  app.use('/api/tests', requireAuth, testsRouter(db))
-  app.use('/api/plans', requireAuth, plansRouter(db))
-  app.use('/api/settings', requireAuth, settingsRouter(db))
-  app.use('/api/data', requireAuth, dataRouter(db))
-  app.use('/api/admin', requireAuth, requireAdmin(db), adminRouter(db))
+  app.use('/api/exercises', auth, exercisesRouter(db))
+  app.use('/api/workouts', auth, workoutsRouter(db))
+  app.use('/api/sessions', auth, sessionsRouter(db))
+  app.use('/api/stats', auth, statsRouter(db))
+  app.use('/api/goals', auth, goalsRouter(db))
+  app.use('/api/tests', auth, testsRouter(db))
+  app.use('/api/plans', auth, plansRouter(db))
+  app.use('/api/settings', auth, settingsRouter(db))
+  app.use('/api/data', auth, dataRouter(db))
+  app.use('/api/admin', auth, requireAdmin(db), adminRouter(db))
 
   app.use(notFoundHandler)
   app.use(errorHandler)

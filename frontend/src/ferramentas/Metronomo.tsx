@@ -4,12 +4,13 @@ import { useTelaLigada } from '../lib/telaLigada'
 
 /** Metrônomo de drible: ritmo constante para treinar velocidade de mão. */
 export default function Metronomo({ bpmInicial, aoSalvarBpm }: { bpmInicial: number; aoSalvarBpm: (bpm: number) => void }) {
-  const [bpm, setBpm] = useState(bpmInicial)
+  const [bpm, setBpmInterno] = useState(bpmInicial)
   const [compasso, setCompasso] = useState(4)
   const [tocando, setTocando] = useState(false)
   const [batida, setBatida] = useState(-1)
   const metronomo = useRef<ReturnType<typeof criarMetronomo> | null>(null)
   const toques = useRef<number[]>([])
+  const ajustado = useRef(false)
 
   useTelaLigada(tocando)
 
@@ -22,8 +23,16 @@ export default function Metronomo({ bpmInicial, aoSalvarBpm }: { bpmInicial: num
     metronomo.current?.definir(bpm, compasso)
   }, [bpm, compasso])
 
-  // O padrão salvo chega depois que as configurações carregam.
-  useEffect(() => setBpm(bpmInicial), [bpmInicial])
+  // O padrão salvo chega depois que as configurações carregam. Depois que o atleta mexe no ritmo,
+  // ele fica: se o servidor recusar o novo padrão, a config volta, mas o ritmo escolhido não.
+  useEffect(() => {
+    if (!ajustado.current) setBpmInterno(bpmInicial)
+  }, [bpmInicial])
+
+  const setBpm = (novo: number | ((atual: number) => number)) => {
+    ajustado.current = true
+    setBpmInterno(novo)
+  }
 
   function alternar() {
     if (tocando) metronomo.current?.parar()

@@ -146,7 +146,7 @@ flowchart LR
 | **Frontend** | React 18, TypeScript, Vite, React Router, CSS puro, service worker, IndexedDB (vídeos) |
 | **Backend** | Node.js 24, Express 5, Zod, JWT, senhas com `scrypt`, SQL escrito à mão com `pg` |
 | **Banco** | PostgreSQL 17 no Docker Compose, migrações versionadas |
-| **Testes** | `node:test` + PGlite (Postgres em memória, sem precisar de Docker) |
+| **Testes** | `node:test` + PGlite na API; Vitest + Testing Library no site |
 
 <details>
 <summary><b>Estrutura de pastas</b></summary>
@@ -181,12 +181,12 @@ BasketballPractice/
 
 ## 🧪 Testes
 
-```bash
-cd backend
-npm test
-```
+| Onde | Comando | Ferramentas | O que cobre |
+| --- | --- | --- | --- |
+| **API** | `cd backend && npm test` | `node:test` + PGlite | A API inteira contra um Postgres em memória: cadastro e login, tokens adulterados e vencidos, isolamento entre atletas em cada recurso, validações, sessões, estatísticas com fuso horário, mapa de arremessos, metas, conquistas, gerador, backup tudo-ou-nada e permissões de admin |
+| **Site** | `cd frontend && npm test` | Vitest + Testing Library | Cálculos, CSV, lembretes, cliente da API, quadra, contador, login e cadastro, rotas protegidas, painel admin, início, biblioteca e criação de exercícios, desempenho (totais, comparações, gráficos, mapa, excluir sessão), ferramentas (calculadoras, timer, metrônomo, contador de arremessos), sessão guiada, registro de treino, rotina, metas, gerador e configurações |
 
-Os testes sobem a API inteira contra um Postgres em memória (PGlite). Eles cobrem cadastro e login, isolamento de dados entre atletas, sessões, estatísticas com fuso horário, mapa de arremessos, metas, conquistas, gerador, backup e as permissões do painel admin.
+Nenhum dos dois precisa de Docker nem de servidor rodando.
 
 ## 📚 Documentação
 
@@ -194,7 +194,8 @@ A [documentação técnica](docs/DOCUMENTACAO.md) detalha a arquitetura, todas a
 
 ## 🗺️ Próximos passos
 
-- [ ] Testes automatizados do frontend e de ponta a ponta
+- [x] Testes automatizados do frontend
+- [ ] Testes de ponta a ponta (navegador + API + banco)
 - [ ] Notificações push com o app fechado
 - [ ] Edição de treinos salvos com séries e metas
 - [ ] Deploy em produção

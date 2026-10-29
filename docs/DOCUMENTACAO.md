@@ -91,7 +91,7 @@ Exemplo: o atleta salva uma sessão em `TreinoDetalhe`.
 2. O hook chama `api.registrarSessao`, que converte o formato do frontend (`drillId`, `acertos`…) para o do backend (`entries[].exerciseId`, `makes`…) — [api.ts:199](../frontend/src/api.ts#L199).
 3. `request()` faz o `fetch` para `/api/sessions` com o cabeçalho `Authorization: Bearer <token>` — [api.ts:45](../frontend/src/api.ts#L45).
 4. Em desenvolvimento, o Vite repassa `/api` para `http://localhost:3333` — [vite.config.ts:11](../frontend/vite.config.ts#L11).
-5. No Express, `requireAuth` valida o JWT e põe `req.userId` — [middleware/auth.ts:13](../backend/src/middleware/auth.ts#L13).
+5. No Express, `requireAuth` valida o JWT, confere se a conta ainda existe e põe `req.userId` — [middleware/auth.ts:13](../backend/src/middleware/auth.ts#L13).
 6. A rota valida o corpo com Zod, confere se os exercícios são visíveis ao usuário e grava sessão + entradas numa **transação** — [routes/sessions.ts:159](../backend/src/routes/sessions.ts#L159).
 7. A resposta volta em JSON; o `store.ts` atualiza o cache e a tela navega para `/desempenho`.
 
@@ -218,6 +218,12 @@ As versões vêm de [frontend/package.json](../frontend/package.json) e [backend
 - **No projeto:** [test/pglite.ts](../backend/test/pglite.ts) adapta o PGlite para a mesma interface `Database` do `pg` e aplica as mesmas migrações e seed.
 - **Por que:** os testes rodam sem Docker e sem servidor, em segundos, começam sempre com um banco limpo e usam o **mesmo dialeto SQL** da produção.
 - **Alternativas descartadas:** Postgres real no Docker para testes (mais lento, exige Docker ligado e limpeza entre execuções); Testcontainers (idem); SQLite em memória (dialeto diferente: as queries com `ANY`, `unnest`, `date_trunc` não funcionariam); mocks do banco (não testam o SQL).
+
+#### Vitest + Testing Library + jsdom (frontend)
+- **O que é:** o Vitest roda os testes usando a mesma configuração do Vite; o jsdom simula o navegador no Node; a Testing Library monta os componentes e interage com eles como um usuário (pelo texto, papel e rótulo dos elementos).
+- **No projeto:** a configuração fica no bloco `test` de [vite.config.ts](../frontend/vite.config.ts), com fuso fixo em `America/Sao_Paulo` para as contas de data darem o mesmo resultado em qualquer máquina. [src/test/api-falsa.ts](../frontend/src/test/api-falsa.ts) troca o `fetch` por uma API em memória, com rotas no formato `"GET /auth/me"`, e registra cada chamada para o teste conferir o corpo e o token enviados. [src/test/renderizar.tsx](../frontend/src/test/renderizar.tsx) monta o app inteiro (rotas e login) a partir de uma rota.
+- **Por que:** o Vitest entende TypeScript, JSX e os imports do Vite sem configuração extra. Simular só o `fetch` deixa o código real do app rodar inteiro: `api.ts`, `store.ts`, `auth.tsx` e as páginas.
+- **Alternativas descartadas:** Jest (precisaria de Babel ou ts-jest para TS + ESM); Enzyme (abandonado e preso ao React antigo); MSW para simular a API (mais uma dependência quando um `fetch` falso de 40 linhas resolve).
 
 ---
 
@@ -555,7 +561,7 @@ erDiagram
 | Tabela | Para que serve | Regras de exclusão |
 | --- | --- | --- |
 | `users` | Contas dos atletas | Apagar o usuário apaga tudo dele (`CASCADE`) |
-| `exercises` | Catálogo padrão (`user_id NULL`, 14 itens do seed) + exercícios criados pelo atleta | `RESTRICT` a partir de `workout_exercises` e `session_entries`: não dá para apagar um exercício em uso |
+| `exercises` | Catálogo padrão (`user_id NULL`, 14 itens do seed) + exercícios criados pelo atleta | `RESTRICT` a partir de `workout_exercises` e `session_entries`: não dá para apagar um exercício em uso. Por isso a exclusão de conta pelo admin apaga sessões e treinos antes do usuário ([admin.ts](../backend/src/routes/admin.ts)) |
 | `workouts` | Modelos de treino (lista ordenada de exercícios com metas) | Apagar remove os itens (`CASCADE`) e deixa `practice_sessions.workout_id` como `NULL` |
 | `workout_exercises` | Itens de um modelo de treino, com `position`, séries e metas | — |
 | `practice_sessions` | Cada treino realizado (data, duração, nota de esforço, observações) | Apagar remove as entradas (`CASCADE`) |
@@ -650,7 +656,36 @@ cd backend
 npm test
 ```
 
-Roda [test/api.test.ts](../backend/test/api.test.ts) e [test/features.test.ts](../backend/test/features.test.ts) com PGlite: **não precisa de Docker nem do `.env`**. Cobre health check, cadastro/login/401, fluxo exercício → treino → sessão → estatísticas, fuso do cliente, isolamento entre usuários, reaplicação de migrações/seed e e-mail único. Cobre também as ferramentas: zonas, sequência e cansaço, conquistas, metas, testes físicos, preferências, modelos de rotina, gerador e exportar/importar sem duplicar. O frontend ainda não tem testes.
+Roda todos os `test/*.test.ts` com PGlite: **não precisa de Docker nem do `.env`**. Cada arquivo sobe a API numa porta livre com um banco limpo ([test/http.ts](../backend/test/http.ts)).
+
+| Arquivo | O que cobre |
+| --- | --- |
+| [api.test.ts](../backend/test/api.test.ts) | Health check, cadastro/login/401, fluxo exercício → treino → sessão → estatísticas, fuso do cliente, isolamento, painel admin, migrações/seed e e-mail único |
+| [features.test.ts](../backend/test/features.test.ts) | Zonas, sequência e cansaço, conquistas, metas, testes físicos, preferências, modelos de rotina, gerador e exportar/importar sem duplicar |
+| [lib.test.ts](../backend/test/lib.test.ts) | Unitários: hash de senha (sal, senha errada, hash corrompido), JWT (adulterado, vencido, outro segredo, `alg: none`) e datas de calendário (29/02, 31/04) |
+| [security.test.ts](../backend/test/security.test.ts) | Formato do `Authorization`, e-mail sem diferenciar maiúsculas, login que não revela se o e-mail existe, token de conta excluída e, para **cada** recurso, que outro atleta não lê, edita, apaga nem usa os dados (404) |
+| [rules.test.ts](../backend/test/rules.test.ts) | JSON malformado (400), corpo grande (413), ids inválidos, números impossíveis na sessão, edição que substitui em vez de somar, paginação, ordem dos exercícios do treino, sessão que sobrevive ao treino apagado, regras de metas, preferências corrompidas, importação tudo-ou-nada e exclusão de conta com dados |
+
+```bash
+cd frontend
+npm test            # roda uma vez
+npm run test:watch  # roda de novo a cada arquivo salvo
+```
+
+Os testes do frontend ficam ao lado do código (`*.test.ts(x)`) e não precisam da API nem do banco: o `fetch` é simulado. Cobrem:
+- **Funções puras** ([lib/](../frontend/src/lib/)): percentuais de arremesso, acertos que faltam para uma meta, conversão de distâncias, CSV para o Excel, próximo lembrete e tema.
+- **Cliente da API** ([api.test.ts](../frontend/src/api.test.ts)): token no cabeçalho, erros com detalhes, aviso de token expirado, falha de rede, conversão de sessões e resumo (números que chegam como texto), corpo da nova sessão e leitura da rotina.
+- **Componentes**: quadra (zonas, mapa de calor, clique e teclado), contador de arremessos (sequências, desfazer, zerar, zonas), barra de progresso e estados de carregamento.
+- **Telas**: login e cadastro (redirecionamento, erros traduzidos, validação), sessão salva e expirada, sair, acesso à página admin e o painel admin (listar, promover, excluir com confirmação, erros).
+- **Início** ([Inicio.test.tsx](../frontend/src/pages/Inicio.test.tsx)): números dos últimos 7 dias (período pedido à API a partir da meia-noite local), "—" sem arremessos, "!" quando o resumo falha, sequência de dias com a próxima meta aberta e o treino de hoje pela rotina (ou o convite ao gerador).
+- **Treinos** ([Treinos.test.tsx](../frontend/src/pages/Treinos.test.tsx)): filtros de categoria e de registro somados, busca sem acento nem maiúscula no nome e na descrição, erro de carga com "Tentar de novo", criar exercício (corpo enviado, descrição vazia como `null`, nome curto, erro do servidor sem perder o digitado, cancelar) e editar o próprio exercício.
+- **Desempenho** ([Desempenho.test.tsx](../frontend/src/pages/Desempenho.test.tsx)): totais com cansaço e esforço médios, comparação semana × semana passada e mês × mês passado (com o período exato pedido à API), barras dos 7 dias no fuso local, evolução de 12 semanas, mapa de 30 dias × tudo, detalhes do histórico, excluir só depois de confirmar (e desfazer se a API recusar) e CSV paginado.
+- **Ferramentas** ([Ferramentas.test.tsx](../frontend/src/pages/Ferramentas.test.tsx), [Calculadoras.test.tsx](../frontend/src/ferramentas/Calculadoras.test.tsx), [TimerIntervalos.test.tsx](../frontend/src/ferramentas/TimerIntervalos.test.tsx)): abas pelo endereço, FG%/eFG%/TS%, quanto falta para a meta, metros ↔ pés, timer (preparo → trabalho → descanso, rodadas, sem descanso, pausa, bipes dos 3 últimos segundos), metrônomo (limites 30–240, tap tempo, acento, salvar como padrão e erro) e contador de arremessos salvo como sessão.
+- **Fluxos que gravam dados**: sessão guiada (blocos, pular, cronômetro com bipes, diário, erro sem perder o treino, treino do dia pela rotina), registro de um exercício (contador × campos digitados, validação, cronômetro), rotina (fila que não cria dois treinos para o mesmo dia, desfazer quando o servidor recusa, modelos), metas e testes físicos, gerador e configurações (tema, lembretes, backup, CSV paginado).
+
+[src/test/api-falsa.ts](../frontend/src/test/api-falsa.ts) aceita rotas com parâmetro (`"PUT /workouts/:id"`), e [src/test/renderizar.tsx](../frontend/src/test/renderizar.tsx) expõe o caminho atual (`getByTestId("caminho")`) para conferir navegações.
+
+**Como saber se um teste vale algo:** cada teste novo foi conferido com mutação, ou seja, um defeito colocado de propósito no código, para garantir que ele falha. Um teste que continua verde com o código quebrado não protege nada.
 
 ### Pelo app do Claude
 
@@ -673,7 +708,7 @@ As duas `-melhorias` servem para testar sem disputar porta com outras sessões. 
 | **Docker na porta 5433** | A máquina já tem um PostgreSQL nativo na 5432, que **não deve ser alterado**. O container expõe `5433 → 5432` ([docker-compose.yml:11](../backend/docker-compose.yml#L11)) e a `DATABASE_URL` padrão aponta para a 5433 ([config.ts:18](../backend/src/config.ts#L18)). |
 | **Frontend ligado à API** | ⚠️ **Diferente do que se esperava:** o frontend **já está ligado à API**. Tem login/cadastro, envia o JWT e lê/grava exercícios, sessões, resumo e rotina pelo backend ([api.ts](../frontend/src/api.ts), [store.ts](../frontend/src/store.ts)). O `localStorage` guarda **só o token** (`bp.token`), não os dados de treino. Para usar o app, o backend e o banco precisam estar rodando. |
 | **Rotina guardada como workouts** | Não existe tabela própria de rotina; o frontend reaproveita `workouts` com a marca `bp-rotina:<dia>` na descrição. |
-| **Suíte de testes completa adiada** | Hoje existem só os testes de integração do backend ([api.test.ts](../backend/test/api.test.ts) e [features.test.ts](../backend/test/features.test.ts)). Testes do frontend, testes unitários e cobertura maior ficaram para depois. |
+| **Testes** | Backend com testes de integração ([api.test.ts](../backend/test/api.test.ts) e [features.test.ts](../backend/test/features.test.ts)) e frontend com Vitest (desde 2026-10-29). Ainda faltam testes de ponta a ponta (navegador real + API + banco) e testes das telas Início, Treinos (lista), Desempenho e Ferramentas. |
 | **Migrações só aditivas** | Para mudar o esquema, adicione um item ao fim do array em [migrations.ts](../backend/src/db/migrations.ts); nunca edite os existentes. |
 | **Segredo do JWT** | Em produção (`NODE_ENV=production`) a API não sobe com o segredo padrão. Tokens não podem ser revogados antes de expirar (7 dias por padrão). |
 | **Funcionalidades da API ainda sem tela** | Editar modelos de treino salvos (com séries e metas) e a tabela `byExercise` das estatísticas. Hoje os treinos salvos pelo gerador só podem ser criados. |

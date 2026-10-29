@@ -5,10 +5,11 @@ import { HttpError } from '../lib/http-error.js'
 import { parse } from '../lib/validate.js'
 import { currentUser } from '../middleware/auth.js'
 import { CATEGORIES, METRICS } from './exercises.js'
-import { goalSchema } from './goals.js'
+import { assertGoalExerciseKind, goalSchema } from './goals.js'
 import { insertSession, sessionDetails, sessionSchema } from './sessions.js'
 import { readSettings, settingsSchema, writeSettings } from './settings.js'
 import { testSchema } from './tests.js'
+import { workoutSchema } from './workouts.js'
 
 const FORMAT = 'basketball-practice'
 const VERSION = 1
@@ -169,7 +170,11 @@ async function importData(tx: Queryable, userId: number, data: z.infer<typeof im
   // Treinos com o mesmo nome e descrição (como os dias da rotina) têm os exercícios substituídos.
   const workoutIds = new Map<string, number>()
   for (const workout of data.workouts) {
-    const items = workout.exercises.map((item) => ({ ...item, exerciseId: resolve(item) }))
+    // Mesmos limites da tela de treinos (séries, repetições, tempo).
+    const items = parse(workoutSchema, {
+      ...workout,
+      exercises: workout.exercises.map((item) => ({ ...item, exerciseId: resolve(item) })),
+    }).exercises
     const existing = await one<{ id: number }>(
       tx,
       'SELECT id FROM workouts WHERE user_id = $1 AND name = $2 AND description IS NOT DISTINCT FROM $3 ORDER BY id DESC LIMIT 1',
@@ -230,6 +235,7 @@ async function importData(tx: Queryable, userId: number, data: z.infer<typeof im
       ...rest,
       exerciseId: exerciseName ? resolve({ exerciseId: raw.exerciseId as number | null, exerciseName }) : null,
     })
+    assertGoalExerciseKind(goal)
     const duplicate = await one(tx, 'SELECT 1 FROM goals WHERE user_id = $1 AND title = $2 AND kind = $3 AND target = $4', [
       userId,
       goal.title,

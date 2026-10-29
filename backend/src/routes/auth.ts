@@ -60,7 +60,7 @@ export function authRouter(db: Database) {
     res.json({ token: signToken(row.id), user: await findUser(row.id) })
   })
 
-  router.get('/me', requireAuth, async (req, res) => {
+  router.get('/me', requireAuth(db), async (req, res) => {
     const user = await findUser(currentUser(req))
     if (!user) throw notFound('Usuário')
     res.json(user)

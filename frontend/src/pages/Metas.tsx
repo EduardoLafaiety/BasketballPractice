@@ -95,7 +95,9 @@ function SecaoMetas() {
     if (tipo === 'aproveitamento' && n > 100) return setErroForm('Aproveitamento vai até 100%.')
     setSalvando(true)
     setErroForm(null)
-    const nomeDrill = drills.find((d) => d.id === drillId)?.nome
+    // O exercício escolhido só vale para os tipos que aceitam exercício (o select some ao trocar de tipo).
+    const idDrill = info.comExercicio && drillId ? drillId : undefined
+    const nomeDrill = drills.find((d) => d.id === idDrill)?.nome
     try {
       await adicionar({
         titulo:
@@ -103,7 +105,7 @@ function SecaoMetas() {
           `${info.rotulo}: ${info.unidade === '%' ? `${n}%` : `${n.toLocaleString('pt-BR')} ${info.unidade}`}${nomeDrill ? ` (${nomeDrill})` : ''}`,
         tipo,
         alvo: n,
-        drillId: info.comExercicio && drillId ? drillId : undefined,
+        drillId: idDrill,
         prazo: prazo || undefined,
       })
       setCriando(false)
