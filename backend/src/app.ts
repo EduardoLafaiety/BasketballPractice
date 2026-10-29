@@ -13,6 +13,7 @@ import { plansRouter } from './routes/plans.js'
 import { sessionsRouter } from './routes/sessions.js'
 import { settingsRouter } from './routes/settings.js'
 import { statsRouter } from './routes/stats.js'
+import { stylesRouter } from './routes/styles.js'
 import { testsRouter } from './routes/tests.js'
 import { workoutsRouter } from './routes/workouts.js'
 
@@ -43,6 +44,7 @@ export function createApp(db: Database) {
   app.use('/api/goals', auth, goalsRouter(db))
   app.use('/api/tests', auth, testsRouter(db))
   app.use('/api/plans', auth, plansRouter(db))
+  app.use('/api/styles', auth, stylesRouter(db))
   app.use('/api/settings', auth, settingsRouter(db))
   app.use('/api/data', auth, dataRouter(db))
   app.use('/api/admin', auth, requireAdmin(db), adminRouter(db))

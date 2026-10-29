@@ -10,6 +10,7 @@ import { plansRouter } from '../../../backend/src/routes/plans'
 import { sessionsRouter } from '../../../backend/src/routes/sessions'
 import { settingsRouter } from '../../../backend/src/routes/settings'
 import { statsRouter } from '../../../backend/src/routes/stats'
+import { stylesRouter } from '../../../backend/src/routes/styles'
 import { testsRouter } from '../../../backend/src/routes/tests'
 import { workoutsRouter } from '../../../backend/src/routes/workouts'
 import { RespostaDemo, type PedidoDemo, type RouterDemo } from './express'
@@ -81,6 +82,7 @@ export async function criarServidor({ dados }: { dados?: string } = {}) {
     ['/goals', montar(goalsRouter(db))],
     ['/tests', montar(testsRouter(db))],
     ['/plans', montar(plansRouter(db))],
+    ['/styles', montar(stylesRouter(db))],
     ['/settings', montar(settingsRouter(db))],
     ['/data', montar(dataRouter(db))],
   ]
