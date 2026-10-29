@@ -9,3 +9,4 @@ Thumbs.db
 backend/data/
 .claude/settings.local.json
 *.tsbuildinfo
+backend/admin-local.txt

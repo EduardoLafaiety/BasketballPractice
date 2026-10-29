@@ -538,3 +538,11 @@ section + section, .card + section { margin-top: 1.5rem; }
   .nav { order: 3; width: 100%; overflow-x: auto; flex-wrap: nowrap; scrollbar-width: none; }
   .nav-link { white-space: nowrap; }
 }
+
+/* Administração */
+.admin-usuario { display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; }
+.admin-info { display: grid; gap: 0.2rem; min-width: 0; }
+.admin-info span { overflow-wrap: anywhere; }
+.admin-tag { margin-left: 0.5rem; }
+.btn-perigo { color: var(--erro); }
+.btn-perigo:hover:not(:disabled) { border-color: var(--erro); }

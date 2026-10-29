@@ -68,3 +68,10 @@ export function RequerLogin({ children }: { children: ReactNode }) {
   if (!usuario && !tokenAtual()) return <Navigate to="/entrar" replace state={{ de: local.pathname }} />
   return <>{children}</>
 }
+
+/** Só admins entram; os demais veem a página de "não encontrada" (a API também bloqueia). */
+export function RequerAdmin({ children, senao }: { children: ReactNode; senao: ReactNode }) {
+  const { usuario } = useAuth()
+  if (!usuario) return <Carregando texto="Conferindo sua sessão…" />
+  return <>{usuario.isAdmin ? children : senao}</>
+}

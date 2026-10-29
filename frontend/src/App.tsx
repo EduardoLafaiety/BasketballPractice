@@ -1,5 +1,5 @@
 import { Route, Routes } from 'react-router-dom'
-import { RequerLogin } from './auth'
+import { RequerAdmin, RequerLogin } from './auth'
 import Layout from './components/Layout'
 import Inicio from './pages/Inicio'
 import Entrar from './pages/Entrar'
@@ -13,6 +13,7 @@ import Gerador from './pages/Gerador'
 import SessaoGuiada from './pages/SessaoGuiada'
 import Configuracoes from './pages/Configuracoes'
 import NaoEncontrada from './pages/NaoEncontrada'
+import Admin from './pages/Admin'
 
 export default function App() {
   return (
@@ -36,6 +37,7 @@ export default function App() {
         <Route path="metas" element={<Metas />} />
         <Route path="ferramentas" element={<Ferramentas />} />
         <Route path="configuracoes" element={<Configuracoes />} />
+        <Route path="admin" element={<RequerAdmin senao={<NaoEncontrada />}><Admin /></RequerAdmin>} />
         <Route path="*" element={<NaoEncontrada />} />
       </Route>
     </Routes>

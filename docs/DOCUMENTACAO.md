@@ -338,9 +338,10 @@ BasketballPractice/
     │   │   ├── token.ts         JWT
     │   │   └── validate.ts      parse() com Zod, idParam, isoDate
     │   ├── middleware/
-    │   │   ├── auth.ts          requireAuth e currentUser
+    │   │   ├── auth.ts          requireAuth, requireAdmin e currentUser
     │   │   └── errors.ts        404 e tratamento de erros
     │   └── routes/
+    │       ├── admin.ts         /api/admin (painel do administrador)
     │       ├── auth.ts          /api/auth
     │       ├── exercises.ts     /api/exercises
     │       ├── workouts.ts      /api/workouts
@@ -377,7 +378,19 @@ Erros seguem o formato `{ "error": "mensagem", "details": { "campo": ["..."] } }
 | --- | --- | --- | --- | --- |
 | POST | `/api/auth/register` | não | `{ name (2–80), email, password (8–128) }` | `201 { token, user }`; `409` se o e-mail já existe (sem diferenciar maiúsculas) |
 | POST | `/api/auth/login` | não | `{ email, password }` | `200 { token, user }`; `401` se incorreto |
-| GET | `/api/auth/me` | sim | — | `{ id, name, email, createdAt }` |
+| GET | `/api/auth/me` | sim | — | `{ id, name, email, isAdmin, createdAt }` |
+
+### Administração — [routes/admin.ts](../backend/src/routes/admin.ts)
+
+Só para contas com `is_admin = true`; as demais recebem `403`. O papel é lido do banco a cada pedido, então tirar o admin vale na hora. O admin não altera nem exclui a própria conta, o que garante que sempre sobra um. O frontend mostra o link "Admin" e a página `/admin` só para admins.
+
+| Método | Rota | Auth | Corpo | Resposta |
+| --- | --- | --- | --- | --- |
+| GET | `/api/admin/users` | admin | — | Contas com `{ id, name, email, isAdmin, createdAt, workouts, sessions, lastSessionAt }`, mais novas primeiro |
+| PATCH | `/api/admin/users/:id` | admin | `{ isAdmin: boolean }` | A conta atualizada; `400` na própria conta |
+| DELETE | `/api/admin/users/:id` | admin | — | `204`, apagando todos os dados da conta; `400` na própria conta |
+
+O primeiro admin é criado pelo terminal, numa conta já cadastrada: `npm run admin -- email@exemplo.com` (na pasta `backend`). Para tirar o papel: `npm run admin -- email@exemplo.com --remover`.
 
 ### Exercícios — [routes/exercises.ts](../backend/src/routes/exercises.ts)
 
@@ -487,6 +500,7 @@ erDiagram
         text name
         text email "único em lower(email)"
         text password_hash "scrypt$salt$hash"
+        boolean is_admin "padrão false"
         timestamptz created_at
     }
     exercises {
@@ -613,7 +627,7 @@ cd backend
 npm run dev
 ```
 
-API em `http://localhost:3333/api`. Na inicialização, aplica as migrações pendentes e o seed. Outros scripts: `npm run typecheck`, `npm run build` (compila para `dist/`) e `npm start` (roda a versão compilada).
+API em `http://localhost:3333/api`. Na inicialização, aplica as migrações pendentes e o seed. Outros scripts: `npm run typecheck`, `npm run build` (compila para `dist/`), `npm start` (roda a versão compilada) e `npm run admin -- email` (torna uma conta admin).
 
 Variáveis do `.env` (veja [backend/.env.example](../backend/.env.example)): `PORT` (3333), `JWT_SECRET` (obrigatório trocar em produção), `JWT_EXPIRES_IN` (7d), `DATABASE_URL`, `CORS_ORIGIN` (http://localhost:5173).
 

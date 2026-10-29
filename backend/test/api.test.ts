@@ -158,6 +158,41 @@ describe('API', () => {
     assert.equal((await api('GET', '/sessions', undefined, otherToken)).body.length, 0)
     assert.equal((await api('GET', '/workouts/1', undefined, otherToken)).status, 404)
   })
+
+  it('libera o painel admin só para administradores', async () => {
+    const credentials = { name: 'Chefe', email: 'chefe@example.com', password: 'senha-segura' }
+    const register = await api('POST', '/auth/register', credentials, '')
+    assert.equal(register.body.user.isAdmin, false)
+    const adminToken = register.body.token
+    assert.equal((await api('GET', '/admin/users', undefined, adminToken)).status, 403)
+    assert.equal((await api('GET', '/admin/users', undefined, '')).status, 401)
+
+    await db.query('UPDATE users SET is_admin = true WHERE email = $1', [credentials.email])
+    assert.equal((await api('GET', '/auth/me', undefined, adminToken)).body.isAdmin, true)
+
+    const users = (await api('GET', '/admin/users', undefined, adminToken)).body
+    const athlete = users.find((u: { email: string }) => u.email === 'atleta@example.com')
+    assert.ok(athlete.workouts > 0 && athlete.sessions > 0)
+    assert.equal(users[0].passwordHash, undefined)
+
+    // Comum não promove ninguém; admin promove e o novo admin passa a ter acesso na hora.
+    assert.equal((await api('PATCH', `/admin/users/${athlete.id}`, { isAdmin: true })).status, 403)
+    const promoted = await api('PATCH', `/admin/users/${athlete.id}`, { isAdmin: true }, adminToken)
+    assert.equal(promoted.body.isAdmin, true)
+    assert.equal((await api('GET', '/admin/users')).status, 200)
+    await api('PATCH', `/admin/users/${athlete.id}`, { isAdmin: false }, adminToken)
+    assert.equal((await api('GET', '/admin/users')).status, 403)
+
+    const self = users.find((u: { email: string }) => u.email === credentials.email)
+    assert.equal((await api('PATCH', `/admin/users/${self.id}`, { isAdmin: false }, adminToken)).status, 400)
+    assert.equal((await api('DELETE', `/admin/users/${self.id}`, undefined, adminToken)).status, 400)
+    assert.equal((await api('PATCH', `/admin/users/${athlete.id}`, { isAdmin: 'sim' }, adminToken)).status, 400)
+
+    const other = users.find((u: { email: string }) => u.email === 'outro@example.com')
+    assert.equal((await api('DELETE', `/admin/users/${other.id}`, undefined, adminToken)).status, 204)
+    assert.equal((await api('DELETE', `/admin/users/${other.id}`, undefined, adminToken)).status, 404)
+    assert.equal((await api('POST', '/auth/login', { email: 'outro@example.com', password: 'senha-segura' }, '')).status, 401)
+  })
 })
 
 describe('Banco de dados', () => {
@@ -166,7 +201,7 @@ describe('Banco de dados', () => {
     await prepareDatabase(db)
     const afterRun = await db.query('SELECT COUNT(*)::int AS n FROM exercises WHERE user_id IS NULL')
     assert.deepEqual(afterRun.rows, before.rows)
-    assert.deepEqual((await db.query('SELECT MAX(version) AS v FROM schema_migrations')).rows, [{ v: 2 }])
+    assert.deepEqual((await db.query('SELECT MAX(version) AS v FROM schema_migrations')).rows, [{ v: 3 }])
   })
 
   it('garante e-mail único sem diferenciar maiúsculas', async () => {

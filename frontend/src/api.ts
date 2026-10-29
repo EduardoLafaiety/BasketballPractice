@@ -104,6 +104,15 @@ export interface Usuario {
   id: number
   name: string
   email: string
+  isAdmin: boolean
+}
+
+/** Conta vista pelo painel admin, com o resumo de uso. */
+export interface UsuarioAdmin extends Usuario {
+  createdAt: string
+  workouts: number
+  sessions: number
+  lastSessionAt: string | null
 }
 
 interface AuthResposta {
@@ -313,6 +322,10 @@ export const api = {
   entrar: (email: string, senha: string) => request<AuthResposta>('POST', '/auth/login', { email, password: senha }),
 
   eu: () => request<Usuario>('GET', '/auth/me'),
+
+  usuariosAdmin: () => request<UsuarioAdmin[]>('GET', '/admin/users'),
+  definirAdmin: (id: number, isAdmin: boolean) => request<UsuarioAdmin>('PATCH', `/admin/users/${id}`, { isAdmin }),
+  excluirUsuario: (id: number) => request<null>('DELETE', `/admin/users/${id}`),
 
   async drills() {
     return (await request<ExerciseApi[]>('GET', '/exercises')).map(paraDrill)

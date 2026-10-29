@@ -12,6 +12,7 @@
     "start": "node dist/server.js",
     "test": "tsx --test test/*.test.ts",
     "typecheck": "tsc --noEmit",
+    "admin": "tsx src/scripts/make-admin.ts",
     "db:up": "docker compose up -d --wait",
     "db:down": "docker compose down",
     "db:psql": "docker compose exec postgres psql -U basketball -d basketball"

@@ -1,4 +1,5 @@
 import type { NextFunction, Request, Response } from 'express'
+import { one, type Database } from '../db/index.js'
 import { HttpError } from '../lib/http-error.js'
 import { verifyToken } from '../lib/token.js'
 
@@ -21,3 +22,14 @@ export function requireAuth(req: Request, _res: Response, next: NextFunction) {
 
 // Use apenas em rotas protegidas por requireAuth.
 export const currentUser = (req: Request) => req.userId!
+
+// Consulta o banco a cada pedido: quem perde o papel de admin perde o acesso na hora, sem esperar o token expirar.
+export function requireAdmin(db: Database) {
+  return async (req: Request, _res: Response, next: NextFunction) => {
+    const user = await one<{ isAdmin: boolean }>(db, 'SELECT is_admin AS "isAdmin" FROM users WHERE id = $1', [
+      currentUser(req),
+    ])
+    if (!user?.isAdmin) throw new HttpError(403, 'Acesso restrito a administradores')
+    next()
+  }
+}

@@ -18,9 +18,9 @@ const loginSchema = z.object({
   password: z.string().min(1),
 })
 
-type User = { id: number; name: string; email: string; createdAt: Date }
+type User = { id: number; name: string; email: string; isAdmin: boolean; createdAt: Date }
 
-const USER_COLUMNS = `id, name, email, created_at AS "createdAt"`
+const USER_COLUMNS = `id, name, email, is_admin AS "isAdmin", created_at AS "createdAt"`
 
 export function authRouter(db: Database) {
   const router = Router()

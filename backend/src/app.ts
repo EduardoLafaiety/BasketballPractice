@@ -2,8 +2,9 @@ import cors from 'cors'
 import express from 'express'
 import { config } from './config.js'
 import type { Database } from './db/index.js'
-import { requireAuth } from './middleware/auth.js'
+import { requireAdmin, requireAuth } from './middleware/auth.js'
 import { errorHandler, notFoundHandler } from './middleware/errors.js'
+import { adminRouter } from './routes/admin.js'
 import { authRouter } from './routes/auth.js'
 import { dataRouter } from './routes/data.js'
 import { exercisesRouter } from './routes/exercises.js'
@@ -43,6 +44,7 @@ export function createApp(db: Database) {
   app.use('/api/plans', requireAuth, plansRouter(db))
   app.use('/api/settings', requireAuth, settingsRouter(db))
   app.use('/api/data', requireAuth, dataRouter(db))
+  app.use('/api/admin', requireAuth, requireAdmin(db), adminRouter(db))
 
   app.use(notFoundHandler)
   app.use(errorHandler)

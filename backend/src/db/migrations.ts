@@ -118,6 +118,10 @@ const migrations: string[] = [
     updated_at timestamptz NOT NULL DEFAULT now()
   );
   `,
+  `
+  -- Administradores gerenciam as contas pelo painel /admin.
+  ALTER TABLE users ADD COLUMN is_admin boolean NOT NULL DEFAULT false;
+  `,
 ]
 
 export async function migrate(db: Database) {

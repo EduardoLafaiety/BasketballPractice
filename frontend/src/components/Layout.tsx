@@ -69,6 +69,11 @@ export default function Layout() {
               {l.rotulo}
             </NavLink>
           ))}
+          {usuario?.isAdmin && (
+            <NavLink to="/admin" className="nav-link">
+              Admin
+            </NavLink>
+          )}
         </nav>
         <div className="conta">
           {usuario && <span className="meta">{usuario.name.split(' ')[0]}</span>}
