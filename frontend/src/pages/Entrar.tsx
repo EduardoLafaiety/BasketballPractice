@@ -2,6 +2,7 @@ import { useState, type FormEvent } from 'react'
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { ApiError } from '../api'
 import { useAuth } from '../auth'
+import Icone from '../components/Icone'
 
 /** Tela de login e de cadastro (modo definido pela rota). */
 export default function Entrar({ modo }: { modo: 'entrar' | 'cadastro' }) {
@@ -44,7 +45,7 @@ export default function Entrar({ modo }: { modo: 'entrar' | 'cadastro' }) {
   return (
     <div className="auth">
       <Link to="/entrar" className="marca auth-marca">
-        <span className="marca-bola" aria-hidden>🏀</span>
+        <span className="marca-bola"><Icone nome="bola" tamanho={28} /></span>
         Basketball Practice
       </Link>
       <form className="card form auth-card" onSubmit={enviar} noValidate>

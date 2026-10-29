@@ -2,6 +2,7 @@ import { useMemo, useState, type FormEvent } from 'react'
 import BarraProgresso from '../components/BarraProgresso'
 import { AvisoDesatualizado, Carregando, ErroCarga } from '../components/Estado'
 import GraficoLinha from '../components/GraficoLinha'
+import Icone from '../components/Icone'
 import { dataLocal } from '../api'
 import { formatarData, useDrills, useMetas, useProgresso, useTestes, useTiposTeste } from '../store'
 import type { Meta, TipoMeta, TipoTeste } from '../types'
@@ -26,7 +27,7 @@ export default function Metas() {
       {progresso ? (
         <section className="sequencia card">
           <div>
-            <span className="sequencia-fogo" aria-hidden>🔥</span>
+            <span className="sequencia-fogo"><Icone nome="fogo" tamanho={32} /></span>
             <strong>{progresso.sequenciaAtual}</strong>
             <span className="muted">{progresso.sequenciaAtual === 1 ? 'dia seguido' : 'dias seguidos'}</span>
           </div>

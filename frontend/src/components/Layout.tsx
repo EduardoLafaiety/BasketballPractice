@@ -6,14 +6,15 @@ import { marcarLembrado, notificar, proximoLembrete } from '../lib/lembretes'
 import { aplicarTema } from '../lib/tema'
 import { diasAtras, useConfig } from '../store'
 import type { Config } from '../types'
+import Icone, { type NomeIcone } from './Icone'
 
-const LINKS = [
-  { to: '/', rotulo: 'Início', fim: true },
-  { to: '/treinos', rotulo: 'Treinos' },
-  { to: '/rotina', rotulo: 'Rotina' },
-  { to: '/desempenho', rotulo: 'Desempenho' },
-  { to: '/metas', rotulo: 'Metas' },
-  { to: '/ferramentas', rotulo: 'Ferramentas' },
+const LINKS: { to: string; rotulo: string; icone: NomeIcone; fim?: boolean }[] = [
+  { to: '/', rotulo: 'Início', icone: 'inicio', fim: true },
+  { to: '/treinos', rotulo: 'Treinos', icone: 'treinos' },
+  { to: '/rotina', rotulo: 'Rotina', icone: 'rotina' },
+  { to: '/desempenho', rotulo: 'Desempenho', icone: 'desempenho' },
+  { to: '/metas', rotulo: 'Metas', icone: 'metas' },
+  { to: '/ferramentas', rotulo: 'Ferramentas', icone: 'ferramentas' },
 ]
 
 // Maior espera do setTimeout é ~24,8 dias; reagendar a cada 6 h também corrige a hora depois de o PC dormir.
@@ -58,31 +59,40 @@ export default function Layout() {
 
   return (
     <div className="app">
-      <header className="topo">
+      <aside className="lateral">
         <NavLink to="/" className="marca">
-          <span className="marca-bola" aria-hidden>🏀</span>
+          <span className="marca-bola"><Icone nome="bola" tamanho={26} /></span>
           Basketball Practice
         </NavLink>
-        <nav className="nav">
+        <nav className="nav" aria-label="Principal">
           {LINKS.map((l) => (
             <NavLink key={l.to} to={l.to} end={l.fim} className="nav-link">
+              <Icone nome={l.icone} />
               {l.rotulo}
             </NavLink>
           ))}
           {usuario?.isAdmin && (
             <NavLink to="/admin" className="nav-link">
+              <Icone nome="admin" />
               Admin
             </NavLink>
           )}
         </nav>
         <div className="conta">
-          {usuario && <span className="meta">{usuario.name.split(' ')[0]}</span>}
-          <NavLink to="/configuracoes" className="nav-link icone" aria-label="Configurações" title="Configurações">
-            ⚙
+          {usuario && (
+            <span className="conta-nome">
+              <span className="avatar" aria-hidden>{usuario.name.trim().charAt(0).toUpperCase()}</span>
+              <span className="conta-primeiro">{usuario.name.split(' ')[0]}</span>
+            </span>
+          )}
+          <NavLink to="/configuracoes" className="botao-icone" aria-label="Configurações" title="Configurações">
+            <Icone nome="config" />
           </NavLink>
-          <button className="chip" onClick={sair}>Sair</button>
+          <button className="botao-icone" onClick={sair} aria-label="Sair" title="Sair">
+            <Icone nome="sair" />
+          </button>
         </div>
-      </header>
+      </aside>
       <main className="conteudo">
         <Outlet />
       </main>

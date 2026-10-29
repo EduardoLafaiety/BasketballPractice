@@ -101,7 +101,7 @@ describe('Início', () => {
 
   it('usa o singular com 1 dia seguido', async () => {
     abrirInicio({ 'GET /stats/progress': { streak: { current: 1, best: 5 }, achievements: [] } })
-    expect(await screen.findByRole('link', { name: /dia seguido/ })).toHaveTextContent(/^🔥 1 dia seguido$/)
+    expect(await screen.findByRole('link', { name: /dia seguido/ })).toHaveTextContent(/^1 dia seguido$/)
   })
 
   it('lista o treino da rotina de hoje e leva à sessão do dia', async () => {
@@ -111,14 +111,14 @@ describe('Início', () => {
     const cartoes = await within(hoje).findAllByRole('link', { name: /Crossover|Lance livre|Suicídio/ })
     expect(cartoes.map((c) => c.querySelector('h3')?.textContent)).toEqual(['Crossover', 'Lance livre'])
     expect(cartoes[1]).toHaveAttribute('href', '/treinos/1')
-    expect(screen.getByRole('link', { name: '▶ Começar treino de hoje' })).toHaveAttribute('href', '/sessao?hoje')
-    expect(screen.queryByRole('link', { name: '⚡ Gerar um treino' })).toBeNull()
+    expect(screen.getByRole('link', { name: 'Começar treino de hoje' })).toHaveAttribute('href', '/sessao?hoje')
+    expect(screen.queryByRole('link', { name: 'Gerar um treino' })).toBeNull()
   })
 
   it('com um só exercício hoje, já oferece começar o treino', async () => {
     abrirInicio(rotinaDe({ 3: [2] }))
-    expect(await screen.findByRole('link', { name: '▶ Começar treino de hoje' })).toBeInTheDocument()
-    expect(screen.queryByRole('link', { name: '⚡ Gerar um treino' })).toBeNull()
+    expect(await screen.findByRole('link', { name: 'Começar treino de hoje' })).toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: 'Gerar um treino' })).toBeNull()
   })
 
   it('sem treino planejado para hoje, sugere a rotina e o gerador', async () => {
@@ -126,7 +126,7 @@ describe('Início', () => {
 
     expect(await screen.findByText(/Nenhum treino planejado para quarta\./)).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Adicione à rotina' })).toHaveAttribute('href', '/rotina')
-    expect(screen.getByRole('link', { name: '⚡ Gerar um treino' })).toHaveAttribute('href', '/gerador')
+    expect(screen.getByRole('link', { name: 'Gerar um treino' })).toHaveAttribute('href', '/gerador')
     expect(screen.queryByRole('link', { name: /Começar treino de hoje/ })).toBeNull()
   })
 

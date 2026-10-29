@@ -73,7 +73,7 @@ Um app web para atletas planejarem o que treinar, registrarem cada arremesso e a
 </table>
 
 <div align="center">
-  <img src="docs/screenshots/mobile.png" alt="App no celular" width="260" />
+  <img src="docs/screenshots/mobile.png" alt="App no celular" width="300" />
   <br />
   <sub>Feito para usar na quadra, direto do celular.</sub>
 </div>

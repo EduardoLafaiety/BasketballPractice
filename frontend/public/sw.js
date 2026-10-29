@@ -1,7 +1,7 @@
 // Service worker do Basketball Practice: deixa o app abrir sem internet.
 // Guarda só a "casca" do site (HTML, JS, CSS, ícones). Respostas da API nunca são guardadas:
 // os dados do atleta ficam no servidor e não sobram no aparelho depois do logout.
-const VERSAO = 'bp-v1'
+const VERSAO = 'bp-v2'
 const CASCA = ['/', '/index.html', '/manifest.webmanifest', '/icon.svg']
 
 self.addEventListener('install', (evento) => {
