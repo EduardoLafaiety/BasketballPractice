@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-/** Aviso fixo da versão de demonstração, com o botão para voltar aos dados de exemplo. */
+/** Aviso fixo da versão de demonstração, com o botão para apagar tudo e começar do zero. */
 export default function FaixaDemo() {
   const [recomecando, setRecomecando] = useState(false)
 
@@ -20,8 +20,8 @@ export default function FaixaDemo() {
   return (
     <div className="faixa-demo" role="note">
       <p>
-        <strong>Versão de demonstração.</strong> Explore à vontade: os dados são de exemplo e o que você registrar fica só
-        neste navegador.
+        <strong>Versão de demonstração.</strong> Use como se fosse sua, sem cadastro: o que você registrar fica só neste
+        navegador.
       </p>
       <button className="link-forte botao-link" onClick={recomecar} disabled={recomecando}>
         {recomecando ? 'Recomeçando…' : 'Recomeçar'}

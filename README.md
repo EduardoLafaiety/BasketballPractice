@@ -19,7 +19,7 @@ Um app web para atletas planejarem o que treinar, registrarem cada arremesso e a
 
 [Funcionalidades](#-funcionalidades) · [Telas](#-telas) · [Como rodar](#-como-rodar) · [Arquitetura](#-arquitetura) · [Documentação](docs/DOCUMENTACAO.md)
 
-**[▶ Experimente a demonstração](https://eduardolafaiety.github.io/BasketballPractice/)**: sem cadastro, com dados de exemplo, direto no navegador.
+**[▶ Experimente a demonstração](https://eduardolafaiety.github.io/BasketballPractice/)**: sem cadastro, direto no navegador, começando do zero como uma conta nova.
 
 <br />
 
@@ -126,7 +126,7 @@ O link **Admin** aparece no menu. Para tirar o papel, acrescente `--remover`.
 
 ### Versão de demonstração (sem banco nem API)
 
-A [demonstração online](https://eduardolafaiety.github.io/BasketballPractice/) é o mesmo site, sem login, com cerca de 8 semanas de treinos de exemplo. Ela roda **as rotas reais do backend dentro do navegador**, sobre o [PGlite](https://pglite.dev) (Postgres em WebAssembly), e guarda os dados no próprio navegador: mesmas regras, mesmos cálculos e mesmas validações do site com API. O botão **Recomeçar** volta aos dados de exemplo.
+A [demonstração online](https://eduardolafaiety.github.io/BasketballPractice/) é o mesmo site, sem login, começando zerado como no primeiro acesso: só o catálogo de exercícios, sem nenhum treino registrado. Ela roda **as rotas reais do backend dentro do navegador**, sobre o [PGlite](https://pglite.dev) (Postgres em WebAssembly), e guarda os dados no próprio navegador: mesmas regras, mesmos cálculos e mesmas validações do site com API. O botão **Recomeçar** apaga tudo e volta ao início.
 
 Para rodar na sua máquina, instale as dependências do `backend` e do `frontend` (`npm install` em cada pasta) e, em `frontend`:
 

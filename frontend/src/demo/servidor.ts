@@ -12,7 +12,6 @@ import { settingsRouter } from '../../../backend/src/routes/settings'
 import { statsRouter } from '../../../backend/src/routes/stats'
 import { testsRouter } from '../../../backend/src/routes/tests'
 import { workoutsRouter } from '../../../backend/src/routes/workouts'
-import { popularDemonstracao } from './dados'
 import { RespostaDemo, type PedidoDemo, type RouterDemo } from './express'
 
 /** O atleta da demonstração: único, sem senha, nunca admin. */
@@ -40,8 +39,11 @@ function envolver(cliente: PGlite | Transaction): Queryable {
   }
 }
 
-/** Apaga tudo do visitante (na ordem do painel admin, por causa das FKs com RESTRICT) e cria de novo. */
-async function recriarVisitante(db: Database, executar: Executar, hoje: Date) {
+/**
+ * Visitante zerado, como uma conta recém-criada: só o catálogo padrão de exercícios, sem nenhum registro.
+ * Apaga o que houver antes (na ordem do painel admin, por causa das FKs com RESTRICT).
+ */
+async function recriarVisitante(db: Database) {
   await db.transaction(async (tx) => {
     await tx.query('DELETE FROM practice_sessions WHERE user_id = $1', [ID_VISITANTE])
     await tx.query('DELETE FROM workouts WHERE user_id = $1', [ID_VISITANTE])
@@ -50,11 +52,7 @@ async function recriarVisitante(db: Database, executar: Executar, hoje: Date) {
       `INSERT INTO users (id, name, email, password_hash) VALUES ($1, 'Visitante', 'visitante@demo.local', '-')`,
       [ID_VISITANTE],
     )
-    await tx.query('DROP TABLE IF EXISTS demo_pronta')
   })
-  await popularDemonstracao(executar, hoje)
-  // Só marca como pronta no fim: se a aba fechar no meio, a próxima visita recomeça do zero.
-  await db.query('CREATE TABLE demo_pronta (em timestamptz NOT NULL DEFAULT now())')
 }
 
 export interface ServidorDemo {
@@ -63,8 +61,8 @@ export interface ServidorDemo {
   fechar: () => Promise<void>
 }
 
-/** `dados`: "idb://nome" guarda no navegador; vazio, só em memória (testes). `hoje` fixa a data nos testes. */
-export async function criarServidor({ dados, hoje = () => new Date() }: { dados?: string; hoje?: () => Date } = {}) {
+/** `dados`: "idb://nome" guarda no navegador; vazio, só em memória (testes). */
+export async function criarServidor({ dados }: { dados?: string } = {}) {
   const pg = await PGlite.create(dados)
   await pg.exec(`SET TIME ZONE 'UTC'`)
   const db = await prepareDatabase({
@@ -126,21 +124,21 @@ export async function criarServidor({ dados, hoje = () => new Date() }: { dados?
     }
   }
 
-  const pronta = await one(db, `SELECT to_regclass('demo_pronta') IS NOT NULL AS existe`)
-  if (!(pronta as { existe: boolean }).existe) await recriarVisitante(db, executar, hoje())
+  if (!(await visitante())) await recriarVisitante(db)
 
   return {
     executar,
-    recomecar: () => recriarVisitante(db, executar, hoje()),
+    recomecar: () => recriarVisitante(db),
     fechar: () => pg.close(),
   } satisfies ServidorDemo
 }
 
 let servidor: Promise<ServidorDemo> | null = null
 
-/** O servidor do navegador, criado (e populado na primeira visita) no primeiro pedido. */
+/** O servidor do navegador, criado no primeiro pedido. */
 export function servidorDoNavegador() {
-  servidor ??= criarServidor({ dados: 'idb://basketball-practice-demo' })
+  // "-v2": a primeira versão vinha com dados de exemplo; quem já tinha aberto também começa do zero.
+  servidor ??= criarServidor({ dados: 'idb://basketball-practice-demo-v2' })
   return servidor
 }
 
@@ -154,7 +152,7 @@ export async function responder(metodo: string, caminho: string, corpo?: unknown
   })
 }
 
-/** Apaga o que o visitante fez e volta aos dados de exemplo. */
+/** Apaga tudo o que o visitante registrou e volta ao app zerado. */
 export async function recomecarDemonstracao() {
   await (await servidorDoNavegador()).recomecar()
 }
