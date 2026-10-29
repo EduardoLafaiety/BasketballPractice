@@ -58,7 +58,19 @@ const CAMINHOS = {
       <path d="M8 6h8M8 11h.01M12 11h.01M16 11h.01M8 15h.01M12 15h.01M16 15h.01M8 19h.01M12 19h.01M16 19h.01" />
     </>
   ),
-  fogo:<path d="M12 3c1 3.5 5 5.5 5 10a5 5 0 0 1-10 0c0-2 1-3.5 2-4.5 0 2 1 3 2 3 0-3.5-1-6 1-8.5z" />,
+  medalha: (
+    <>
+      <circle cx="12" cy="15" r="6" />
+      <path d="M8.5 10.2 6 2h4l2 5 2-5h4l-2.5 8.2M12 12.5v5" />
+    </>
+  ),
+  cadeado: (
+    <>
+      <rect x="5" y="11" width="14" height="10" rx="2" />
+      <path d="M8 11V7a4 4 0 0 1 8 0v4" />
+    </>
+  ),
+  fogo: <path d="M12 3c1 3.5 5 5.5 5 10a5 5 0 0 1-10 0c0-2 1-3.5 2-4.5 0 2 1 3 2 3 0-3.5-1-6 1-8.5z" />,
 }
 
 export type NomeIcone = keyof typeof CAMINHOS

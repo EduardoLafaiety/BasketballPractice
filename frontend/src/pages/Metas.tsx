@@ -2,7 +2,7 @@ import { useMemo, useState, type FormEvent } from 'react'
 import BarraProgresso from '../components/BarraProgresso'
 import { AvisoDesatualizado, Carregando, ErroCarga } from '../components/Estado'
 import GraficoLinha from '../components/GraficoLinha'
-import Icone from '../components/Icone'
+import Icone, { type NomeIcone } from '../components/Icone'
 import { dataLocal } from '../api'
 import { formatarData, useDrills, useMetas, useProgresso, useTestes, useTiposTeste } from '../store'
 import type { Meta, TipoMeta, TipoTeste } from '../types'
@@ -15,6 +15,19 @@ const TIPOS: Record<TipoMeta, { rotulo: string; unidade: string; exemplo: string
   minutos_total: { rotulo: 'Minutos a partir de hoje', unidade: 'min', exemplo: '20 horas de quadra' },
   cestas_total: { rotulo: 'Cestas a partir de hoje', unidade: 'cestas', exemplo: '1.000 lances livres convertidos', comExercicio: true },
   dias_seguidos: { rotulo: 'Dias seguidos treinando', unidade: 'dias', exemplo: '10 dias sem falhar' },
+}
+
+/** Ícone de cada conquista desbloqueada, pelo que ela mede; as que não estão aqui usam a medalha. */
+const ICONE_CONQUISTA: Record<string, NomeIcone> = {
+  '3-dias': 'fogo',
+  '7-dias': 'fogo',
+  '30-dias': 'fogo',
+  '10-horas': 'relogio',
+  '100-num-dia': 'bola',
+  '1000-cestas': 'bola',
+  'sequencia-10': 'metas',
+  'sequencia-25': 'metas',
+  'teste-fisico': 'raio',
 }
 
 export default function Metas() {
@@ -50,7 +63,9 @@ export default function Metas() {
           <ul className="conquistas">
             {progresso.conquistas.map((c) => (
               <li key={c.id} className={`card conquista ${c.desbloqueada ? 'desbloqueada' : ''}`}>
-                <span className="conquista-icone" aria-hidden>{c.desbloqueada ? '🏆' : '🔒'}</span>
+                <span className="conquista-icone">
+                  <Icone nome={c.desbloqueada ? (ICONE_CONQUISTA[c.id] ?? 'medalha') : 'cadeado'} tamanho={22} />
+                </span>
                 <div>
                   <strong>{c.titulo}</strong>
                   <span className="meta">{c.descricao}</span>
