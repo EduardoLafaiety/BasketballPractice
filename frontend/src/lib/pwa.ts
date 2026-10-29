@@ -24,7 +24,7 @@ export function iniciarPwa() {
   // Só em produção: em dev o cache do service worker atrapalharia o recarregamento do Vite.
   if (import.meta.env.PROD && 'serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/sw.js').catch((e) => console.warn('Service worker não registrado', e))
+      navigator.serviceWorker.register(`${import.meta.env.BASE_URL}sw.js`).catch((e) => console.warn('Service worker não registrado', e))
     })
   }
 }

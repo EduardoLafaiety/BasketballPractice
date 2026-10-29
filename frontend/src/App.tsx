@@ -1,4 +1,4 @@
-import { Route, Routes } from 'react-router-dom'
+import { Navigate, Route, Routes } from 'react-router-dom'
 import { RequerAdmin, RequerLogin } from './auth'
 import Layout from './components/Layout'
 import Inicio from './pages/Inicio'
@@ -18,8 +18,9 @@ import Admin from './pages/Admin'
 export default function App() {
   return (
     <Routes>
-      <Route path="entrar" element={<Entrar modo="entrar" />} />
-      <Route path="cadastro" element={<Entrar modo="cadastro" />} />
+      {/* Na demonstração não há contas: login e cadastro levam direto ao app. */}
+      <Route path="entrar" element={__DEMO__ ? <Navigate to="/" replace /> : <Entrar modo="entrar" />} />
+      <Route path="cadastro" element={__DEMO__ ? <Navigate to="/" replace /> : <Entrar modo="cadastro" />} />
       <Route
         element={
           <RequerLogin>

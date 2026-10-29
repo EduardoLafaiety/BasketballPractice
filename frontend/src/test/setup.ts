@@ -27,7 +27,7 @@ afterEach(() => {
   cleanup()
   definirToken(null)
   limparCache()
-  localStorage.clear()
+  globalThis.localStorage?.clear() // os testes da demonstração rodam em Node, sem localStorage
   vi.unstubAllGlobals()
   vi.restoreAllMocks()
   vi.useRealTimers()

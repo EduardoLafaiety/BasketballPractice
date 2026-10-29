@@ -1,8 +1,11 @@
 // Service worker do Basketball Practice: deixa o app abrir sem internet.
 // Guarda só a "casca" do site (HTML, JS, CSS, ícones). Respostas da API nunca são guardadas:
 // os dados do atleta ficam no servidor e não sobram no aparelho depois do logout.
-const VERSAO = 'bp-v2'
-const CASCA = ['/', '/index.html', '/manifest.webmanifest', '/icon.svg']
+const VERSAO = 'bp-v3'
+// Caminhos relativos ao escopo: o site pode estar em / ou numa subpasta (ex.: /BasketballPractice/ no GitHub Pages).
+const BASE = new URL(self.registration.scope).pathname
+const INDEX = BASE + 'index.html'
+const CASCA = [BASE, INDEX, BASE + 'manifest.webmanifest', BASE + 'icon.svg']
 
 self.addEventListener('install', (evento) => {
   evento.waitUntil(caches.open(VERSAO).then((cache) => cache.addAll(CASCA)).then(() => self.skipWaiting()))
@@ -20,7 +23,7 @@ self.addEventListener('activate', (evento) => {
 self.addEventListener('fetch', (evento) => {
   const { request } = evento
   const url = new URL(request.url)
-  if (request.method !== 'GET' || url.origin !== self.location.origin || url.pathname.startsWith('/api/')) return
+  if (request.method !== 'GET' || url.origin !== self.location.origin || url.pathname.startsWith(BASE + 'api/')) return
 
   // Páginas: rede primeiro (versão nova), cache se estiver offline.
   if (request.mode === 'navigate') {
@@ -28,10 +31,10 @@ self.addEventListener('fetch', (evento) => {
       fetch(request)
         .then((resposta) => {
           const copia = resposta.clone()
-          caches.open(VERSAO).then((cache) => cache.put('/index.html', copia))
+          caches.open(VERSAO).then((cache) => cache.put(INDEX, copia))
           return resposta
         })
-        .catch(() => caches.match('/index.html')),
+        .catch(() => caches.match(INDEX)),
     )
     return
   }
@@ -42,7 +45,7 @@ self.addEventListener('fetch', (evento) => {
       (guardado) =>
         guardado ??
         fetch(request).then((resposta) => {
-          if (resposta.ok && (url.pathname.startsWith('/assets/') || CASCA.includes(url.pathname))) {
+          if (resposta.ok && (url.pathname.startsWith(BASE + 'assets/') || CASCA.includes(url.pathname))) {
             const copia = resposta.clone()
             caches.open(VERSAO).then((cache) => cache.put(request, copia))
           }
@@ -58,7 +61,7 @@ self.addEventListener('notificationclick', (evento) => {
   evento.waitUntil(
     self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((janelas) => {
       const aberta = janelas.find((j) => 'focus' in j)
-      return aberta ? aberta.focus() : self.clients.openWindow('/')
+      return aberta ? aberta.focus() : self.clients.openWindow(BASE)
     }),
   )
 })

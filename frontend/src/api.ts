@@ -21,6 +21,7 @@ import type {
   Zona,
 } from './types'
 
+
 // Em dev o Vite faz proxy de /api para o backend (vite.config.ts).
 const BASE = (import.meta.env.VITE_API_URL ?? '/api').replace(/\/$/, '')
 const CHAVE_TOKEN = 'bp.token'
@@ -35,7 +36,8 @@ export class ApiError extends Error {
   }
 }
 
-let token: string | null = lerToken()
+// Na demonstração não há login: o visitante já entra com a sessão aberta.
+let token: string | null = __DEMO__ ? 'demo' : lerToken()
 let aoExpirar: (() => void) | null = null
 
 function lerToken() {
@@ -66,15 +68,19 @@ export function aoTokenExpirar(fn: (() => void) | null) {
 async function request<T>(metodo: string, caminho: string, corpo?: unknown): Promise<T> {
   let resposta: Response
   try {
-    resposta = await fetch(`${BASE}${caminho}`, {
-      method: metodo,
-      headers: {
-        ...(corpo !== undefined ? { 'Content-Type': 'application/json' } : {}),
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      },
-      body: corpo === undefined ? undefined : JSON.stringify(corpo),
-    })
-  } catch {
+    resposta = __DEMO__
+      ? // Demonstração: a API real roda no próprio navegador (src/demo/servidor.ts).
+        await (await import('@demo/servidor')).responder(metodo, caminho, corpo)
+      : await fetch(`${BASE}${caminho}`, {
+          method: metodo,
+          headers: {
+            ...(corpo !== undefined ? { 'Content-Type': 'application/json' } : {}),
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
+          body: corpo === undefined ? undefined : JSON.stringify(corpo),
+        })
+  } catch (erro) {
+    if (__DEMO__) console.error('Demonstração indisponível', erro)
     throw new ApiError(0, 'Não foi possível falar com o servidor. Verifique sua conexão.')
   }
 

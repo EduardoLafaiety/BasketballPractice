@@ -19,6 +19,8 @@ Um app web para atletas planejarem o que treinar, registrarem cada arremesso e a
 
 [Funcionalidades](#-funcionalidades) · [Telas](#-telas) · [Como rodar](#-como-rodar) · [Arquitetura](#-arquitetura) · [Documentação](docs/DOCUMENTACAO.md)
 
+**[▶ Experimente a demonstração](https://eduardolafaiety.github.io/BasketballPractice/)**: sem cadastro, com dados de exemplo, direto no navegador.
+
 <br />
 
 <img src="docs/screenshots/inicio.png" alt="Tela inicial com o treino do dia, sequência de dias e números da semana" width="900" />
@@ -121,6 +123,18 @@ npm run admin -- seu@email.com
 ```
 
 O link **Admin** aparece no menu. Para tirar o papel, acrescente `--remover`.
+
+### Versão de demonstração (sem banco nem API)
+
+A [demonstração online](https://eduardolafaiety.github.io/BasketballPractice/) é o mesmo site, sem login, com cerca de 8 semanas de treinos de exemplo. Ela roda **as rotas reais do backend dentro do navegador**, sobre o [PGlite](https://pglite.dev) (Postgres em WebAssembly), e guarda os dados no próprio navegador: mesmas regras, mesmos cálculos e mesmas validações do site com API. O botão **Recomeçar** volta aos dados de exemplo.
+
+Para rodar na sua máquina, instale as dependências do `backend` e do `frontend` (`npm install` em cada pasta) e, em `frontend`:
+
+```bash
+npm run dev:demo
+```
+
+Ela é publicada no GitHub Pages pelo workflow [`demo.yml`](.github/workflows/demo.yml) a cada push na `main`. O código fica em [`frontend/src/demo`](frontend/src/demo) e só entra no build com `--mode demo`: o site normal não carrega nada dela.
 
 ## 🧱 Arquitetura
 
