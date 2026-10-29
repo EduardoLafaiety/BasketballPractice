@@ -179,3 +179,40 @@ export interface Config {
   lembretes: { ativo: boolean; horario: string; dias: DiaSemana[] }
   metronomoBpm: number
 }
+
+export type Posicao = 'Armador' | 'Ala' | 'Pivô'
+
+/** Fatia da sessão de um estilo por categoria; as fatias somam 100. */
+export interface FatiaEstilo {
+  categoria: Categoria
+  porcentagem: number
+}
+
+export interface EstiloResumo {
+  id: string
+  nome: string
+  posicao: Posicao
+  arquetipo: string
+  totalMovimentos: number
+  minutos: number
+  divisao: FatiaEstilo[]
+}
+
+export interface MovimentoEstilo {
+  nome: string
+  descricao: string
+  dica: string
+  dose: string
+  minutos: number
+  /** Exercício do catálogo usado para treinar o movimento; null se sumiu do catálogo. */
+  exercicio: { drillId: string; nome: string; categoria: Categoria; metrica: Metrica } | null
+}
+
+export interface Estilo extends EstiloResumo {
+  alturaCm: number
+  ritmo: string
+  resumo: string
+  mentalidade: string
+  movimentos: MovimentoEstilo[]
+  sessao: (BlocoPlano & { dose: string })[]
+}

@@ -97,6 +97,21 @@
         "VITE_BASE": "/BasketballPractice/"
       },
       "port": 5178
+    },
+    {
+      "name": "demo-dev",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "--prefix",
+        "frontend",
+        "run",
+        "dev:demo",
+        "--",
+        "--port",
+        "5179",
+        "--strictPort"
+      ],
+      "port": 5179
     }
   ]
 }

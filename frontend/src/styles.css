@@ -739,3 +739,72 @@ section + section, .card + section { margin-top: 1.5rem; }
 }
 .faixa-demo p { margin: 0; }
 .faixa-demo .botao-link { min-height: 44px; }
+
+/* Jogue como: estilos de jogo de jogadores da NBA */
+.grade-jogadores { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1.25rem; }
+.cartao-jogador { display: flex; flex-direction: column; padding: 0; overflow: hidden; color: var(--texto); text-decoration: none; transition: transform 0.15s, border-color 0.15s; }
+.cartao-jogador:hover { transform: translateY(-2px); border-color: var(--texto); }
+.cartao-jogador:hover img { transform: scale(1.03); }
+.cartao-jogador-info { display: flex; flex-direction: column; gap: 0.35rem; flex: 1; padding: 1rem 1.25rem 1.25rem; }
+.cartao-jogador-info h3, .cartao-jogador-info p { margin: 0; }
+.cartao-jogador-info p { font-size: 0.9rem; }
+.cartao-jogador-rodape { margin-top: auto; padding-top: 0.75rem; display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--laranja-texto); }
+.barra-divisao { display: flex; gap: 2px; height: 6px; margin-top: 0.4rem; border-radius: 1px; overflow: hidden; }
+.barra-divisao span { background: var(--c); }
+
+.foto-jogador { position: relative; aspect-ratio: 4 / 3; max-width: 100%; overflow: hidden; background: var(--superficie-2); border-bottom: 1px solid var(--borda); display: grid; place-items: center; }
+.foto-jogador::after { content: ''; position: absolute; inset: auto 0 0; height: 6px; background: var(--c, var(--laranja)); }
+.foto-jogador img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center top; transition: transform 0.3s; }
+.foto-jogador-iniciais { font-family: var(--fonte-display); font-size: 4rem; color: var(--muted); }
+.foto-jogador-grande { aspect-ratio: 4 / 5; border: 1px solid var(--borda); border-radius: var(--raio); }
+.credito-foto { font-size: 0.72rem; color: var(--muted); margin: 0.4rem 0 0; }
+.credito-foto a { color: inherit; }
+.aviso-estilos { margin-top: 2.5rem; max-width: 70ch; }
+
+.estilo-topo { display: grid; grid-template-columns: minmax(0, 320px) minmax(0, 1fr); gap: 2rem; align-items: start; }
+.estilo-texto { min-width: 0; }
+.estilo-texto h1 { margin-top: 0.5rem; }
+.estilo-ficha { display: flex; flex-wrap: wrap; gap: 0.5rem 1.75rem; margin: 1rem 0 1.25rem; }
+.estilo-ficha dt { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
+.estilo-ficha dd { margin: 0; }
+.estilo-resumo { font-size: 1.05rem; max-width: 62ch; }
+.estilo-divisao { display: grid; gap: 0.45rem; max-width: 520px; }
+.estilo-divisao-linha { display: grid; grid-template-columns: 130px 1fr 44px; align-items: center; gap: 0.75rem; font-size: 0.85rem; }
+.estilo-divisao-linha .trilho { height: 8px; background: var(--superficie-2); border-radius: 1px; overflow: hidden; }
+.estilo-divisao-linha .trilho span { display: block; height: 100%; background: var(--c); }
+.estilo-divisao-linha .meta { text-align: right; font-variant-numeric: tabular-nums; }
+.estilo-faixa { margin-top: 2.5rem; }
+
+.movimentos { display: grid; gap: 1rem; }
+.movimento { display: grid; grid-template-columns: 52px minmax(0, 1fr) minmax(0, 280px); gap: 1.25rem; align-items: start; }
+.movimento-numero { font-family: var(--fonte-display); font-size: 2.4rem; line-height: 1; color: var(--c); }
+.movimento-corpo { min-width: 0; }
+.movimento-corpo h3 { margin: 0.4rem 0; }
+.movimento-corpo p { margin: 0 0 0.6rem; }
+.movimento-dica { font-size: 0.9rem; color: var(--muted); border-left: 2px solid var(--c); padding-left: 0.75rem; }
+.movimento-exercicio { display: flex; flex-direction: column; gap: 0.2rem; min-width: 0; padding: 0.9rem 1rem; border-radius: 2px; background: var(--superficie-2); color: var(--texto); text-decoration: none; border: 1px solid transparent; }
+.movimento-exercicio:hover { border-color: var(--texto); }
+
+.estilo-plano { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 320px); gap: 1.25rem; align-items: start; }
+.estilo-plano .plano { margin-top: 0; }
+.estilo-plano .plano-item { grid-template-columns: auto auto minmax(0, 1fr); }
+.estilo-plano .plano-item .meta { grid-column: 3; text-align: left; }
+.estilo-lado { display: flex; flex-direction: column; gap: 0.75rem; }
+.estilo-lado .btn { width: 100%; }
+.estilo-mentalidade { font-size: 1.1rem; font-weight: 600; line-height: 1.4; margin: 0.5rem 0 0; }
+
+@media (max-width: 960px) {
+  .movimento { grid-template-columns: 40px minmax(0, 1fr); }
+  .movimento-exercicio { grid-column: 2; }
+  .estilo-plano { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 760px) {
+  .estilo-topo { grid-template-columns: minmax(0, 1fr); }
+  .foto-jogador-grande { aspect-ratio: 16 / 11; }
+}
+@media (max-width: 560px) {
+  .estilo-divisao-linha { grid-template-columns: 100px 1fr 40px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cartao-jogador, .foto-jogador img { transition: none; }
+}

@@ -28,6 +28,7 @@ const CAMINHOS = {
     </>
   ),
   ferramentas: <path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18v3h3l6.3-6.3a4 4 0 0 0 5.4-5.4l-2.6 2.6-2.4-.6-.6-2.4z" />,
+  jogador: <path d="M8 3h2a2 2 0 0 0 4 0h2l1 4-2 2v12H9V9L7 7z" />,
   admin: <path d="M12 3 4 6v6c0 4.5 3.4 8.3 8 9 4.6-.7 8-4.5 8-9V6z" />,
   config: (
     <>

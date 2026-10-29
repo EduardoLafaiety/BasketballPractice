@@ -12,6 +12,7 @@ import FaixaDemo from '../demo/FaixaDemo'
 const LINKS: { to: string; rotulo: string; icone: NomeIcone; fim?: boolean }[] = [
   { to: '/', rotulo: 'Início', icone: 'inicio', fim: true },
   { to: '/treinos', rotulo: 'Treinos', icone: 'treinos' },
+  { to: '/jogue-como', rotulo: 'Jogue como', icone: 'jogador' },
   { to: '/rotina', rotulo: 'Rotina', icone: 'rotina' },
   { to: '/desempenho', rotulo: 'Desempenho', icone: 'desempenho' },
   { to: '/metas', rotulo: 'Metas', icone: 'metas' },
