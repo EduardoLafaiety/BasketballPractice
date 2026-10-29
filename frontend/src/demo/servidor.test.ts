@@ -29,7 +29,7 @@ async function esperarZerado(get: <T>(caminho: string) => Promise<T>) {
   expect((await get<{ attempts: number }[]>(`/stats/zones?${FUSO}`)).every((z) => z.attempts === 0)).toBe(true)
   // Só o catálogo padrão, nenhum exercício próprio.
   const exercicios = await get<{ custom: boolean }[]>('/exercises')
-  expect(exercicios).toHaveLength(14)
+  expect(exercicios).toHaveLength(23)
   expect(exercicios.some((e) => e.custom)).toBe(false)
 }
 

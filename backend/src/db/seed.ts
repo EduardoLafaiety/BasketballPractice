@@ -1,4 +1,4 @@
-import { one, type Database } from './index.js'
+import type { Database } from './index.js'
 
 type SeedExercise = [name: string, category: string, metric: string, description: string]
 
@@ -17,16 +17,31 @@ const catalog: SeedExercise[] = [
   ['Closeout', 'defesa', 'repeticoes', 'Sair do garrafão até a linha de 3 e fechar o arremessador com passos curtos.'],
   ['Suicídio', 'condicionamento', 'tempo', 'Corridas de ida e volta às linhas da quadra.'],
   ['Saltos na caixa', 'condicionamento', 'repeticoes', 'Saltos explosivos para melhorar a impulsão.'],
+  // Movimentos usados pelos estilos de jogo (aba "Jogue como").
+  ['Corta-luz com cadeira', 'passe', 'repeticoes', 'Uma cadeira faz o papel do pivô: sair raspando o bloqueio e escolher entre arremesso, bandeja ou passe na parede.'],
+  ['Step-back de três', 'arremesso', 'acertos', 'Dois dribles para a frente, recuo empurrando com o pé da frente e arremesso de três em base larga.'],
+  ['Hesitação em linha reta', 'drible', 'repeticoes', 'Drible de fundo a fundo alternando desaceleração e explosão no primeiro passo.'],
+  ['Fadeaway do cotovelo', 'arremesso', 'acertos', 'De costas para a cesta no cotovelo do garrafão, giro sobre o pé de apoio e arremesso caindo para trás.'],
+  ['Floater em uma perna', 'finalizacao', 'acertos', 'Saída com um pé só a dois passos do aro, soltando a bola alta com a ponta dos dedos.'],
+  ['Bandeja com contato', 'finalizacao', 'acertos', 'Bandejas absorvendo contato de uma almofada ou de um parceiro, protegendo a bola com as duas mãos.'],
+  ['Eurostep entre cones', 'finalizacao', 'acertos', 'Dois passos em direções opostas entre os cones e bandeja longe do defensor.'],
+  ['Trabalho de pés no poste baixo', 'finalizacao', 'repeticoes', 'Drop step e meia-volta dos dois lados do garrafão, terminando com bandeja ou gancho.'],
+  ['Corre e arremessa', 'arremesso', 'acertos', 'Corridas entre dois cones com um arremesso de três cada vez que chegar na linha.'],
 ]
 
-// Popula o catálogo padrão (exercícios sem dono) apenas na primeira execução.
+// Insere no catálogo padrão (exercícios sem dono) o que ainda não estiver lá, pelo nome: um banco novo
+// recebe tudo e um banco antigo só os exercícios adicionados depois. O catálogo não pode ser apagado nem
+// renomeado pela API, então nada volta sem querer. Um exercício do atleta com o mesmo nome não conta.
 export async function seed(db: Database) {
   await db.transaction(async (tx) => {
     await tx.query('SELECT pg_advisory_xact_lock(4242)')
-    if (await one(tx, 'SELECT 1 FROM exercises WHERE user_id IS NULL LIMIT 1')) return
-
     for (const exercise of catalog) {
-      await tx.query('INSERT INTO exercises (name, category, metric, description) VALUES ($1, $2, $3, $4)', exercise)
+      await tx.query(
+        `INSERT INTO exercises (name, category, metric, description)
+         SELECT $1, $2, $3, $4
+         WHERE NOT EXISTS (SELECT 1 FROM exercises WHERE user_id IS NULL AND name = $1)`,
+        exercise,
+      )
     }
   })
 }

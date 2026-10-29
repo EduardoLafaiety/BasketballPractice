@@ -81,10 +81,11 @@ function random(seed: number) {
   }
 }
 
-const visibleExercises = (db: Queryable, userId: number) =>
+const visibleExercises = (db: Queryable, userId: number, catalogFirst = false) =>
   many<ExerciseRow>(
     db,
-    'SELECT id, name, category, metric FROM exercises WHERE user_id IS NULL OR user_id = $1 ORDER BY id',
+    `SELECT id, name, category, metric FROM exercises WHERE user_id IS NULL OR user_id = $1
+     ORDER BY ${catalogFirst ? 'user_id NULLS FIRST, ' : ''}id`,
     [userId],
   )
 
@@ -134,8 +135,9 @@ export function plansRouter(db: Database) {
 
   // Modelos com os ids dos exercícios já resolvidos; nomes que sumiram do catálogo são ignorados.
   router.get('/templates', async (req, res) => {
-    const exercises = await visibleExercises(db, currentUser(req))
-    // Ordenados por id, o catálogo vem antes: um exercício do atleta com o mesmo nome não o substitui.
+    // O catálogo vem antes: um exercício do atleta com o mesmo nome não o substitui, mesmo que seja mais
+    // antigo que um exercício acrescentado ao catálogo depois.
+    const exercises = await visibleExercises(db, currentUser(req), true)
     const byName = new Map<string, ExerciseRow>()
     for (const exercise of exercises) if (!byName.has(exercise.name)) byName.set(exercise.name, exercise)
     res.json(
