@@ -5,6 +5,7 @@ import { Carregando, ErroCarga } from '../components/Estado'
 import { coreografiaDe } from '../demonstracoes/coreografias'
 import Demonstracao from '../demonstracoes/Demonstracao'
 import FormExercicio from '../components/FormExercicio'
+import { ROTULO_NIVEL } from '../lib/niveis'
 import { useTelaLigada } from '../lib/telaLigada'
 import { ROTULO_METRICA, useDrills, useSessoes } from '../store'
 
@@ -115,6 +116,7 @@ export default function TreinoDetalhe() {
           <div className="drill-card-topo">
             <span className={`tag tag-${drill.categoria}`}>{drill.categoria}</span>
             <span className="meta">{ROTULO_METRICA[drill.metrica]}</span>
+            {drill.nivel && <span className="meta">{ROTULO_NIVEL[drill.nivel]}{drill.aquecimento ? ' · Aquecimento' : ''}</span>}
           </div>
           <h1>{drill.nome}</h1>
           <p className="muted">{drill.descricao}</p>

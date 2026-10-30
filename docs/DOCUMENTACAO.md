@@ -28,7 +28,7 @@ O **Basketball Practice** é um app web para **um atleta individual** de basquet
 
 | Área | O que faz | Onde está |
 | --- | --- | --- |
-| **Treinos** | Biblioteca de exercícios (arremesso, drible, passe, finalização, defesa, condicionamento), com cronômetro e registro de sessão | [Treinos.tsx](../frontend/src/pages/Treinos.tsx), [TreinoDetalhe.tsx](../frontend/src/pages/TreinoDetalhe.tsx) |
+| **Treinos** | Biblioteca dividida em iniciante, intermediário e avançado, cada nível com seu aquecimento em ordem de progressão. Exercícios (arremesso, drible, passe, finalização, defesa, condicionamento), com cronômetro e registro de sessão | [Treinos.tsx](../frontend/src/pages/Treinos.tsx), [TreinoDetalhe.tsx](../frontend/src/pages/TreinoDetalhe.tsx) |
 | **Rotina** | Plano semanal: quais exercícios fazer em cada dia | [Rotina.tsx](../frontend/src/pages/Rotina.tsx) |
 | **Desempenho** | Totais de sessões, minutos, aproveitamento nos arremessos, gráfico dos últimos 7 dias e histórico | [Desempenho.tsx](../frontend/src/pages/Desempenho.tsx), [Inicio.tsx](../frontend/src/pages/Inicio.tsx) |
 
@@ -254,7 +254,7 @@ As versões vêm de [frontend/package.json](../frontend/package.json) e [backend
 | **Consultas parametrizadas** | Valores vão separados do SQL (`$1`, `$2`), o que impede SQL injection. | todas as rotas, ex.: [routes/auth.ts:38](../backend/src/routes/auth.ts#L38) |
 | **Transações** | Várias operações que acontecem "tudo ou nada" (`BEGIN`/`COMMIT`/`ROLLBACK`): sessão e suas entradas são gravadas juntas. | [db/index.ts:37](../backend/src/db/index.ts#L37), [routes/sessions.ts:164](../backend/src/routes/sessions.ts#L164) |
 | **Migrações / esquema do banco** | O esquema é uma lista versionada de scripts SQL. Ao iniciar, a API aplica só os que faltam e registra a versão em `schema_migrations`. Um *advisory lock* impede duas instâncias de migrarem ao mesmo tempo. Nunca se edita uma migração já aplicada; adiciona-se outra. | [db/migrations.ts:4](../backend/src/db/migrations.ts#L4), [db/migrations.ts:77](../backend/src/db/migrations.ts#L77) |
-| **Seed** | Dados iniciais: 23 exercícios do catálogo padrão. Roda a cada início e insere só os que faltam, pelo nome, então um banco antigo recebe os exercícios novos. | [db/seed.ts](../backend/src/db/seed.ts) |
+| **Seed** | Dados iniciais: o catálogo padrão ([catalog.ts](../backend/src/db/catalog.ts)), com pelo menos 50 exercícios e um aquecimento em cada nível (iniciante, intermediário e avançado). Roda a cada início e insere só os que faltam, pelo nome, então um banco antigo recebe os exercícios novos. | [db/seed.ts](../backend/src/db/seed.ts) |
 | **Containers** | Um processo isolado com tudo que precisa (aqui, o Postgres), descrito em arquivo e reproduzível. O volume mantém os dados entre reinícios; o healthcheck diz quando está pronto. | [docker-compose.yml](../backend/docker-compose.yml) |
 | **Desligamento gracioso** | Ao receber `SIGINT`/`SIGTERM`, o servidor para de aceitar conexões e fecha o pool antes de sair. | [server.ts:10](../backend/src/server.ts#L10) |
 | **Injeção de dependência simples** | `createApp(db)` e cada `xxxRouter(db)` recebem o banco como parâmetro, então os testes passam um banco diferente. | [app.ts:13](../backend/src/app.ts#L13) |

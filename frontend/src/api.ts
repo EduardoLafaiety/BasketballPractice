@@ -6,6 +6,7 @@ import type {
   Conquista,
   DiaSemana,
   Drill,
+  Nivel,
   Estilo,
   EstiloResumo,
   FatiaEstilo,
@@ -149,6 +150,9 @@ interface ExerciseApi {
   category: string
   metric: Metrica
   description: string | null
+  level?: Nivel | null
+  warmup?: boolean
+  position?: number | null
   custom: boolean
 }
 
@@ -255,6 +259,9 @@ const paraDrill = (e: ExerciseApi): Drill => ({
   metrica: e.metric,
   descricao: e.description ?? '',
   personalizado: e.custom,
+  nivel: e.level ?? undefined,
+  aquecimento: e.warmup ?? false,
+  ordem: e.position ?? undefined,
 })
 
 function paraSessao(s: SessionApi): Sessao {
@@ -521,7 +528,7 @@ export const api = {
     }))
   },
 
-  async gerarTreino(minutos: number, foco: Categoria[], aquecimento: boolean, semente?: number) {
+  async gerarTreino(minutos: number, foco: Categoria[], aquecimento: boolean, semente?: number, nivel?: Nivel) {
     const r = await request<{
       minutes: number
       blocks: { exerciseId: number; name: string; category: string; metric: Metrica; minutes: number }[]
@@ -530,6 +537,7 @@ export const api = {
       focus: foco.map((c) => CATEGORIA_API[c]),
       warmup: aquecimento,
       seed: semente,
+      level: nivel,
     })
     return r.blocks.map(
       (b): BlocoPlano => ({

@@ -37,7 +37,7 @@ describe('Gerador de treino', () => {
     await user.click(screen.getByRole('button', { name: 'Gerar treino' }))
 
     expect(await screen.findByRole('heading', { name: 'Seu treino' })).toBeInTheDocument()
-    expect(ultima('POST', '/plans/generate')?.corpo).toEqual({ minutes: 45, focus: ['arremesso'], warmup: false })
+    expect(ultima('POST', '/plans/generate')?.corpo).toEqual({ minutes: 45, focus: ['arremesso'], warmup: false, level: 'iniciante' })
     expect(screen.getByRole('button', { name: 'Gerar outro' })).toBeInTheDocument()
   })
 

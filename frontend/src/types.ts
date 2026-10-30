@@ -9,6 +9,8 @@ export type Categoria =
 /** Como o treino é medido: acertos/tentativas, repetições ou tempo. */
 export type Metrica = 'acertos' | 'repeticoes' | 'tempo'
 
+export type Nivel = 'iniciante' | 'intermediario' | 'avancado'
+
 export interface Drill {
   id: string
   nome: string
@@ -17,6 +19,12 @@ export interface Drill {
   descricao: string
   /** Criado pelo próprio atleta (não faz parte do catálogo padrão). */
   personalizado: boolean
+  /** Nível no catálogo padrão; exercício do atleta não tem. */
+  nivel?: Nivel
+  /** Faz parte do aquecimento do nível, não dos exercícios principais. */
+  aquecimento?: boolean
+  /** Posição na progressão do catálogo. */
+  ordem?: number
 }
 
 export interface Sessao {

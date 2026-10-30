@@ -10,6 +10,11 @@ describe('Coreografias', () => {
     expect(nomes.sort()).toEqual(catalog.map(([nome]) => nome).sort())
   })
 
+  it('cada figura é um movimento próprio, sem quadros repetidos de outra', () => {
+    const repetidas = nomes.filter((n, i) => nomes.findIndex((m) => JSON.stringify(COREOGRAFIAS[m].quadros) === JSON.stringify(COREOGRAFIAS[n].quadros)) !== i)
+    expect(repetidas).toEqual([])
+  })
+
   it('exercício criado pelo atleta não tem demonstração, mesmo com nome do catálogo', () => {
     expect(coreografiaDe('Lance livre', false)).toBe(COREOGRAFIAS['Lance livre'])
     expect(coreografiaDe('Lance livre', true)).toBeUndefined()
