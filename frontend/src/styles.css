@@ -763,7 +763,7 @@ section + section, .card + section { margin-top: 1.5rem; }
 
 .estilo-topo { display: grid; grid-template-columns: minmax(0, 320px) minmax(0, 1fr); gap: 2rem; align-items: start; }
 .estilo-texto { min-width: 0; }
-.estilo-texto h1 { margin-top: 0.5rem; }
+.estilo-texto h1 { margin-top: 0.9rem; }
 .estilo-ficha { display: flex; flex-wrap: wrap; gap: 0.5rem 1.75rem; margin: 1rem 0 1.25rem; }
 .estilo-ficha dt { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
 .estilo-ficha dd { margin: 0; }
@@ -773,7 +773,7 @@ section + section, .card + section { margin-top: 1.5rem; }
 .estilo-divisao-linha .trilho { height: 8px; background: var(--superficie-2); border-radius: 1px; overflow: hidden; }
 .estilo-divisao-linha .trilho span { display: block; height: 100%; background: var(--c); }
 .estilo-divisao-linha .meta { text-align: right; font-variant-numeric: tabular-nums; }
-.estilo-faixa { margin-top: 2.5rem; }
+.stats.faixa.estilo-faixa { margin-top: 2.5rem; }
 
 .movimentos { display: grid; gap: 1rem; }
 .movimento { display: grid; grid-template-columns: 52px minmax(0, 1fr) minmax(0, 280px); gap: 1.25rem; align-items: start; }

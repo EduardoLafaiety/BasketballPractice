@@ -73,6 +73,14 @@ Um app web para atletas planejarem o que treinar, registrarem cada arremesso e a
     <td align="center"><b>Treinos</b> · biblioteca por categoria</td>
     <td align="center"><b>Ferramentas</b> · timer, contador, metrônomo e mais</td>
   </tr>
+  <tr>
+    <td><img src="docs/screenshots/jogue-como.png" alt="Aba Jogue como com os cards dos jogadores da NBA e filtro por posição" /></td>
+    <td><img src="docs/screenshots/jogue-como-perfil.png" alt="Perfil do Luka Dončić com a divisão do treino e os movimentos-assinatura" /></td>
+  </tr>
+  <tr>
+    <td align="center"><b>Jogue como</b> · 20 jogadores da NBA, filtro por posição</td>
+    <td align="center"><b>Perfil do jogador</b> · estilo, movimentos e treino pronto</td>
+  </tr>
 </table>
 
 <div align="center">
@@ -161,7 +169,7 @@ flowchart LR
 | **Frontend** | React 18, TypeScript, Vite, React Router, CSS puro, service worker, IndexedDB (vídeos) |
 | **Backend** | Node.js 24, Express 5, Zod, JWT, senhas com `scrypt`, SQL escrito à mão com `pg` |
 | **Banco** | PostgreSQL 17 no Docker Compose, migrações versionadas |
-| **Testes** | `node:test` + PGlite na API; Vitest + Testing Library no site |
+| **Testes** | `node:test` + PGlite na API; Vitest + Testing Library no site; Playwright + Postgres de ponta a ponta |
 
 <details>
 <summary><b>Estrutura de pastas</b></summary>
@@ -175,7 +183,7 @@ BasketballPractice/
 │   │   ├── db/               conexão, migrações e catálogo de exercícios
 │   │   ├── lib/              senha, JWT, validação e erros HTTP
 │   │   ├── middleware/       autenticação, admin e tratamento de erros
-│   │   ├── routes/           auth, admin, exercises, workouts, sessions, stats, goals, tests, plans, settings, data
+│   │   ├── routes/           auth, admin, exercises, workouts, sessions, stats, goals, tests, plans, styles, settings, data
 │   │   └── scripts/          comando para promover administradores
 │   ├── test/                 testes de integração com PGlite
 │   └── docker-compose.yml
@@ -185,6 +193,7 @@ BasketballPractice/
 │       ├── pages/            uma página por rota
 │       ├── components/       quadra, gráficos, cartões e layout
 │       ├── ferramentas/      timer, contador, metrônomo, vídeo e calculadoras
+│       ├── assets/jogadores/ fotos dos jogadores (Wikimedia Commons) e créditos
 │       ├── demo/             versão de demonstração: a API rodando no navegador
 │       ├── api.ts            cliente da API
 │       └── store.ts          estado e cache
@@ -201,8 +210,8 @@ BasketballPractice/
 
 | Onde | Comando | Ferramentas | O que cobre |
 | --- | --- | --- | --- |
-| **API** | `cd backend && npm test` | `node:test` + PGlite | A API inteira contra um Postgres em memória: cadastro e login, tokens adulterados e vencidos, isolamento entre atletas em cada recurso, validações, sessões, estatísticas com fuso horário, mapa de arremessos, metas, conquistas, gerador, backup tudo-ou-nada e permissões de admin |
-| **Site** | `cd frontend && npm test` | Vitest + Testing Library | Cálculos, CSV, lembretes, cliente da API, quadra, contador, login e cadastro, rotas protegidas, painel admin, início, biblioteca e criação de exercícios, desempenho (totais, comparações, gráficos, mapa, excluir sessão), ferramentas (calculadoras, timer, metrônomo, contador de arremessos), sessão guiada, registro de treino, rotina, metas, gerador e configurações |
+| **API** | `cd backend && npm test` | `node:test` + PGlite | A API inteira contra um Postgres em memória: cadastro e login, tokens adulterados e vencidos, isolamento entre atletas em cada recurso, validações, sessões, estatísticas com fuso horário, mapa de arremessos, metas, conquistas, gerador, estilos de jogo ligados ao catálogo, catálogo que recebe exercícios novos em bancos antigos, backup tudo-ou-nada e permissões de admin |
+| **Site** | `cd frontend && npm test` | Vitest + Testing Library | Cálculos, CSV, lembretes, cliente da API, quadra, contador, login e cadastro, rotas protegidas, painel admin, início, biblioteca e criação de exercícios, desempenho (totais, comparações, gráficos, mapa, excluir sessão), ferramentas (calculadoras, timer, metrônomo, contador de arremessos), sessão guiada, registro de treino, rotina, metas, gerador, a aba Jogue como (lista, filtro, perfil, sessão guiada) com foto e crédito para cada jogador, e configurações |
 
 | **Ponta a ponta** | `cd e2e && npm test` | Playwright + Chrome + Postgres 17 | O site de produção no navegador falando com a API real e um Postgres de verdade: cadastro, login e volta à página pedida, e-mail repetido, rotina do dia → sessão guiada → desempenho, metas e conquistas, exercício próprio que não pode ser excluído quando está em uso, meta semanal no fuso do atleta, tema salvo na conta, backup sem duplicar, painel admin, navegação no celular e a aba Jogue como (os 20 estilos ligados ao catálogo do Postgres, filtro, perfil, sessão guiada salva no banco e treino do estilo na rotina) |
 
