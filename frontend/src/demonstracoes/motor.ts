@@ -384,7 +384,7 @@ export function pegadas(anim: Animacao): Pegada[] {
       const faixa = anim.frente ? 0 : pe === 'F' ? -9 : 9
       const ponto = { x: tornozelo.x + (anim.frente ? 0 : k.dir * 4), y: faixa + k.prof * 14 }
       const antes = ultimo[pe]
-      if (antes && Math.abs(antes.x - ponto.x) < (anim.frente ? 12 : 6) && Math.abs(antes.y - ponto.y) < 4) continue
+      if (antes && Math.abs(antes.x - ponto.x) < (anim.frente ? 12 : 10) && Math.abs(antes.y - ponto.y) < 4) continue
       ultimo[pe] = ponto
       lista.push({ ...ponto, pe, fase: k.fase, tempo: k.tempo, dir: k.dir })
     }
