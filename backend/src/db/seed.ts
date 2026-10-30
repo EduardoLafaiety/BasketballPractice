@@ -2,7 +2,7 @@ import type { Database } from './index.js'
 
 type SeedExercise = [name: string, category: string, metric: string, description: string]
 
-const catalog: SeedExercise[] = [
+export const catalog: SeedExercise[] = [
   ['Lance livre', 'arremesso', 'acertos', 'Arremessos da linha de lance livre, mantendo a mesma rotina antes de cada tentativa.'],
   ['Arremesso de média distância', 'arremesso', 'acertos', 'Arremessos parados de 5 pontos ao redor do garrafão.'],
   ['Arremesso de três', 'arremesso', 'acertos', 'Arremessos de 3 pontos das cinco posições: zonas mortas, 45° e topo.'],

@@ -2,6 +2,8 @@ import { useEffect, useState, type FormEvent } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import Contador, { useContador, zonasParaLista } from '../components/Contador'
 import { Carregando, ErroCarga } from '../components/Estado'
+import { coreografiaDe } from '../demonstracoes/coreografias'
+import Demonstracao from '../demonstracoes/Demonstracao'
 import FormExercicio from '../components/FormExercicio'
 import { useTelaLigada } from '../lib/telaLigada'
 import { ROTULO_METRICA, useDrills, useSessoes } from '../store'
@@ -55,6 +57,7 @@ export default function TreinoDetalhe() {
   const mm = String(Math.floor(segundos / 60)).padStart(2, '0')
   const ss = String(segundos % 60).padStart(2, '0')
   const contaArremessos = drill.metrica === 'acertos'
+  const coreografia = coreografiaDe(drill.nome, drill.personalizado)
   const a = acertos === '' ? contador.acertos : Number(acertos)
   const t = tentativas === '' ? contador.tentativas : Number(tentativas)
   const arremessoInvalido = contaArremessos && a > t
@@ -131,6 +134,13 @@ export default function TreinoDetalhe() {
                 setEditando(false)
               }}
             />
+          )}
+
+          {coreografia && (
+            <>
+              <h2>Como fazer</h2>
+              <Demonstracao coreografia={coreografia} nome={drill.nome} />
+            </>
           )}
 
           <h2>Como registrar</h2>

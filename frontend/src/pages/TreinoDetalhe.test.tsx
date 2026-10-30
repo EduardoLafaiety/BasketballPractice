@@ -1,4 +1,4 @@
-import { act, screen } from '@testing-library/react'
+import { act, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import { definirToken } from '../api'
@@ -134,6 +134,34 @@ describe('Exercício', () => {
   it('avisa quando o exercício não existe', async () => {
     abrirTreino(999)
     expect(await screen.findByText(/Treino não encontrado/)).toBeInTheDocument()
+  })
+
+  it('mostra a demonstração passo a passo dos exercícios do catálogo', async () => {
+    const user = userEvent.setup()
+    abrirTreino(2)
+    await screen.findByRole('heading', { name: 'Saltos na caixa' })
+    const demo = screen.getByRole('region', { name: 'Demonstração: Saltos na caixa' })
+    const passos = within(demo).getAllByRole('listitem')
+    expect(passos.map((p) => p.querySelector('strong')?.textContent)).toEqual([
+      'Carregue.',
+      'Salto explosivo.',
+      'Aterrisse macio.',
+      'Desça com controle.',
+    ])
+
+    await user.click(within(passos[2]).getByRole('button'))
+    expect(passos[2]).toHaveAttribute('aria-current', 'step')
+    expect(within(demo).getByRole('button', { name: /Animar/ })).toBeInTheDocument()
+
+    await user.click(within(demo).getByRole('button', { name: 'Passo anterior' }))
+    expect(passos[1]).toHaveAttribute('aria-current', 'step')
+  })
+
+  it('exercício criado pelo atleta não tem demonstração', async () => {
+    abrirTreino(4)
+    await screen.findByRole('heading', { name: 'Meu floater' })
+    expect(screen.queryByRole('heading', { name: 'Como fazer' })).toBeNull()
+    expect(screen.queryByRole('region', { name: /Demonstração/ })).toBeNull()
   })
 
   it('só deixa editar e excluir exercícios criados pelo atleta', async () => {

@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
 import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import Contador, { useContador, zonasParaLista } from '../components/Contador'
 import { Carregando, ErroCarga } from '../components/Estado'
+import ComoFazer from '../demonstracoes/ComoFazer'
 import type { DadosZonas } from '../components/Quadra'
 import { bipe, vibrar } from '../lib/audio'
 import { useTelaLigada } from '../lib/telaLigada'
@@ -193,6 +194,7 @@ function Execucao({ plano }: { plano: PlanoGuiado }) {
       <span className={`tag tag-${bloco.categoria}`}>{bloco.categoria}</span>
       <h1 className="guiada-nome">{bloco.nome}</h1>
       <p className="meta">{ROTULO_METRICA[bloco.metrica]}</p>
+      <ComoFazer key={indice} drillId={bloco.drillId} nome={bloco.nome} />
 
       <div className={`guiada-relogio ${acabou ? 'esgotado' : ''}`} aria-live="off">
         {acabou ? `+${relogio(-restante)}` : relogio(restante)}

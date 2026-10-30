@@ -808,3 +808,54 @@ section + section, .card + section { margin-top: 1.5rem; }
 @media (prefers-reduced-motion: reduce) {
   .cartao-jogador, .foto-jogador img { transition: none; }
 }
+
+/* Demonstração animada do exercício (manequim) */
+.demo { display: grid; gap: 0.75rem; margin: 1.25rem 0 1.5rem; }
+.demo-cena { width: 100%; height: auto; display: block; border: 1px solid var(--borda); border-radius: var(--raio); background: var(--superficie); }
+.demo-piso { fill: var(--superficie-2); }
+.demo-linha { stroke: var(--borda); stroke-width: 1.5; }
+.demo-mapa { fill: var(--superficie-2); }
+.demo-legenda { font-size: 12px; fill: var(--muted); }
+.demo-trilha { stroke: var(--borda); stroke-dasharray: 3 5; }
+.demo-corpo path { stroke: #3a3936; stroke-width: 1.4; stroke-linejoin: round; }
+.demo-perto { fill: #e4e2dc; }
+.demo-longe { fill: #a9a7a0; }
+.demo-corpo path.demo-musculo { fill: var(--laranja); }
+.demo-corpo path.demo-longe.demo-musculo { fill: #c95a12; }
+.demo-fantasma { transition: opacity 0.25s; }
+.demo-fantasma path { fill: none; stroke: var(--muted); stroke-width: 1; opacity: 0.55; }
+.demo-parceiro path { fill: var(--borda); stroke: none; }
+.demo-bola { fill: var(--laranja); stroke: #8a3a08; stroke-width: 1.2; }
+.demo-tabela { stroke: var(--muted); stroke-width: 4; stroke-linecap: round; }
+.demo-tabela-frente { fill: none; stroke: var(--muted); stroke-width: 2.5; }
+.demo-poste { stroke: var(--borda); stroke-width: 3; }
+.demo-aro { fill: none; stroke: var(--laranja-escuro); stroke-width: 3; stroke-linecap: round; }
+.demo-rede { fill: none; stroke: var(--muted); stroke-width: 1; opacity: 0.7; }
+.demo-cone { fill: var(--laranja); }
+.demo-marca-chao { fill: var(--muted); }
+.demo-parede, .demo-caixa { fill: var(--superficie-2); stroke: var(--muted); stroke-width: 1.5; }
+.demo-cadeira { fill: none; stroke: var(--muted); stroke-width: 4; stroke-linecap: round; }
+.demo-pegada-frente { fill: var(--laranja); }
+.demo-pegada-tras { fill: var(--muted); }
+.demo-pegada-num { font-size: 9px; font-weight: 700; fill: var(--bg); }
+.demo-controles { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
+.demo-tocar { min-width: 7rem; justify-content: center; }
+.demo-espaco { flex: 1; }
+.demo-opcao { display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.85rem; color: var(--muted); }
+.demo-opcao input[type='checkbox'] { accent-color: var(--laranja); }
+.demo-amostra { width: 0.75rem; height: 0.75rem; border-radius: 2px; background: var(--laranja); }
+.demo-velocidade { width: auto; padding: 0.3rem 0.5rem; }
+.demo-passos { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.25rem; }
+.demo-passos button {
+  display: flex; gap: 0.75rem; width: 100%; text-align: left; padding: 0.55rem 0.75rem;
+  background: none; border: 0; border-left: 2px solid transparent; color: var(--muted); font: inherit; font-size: 0.9rem; cursor: pointer;
+}
+.demo-passos b { color: var(--texto); min-width: 1.25rem; font-family: var(--fonte-display); font-weight: 400; }
+.demo-passos strong { color: var(--texto); font-weight: 600; }
+.demo-passos .atual button { background: var(--superficie-2); border-left-color: var(--laranja); color: var(--texto); }
+.demo-passos .atual b { color: var(--laranja-texto); }
+.guiada-demo { width: 100%; text-align: left; }
+.guiada-demo summary { cursor: pointer; color: var(--laranja-texto); font-weight: 600; }
+@media (prefers-reduced-motion: reduce) {
+  .demo-fantasma { transition: none; }
+}
