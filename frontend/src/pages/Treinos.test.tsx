@@ -56,6 +56,41 @@ function abrir(rotas: Parameters<typeof apiFalsa>[0], rota = '/treinos') {
   return api
 }
 
+const doNivel = (id: number, name: string, level: string, position: number, warmup = false) => ({ ...exercicio(id, name, 'arremesso', 'acertos'), level, position, warmup })
+
+describe('Níveis', () => {
+  const niveis = [
+    doNivel(11, 'Arremesso de três', 'avancado', 9),
+    doNivel(12, 'Arremesso a um metro', 'iniciante', 3),
+    doNivel(13, 'Arremesso dois passos atrás', 'iniciante', 2, true),
+    doNivel(14, 'Arremesso colado à cesta', 'iniciante', 1, true),
+    doNivel(15, 'Receber e arremessar', 'intermediario', 5),
+    exercicio(16, 'Meu exercício', 'arremesso', 'acertos', null, true),
+  ]
+
+  it('abre no iniciante, com o aquecimento em ordem antes dos exercícios', async () => {
+    abrir({ 'GET /auth/me': usuarioFalso(), 'GET /settings': configFalsa, 'GET /exercises': niveis })
+    const aquecimento = await screen.findByRole('region', { name: 'Aquecimento' })
+    expect(within(aquecimento).getAllByRole('heading', { level: 3 }).map((h) => h.textContent)).toEqual(['Arremesso colado à cesta', 'Arremesso dois passos atrás'])
+    expect(within(aquecimento).getByText('Passo 1')).toBeInTheDocument()
+    expect(within(screen.getByRole('region', { name: 'Exercícios' })).getAllByRole('heading', { level: 3 }).map((h) => h.textContent)).toEqual(['Arremesso a um metro', 'Meu exercício'])
+    expect(screen.getByRole('button', { name: /Iniciante/ })).toHaveAttribute('aria-pressed', 'true')
+  })
+
+  it('troca de nível mantendo os exercícios do atleta', async () => {
+    const user = userEvent.setup()
+    abrir({ 'GET /auth/me': usuarioFalso(), 'GET /settings': configFalsa, 'GET /exercises': niveis })
+    await user.click(await screen.findByRole('button', { name: /Avançado/ }))
+    expect(nomesNaTela()).toEqual(['Arremesso de três', 'Meu exercício'])
+    expect(screen.queryByRole('region', { name: 'Aquecimento' })).toBeNull()
+  })
+
+  it('abre direto no nível pedido no link', async () => {
+    abrir({ 'GET /auth/me': usuarioFalso(), 'GET /settings': configFalsa, 'GET /exercises': niveis }, '/treinos?nivel=intermediario')
+    await waitFor(() => expect(nomesNaTela()).toEqual(['Receber e arremessar', 'Meu exercício']))
+  })
+})
+
 /** Nomes dos exercícios nos cartões da biblioteca, na ordem da tela. */
 const nomesNaTela = () => screen.queryAllByRole('heading', { level: 3 }).map((h) => h.textContent)
 

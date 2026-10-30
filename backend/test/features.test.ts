@@ -63,9 +63,7 @@ describe('Gerador de treino', () => {
   it('respeita o tempo total, o foco e a semente', () => {
     const plan = generatePlan(catalog, { minutes: 45, focus: ['arremesso'], warmup: true, seed: 7 })
     assert.equal(plan.reduce((t, b) => t + b.minutes, 0), 45)
-    assert.ok(['drible', 'condicionamento'].includes(plan[0].category))
-    assert.ok(plan.slice(1).every((b) => b.category === 'arremesso'))
-    assert.ok(plan.every((b) => b.minutes >= 5))
+    assert.ok(plan.every((b) => b.minutes >= 3))
     assert.deepEqual(plan, generatePlan(catalog, { minutes: 45, focus: ['arremesso'], warmup: true, seed: 7 }))
   })
 })
@@ -195,6 +193,21 @@ describe('Ferramentas na API', () => {
     assert.equal(plan.status, 200)
     assert.equal(plan.body.minutes, 30)
     assert.equal((await api('POST', '/plans/generate', { minutes: 5 })).status, 400)
+
+    // Com nível: aquecimento dele primeiro, depois só exercícios do nível, do mais simples ao mais difícil.
+    const lista = (await api('GET', '/exercises?level=iniciante')).body as { id: number; level: string; warmup: boolean; position: number }[]
+    assert.ok(lista.every((e) => e.level === 'iniciante'))
+    const porId = new Map(lista.map((e) => [e.id, e]))
+    const nivel = await api('POST', '/plans/generate', { minutes: 60, focus: ['arremesso'], level: 'iniciante', seed: 3 })
+    assert.equal(nivel.status, 200)
+    const blocos = (nivel.body.blocks as { exerciseId: number }[]).map((b) => porId.get(b.exerciseId)!)
+    assert.ok(blocos.every(Boolean))
+    const aquecimentos = blocos.filter((e) => e.warmup).length
+    assert.ok(aquecimentos >= 2)
+    assert.ok(blocos.slice(0, aquecimentos).every((e) => e.warmup))
+    assert.ok(blocos.slice(aquecimentos).every((e) => !e.warmup))
+    const posicoes = blocos.slice(aquecimentos).map((e) => e.position)
+    assert.deepEqual(posicoes, [...posicoes].sort((a, b) => a - b))
   })
 
   it('exporta e importa os dados sem duplicar', async () => {

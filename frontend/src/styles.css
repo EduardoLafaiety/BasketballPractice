@@ -867,6 +867,16 @@ section + section, .card + section { margin-top: 1.5rem; }
 .plano-item::before { content: counter(passo); font-family: var(--fonte-display); font-weight: var(--peso-display); font-size: 1.3rem; color: var(--laranja-texto); min-width: 1.2rem; }
 .plano-item .meta { text-align: right; }
 .guiada { display: grid; justify-items: center; text-align: center; gap: 0.75rem; max-width: 560px; margin: 0 auto; }
+.niveis { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.5rem; margin: 1rem 0 0.5rem; }
+.nivel-opcao { display: grid; gap: 0.15rem; padding: 0.75rem 1rem; text-align: left; background: var(--superficie); color: var(--texto); border: 1px solid var(--borda); border-radius: var(--raio); cursor: pointer; font: inherit; }
+.nivel-opcao span { color: var(--muted); font-size: 0.8rem; }
+.nivel-opcao:hover { border-color: var(--texto); }
+.nivel-opcao.ativo { background: var(--texto); color: var(--bg); border-color: var(--texto); }
+.nivel-opcao.ativo span { color: inherit; opacity: 0.75; }
+@media (max-width: 560px) {
+  .nivel-opcao { padding: 0.6rem 0.35rem; text-align: center; font-size: 0.82rem; }
+  .nivel-opcao span { font-size: 0.7rem; }
+}
 .guiada:has(.demo) { max-width: 1040px; }
 .guiada-treino { width: 100%; display: grid; gap: 1.5rem; align-items: start; }
 .guiada-treino:has(.demo) { grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); }

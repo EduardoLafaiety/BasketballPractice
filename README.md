@@ -34,7 +34,8 @@ Um app web para atletas planejarem o que treinar, registrarem cada arremesso e a
 | | Recurso | O que faz |
 | :-: | --- | --- |
 | 🗓️ | **Rotina semanal** | Monte o que treinar em cada dia ou comece de um modelo pronto. A tela inicial já mostra o treino de hoje. |
-| ⚡ | **Gerador de treino** | Diga quanto tempo tem e o foco (arremesso, drible, defesa…): o app monta a sessão com a biblioteca de exercícios. |
+| 📶 | **Níveis** | Treinos dividido em iniciante, intermediário e avançado, cada um com pelo menos 50 exercícios e um aquecimento próprio, sempre do mais simples ao mais difícil. |
+| ⚡ | **Gerador de treino** | Diga quanto tempo tem, o nível e o foco (arremesso, drible, defesa…): o app começa pelo aquecimento e monta a sessão do mais fácil ao mais difícil. |
 | 🏀 | **Jogue como** | Escolha um jogador da NBA (Luka, Curry, Jokić, Wembanyama e mais 16) e treine os movimentos que definem o estilo dele, com uma sessão pronta. |
 | 🎬 | **Como fazer** | Cada exercício do catálogo tem uma animação de um manequim mostrando o movimento passo a passo, com os músculos em ação, o rastro das poses e as pegadas vistas de cima. |
 | ▶️ | **Sessão guiada** | Passo a passo do treino com cronômetro, contador de acertos e registro automático no fim. |

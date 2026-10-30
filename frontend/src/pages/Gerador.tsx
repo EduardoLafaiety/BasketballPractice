@@ -2,8 +2,9 @@ import { useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { api } from '../api'
 import { CATEGORIAS } from '../components/FormExercicio'
+import { NIVEIS } from '../lib/niveis'
 import { DIAS, ROTULO_METRICA, useRotina } from '../store'
-import type { BlocoPlano, Categoria, DiaSemana } from '../types'
+import type { BlocoPlano, Categoria, DiaSemana, Nivel } from '../types'
 import type { PlanoGuiado } from './SessaoGuiada'
 
 const ORDEM_DIAS: DiaSemana[] = [1, 2, 3, 4, 5, 6, 0]
@@ -12,6 +13,7 @@ export default function Gerador() {
   const navigate = useNavigate()
   const rotina = useRotina()
   const [minutos, setMinutos] = useState(45)
+  const [nivel, setNivel] = useState<Nivel>('iniciante')
   const [foco, setFoco] = useState<Categoria[]>([])
   const [aquecimento, setAquecimento] = useState(true)
   const [blocos, setBlocos] = useState<BlocoPlano[] | null>(null)
@@ -28,7 +30,7 @@ export default function Gerador() {
     setErro(null)
     setAviso(null)
     try {
-      setBlocos(await api.gerarTreino(minutos, foco, aquecimento))
+      setBlocos(await api.gerarTreino(minutos, foco, aquecimento, undefined, nivel))
     } catch (e) {
       setErro((e as Error).message)
     } finally {
@@ -75,6 +77,16 @@ export default function Gerador() {
           <input type="range" min={10} max={120} step={5} value={minutos} onChange={(e) => setMinutos(Number(e.target.value))} />
         </label>
         <fieldset className="fieldset">
+          <legend>Nível</legend>
+          <div className="chips">
+            {NIVEIS.map((n) => (
+              <button key={n.id} type="button" className={`chip ${nivel === n.id ? 'ativo' : ''}`} aria-pressed={nivel === n.id} onClick={() => setNivel(n.id)}>
+                {n.rotulo}
+              </button>
+            ))}
+          </div>
+        </fieldset>
+        <fieldset className="fieldset">
           <legend>Foco (vazio = treino completo)</legend>
           <div className="chips">
             {CATEGORIAS.map((c) => (
@@ -92,7 +104,7 @@ export default function Gerador() {
         </fieldset>
         <label className="check">
           <input type="checkbox" checked={aquecimento} onChange={(e) => setAquecimento(e.target.checked)} />
-          Começar com 5 min de aquecimento
+          Começar com aquecimento do nível
         </label>
         <button className="btn btn-primario" type="submit" disabled={gerando}>
           {gerando ? 'Montando…' : blocos ? 'Gerar outro' : 'Gerar treino'}

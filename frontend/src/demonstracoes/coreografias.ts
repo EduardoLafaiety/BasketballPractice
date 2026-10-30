@@ -1,82 +1,15 @@
 // Coreografias das demonstrações: uma por exercício do catálogo padrão, pelo nome (backend/src/db/seed.ts).
 // Cada quadro é uma pose-chave; os ângulos estão explicados em motor.ts. Na vista de lado o boneco olha
 // para a cesta (direita); na vista de frente, "F" é a perna da direita da tela e "P" o braço da direita.
-import { esqueleto, POSE_NEUTRA, type Bola, type Coreografia, type Pose, type Quadro } from './motor'
-
-type P = Partial<Pose>
-
-// Pernas
-const EM_PE: P = { t: 3, cF: 8, kF: 0, cT: -6, kT: -6 }
-const BASE: P = { t: 15, cF: 35, kF: 0, cT: -5, kT: -30 }
-const CARGA: P = { t: 15, cF: 45, kF: -8, cT: 10, kT: -32 }
-const SALTO: P = { t: 0, cF: 8, kF: 0, cT: -5, kT: -10 }
-const ATERRISSA: P = { t: 10, cF: 30, kF: -5, cT: 0, kT: -25 }
-const CORRE_A: P = { t: 15, cF: 30, kF: 5, cT: -35, kT: -85 }
-const CORRE_B: P = { t: 15, cF: -35, kF: -85, cT: 30, kT: 5 }
-// Braços
-const DRIBLE: P = { bP: 25, aP: 70, bL: 40, aL: 100 }
-const PEITO: P = { bP: 30, aP: 120, bL: 35, aL: 115 }
-const PRONTO: P = { bP: 50, aP: 95, bL: 55, aL: 95 }
-const ARMAR: P = { bP: 150, aP: 180, bL: 140, aL: 170 }
-const SOLTAR: P = { bP: 165, aP: 165, bL: 160, aL: 160 }
-const FINAL: P = { bP: 160, aP: 110, bL: 150, aL: 140 }
-const SOLTOS: P = { bP: 5, aP: 20, bL: -5, aL: 10 }
-// Vista de frente
-const F_PE: P = { t: 0, cF: 6, kF: 0, cT: -6, kT: 0, eF: 1, eT: 1 }
-const F_BASE: P = { t: 0, cF: 22, kF: -6, cT: -22, kT: 6, eF: 0.85, eT: 0.85 }
-
-/** Bola caindo pela rede até o chão. */
-const NA_REDE: Bola = { m: 'voo', para: 'aro', p: 1, alt: 110 }
-const NO_CHAO: Bola = { m: 'voo', para: 'aro', p: 1.94, alt: 110 }
-const voo = (p: number, alt = 110): Bola => ({ m: 'voo', para: 'aro', p, alt })
-const mao = (d: number, lado: 'P' | 'L' = 'P'): Bola => ({ m: 'mao', d, lado })
-
-/** Passadas de corrida alternando as pernas; com bola, ela quica a cada passada. */
-function correr(xs: number[], fase: number, bola: 'drible' | 'drible-L' | 'sem' = 'drible', extra: (i: number) => Partial<Quadro> = () => ({})): Quadro[] {
-  return xs.map((x, i) => {
-    const a = i % 2 === 0
-    const pernas = a ? CORRE_A : CORRE_B
-    const bracos: P =
-      bola === 'sem' ? (a ? { bP: -35, aP: 10, bL: 40, aL: 110 } : { bP: 40, aP: 110, bL: -35, aL: 10 })
-      : bola === 'drible-L' ? { bL: 30, aL: 75, bP: a ? -30 : 35, aP: a ? 20 : 100 }
-      : { bP: 30, aP: 75, bL: a ? 40 : -30, aL: a ? 110 : 20 }
-    const quique = bola === 'sem' ? undefined : mao(a ? 1 : 0, bola === 'drible-L' ? 'L' : 'P')
-    return { d: 200, fase, x, ...pernas, ...bracos, bola: quique, ...extra(i) }
-  })
-}
-
-/** Final de arremesso: sobe, solta, a bola cai na cesta e o atleta aterrissa. */
-function arremesso(x: number, fase: number, alt = 110, extra: Partial<Quadro> = {}, faseSoltura = fase + 1): Quadro[] {
-  return [
-    { d: 300, fase, x, ...SALTO, ar: 22, ...ARMAR, bola: { m: 'cima' }, hl: ['pF', 'pT'], ...extra },
-    { d: 140, fase: faseSoltura, x, ...SALTO, ar: 26, ...SOLTAR, bola: { m: 'cima' }, hl: ['bP'], ...extra },
-    { d: 330, fase: faseSoltura, x, ...SALTO, ar: 16, ...FINAL, bola: voo(0.6, alt), hl: ['bP'], ...extra },
-    { d: 380, fase: faseSoltura, x, ...ATERRISSA, ar: 0, ...FINAL, bola: voo(1, alt), ...extra },
-    { d: 900, fase: faseSoltura, x, ...ATERRISSA, ...SOLTOS, bola: voo(1.94, alt), ...extra },
-  ]
-}
-
-/** Deslizamento lateral (vista de frente): abre o pé que lidera e recolhe o outro, sem cruzar. */
-function deslizar(inicio: number, passos: number, sentido: 1 | -1, fases: [number, number]) {
-  const bracos: P = { bP: 75, aP: 140, bL: -75, aL: -140 }
-  const fechado: P = { t: 0, cF: 35, kF: -5, cT: -35, kT: 5, eF: 0.8, eT: 0.8, ...bracos }
-  const aberto: P = sentido === 1 ? { ...fechado, cF: 62, kF: 2, eF: 1 } : { ...fechado, cT: -62, kT: -2, eT: 1 }
-  const pe = (p: P, qual: 'F' | 'T') => {
-    const e = esqueleto({ ...POSE_NEUTRA, ...p }, 0, 0, true)
-    return qual === 'F' ? e.tornozeloF.x : e.tornozeloT.x
-  }
-  const lider = sentido === 1 ? 'F' : 'T'
-  const outro = sentido === 1 ? 'T' : 'F'
-  const quadros: Quadro[] = []
-  let parado = inicio + pe(fechado, outro)
-  for (let i = 0; i < passos; i++) {
-    quadros.push({ d: 260, fase: fases[0], x: parado, pe: outro, ...aberto, hl: [sentido === 1 ? 'pF' : 'pT'] })
-    const apoio = parado - pe(aberto, outro) + pe(aberto, lider)
-    quadros.push({ d: 240, fase: fases[1], x: apoio, pe: lider, ...fechado, hl: [sentido === 1 ? 'pT' : 'pF'] })
-    parado = apoio - pe(fechado, lider) + pe(fechado, outro)
-  }
-  return { quadros, fim: parado - pe(fechado, outro) }
-}
+import type { Coreografia, Quadro } from './motor'
+import { AQUECIMENTOS } from './figuras-aquecimento'
+import { FIGURAS_AVANCADO } from './figuras-avancado'
+import { FIGURAS_INICIANTE } from './figuras-iniciante'
+import { FIGURAS_INTERMEDIARIO } from './figuras-intermediario'
+import {
+  ARMAR, arremesso, ATERRISSA, BASE, CARGA, correr, CORRE_A, CORRE_B, deslizar, DRIBLE, EM_PE, F_BASE, F_PE, FINAL,
+  mao, NA_REDE, NO_CHAO, PEITO, PRONTO, SALTO, SOLTAR, SOLTOS, voo,
+} from './pecas'
 
 const IDA = deslizar(200, 7, 1, [1, 2])
 const VOLTA = deslizar(IDA.fim, 7, -1, [3, 3])
@@ -87,6 +20,11 @@ const ARREMESSO_TEXTO = {
 }
 
 export const COREOGRAFIAS: Record<string, Coreografia> = {
+  ...AQUECIMENTOS,
+  ...FIGURAS_INICIANTE,
+  ...FIGURAS_INTERMEDIARIO,
+  ...FIGURAS_AVANCADO,
+
   'Lance livre': {
     cena: { cesta: 'lado', linhas: [300] },
     fases: [

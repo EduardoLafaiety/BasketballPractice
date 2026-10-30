@@ -1,5 +1,6 @@
 import { Router } from 'express'
 import { z } from 'zod'
+import { LEVELS } from '../db/catalog.js'
 import { many, type Database, type Queryable } from '../db/index.js'
 import { HttpError } from '../lib/http-error.js'
 import { parse } from '../lib/validate.js'
@@ -63,11 +64,12 @@ const TEMPLATES: { id: string; name: string; description: string; days: Partial<
 const generateSchema = z.object({
   minutes: z.number().int().min(10).max(180),
   focus: z.array(z.enum(CATEGORIES)).max(CATEGORIES.length).default([]),
+  level: z.enum(LEVELS).optional(),
   warmup: z.boolean().default(true),
   seed: z.number().int().optional(),
 })
 
-type ExerciseRow = { id: number; name: string; category: string; metric: string }
+type ExerciseRow = { id: number; name: string; category: string; metric: string; level?: string | null; warmup?: boolean; position?: number | null }
 
 // Gerador pseudoaleatório com semente (mulberry32): a mesma semente gera o mesmo treino.
 function random(seed: number) {
@@ -84,7 +86,7 @@ function random(seed: number) {
 const visibleExercises = (db: Queryable, userId: number, catalogFirst = false) =>
   many<ExerciseRow>(
     db,
-    `SELECT id, name, category, metric FROM exercises WHERE user_id IS NULL OR user_id = $1
+    `SELECT id, name, category, metric, level, warmup, position FROM exercises WHERE user_id IS NULL OR user_id = $1
      ORDER BY ${catalogFirst ? 'user_id NULLS FIRST, ' : ''}id`,
     [userId],
   )
@@ -101,16 +103,23 @@ export function generatePlan(exercises: ExerciseRow[], input: z.infer<typeof gen
   const pick = <T>(list: T[]) => list[Math.floor(rand() * list.length)]
   const focus = input.focus.length ? input.focus : [...CATEGORIES]
   const used = new Set<number>()
-  const blocks: (ExerciseRow & { minutes: number })[] = []
+  const warmups: (ExerciseRow & { minutes: number })[] = []
+  const main: (ExerciseRow & { minutes: number })[] = []
+  // Exercício do atleta não tem nível e serve para todos; o aquecimento nunca entra na parte principal.
+  const ofLevel = exercises.filter((e) => !input.level || !e.level || e.level === input.level)
+  const pool = ofLevel.filter((e) => !e.warmup)
 
   let remaining = input.minutes
   if (input.warmup && remaining >= 20) {
-    const options = exercises.filter((e) => e.category === 'drible' || e.category === 'condicionamento')
-    if (options.length) {
-      const warmup = pick(options)
+    const options = ofLevel.filter((e) => e.warmup)
+    const general = options.filter((e) => e.category === 'condicionamento')
+    // O aquecimento específico segue a ordem da lista: no arremesso, sempre de perto para longe da cesta.
+    const specific = options.filter((e) => e.category !== 'condicionamento' && focus.includes(e.category as (typeof focus)[number]))
+    const chosen = [general.length ? pick(general) : undefined, ...specific.slice(0, remaining >= 45 ? 2 : 1)].filter((e) => e !== undefined)
+    for (const warmup of chosen.length ? chosen : options.slice(0, 1)) {
       used.add(warmup.id)
-      blocks.push({ ...warmup, minutes: 5 })
-      remaining -= 5
+      warmups.push({ ...warmup, minutes: 3 })
+      remaining -= 3
     }
   }
 
@@ -118,14 +127,18 @@ export function generatePlan(exercises: ExerciseRow[], input: z.infer<typeof gen
   // Começa por uma categoria aleatória e alterna entre as do foco para variar o treino.
   let category = Math.floor(rand() * focus.length)
   for (const duration of minutes) {
-    const ofCategory = exercises.filter((e) => e.category === focus[category % focus.length])
+    const ofCategory = pool.filter((e) => e.category === focus[category % focus.length])
     const fresh = ofCategory.filter((e) => !used.has(e.id))
-    const options = fresh.length ? fresh : ofCategory.length ? ofCategory : exercises
+    const options = fresh.length ? fresh : ofCategory.length ? ofCategory : pool.length ? pool : exercises
     const chosen = pick(options)
     used.add(chosen.id)
-    blocks.push({ ...chosen, minutes: duration })
+    main.push({ ...chosen, minutes: duration })
     category++
   }
+
+  // Do mais simples ao mais difícil: a posição do catálogo é a progressão; o que é do atleta fica no fim.
+  const progression = (a: ExerciseRow, b: ExerciseRow) => (a.position ?? Infinity) - (b.position ?? Infinity) || 0
+  const blocks = [...warmups.sort(progression), ...main.sort(progression)]
 
   return blocks.map(({ id, name, category, metric, minutes }) => ({ exerciseId: id, name, category, metric, minutes }))
 }

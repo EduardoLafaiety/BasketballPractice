@@ -145,6 +145,12 @@ const migrations: string[] = [
   );
   INSERT INTO news_sync DEFAULT VALUES;
   `,
+  `
+  -- Nível, aquecimento e ordem de progressão do catálogo padrão; exercícios do atleta ficam sem nível.
+  ALTER TABLE exercises ADD COLUMN level text CHECK (level IN ('iniciante', 'intermediario', 'avancado'));
+  ALTER TABLE exercises ADD COLUMN warmup boolean NOT NULL DEFAULT false;
+  ALTER TABLE exercises ADD COLUMN position integer;
+  `,
 ]
 
 export async function migrate(db: Database) {

@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import { z } from 'zod'
 import { isStillReferenced, many, one, type Database, type Queryable } from '../db/index.js'
+import { LEVELS } from '../db/catalog.js'
 import { HttpError, notFound } from '../lib/http-error.js'
 import { idParam, parse } from '../lib/validate.js'
 import { currentUser } from '../middleware/auth.js'
@@ -15,7 +16,7 @@ const exerciseSchema = z.object({
   description: z.string().trim().max(1000).nullish(),
 })
 
-const listQuery = z.object({ category: z.enum(CATEGORIES).optional() })
+const listQuery = z.object({ category: z.enum(CATEGORIES).optional(), level: z.enum(LEVELS).optional() })
 
 type ExerciseRow = {
   id: number
@@ -23,10 +24,13 @@ type ExerciseRow = {
   category: string
   metric: string
   description: string | null
+  level: string | null
+  warmup: boolean
+  position: number | null
   ownerId: number | null
 }
 
-const COLUMNS = `id, name, category, metric, description, user_id AS "ownerId"`
+const COLUMNS = `id, name, category, metric, description, level, warmup, position, user_id AS "ownerId"`
 
 const toExercise = ({ ownerId, ...exercise }: ExerciseRow) => ({ ...exercise, custom: ownerId !== null })
 
@@ -65,13 +69,13 @@ export function exercisesRouter(db: Database) {
   }
 
   router.get('/', async (req, res) => {
-    const { category } = parse(listQuery, req.query)
+    const { category, level } = parse(listQuery, req.query)
     const rows = await many<ExerciseRow>(
       db,
       `SELECT ${COLUMNS} FROM exercises
-       WHERE (user_id IS NULL OR user_id = $1) AND ($2::text IS NULL OR category = $2)
+       WHERE (user_id IS NULL OR user_id = $1) AND ($2::text IS NULL OR category = $2) AND ($3::text IS NULL OR level = $3)
        ORDER BY category, name`,
-      [currentUser(req), category ?? null],
+      [currentUser(req), category ?? null, level ?? null],
     )
     res.json(rows.map(toExercise))
   })
