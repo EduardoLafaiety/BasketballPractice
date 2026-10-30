@@ -63,6 +63,34 @@ jobs:
         env:
           GNEWS_API_KEY: ${{ secrets.GNEWS_API_KEY }}
 
+      # Versão de avaliação da repaginada, em /previa/site/, gerada da branch dela. O site oficial não muda.
+      # Remover este trecho ao publicar a repaginada.
+      - uses: actions/checkout@v7
+        with:
+          ref: repaginada
+          path: _repaginada
+
+      - name: Build da versão de avaliação
+        working-directory: _repaginada
+        run: |
+          (cd backend && npm ci)
+          (cd frontend && npm ci && VITE_BASE=/${{ github.event.repository.name }}/previa/site/ npm run build:demo)
+          rm -rf frontend/dist/previa
+          # O Pages só conhece arquivos: cada rota ganha uma cópia da página, para recarregar e abrir links diretos.
+          cd frontend/dist
+          for rota in treinos jogue-como rotina desempenho metas ferramentas gerador configuracoes sessao; do
+            mkdir -p "$rota" && cp index.html "$rota/index.html"
+          done
+          for id in $(seq 1 200); do mkdir -p "treinos/$id" && cp index.html "treinos/$id/index.html"; done
+          for foto in ../src/assets/jogadores/*-520.webp; do
+            id=$(basename "$foto" -520.webp)
+            mkdir -p "jogue-como/$id" && cp index.html "jogue-como/$id/index.html"
+          done
+          cd ../../..
+          mkdir -p frontend/dist/previa/site
+          cp -r _repaginada/frontend/dist/. frontend/dist/previa/site/
+          cp frontend/dist/noticias.json frontend/dist/previa/site/noticias.json
+
       - uses: actions/configure-pages@v6
 
       - uses: actions/upload-pages-artifact@v5
