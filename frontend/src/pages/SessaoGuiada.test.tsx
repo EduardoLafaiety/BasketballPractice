@@ -53,6 +53,26 @@ describe('Sessão guiada', () => {
     ])
   })
 
+  it('mostra a demonstração junto do cronômetro, sem precisar abrir, e a troca com o exercício', async () => {
+    const user = userEvent.setup()
+    const exercicio = (id: number, name: string, custom = false) => ({ id, name, category: 'arremesso', metric: 'acertos', description: null, custom })
+    abrirSessao({ 'GET /exercises': [exercicio(1, 'Lance livre'), exercicio(9, 'Saltos na caixa'), exercicio(4, 'Suicídio', true)] })
+    await user.click(await screen.findByRole('button', { name: 'Começar' }))
+
+    expect(await screen.findByRole('region', { name: 'Demonstração: Lance livre' })).toBeInTheDocument()
+    expect(screen.queryByText('Ver como fazer')).toBeNull()
+    expect(screen.getByRole('button', { name: 'Pausar' })).toBeInTheDocument()
+
+    await clicar(user, 'Próximo exercício →')
+    expect(await screen.findByRole('region', { name: 'Demonstração: Saltos na caixa' })).toBeInTheDocument()
+    expect(screen.queryByRole('region', { name: 'Demonstração: Lance livre' })).toBeNull()
+
+    // Exercício criado pelo atleta não tem demonstração: fica só o cronômetro.
+    await clicar(user, 'Próximo exercício →')
+    expect(await screen.findByRole('heading', { name: 'Suicídio' })).toBeInTheDocument()
+    expect(screen.queryByRole('region', { name: /Demonstração/ })).toBeNull()
+  })
+
   it('registra arremessos e repetições de cada bloco e salva a sessão com o diário', async () => {
     const user = userEvent.setup()
     const { ultima } = abrirSessao({ 'POST /sessions': sessaoSalva })
