@@ -3,4 +3,3 @@
 const desligada = () => Promise.reject(new Error('A versão de demonstração não faz parte deste build'))
 
 export const responder = desligada
-export const recomecarDemonstracao = desligada

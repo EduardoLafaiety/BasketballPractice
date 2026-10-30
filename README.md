@@ -147,7 +147,7 @@ Reinicie a API. Sem a chave, a barra mostra só as manchetes publicadas no paine
 
 ### Versão de demonstração (sem banco nem API)
 
-A [demonstração online](https://eduardolafaiety.github.io/BasketballPractice/) é o mesmo site, sem login, começando zerado como no primeiro acesso: só o catálogo de exercícios, sem nenhum treino registrado. Ela roda **as rotas reais do backend dentro do navegador**, sobre o [PGlite](https://pglite.dev) (Postgres em WebAssembly), e guarda os dados no próprio navegador: mesmas regras, mesmos cálculos e mesmas validações do site com API. O botão **Recomeçar** apaga tudo e volta ao início.
+A [demonstração online](https://eduardolafaiety.github.io/BasketballPractice/) é o mesmo site, sem login, começando zerado como no primeiro acesso: só o catálogo de exercícios, sem nenhum treino registrado. Ela roda **as rotas reais do backend dentro do navegador**, sobre o [PGlite](https://pglite.dev) (Postgres em WebAssembly), e guarda os dados no próprio navegador: mesmas regras, mesmos cálculos e mesmas validações do site com API.
 
 Para rodar na sua máquina, instale as dependências do `backend` e do `frontend` (`npm install` em cada pasta) e, em `frontend`:
 

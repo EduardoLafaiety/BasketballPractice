@@ -8,7 +8,6 @@ import { diasAtras, useConfig } from '../store'
 import type { Config } from '../types'
 import BarraNoticias from './BarraNoticias'
 import Icone, { type NomeIcone } from './Icone'
-import FaixaDemo from '../demo/FaixaDemo'
 
 const LINKS: { to: string; rotulo: string; icone: NomeIcone; fim?: boolean }[] = [
   { to: '/', rotulo: 'Início', icone: 'inicio', fim: true },
@@ -99,7 +98,6 @@ export default function Layout() {
         </div>
       </aside>
       <main className="conteudo">
-        {__DEMO__ && <FaixaDemo />}
         <Outlet />
       </main>
       <BarraNoticias />

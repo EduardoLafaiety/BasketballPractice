@@ -58,7 +58,6 @@ async function recriarVisitante(db: Database) {
 
 export interface ServidorDemo {
   executar: Executar
-  recomecar: () => Promise<void>
   fechar: () => Promise<void>
 }
 
@@ -130,7 +129,6 @@ export async function criarServidor({ dados }: { dados?: string } = {}) {
 
   return {
     executar,
-    recomecar: () => recriarVisitante(db),
     fechar: () => pg.close(),
   } satisfies ServidorDemo
 }
@@ -152,9 +150,4 @@ export async function responder(metodo: string, caminho: string, corpo?: unknown
     status,
     headers: { 'Content-Type': 'application/json' },
   })
-}
-
-/** Apaga tudo o que o visitante registrou e volta ao app zerado. */
-export async function recomecarDemonstracao() {
-  await (await servidorDoNavegador()).recomecar()
 }

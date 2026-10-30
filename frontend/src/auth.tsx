@@ -64,7 +64,7 @@ export function useAuth() {
 export function RequerLogin({ children }: { children: ReactNode }) {
   const { usuario, verificando } = useAuth()
   const local = useLocation()
-  if (verificando) return <Carregando texto={__DEMO__ ? 'Preparando a demonstração…' : 'Conferindo sua sessão…'} />
+  if (verificando) return <Carregando texto={__DEMO__ ? 'Preparando o app…' : 'Conferindo sua sessão…'} />
   if (!usuario && !tokenAtual()) return <Navigate to="/entrar" replace state={{ de: local.pathname }} />
   return <>{children}</>
 }

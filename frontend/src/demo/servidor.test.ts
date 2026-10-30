@@ -98,7 +98,7 @@ describe('Registros do visitante', () => {
   }, 60_000)
   afterAll(() => servidor.fechar())
 
-  it('o primeiro treino entra nas estatísticas; recomeçar apaga tudo e volta ao app zerado', async () => {
+  it('o primeiro treino entra nas estatísticas', async () => {
     await servidor.executar('POST', '/workouts', {
       name: 'Rotina de quinta',
       description: 'bp-rotina:4',
@@ -120,8 +120,5 @@ describe('Registros do visitante', () => {
     expect(progresso.streak).toEqual({ current: 1, best: 1 })
     expect(progresso.achievements.find((a) => a.id === 'primeira-sessao')?.unlocked).toBe(true)
     expect((await get<{ current: number }[]>(`/goals?${FUSO}`))[0].current).toBe(1)
-
-    await servidor.recomecar()
-    await esperarZerado(get)
   }, 60_000)
 })
