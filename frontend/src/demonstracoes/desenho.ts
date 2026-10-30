@@ -1,5 +1,5 @@
 // Do esqueleto para o desenho: cada parte do manequim vira um caminho SVG com volume (cápsula afinando).
-import type { Esqueleto, Musculo, Ponto } from './motor'
+import type { Animacao, Esqueleto, Instante, Musculo, Ponto } from './motor'
 
 const f = (v: number) => v.toFixed(1)
 
@@ -62,5 +62,26 @@ export function caminhos(e: Esqueleto, dir: number, frente: boolean): Record<str
     peF: capsula(e.tornozeloF, pe(e.tornozeloF, 1), 3.4, 2.8),
     bracoP: capsula(e.ombroP, e.cotoveloP, 4.7, 4),
     antebracoP: capsula(e.cotoveloP, e.maoP, 4, 3.4),
+  }
+}
+
+/** Atualiza os caminhos do corpo e marca os músculos em ação. */
+export function pintar(anim: Animacao, agora: Instante, els: Record<string, SVGPathElement | null>) {
+  const c = caminhos(agora.e, agora.dir, anim.frente)
+  for (const p of PARTES) {
+    const el = els[p.id]
+    if (!el) continue
+    el.setAttribute('d', c[p.id])
+    el.classList.toggle('demo-musculo', !!p.musculo && agora.hl.includes(p.musculo))
+  }
+}
+
+/** Move a bola (ou esconde, quando não há bola). */
+export function posicionar(el: SVGCircleElement | null, p: { x: number; y: number } | null) {
+  if (!el) return
+  el.setAttribute('visibility', p ? 'visible' : 'hidden')
+  if (p) {
+    el.setAttribute('cx', p.x.toFixed(1))
+    el.setAttribute('cy', p.y.toFixed(1))
   }
 }

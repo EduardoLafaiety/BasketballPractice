@@ -7,6 +7,8 @@ describe('Fotos dos jogadores', () => {
     const ids = STYLES.map((s) => s.id).sort()
     expect(Object.keys(FOTOS_JOGADORES).sort()).toEqual(ids)
     for (const foto of Object.values(FOTOS_JOGADORES)) {
+      expect(foto.src).toMatch(/-520.webp$/)
+      expect(foto.srcPequena).toMatch(/-300.webp$/)
       expect(foto.autor).not.toBe('')
       expect(foto.licenca).toMatch(/^(CC BY(-SA)? \d\.\d|CC0|Domínio público)$/)
       expect(foto.fonte).toMatch(/^https:\/\/commons\.wikimedia\.org\/wiki\/File:/)

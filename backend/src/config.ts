@@ -17,4 +17,8 @@ export const config = {
   jwtExpiresIn: process.env.JWT_EXPIRES_IN ?? '7d',
   databaseUrl: process.env.DATABASE_URL ?? 'postgres://basketball:basketball@localhost:5433/basketball',
   corsOrigin: process.env.CORS_ORIGIN ?? 'http://localhost:5173',
+  // Atrás de um proxy (Nginx, Render, Railway…), defina TRUST_PROXY=1 para o req.ip ser o do atleta, não o do proxy.
+  trustProxy: Number(process.env.TRUST_PROXY ?? 0),
+  /** Tentativas erradas de login e cadastro por IP a cada 15 minutos. */
+  authAttempts: Number(process.env.AUTH_ATTEMPTS ?? 10),
 }

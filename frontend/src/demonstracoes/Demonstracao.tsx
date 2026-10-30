@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { caminhos, PARTES } from './desenho'
+import { caminhos, PARTES, pintar, posicionar } from './desenho'
 import {
   alturaQuadril,
   ARO,
@@ -14,7 +14,6 @@ import {
   RAIO_BOLA,
   type Animacao,
   type Coreografia,
-  type Instante,
 } from './motor'
 
 const VELOCIDADES = [0.25, 0.5, 1]
@@ -190,25 +189,6 @@ export default function Demonstracao({ coreografia, nome }: { coreografia: Coreo
       </ol>
     </section>
   )
-}
-
-function pintar(anim: Animacao, agora: Instante, els: Record<string, SVGPathElement | null>) {
-  const c = caminhos(agora.e, agora.dir, anim.frente)
-  for (const p of PARTES) {
-    const el = els[p.id]
-    if (!el) continue
-    el.setAttribute('d', c[p.id])
-    el.classList.toggle('demo-musculo', !!p.musculo && agora.hl.includes(p.musculo))
-  }
-}
-
-function posicionar(el: SVGCircleElement | null, p: { x: number; y: number } | null) {
-  if (!el) return
-  el.setAttribute('visibility', p ? 'visible' : 'hidden')
-  if (p) {
-    el.setAttribute('cx', p.x.toFixed(1))
-    el.setAttribute('cy', p.y.toFixed(1))
-  }
 }
 
 /** Cesta, cones, parede, caixa e o que mais a coreografia pedir. */

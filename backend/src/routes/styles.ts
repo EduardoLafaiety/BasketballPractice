@@ -960,8 +960,12 @@ export function stylesRouter(db: Database) {
       ),
     )
 
+  // Os estilos são iguais para todo mundo e só mudam numa nova versão: o navegador pode guardar por 5 min.
+  const CACHE = 'private, max-age=300'
+
   router.get('/', async (_req, res) => {
     const catalog = await loadCatalog()
+    res.setHeader('Cache-Control', CACHE)
     res.json(
       STYLES.map((style) => {
         const { session, mix } = resolve(style, catalog)
@@ -983,6 +987,7 @@ export function stylesRouter(db: Database) {
     const style = STYLES.find((s) => s.id === id)
     if (!style) throw notFound('Estilo')
     const { moves, session, mix } = resolve(style, await loadCatalog())
+    res.setHeader('Cache-Control', CACHE)
     res.json({ ...style, moves, session, mix, minutes: session.reduce((sum, block) => sum + block.minutes, 0) })
   })
 

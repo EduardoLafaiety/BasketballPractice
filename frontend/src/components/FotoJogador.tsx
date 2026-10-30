@@ -8,7 +8,14 @@ export default function FotoJogador({ id, nome, categoria, grande = false }: { i
   return (
     <div className={`foto-jogador tag-${categoria ?? 'Arremesso'} ${grande ? 'foto-jogador-grande' : ''}`}>
       {foto ? (
-        <img src={foto.src} alt={`${nome} em quadra (${foto.legenda})`} loading="lazy" />
+        <img
+          src={grande ? foto.src : foto.srcPequena}
+          srcSet={grande ? undefined : `${foto.srcPequena} 300w, ${foto.src} 520w`}
+          sizes={grande ? undefined : '(max-width: 560px) 100vw, (max-width: 1280px) 45vw, 30vw'}
+          alt={`${nome} em quadra (${foto.legenda})`}
+          loading="lazy"
+          decoding="async"
+        />
       ) : (
         <span className="foto-jogador-iniciais" aria-hidden>{iniciais}</span>
       )}

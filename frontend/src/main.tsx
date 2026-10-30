@@ -5,6 +5,9 @@ import App from './App'
 import { AuthProvider } from './auth'
 import { iniciarPwa } from './lib/pwa'
 import { aplicarTema, temaSalvo } from './lib/tema'
+// Fontes servidas pelo próprio site: sem depender do Google Fonts e funcionando offline no PWA.
+import '@fontsource-variable/big-shoulders-display'
+import '@fontsource-variable/manrope'
 import './styles.css'
 
 // Subpasta do site (VITE_BASE), ex.: /BasketballPractice no GitHub Pages; "/" no site normal.
