@@ -194,46 +194,51 @@ function Execucao({ plano }: { plano: PlanoGuiado }) {
       <span className={`tag tag-${bloco.categoria}`}>{bloco.categoria}</span>
       <h1 className="guiada-nome">{bloco.nome}</h1>
       <p className="meta">{ROTULO_METRICA[bloco.metrica]}</p>
-      <ComoFazer key={indice} drillId={bloco.drillId} nome={bloco.nome} />
 
-      <div className={`guiada-relogio ${acabou ? 'esgotado' : ''}`} aria-live="off">
-        {acabou ? `+${relogio(-restante)}` : relogio(restante)}
-      </div>
-      {acabou && <p className="guiada-aviso" role="status">Tempo! Siga para o próximo quando terminar.</p>}
+      <div className="guiada-treino">
+        <ComoFazer key={indice} drillId={bloco.drillId} nome={bloco.nome} />
 
-      <div className="acoes centro-flex">
-        <button className="btn" onClick={() => setRodando((r) => !r)}>
-          {rodando ? 'Pausar' : 'Continuar'}
-        </button>
-        <button className="btn" onClick={() => setRestante((r) => r + 60)}>+1 min</button>
-      </div>
+        <div className="guiada-painel">
+          <div className={`guiada-relogio ${acabou ? 'esgotado' : ''}`} aria-live="off">
+            {acabou ? `+${relogio(-restante)}` : relogio(restante)}
+          </div>
+          {acabou && <p className="guiada-aviso" role="status">Tempo! Siga para o próximo quando terminar.</p>}
 
-      {bloco.metrica === 'acertos' && (
-        <div className="card guiada-registro">
-          <Contador contador={contador} />
-        </div>
-      )}
-      {bloco.metrica === 'repeticoes' && (
-        <div className="card guiada-registro">
-          <div className="contador-placar">
-            <div>
-              <strong>{reps}</strong>
-              <span className="meta">repetições</span>
+          <div className="acoes centro-flex">
+            <button className="btn" onClick={() => setRodando((r) => !r)}>
+              {rodando ? 'Pausar' : 'Continuar'}
+            </button>
+            <button className="btn" onClick={() => setRestante((r) => r + 60)}>+1 min</button>
+          </div>
+
+          {bloco.metrica === 'acertos' && (
+            <div className="card guiada-registro">
+              <Contador contador={contador} />
             </div>
-          </div>
-          <div className="contador-botoes">
-            <button className="btn btn-acerto" onClick={() => setReps((r) => r + 1)}>+1</button>
-            <button className="btn" onClick={() => setReps((r) => r + 5)}>+5</button>
-            <button className="btn" onClick={() => setReps((r) => Math.max(0, r - 1))}>−1</button>
+          )}
+          {bloco.metrica === 'repeticoes' && (
+            <div className="card guiada-registro">
+              <div className="contador-placar">
+                <div>
+                  <strong>{reps}</strong>
+                  <span className="meta">repetições</span>
+                </div>
+              </div>
+              <div className="contador-botoes">
+                <button className="btn btn-acerto" onClick={() => setReps((r) => r + 1)}>+1</button>
+                <button className="btn" onClick={() => setReps((r) => r + 5)}>+5</button>
+                <button className="btn" onClick={() => setReps((r) => Math.max(0, r - 1))}>−1</button>
+              </div>
+            </div>
+          )}
+
+          <div className="acoes centro-flex guiada-acoes">
+            <button className="btn btn-primario btn-grande" onClick={() => concluir(true)}>
+              {indice + 1 === blocos.length ? 'Concluir treino' : 'Próximo exercício →'}
+            </button>
+            <button className="btn" onClick={() => concluir(false)}>Pular</button>
           </div>
         </div>
-      )}
-
-      <div className="acoes centro-flex guiada-acoes">
-        <button className="btn btn-primario btn-grande" onClick={() => concluir(true)}>
-          {indice + 1 === blocos.length ? 'Concluir treino' : 'Próximo exercício →'}
-        </button>
-        <button className="btn" onClick={() => concluir(false)}>Pular</button>
       </div>
     </div>
   )

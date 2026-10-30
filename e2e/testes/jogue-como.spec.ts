@@ -86,9 +86,9 @@ test('faz o treino do estilo na sessão guiada e a sessão é salva no banco', a
   // Aquecimento e hesitação ficam de fora; o corta-luz registra repetições.
   const nome = page.locator('.guiada-nome')
   await expect(nome).toHaveText('Drible estacionário')
-  await page.getByRole('button', { name: 'Pular' }).click()
+  await page.getByRole('button', { name: 'Pular', exact: true }).click()
   await expect(nome).toHaveText('Hesitação em linha reta')
-  await page.getByRole('button', { name: 'Pular' }).click()
+  await page.getByRole('button', { name: 'Pular', exact: true }).click()
   await expect(nome).toHaveText('Corta-luz com cadeira')
   await page.getByRole('button', { name: '+5' }).click()
   await page.getByRole('button', { name: '+1', exact: true }).click()
@@ -105,7 +105,7 @@ test('faz o treino do estilo na sessão guiada e a sessão é salva no banco', a
 
   for (const resto of ['Fadeaway do cotovelo', 'Floater em uma perna', 'Lance livre']) {
     await expect(nome).toHaveText(resto)
-    await page.getByRole('button', { name: 'Pular' }).click()
+    await page.getByRole('button', { name: 'Pular', exact: true }).click()
   }
 
   await expect(page.getByRole('heading', { name: /Treino concluído/ })).toBeVisible()

@@ -867,7 +867,21 @@ section + section, .card + section { margin-top: 1.5rem; }
 .plano-item::before { content: counter(passo); font-family: var(--fonte-display); font-weight: var(--peso-display); font-size: 1.3rem; color: var(--laranja-texto); min-width: 1.2rem; }
 .plano-item .meta { text-align: right; }
 .guiada { display: grid; justify-items: center; text-align: center; gap: 0.75rem; max-width: 560px; margin: 0 auto; }
-.guiada > .card { width: 100%; text-align: left; }
+.guiada:has(.demo) { max-width: 1040px; }
+.guiada-treino { width: 100%; display: grid; gap: 1.5rem; align-items: start; }
+.guiada-treino:has(.demo) { grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); }
+.guiada-treino .demo { text-align: left; }
+.guiada-painel { display: grid; justify-items: center; gap: 0.75rem; position: sticky; top: 1rem; }
+.guiada-painel > .card { width: 100%; text-align: left; }
+/* No celular, a cena fica colada no cronômetro; os controles e os passos da demonstração descem para o fim. */
+@media (max-width: 860px) {
+  .guiada-treino:has(.demo) { grid-template-columns: minmax(0, 1fr); gap: 0.75rem; justify-items: center; }
+  .guiada-treino:has(.demo) .demo, .guiada-treino:has(.demo) .guiada-painel { display: contents; }
+  .guiada-treino .demo-cena { order: 1; }
+  .guiada-treino .guiada-painel > * { order: 2; }
+  .guiada-treino .demo-controles { order: 3; width: 100%; text-align: left; }
+  .guiada-treino .demo-passos { order: 4; width: 100%; text-align: left; }
+}
 .guiada-topo { width: 100%; display: grid; gap: 0.4rem; }
 .guiada-passos { display: flex; gap: 4px; }
 .guiada-passos span { flex: 1; height: 5px; border-radius: 999px; background: var(--borda); }
@@ -1176,8 +1190,6 @@ section + section, .card + section { margin-top: 1.5rem; }
 .demo-passos strong { color: var(--texto); font-weight: 600; }
 .demo-passos .atual button { background: var(--superficie-2); border-left-color: var(--laranja); color: var(--texto); }
 .demo-passos .atual b { color: var(--laranja-texto); }
-.guiada-demo { width: 100%; text-align: left; }
-.guiada-demo summary { cursor: pointer; color: var(--laranja-texto); font-weight: 600; }
 @media (prefers-reduced-motion: reduce) {
   .demo-fantasma { transition: none; }
 }
