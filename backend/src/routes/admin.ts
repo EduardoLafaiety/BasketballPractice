@@ -7,6 +7,14 @@ import { currentUser } from '../middleware/auth.js'
 
 const roleSchema = z.object({ isAdmin: z.boolean() })
 
+const headlineSchema = z.object({
+  title: z.string().trim().min(3).max(160),
+  sourceName: z.string().trim().min(1).max(80).nullable().default(null),
+  // Só http(s): o link vai para um href, e "javascript:" rodaria no site.
+  url: z.string().trim().url().max(2000).regex(/^https?:\/\//i, 'Use um link http ou https').nullable().default(null),
+  hours: z.number().int().min(1).max(168).default(24),
+})
+
 type AdminUser = {
   id: number
   name: string
@@ -62,6 +70,28 @@ export function adminRouter(db: Database) {
       return (await tx.query('DELETE FROM users WHERE id = $1', [id])).rowCount
     })
     if (!rowCount) throw notFound('Usuário')
+    res.status(204).end()
+  })
+
+  router.post('/news', async (req, res) => {
+    const { title, sourceName, url, hours } = parse(headlineSchema, req.body)
+    await db.query(`DELETE FROM news_items WHERE origin = 'admin' AND expires_at <= now()`)
+    const created = await one(
+      db,
+      `INSERT INTO news_items (origin, title, source_name, url, expires_at)
+       VALUES ('admin', $1, $2, $3, now() + make_interval(hours => $4::int))
+       RETURNING id, origin, title, source_name AS "sourceName", url, published_at AS "publishedAt", expires_at AS "expiresAt"`,
+      [title, sourceName, url, hours],
+    )
+    res.status(201).json(created)
+  })
+
+  router.delete('/news/:id', async (req, res) => {
+    const { id } = parse(idParam, req.params)
+    // A do GNews só fica escondida: apagada, voltaria na próxima busca.
+    const hidden = await db.query(`UPDATE news_items SET hidden = true WHERE id = $1 AND origin = 'gnews'`, [id])
+    const deleted = hidden.rowCount ? hidden : await db.query(`DELETE FROM news_items WHERE id = $1`, [id])
+    if (!deleted.rowCount) throw notFound('Manchete')
     res.status(204).end()
   })
 

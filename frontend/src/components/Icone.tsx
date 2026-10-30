@@ -38,6 +38,7 @@ const CAMINHOS = {
   ),
   sair: <path d="M15 4h4v16h-4M10 8l-4 4 4 4M6 12h10" />,
   play: <path d="M7 4.5v15l12-7.5z" fill="currentColor" />,
+  pausa: <path d="M8 5v14M16 5v14" />,
   raio: <path d="M13 2 4 14h7l-1 8 9-12h-7z" />,
   seta: <path d="M5 12h14M13 6l6 6-6 6" />,
   relogio: (

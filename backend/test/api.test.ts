@@ -201,7 +201,7 @@ describe('Banco de dados', () => {
     await prepareDatabase(db)
     const afterRun = await db.query('SELECT COUNT(*)::int AS n FROM exercises WHERE user_id IS NULL')
     assert.deepEqual(afterRun.rows, before.rows)
-    assert.deepEqual((await db.query('SELECT MAX(version) AS v FROM schema_migrations')).rows, [{ v: 3 }])
+    assert.deepEqual((await db.query('SELECT MAX(version) AS v FROM schema_migrations')).rows, [{ v: 4 }])
   })
 
   it('garante e-mail único sem diferenciar maiúsculas', async () => {

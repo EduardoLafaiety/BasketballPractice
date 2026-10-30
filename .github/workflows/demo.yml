@@ -5,6 +5,9 @@ name: Demonstração no GitHub Pages
 on:
   push:
     branches: [main]
+  # A demonstração não tem servidor: republicar é o que atualiza as notícias da barra (4 consultas por dia ao GNews).
+  schedule:
+    - cron: '17 */6 * * *'
   workflow_dispatch:
 
 permissions:
@@ -52,6 +55,13 @@ jobs:
       # O Pages não conhece as rotas do app: um link direto (ex.: /metas) cai no 404.html, que é o próprio app.
       - name: Fallback de rotas
         run: cp frontend/dist/index.html frontend/dist/404.html
+
+      # Sem o secret GNEWS_API_KEY, saem as manchetes escritas à mão (backend/src/lib/curated-news.ts).
+      - name: Notícias da barra
+        run: npx tsx src/scripts/export-news.ts ../frontend/dist/noticias.json
+        working-directory: backend
+        env:
+          GNEWS_API_KEY: ${{ secrets.GNEWS_API_KEY }}
 
       - uses: actions/configure-pages@v6
 

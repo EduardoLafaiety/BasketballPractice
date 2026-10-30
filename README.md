@@ -45,7 +45,8 @@ Um app web para atletas planejarem o que treinar, registrarem cada arremesso e a
 | 🧪 | **Testes físicos** | Registre impulsão vertical, sprint e outros testes e veja o recorde de cada um. |
 | 💾 | **Backup** | Exporte e importe tudo em JSON (sem duplicar) ou baixe as sessões em CSV. |
 | 📱 | **PWA** | Instalável no celular, funciona offline para as ferramentas, com tema claro/escuro e lembretes de treino. |
-| 🛡️ | **Painel admin** | Administradores veem todas as contas, promovem outros admins e excluem contas. |
+| 📰 | **Barra de notícias** | Manchetes de basquete correndo no rodapé, com fonte e link para a matéria. As automáticas vêm do [GNews](https://gnews.io) e os admins publicam as "Breaking news". |
+| 🛡️ | **Painel admin** | Administradores veem todas as contas, promovem outros admins, excluem contas e cuidam da barra de notícias. |
 
 ## 📸 Telas
 
@@ -134,6 +135,16 @@ npm run admin -- seu@email.com
 
 O link **Admin** aparece no menu. Para tirar o papel, acrescente `--remover`.
 
+### 5. (Opcional) Notícias automáticas na barra
+
+Crie uma chave grátis em [gnews.io](https://gnews.io) e coloque em `backend/.env`:
+
+```bash
+GNEWS_API_KEY=sua-chave
+```
+
+Reinicie a API. Sem a chave, a barra mostra só as manchetes publicadas no painel admin. O plano grátis é para uso não comercial e entrega as notícias com 12 horas de atraso. Para a demonstração online, cadastre a mesma chave como secret `GNEWS_API_KEY` no GitHub. Sem ela, a demonstração mostra as manchetes escritas à mão em `backend/src/lib/curated-news.ts`, que não se atualizam sozinhas.
+
 ### Versão de demonstração (sem banco nem API)
 
 A [demonstração online](https://eduardolafaiety.github.io/BasketballPractice/) é o mesmo site, sem login, começando zerado como no primeiro acesso: só o catálogo de exercícios, sem nenhum treino registrado. Ela roda **as rotas reais do backend dentro do navegador**, sobre o [PGlite](https://pglite.dev) (Postgres em WebAssembly), e guarda os dados no próprio navegador: mesmas regras, mesmos cálculos e mesmas validações do site com API. O botão **Recomeçar** apaga tudo e volta ao início.
@@ -211,10 +222,10 @@ BasketballPractice/
 
 | Onde | Comando | Ferramentas | O que cobre |
 | --- | --- | --- | --- |
-| **API** | `cd backend && npm test` | `node:test` + PGlite | A API inteira contra um Postgres em memória: cadastro e login, tokens adulterados e vencidos, isolamento entre atletas em cada recurso, validações, sessões, estatísticas com fuso horário, mapa de arremessos, metas, conquistas, gerador, estilos de jogo ligados ao catálogo, catálogo que recebe exercícios novos em bancos antigos, backup tudo-ou-nada e permissões de admin |
-| **Site** | `cd frontend && npm test` | Vitest + Testing Library | Cálculos, CSV, lembretes, cliente da API, quadra, contador, login e cadastro, rotas protegidas, painel admin, início, biblioteca e criação de exercícios, desempenho (totais, comparações, gráficos, mapa, excluir sessão), ferramentas (calculadoras, timer, metrônomo, contador de arremessos), sessão guiada, registro de treino, rotina, metas, gerador, a aba Jogue como (lista, filtro, perfil, sessão guiada) com foto e crédito para cada jogador, e configurações |
+| **API** | `cd backend && npm test` | `node:test` + PGlite | A API inteira contra um Postgres em memória: cadastro e login, tokens adulterados e vencidos, isolamento entre atletas em cada recurso, validações, sessões, estatísticas com fuso horário, mapa de arremessos, metas, conquistas, gerador, estilos de jogo ligados ao catálogo, catálogo que recebe exercícios novos em bancos antigos, backup tudo-ou-nada, permissões de admin e notícias (busca no GNews sem gastar a cota à toa, manchetes do admin, prazo e remoção) |
+| **Site** | `cd frontend && npm test` | Vitest + Testing Library | Cálculos, CSV, lembretes, cliente da API, quadra, contador, login e cadastro, rotas protegidas, painel admin, início, biblioteca e criação de exercícios, desempenho (totais, comparações, gráficos, mapa, excluir sessão), ferramentas (calculadoras, timer, metrônomo, contador de arremessos), sessão guiada, registro de treino, rotina, metas, gerador, a aba Jogue como (lista, filtro, perfil, sessão guiada) com foto e crédito para cada jogador, barra de notícias e configurações |
 
-| **Ponta a ponta** | `cd e2e && npm test` | Playwright + Chrome + Postgres 17 | O site de produção no navegador falando com a API real e um Postgres de verdade: cadastro, login e volta à página pedida, e-mail repetido, rotina do dia → sessão guiada → desempenho, metas e conquistas, exercício próprio que não pode ser excluído quando está em uso, meta semanal no fuso do atleta, tema salvo na conta, backup sem duplicar, painel admin, navegação no celular e a aba Jogue como (os 20 estilos ligados ao catálogo do Postgres, filtro, perfil, sessão guiada salva no banco e treino do estilo na rotina) |
+| **Ponta a ponta** | `cd e2e && npm test` | Playwright + Chrome + Postgres 17 | O site de produção no navegador falando com a API real e um Postgres de verdade: cadastro, login e volta à página pedida, e-mail repetido, rotina do dia → sessão guiada → desempenho, metas e conquistas, exercício próprio que não pode ser excluído quando está em uso, meta semanal no fuso do atleta, tema salvo na conta, backup sem duplicar, painel admin, manchete do admin na barra de notícias, navegação no celular e a aba Jogue como (os 20 estilos ligados ao catálogo do Postgres, filtro, perfil, sessão guiada salva no banco e treino do estilo na rotina) |
 
 Os testes da API e do site não precisam de Docker nem de servidor rodando. Os de ponta a ponta precisam do Postgres do Docker (`cd backend && npm run db:up`) e do Google Chrome instalado. Eles sobem sozinhos a API e o site em portas próprias (3410 e 4410) e usam um banco separado, `basketball_e2e`, recriado vazio a cada execução: o banco de desenvolvimento não é tocado. Na primeira vez, rode `npm install` dentro de `e2e`. O relatório de cada execução fica em `npm run report`.
 

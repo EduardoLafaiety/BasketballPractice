@@ -125,6 +125,19 @@ export interface UsuarioAdmin extends Usuario {
   lastSessionAt: string | null
 }
 
+/** Manchete da barra de notícias: automática (GNews) ou escrita por um admin ("Breaking news"). */
+export interface Noticia {
+  id: number
+  origin: 'admin' | 'gnews' | 'curated'
+  title: string
+  sourceName: string | null
+  url: string | null
+  publishedAt: string
+  expiresAt: string | null
+}
+
+export type NovaManchete = Pick<Noticia, 'title' | 'sourceName' | 'url'> & { hours: number }
+
 interface AuthResposta {
   token: string
   user: Usuario
@@ -336,6 +349,15 @@ export const api = {
   usuariosAdmin: () => request<UsuarioAdmin[]>('GET', '/admin/users'),
   definirAdmin: (id: number, isAdmin: boolean) => request<UsuarioAdmin>('PATCH', `/admin/users/${id}`, { isAdmin }),
   excluirUsuario: (id: number) => request<null>('DELETE', `/admin/users/${id}`),
+  publicarManchete: (manchete: NovaManchete) => request<Noticia>('POST', '/admin/news', manchete),
+  removerManchete: (id: number) => request<null>('DELETE', `/admin/news/${id}`),
+
+  async noticias(): Promise<Noticia[]> {
+    if (!__DEMO__) return request<Noticia[]>('GET', '/news')
+    // A demonstração não tem servidor nem chave: o JSON é gerado ao publicar (.github/workflows/demo.yml).
+    const resposta = await fetch(`${import.meta.env.BASE_URL}noticias.json`)
+    return resposta.ok ? ((await resposta.json()) as Noticia[]) : []
+  },
 
   async drills() {
     return (await request<ExerciseApi[]>('GET', '/exercises')).map(paraDrill)

@@ -398,8 +398,16 @@ Só para contas com `is_admin = true`; as demais recebem `403`. O papel é lido 
 | GET | `/api/admin/users` | admin | — | Contas com `{ id, name, email, isAdmin, createdAt, workouts, sessions, lastSessionAt }`, mais novas primeiro |
 | PATCH | `/api/admin/users/:id` | admin | `{ isAdmin: boolean }` | A conta atualizada; `400` na própria conta |
 | DELETE | `/api/admin/users/:id` | admin | — | `204`, apagando todos os dados da conta; `400` na própria conta |
+| POST | `/api/admin/news` | admin | `{ title, sourceName?, url?, hours? }` | `201` com a manchete. `hours` de 1 a 168 (padrão 24); `url` só http(s) |
+| DELETE | `/api/admin/news/:id` | admin | — | `204`. A manchete do admin é apagada; a do GNews fica escondida, para não voltar na próxima busca |
 
 O primeiro admin é criado pelo terminal, numa conta já cadastrada: `npm run admin -- email@exemplo.com` (na pasta `backend`). Para tirar o papel: `npm run admin -- email@exemplo.com --remover`.
+
+### Notícias — [routes/news.ts](../backend/src/routes/news.ts)
+
+| Método | Rota | Auth | Corpo | Resposta |
+| --- | --- | --- | --- | --- |
+| GET | `/api/news` | sim | — | Até 15 manchetes `{ id, origin, title, sourceName, url, publishedAt, expiresAt }`: as do admin primeiro, depois as mais recentes |
 
 ### Exercícios — [routes/exercises.ts](../backend/src/routes/exercises.ts)
 
@@ -583,6 +591,8 @@ erDiagram
 | `goals` (`kind`, `target`, `exercise_id?`, `deadline?`) | Metas do atleta; o progresso é calculado na consulta | `CASCADE` com o usuário e com o exercício |
 | `physical_tests` (`kind`, `value`, `performed_at`) | Testes físicos periódicos | `value > 0`; índice `(user_id, kind, performed_at)` |
 | `user_settings` (`user_id` PK, `data jsonb`) | Tema, lembretes e bpm do metrônomo | Validado pelo Zod ao ler e ao gravar |
+| `news_items` (`origin`, `title`, `source_name`, `url`, `published_at`, `expires_at`, `hidden`) | Manchetes da barra de notícias | Do GNews guarda só título, fonte e link, por 7 dias. A do admin sai do ar em `expires_at` |
+| `news_sync` (linha única, `last_attempt_at`) | Hora da última busca no GNews | Reiniciar a API ou subir outra instância não gasta a cota |
 
 Os valores válidos de `zone`, `goals.kind` e `physical_tests.kind` ficam no Zod, e não em `CHECK` no banco, para que dê para adicionar opções sem migração.
 
@@ -640,7 +650,7 @@ npm run dev
 
 API em `http://localhost:3333/api`. Na inicialização, aplica as migrações pendentes e o seed. Outros scripts: `npm run typecheck`, `npm run build` (compila para `dist/`), `npm start` (roda a versão compilada) e `npm run admin -- email` (torna uma conta admin).
 
-Variáveis do `.env` (veja [backend/.env.example](../backend/.env.example)): `PORT` (3333), `JWT_SECRET` (obrigatório trocar em produção), `JWT_EXPIRES_IN` (7d), `DATABASE_URL`, `CORS_ORIGIN` (http://localhost:5173).
+Variáveis do `.env` (veja [backend/.env.example](../backend/.env.example)): `PORT` (3333), `JWT_SECRET` (obrigatório trocar em produção), `JWT_EXPIRES_IN` (7d), `DATABASE_URL`, `CORS_ORIGIN` (http://localhost:5173), `GNEWS_API_KEY` (vazia: a barra de notícias mostra só as manchetes do admin) e `NEWS_INTERVAL_MINUTES` (20).
 
 ### Frontend
 
@@ -719,4 +729,5 @@ As duas `-melhorias` servem para testar sem disputar porta com outras sessões. 
 | **Funcionalidades da API ainda sem tela** | Editar modelos de treino salvos (com séries e metas) e a tabela `byExercise` das estatísticas. Hoje os treinos salvos pelo gerador só podem ser criados. |
 | **Ferramentas (2026-10-24)** | Implementadas no front e no back: shot chart por zona, contador ao vivo com sequência, timer de intervalos, metrônomo, sessão guiada, gerador de treino, modelos de rotina, lembretes, metas, sequência de dias e conquistas, comparação de períodos, evolução semanal, diário (esforço + cansaço), testes físicos, backup JSON/CSV e importação, PWA instalável, vídeo em câmera lenta, tema claro/escuro, tela sempre acesa e calculadoras. |
 | **Vídeos só no aparelho** | Escolha do usuário: os vídeos ficam no IndexedDB do navegador, sem upload. Limpar os dados do site apaga os vídeos, e eles não entram no backup. |
+| **Barra de notícias (GNews grátis + admin)** | Escolha do usuário. O plano grátis do GNews só permite uso **não comercial** e entrega as notícias com **12 h de atraso**, por isso as automáticas levam o rótulo "Últimas notícias" e só as escritas no admin levam "Breaking news". Com anúncios, assinatura ou outra receita, o projeto precisa de um plano pago. A API busca a cada 20 min (72 das 100 consultas diárias) e só enquanto estiver no ar; o texto e as imagens das matérias não são guardados. A demonstração, sem servidor, recebe um `noticias.json` gerado ao publicar, a cada 6 h, com o GNews se o secret `GNEWS_API_KEY` existir no GitHub; sem ele, com as manchetes escritas à mão em `backend/src/lib/curated-news.ts`, que não se atualizam sozinhas. |
 | **Lembretes sem push** | Escolha do usuário: usam `Notification` e o service worker do navegador. Com o app fechado, não chegam; um servidor de Web Push (chaves VAPID) seria o próximo passo. |
