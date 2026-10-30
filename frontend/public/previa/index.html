@@ -20,17 +20,26 @@ a { color: inherit; }
 .rotulo { font-size: .72rem; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
 .laranja { color: var(--laranja); }
 
-/* Barra lateral */
-.lateral { position: fixed; inset: 0 auto 0 0; width: var(--lateral); z-index: 20; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 22px 0; background: var(--preto); color: var(--claro); }
-.logo { width: 42px; height: 42px; display: block; }
-.lateral nav { display: flex; flex-direction: column; gap: 4px; width: 100%; }
-.lateral nav a { display: block; padding: 10px 4px; text-align: center; font-size: .62rem; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; text-decoration: none; color: rgba(244, 242, 234, .55); border-left: 3px solid transparent; transition: color .2s, border-color .2s; }
-.lateral nav a:hover { color: var(--claro); }
-.lateral nav a.ativo { color: var(--laranja); border-left-color: var(--laranja); }
-.barra-progresso { width: 3px; height: 70px; background: rgba(244, 242, 234, .2); }
-.barra-progresso i { display: block; width: 100%; height: 100%; background: var(--laranja); transform-origin: top; transform: scaleY(0); }
-main { margin-left: var(--lateral); position: relative; }
-.btn-app { position: fixed; top: 18px; right: 18px; z-index: 19; padding: 11px 18px; background: var(--laranja); color: #111; font-size: .78rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; text-decoration: none; border: 1.5px solid #111; border-radius: 6px; }
+/* Topo e menu em tela cheia */
+.topo { position: fixed; inset: 0 0 auto 0; z-index: 30; display: flex; align-items: center; gap: 10px; padding: 14px 18px; pointer-events: none; }
+.topo > * { pointer-events: auto; }
+.marca { display: block; line-height: 0; }
+.logo { width: 46px; height: 46px; display: block; }
+.secao-atual { margin-right: auto; padding: 6px 10px; background: var(--preto); color: var(--claro); border-radius: 4px; font-size: .68rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+.btn-menu { display: inline-flex; align-items: center; gap: 9px; padding: 11px 14px; background: var(--claro); color: #111; border: 1.5px solid #111; border-radius: 6px; font: 800 .78rem/1 Manrope, sans-serif; letter-spacing: .06em; text-transform: uppercase; cursor: pointer; }
+.btn-menu:hover { background: #fff; }
+.tracos { display: block; width: 18px; height: 8px; border-top: 2px solid currentColor; border-bottom: 2px solid currentColor; transition: height .2s; }
+.btn-menu[aria-expanded='true'] .tracos { height: 2px; border-bottom: 0; }
+.progresso { position: fixed; inset: 0 0 auto 0; height: 3px; z-index: 31; }
+.progresso i { display: block; height: 100%; background: var(--laranja); transform-origin: left; transform: scaleX(0); }
+.menu-tela { position: fixed; inset: 0; z-index: 25; display: flex; flex-direction: column; justify-content: center; padding: 80px 6vw 30px; background: var(--preto); overflow-y: auto; }
+.menu-tela[hidden] { display: none; }
+.menu-tela a { display: flex; align-items: baseline; gap: 1.2rem; padding: .1em 0; color: var(--claro); text-decoration: none; font: 900 clamp(2.6rem, 8.6vh, 6.4rem)/1.04 'Big Shoulders Display', Impact, sans-serif; text-transform: uppercase; transition: color .2s, transform .25s; }
+.menu-tela a span { font: 800 .8rem/1 Manrope, sans-serif; letter-spacing: .1em; color: var(--laranja); }
+.menu-tela a:hover, .menu-tela a:focus-visible { color: var(--laranja); transform: translateX(14px); }
+.menu-tela a.ativo { color: var(--laranja); }
+main { position: relative; }
+.btn-app { padding: 11px 18px; background: var(--laranja); color: #111; font-size: .78rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; text-decoration: none; border: 1.5px solid #111; border-radius: 6px; }
 .btn-app:hover { background: #ff8a3f; }
 
 /* Fundo com linhas de quadra, no lugar das curvas de nível */
@@ -111,14 +120,29 @@ figure { margin: 0; }
 .regua { margin-top: 1rem; height: 3px; background: var(--linha); }
 .regua i { display: block; height: 100%; background: var(--laranja); transform-origin: left; transform: scaleX(0); }
 
-/* Jogue como */
-.jogue { background: var(--escuro); color: var(--claro); padding: 16vh 0; overflow: hidden; }
-.jogue .rotulo { padding: 0 5vw; display: block; margin-bottom: 4vh; color: var(--laranja); }
-.nomes { white-space: nowrap; will-change: transform; }
-.nomes a { text-decoration: none; }
-.nomes a:hover { color: var(--laranja); }
-.nomes .sep { color: var(--laranja); padding: 0 .25em; }
-.jogue-texto { padding: 6vh 5vw 0; max-width: 34em; font-size: 1.2rem; }
+/* Jogue como: um embaixo do outro */
+.jogue { background: var(--escuro); color: var(--claro); padding: 16vh 5vw 12vh; overflow: clip; }
+.jogue-topo { margin-bottom: 12vh; }
+.jogue-topo p { margin-top: 1.5rem; max-width: 26em; font-size: 1.25rem; }
+.jogador { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); align-items: center; gap: 4vw; min-height: 86vh; padding: 5vh 0; }
+.jogador.inverte { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); }
+.jogador.inverte .foto { order: 2; }
+.foto { position: relative; aspect-ratio: 4 / 5; max-height: 76vh; overflow: hidden; background: #2a2b22; }
+.foto img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center top; }
+.js .jogador .foto { clip-path: inset(100% 0 0 0); transition: clip-path 1s cubic-bezier(.7, 0, .2, 1); }
+.js .jogador.visivel .foto { clip-path: inset(0); }
+.js .jogador-texto { opacity: 0; transform: translateY(46px); transition: opacity .8s .25s, transform .8s .25s cubic-bezier(.2, .7, .2, 1); }
+.js .jogador.visivel .jogador-texto { opacity: 1; transform: none; }
+.jogador h3 { margin: .5rem 0 .6rem; font: 900 clamp(3.2rem, 8.5vw, 8.5rem)/.88 'Big Shoulders Display', Impact, sans-serif; text-transform: uppercase; }
+.jogador-texto > p { font-size: clamp(1.2rem, 2vw, 1.8rem); }
+.treinar { display: inline-block; margin-top: 1.4rem; padding: 11px 16px; background: var(--laranja); color: #111; font-size: .78rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; text-decoration: none; border-radius: 6px; }
+.treinar:hover { background: #ff8a3f; }
+.jogador small { display: block; margin-top: 1.1rem; font-size: .72rem; opacity: .6; }
+.aviso-fotos { margin-top: 8vh; max-width: 44em; font-size: .8rem; opacity: .6; }
+/* No computador a foto fica em preto e branco, e o mouse revela a cor. */
+@media (hover: hover) { .foto > img { filter: grayscale(1) contrast(1.05); } }
+.foto .foto-cor { position: absolute; inset: 0; pointer-events: none; }
+.foto .foto-cor img { filter: none; display: block; width: 100%; height: 100%; object-fit: cover; object-position: center top; }
 
 /* Rotina */
 .rotina { position: relative; padding: 16vh 5vw; overflow: hidden; }
@@ -165,21 +189,22 @@ figure { margin: 0; }
 .f-corpo path.demo-musculo { fill: var(--laranja); }
 
 @media (max-width: 860px) {
-  :root { --lateral: 0px; }
-  .lateral { inset: auto 0 0 0; width: 100%; height: 58px; flex-direction: row; padding: 0 6px; }
-  .logo, .barra-progresso { display: none; }
-  .lateral nav { flex-direction: row; overflow-x: auto; scrollbar-width: none; }
-  .lateral nav a { flex: none; padding: 20px 10px; border-left: 0; border-top: 3px solid transparent; }
-  .lateral nav a.ativo { border-top-color: var(--laranja); }
-  .btn-app { top: 12px; right: 12px; padding: 9px 13px; }
+  .topo { padding: 10px 12px; gap: 7px; }
+  .logo { width: 40px; height: 40px; }
+  .btn-app, .btn-menu { padding: 9px 11px; font-size: .7rem; }
+  .secao-atual { visibility: hidden; flex: 1; padding: 0; }
+  .btn-app { white-space: nowrap; }
+  .jogador, .jogador.inverte { grid-template-columns: minmax(0, 1fr); gap: 1.2rem; min-height: 0; padding: 5vh 0; }
+  .jogador.inverte .foto { order: 0; }
+  .foto { max-height: 62vh; }
   .proximo { display: none; }
   .titulo-a { top: 10vh; }
-  .titulo-b { bottom: 12vh; }
-  .dica { right: auto; left: 0; width: 100%; bottom: 68px; text-align: center; }
+  .titulo-b { bottom: 9vh; }
+  .dica { right: auto; left: 0; width: 100%; bottom: 20px; text-align: center; }
   .niveis, .numeros { grid-template-columns: minmax(0, 1fr); }
   .nivel:nth-child(n) { margin-top: 0; min-height: 0; }
   .nivel svg { min-height: 170px; }
-  .aquecimento-fixo { grid-template-columns: minmax(0, 1fr); align-content: center; gap: 1rem; padding: 0 5vw 58px; }
+  .aquecimento-fixo { grid-template-columns: minmax(0, 1fr); align-content: center; gap: 1rem; padding: 60px 5vw 20px; }
   .fase-atual { min-height: 9em; margin-top: .6rem; }
   .semana { grid-template-columns: minmax(0, 1fr); }
   .dia { min-height: 0; }
@@ -187,7 +212,6 @@ figure { margin: 0; }
   .item { flex-direction: column; }
   .item p { text-align: left; }
   .flutua { display: none; }
-  .fim { padding-bottom: 26vh; }
 }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
@@ -199,20 +223,24 @@ figure { margin: 0; }
 <body>
 <script>document.documentElement.classList.add('js')</script>
 
-<aside class="lateral">
-  <svg class="logo" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="28" fill="none" stroke="#ff6a13" stroke-width="4"/><path d="M4 32h56M32 4v56M12 13c10 8 10 30 0 38M52 13c-10 8-10 30 0 38" fill="none" stroke="#ff6a13" stroke-width="3"/></svg>
-  <nav aria-label="Seções">
-    <a href="#inicio">Início</a>
-    <a href="#treinos">Treinos</a>
-    <a href="#aquecimento">Aquecer</a>
-    <a href="#jogue">Jogue como</a>
-    <a href="#rotina">Rotina</a>
-    <a href="#desempenho">Números</a>
-    <a href="#ferramentas">Ferramentas</a>
-  </nav>
-  <div class="barra-progresso" aria-hidden="true"><i id="progresso"></i></div>
-</aside>
-<a class="btn-app" href="../">Abrir o app</a>
+<header class="topo">
+  <a class="marca" href="#inicio" aria-label="Basketball Practice, início">
+    <svg class="logo" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="28" fill="#101010" stroke="#ff6a13" stroke-width="4"/><path d="M4 32h56M32 4v56M12 13c10 8 10 30 0 38M52 13c-10 8-10 30 0 38" fill="none" stroke="#ff6a13" stroke-width="3"/></svg>
+  </a>
+  <span class="secao-atual" id="secaoAtual">Início</span>
+  <a class="btn-app" href="../">Abrir o app</a>
+  <button class="btn-menu" id="btnMenu" aria-expanded="false" aria-controls="menuTela"><span class="tracos" aria-hidden="true"></span><span id="btnMenuTexto">Menu</span></button>
+</header>
+<div class="progresso" aria-hidden="true"><i id="progresso"></i></div>
+<nav class="menu-tela" id="menuTela" aria-label="Seções" hidden>
+  <a href="#inicio"><span>01</span>Início</a>
+  <a href="#treinos"><span>02</span>Treinos</a>
+  <a href="#aquecimento"><span>03</span>Aquecer</a>
+  <a href="#jogue"><span>04</span>Jogue como</a>
+  <a href="#rotina"><span>05</span>Rotina</a>
+  <a href="#desempenho"><span>06</span>Números</a>
+  <a href="#ferramentas"><span>07</span>Ferramentas</a>
+</nav>
 
 <main>
   <section class="abertura" id="inicio">
@@ -274,11 +302,214 @@ figure { margin: 0; }
   </section>
 
   <section class="jogue sobre-escuro" id="jogue">
-    <span class="rotulo">Jogue como</span>
-    <div class="grande nomes" id="nomes1"><a href="../jogue-como">Luka Dončić</a><span class="sep">/</span><a href="../jogue-como">Stephen Curry</a><span class="sep">/</span><a href="../jogue-como">Nikola Jokić</a><span class="sep">/</span><a href="../jogue-como">LeBron James</a><span class="sep">/</span></div>
-    <div class="grande nomes" id="nomes2" aria-hidden="true"><a tabindex="-1" href="../jogue-como">Kevin Durant</a><span class="sep">/</span><a tabindex="-1" href="../jogue-como">Giannis Antetokounmpo</a><span class="sep">/</span><a tabindex="-1" href="../jogue-como">Kyrie Irving</a><span class="sep">/</span><a tabindex="-1" href="../jogue-como">Damian Lillard</a><span class="sep">/</span></div>
-    <p class="jogue-texto serifa surge">Escolha um jogador e treine os movimentos que definem o jogo dele, numa sessão pronta.</p>
-  </section>
+      <div class="jogue-topo surge">
+        <h2 class="grande">Jogue como</h2>
+        <p class="serifa">20 jogadores. Role para conhecer cada um e escolha os movimentos que você quer treinar.</p>
+      </div>
+      <div class="jogadores">
+      <article class="jogador">
+        <div class="foto"><img src="fotos/luka-doncic.webp" alt="Luka Dončić" loading="lazy" width="520" height="650"></div>
+        <div class="jogador-texto">
+          <span class="rotulo laranja">01 / 20</span>
+          <h3>Luka Dončić</h3>
+          <p class="serifa">Maestro do pick-and-roll</p>
+          <a class="treinar" href="../jogue-como/luka-doncic">Treinar este estilo →</a>
+          <small>Foto: <a href="https://commons.wikimedia.org/wiki/File:Luka_Doncic_(55095317361)_(cropped).jpg" rel="noopener noreferrer" target="_blank">Erik Drost</a>, CC BY 4.0</small>
+        </div>
+      </article>
+      <article class="jogador inverte">
+        <div class="foto"><img src="fotos/kyrie-irving.webp" alt="Kyrie Irving" loading="lazy" width="520" height="650"></div>
+        <div class="jogador-texto">
+          <span class="rotulo laranja">02 / 20</span>
+          <h3>Kyrie Irving</h3>
+          <p class="serifa">Mãos mais rápidas</p>
+          <a class="treinar" href="../jogue-como/kyrie-irving">Treinar este estilo →</a>
+          <small>Foto: <a href="https://commons.wikimedia.org/wiki/File:Kyrie_Irving_-_51831772061_01_(cropped).jpg" rel="noopener noreferrer" target="_blank">Erik Drost</a>, CC BY 2.0</small>
+        </div>
+      </article>
+      <article class="jogador">
+        <div class="foto"><img src="fotos/lebron-james.webp" alt="LeBron James" loading="lazy" width="520" height="650"></div>
+        <div class="jogador-texto">
+          <span class="rotulo laranja">03 / 20</span>
+          <h3>LeBron James</h3>
+          <p class="serifa">Ataque em linha reta</p>
+          <a class="treinar" href="../jogue-como/lebron-james">Treinar este estilo →</a>
+          <small>Foto: <a href="https://commons.wikimedia.org/wiki/File:LeBron_James_(51959977144)_(cropped2).jpg" rel="noopener noreferrer" target="_blank">Erik Drost</a>, CC BY 2.0</small>
+        </div>
+      </article>
+      <article class="jogador inverte">
+        <div class="foto"><img src="fotos/stephen-curry.webp" alt="Stephen Curry" loading="lazy" width="520" height="650"></div>
+        <div class="jogador-texto">
+          <span class="rotulo laranja">04 / 20</span>
+          <h3>Stephen Curry</h3>
+          <p class="serifa">Arremessador sem limite</p>
+          <a class="treinar" href="../jogue-como/stephen-curry">Treinar este estilo →</a>
+          <small>Foto: <a href="https://commons.wikimedia.org/wiki/File:Stephen_Curry_(24511268640)_(cropped).jpg" rel="noopener noreferrer" target="_blank">Keith Allison</a>, CC BY-SA 2.0</small>
+        </div>
+      </article>
+      <article class="jogador">
+        <div class="foto"><img src="fotos/shai-gilgeous-alexander.webp" alt="Shai Gilgeous-Alexander" loading="lazy" width="520" height="650"></div>
+        <div class="jogador-texto">
+          <span class="rotulo laranja">05 / 20</span>
+          <h3>Shai Gilgeous-Alexander</h3>
+          <p class="serifa">Rei da média distância</p>
+          <a class="treinar" href="../jogue-como/shai-gilgeous-alexander">Treinar este estilo →</a>
+          <small>Foto: <a href="https://commons.wikimedia.org/wiki/File:Shai_Gilgeous-Alexander_(51815871018)_(cropped).jpg" rel="noopener noreferrer" target="_blank">All-Pro Reels</a>, CC BY-SA 2.0</small>
+        </div>
+      </article>
+      <article class="jogador inverte">
+        <div class="foto"><img src="fotos/nikola-jokic.webp" alt="Nikola Jokić" loading="lazy" width="520" height="650"></div>
+        <div class="jogador-texto">
+          <span class="rotulo laranja">06 / 20</span>
+          <h3>Nikola Jokić</h3>
+          <p class="serifa">Pivô que joga de armador</p>
+          <a class="treinar" href="../jogue-como/nikola-jokic">Treinar este estilo →</a>
+          <small>Foto: <a href="https://commons.wikimedia.org/wiki/File:Nikola_Jokic_free_throw_(cropped).jpg" rel="noopener noreferrer" target="_blank">All-Pro Reels</a>, CC BY-SA 2.0</small>
+        </div>
+      </article>
+      <article class="jogador">
+        <div class="foto"><img src="fotos/giannis-antetokounmpo.webp" alt="Giannis Antetokounmpo" loading="lazy" width="520" height="650"></div>
+        <div class="jogador-texto">
+          <span class="rotulo laranja">07 / 20</span>
+          <h3>Giannis Antetokounmpo</h3>
+          <p class="serifa">Passadas longas até o aro</p>
+          <a class="treinar" href="../jogue-como/giannis-antetokounmpo">Treinar este estilo →</a>
+          <small>Foto: <a href="https://commons.wikimedia.org/wiki/File:Giannis_Antetokounmpo_(24845003687)_(cropped).jpg" rel="noopener noreferrer" target="_blank">Keith Allison</a>, CC BY-SA 2.0</small>
+        </div>
+      </article>
+      <article class="jogador inverte">
+        <div class="foto"><img src="fotos/kevin-durant.webp" alt="Kevin Durant" loading="lazy" width="520" height="650"></div>
+        <div class="jogador-texto">
+          <span class="rotulo laranja">08 / 20</span>
+          <h3>Kevin Durant</h3>
+          <p class="serifa">Arremesso impossível de marcar</p>
+          <a class="treinar" href="../jogue-como/kevin-durant">Treinar este estilo →</a>
+          <small>Foto: <a href="https://commons.wikimedia.org/wiki/File:Kevin_Durant_Nets_March_2022.png" rel="noopener noreferrer" target="_blank">YES Network</a>, CC BY 3.0</small>
+        </div>
+      </article>
+      <article class="jogador">
+        <div class="foto"><img src="fotos/jayson-tatum.webp" alt="Jayson Tatum" loading="lazy" width="520" height="650"></div>
+        <div class="jogador-texto">
+          <span class="rotulo laranja">09 / 20</span>
+          <h3>Jayson Tatum</h3>
+          <p class="serifa">Ala de três níveis</p>
+          <a class="treinar" href="../jogue-como/jayson-tatum">Treinar este estilo →</a>
+          <small>Foto: <a href="https://commons.wikimedia.org/wiki/File:Celtics_at_Wizards_2024-12-044_(cropped_2).jpg" rel="noopener noreferrer" target="_blank">Hameltion</a>, CC BY-SA 4.0</small>
+        </div>
+      </article>
+      <article class="jogador inverte">
+        <div class="foto"><img src="fotos/anthony-edwards.webp" alt="Anthony Edwards" loading="lazy" width="520" height="650"></div>
+        <div class="jogador-texto">
+          <span class="rotulo laranja">10 / 20</span>
+          <h3>Anthony Edwards</h3>
+          <p class="serifa">Ataque explosivo</p>
+          <a class="treinar" href="../jogue-como/anthony-edwards">Treinar este estilo →</a>
+          <small>Foto: <a href="https://commons.wikimedia.org/wiki/File:Anthony_Edwards_Kentavious_Caldwell-Pope_(51734745028)_(cropped)_(cropped).jpg" rel="noopener noreferrer" target="_blank">All-Pro Reels</a>, CC BY-SA 2.0</small>
+        </div>
+      </article>
+      <article class="jogador">
+        <div class="foto"><img src="fotos/victor-wembanyama.webp" alt="Victor Wembanyama" loading="lazy" width="520" height="650"></div>
+        <div class="jogador-texto">
+          <span class="rotulo laranja">11 / 20</span>
+          <h3>Victor Wembanyama</h3>
+          <p class="serifa">Pivô que faz tudo</p>
+          <a class="treinar" href="../jogue-como/victor-wembanyama">Treinar este estilo →</a>
+          <small>Foto: <a href="https://commons.wikimedia.org/wiki/File:Victor_Wembanyama_San_Antonio_Spurs_2024.jpg" rel="noopener noreferrer" target="_blank">Frenchieinportland</a>, CC BY 4.0</small>
+        </div>
+      </article>
+      <article class="jogador inverte">
+        <div class="foto"><img src="fotos/jalen-brunson.webp" alt="Jalen Brunson" loading="lazy" width="520" height="650"></div>
+        <div class="jogador-texto">
+          <span class="rotulo laranja">12 / 20</span>
+          <h3>Jalen Brunson</h3>
+          <p class="serifa">Trabalho de pés de veterano</p>
+          <a class="treinar" href="../jogue-como/jalen-brunson">Treinar este estilo →</a>
+          <small>Foto: <a href="https://commons.wikimedia.org/wiki/File:Jalen_Brunson_2023_(cropped).jpg" rel="noopener noreferrer" target="_blank">Erik Drost</a>, CC BY 2.0</small>
+        </div>
+      </article>
+      <article class="jogador">
+        <div class="foto"><img src="fotos/james-harden.webp" alt="James Harden" loading="lazy" width="520" height="650"></div>
+        <div class="jogador-texto">
+          <span class="rotulo laranja">13 / 20</span>
+          <h3>James Harden</h3>
+          <p class="serifa">Mestre do step-back</p>
+          <a class="treinar" href="../jogue-como/james-harden">Treinar este estilo →</a>
+          <small>Foto: <a href="https://commons.wikimedia.org/wiki/File:Harden_dribbling_midcourt,_Cavaliers_vs_Nets_on_January_17,_2022_(cropped).jpg" rel="noopener noreferrer" target="_blank">Erik Drost</a>, CC BY 2.0</small>
+        </div>
+      </article>
+      <article class="jogador inverte">
+        <div class="foto"><img src="fotos/damian-lillard.webp" alt="Damian Lillard" loading="lazy" width="520" height="650"></div>
+        <div class="jogador-texto">
+          <span class="rotulo laranja">14 / 20</span>
+          <h3>Damian Lillard</h3>
+          <p class="serifa">Arremesso do logo</p>
+          <a class="treinar" href="../jogue-como/damian-lillard">Treinar este estilo →</a>
+          <small>Foto: <a href="https://commons.wikimedia.org/wiki/File:Damian_Lillard_(2021)_(cropped).jpg" rel="noopener noreferrer" target="_blank">Erik Drost</a>, CC BY 2.0</small>
+        </div>
+      </article>
+      <article class="jogador">
+        <div class="foto"><img src="fotos/ja-morant.webp" alt="Ja Morant" loading="lazy" width="520" height="650"></div>
+        <div class="jogador-texto">
+          <span class="rotulo laranja">15 / 20</span>
+          <h3>Ja Morant</h3>
+          <p class="serifa">Voo até o aro</p>
+          <a class="treinar" href="../jogue-como/ja-morant">Treinar este estilo →</a>
+          <small>Foto: <a href="https://commons.wikimedia.org/wiki/File:Ja_Morant_2021.jpg" rel="noopener noreferrer" target="_blank">All-Pro Reels</a>, CC BY-SA 2.0</small>
+        </div>
+      </article>
+      <article class="jogador inverte">
+        <div class="foto"><img src="fotos/tyrese-haliburton.webp" alt="Tyrese Haliburton" loading="lazy" width="520" height="650"></div>
+        <div class="jogador-texto">
+          <span class="rotulo laranja">16 / 20</span>
+          <h3>Tyrese Haliburton</h3>
+          <p class="serifa">Armador que pensa no passe</p>
+          <a class="treinar" href="../jogue-como/tyrese-haliburton">Treinar este estilo →</a>
+          <small>Foto: <a href="https://commons.wikimedia.org/wiki/File:1_tyrese_haliburton_2025_(cropped_2).jpg" rel="noopener noreferrer" target="_blank">Chensiyuan</a>, CC BY-SA 4.0</small>
+        </div>
+      </article>
+      <article class="jogador">
+        <div class="foto"><img src="fotos/devin-booker.webp" alt="Devin Booker" loading="lazy" width="520" height="650"></div>
+        <div class="jogador-texto">
+          <span class="rotulo laranja">17 / 20</span>
+          <h3>Devin Booker</h3>
+          <p class="serifa">Artista da média distância</p>
+          <a class="treinar" href="../jogue-como/devin-booker">Treinar este estilo →</a>
+          <small>Foto: <a href="https://commons.wikimedia.org/wiki/File:Devin_Booker_(30362063153)_(cropped).jpg" rel="noopener noreferrer" target="_blank">Keith Allison</a>, CC BY-SA 2.0</small>
+        </div>
+      </article>
+      <article class="jogador inverte">
+        <div class="foto"><img src="fotos/joel-embiid.webp" alt="Joel Embiid" loading="lazy" width="520" height="650"></div>
+        <div class="jogador-texto">
+          <span class="rotulo laranja">18 / 20</span>
+          <h3>Joel Embiid</h3>
+          <p class="serifa">Pivô com jogo de ala</p>
+          <a class="treinar" href="../jogue-como/joel-embiid">Treinar este estilo →</a>
+          <small>Foto: <a href="https://commons.wikimedia.org/wiki/File:Joel_Embiid_2018_(cropped2).jpg" rel="noopener noreferrer" target="_blank">Keith Allison</a>, CC BY-SA 2.0</small>
+        </div>
+      </article>
+      <article class="jogador">
+        <div class="foto"><img src="fotos/kawhi-leonard.webp" alt="Kawhi Leonard" loading="lazy" width="520" height="650"></div>
+        <div class="jogador-texto">
+          <span class="rotulo laranja">19 / 20</span>
+          <h3>Kawhi Leonard</h3>
+          <p class="serifa">Defesa e média distância</p>
+          <a class="treinar" href="../jogue-como/kawhi-leonard">Treinar este estilo →</a>
+          <small>Foto: <a href="https://commons.wikimedia.org/wiki/File:1_kawhi_leonard_2019_(cropped).jpg" rel="noopener noreferrer" target="_blank">Chensiyuan</a>, CC BY-SA 4.0</small>
+        </div>
+      </article>
+      <article class="jogador inverte">
+        <div class="foto"><img src="fotos/trae-young.webp" alt="Trae Young" loading="lazy" width="520" height="650"></div>
+        <div class="jogador-texto">
+          <span class="rotulo laranja">20 / 20</span>
+          <h3>Trae Young</h3>
+          <p class="serifa">Floater e passe</p>
+          <a class="treinar" href="../jogue-como/trae-young">Treinar este estilo →</a>
+          <small>Foto: <a href="https://commons.wikimedia.org/wiki/File:Trae_Young.jpg" rel="noopener noreferrer" target="_blank">Alexander Jonesi</a>, CC BY-SA 2.0</small>
+        </div>
+      </article>
+      </div>
+      <p class="aviso-fotos">O Basketball Practice não tem relação com os jogadores, com a NBA nem com os times. Fotos da Wikimedia Commons; o time na foto é o da época em que ela foi tirada.</p>
+    </section>
 
   <section class="rotina" id="rotina">
     <svg class="linhas" viewBox="0 0 1000 620" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><circle cx="900" cy="90" r="210"/><path d="M-20 560C240 420 480 700 1020 480"/></svg>
@@ -336,11 +567,32 @@ figure { margin: 0; }
   frase.innerHTML = frase.textContent.split(' ').map(function (p) { return '<span>' + p + '</span>' }).join(' ')
   var palavras = todos('#frase span')
 
-  // Aparecer ao entrar na tela.
-  var olho = new IntersectionObserver(function (itens) {
-    itens.forEach(function (i) { if (i.isIntersecting) { i.target.classList.add('visivel'); olho.unobserve(i.target) } })
-  }, { threshold: .12 })
-  todos('.surge').forEach(function (e) { olho.observe(e) })
+  // Aparecer ao entrar na tela: calculado na rolagem, para nada ficar escondido.
+  var aparecer = todos('.surge, .jogador')
+
+  // Menu em tela cheia.
+  var btnMenu = $('#btnMenu'), menuTela = $('#menuTela')
+  function abrirMenu(abrir) {
+    menuTela.hidden = !abrir
+    btnMenu.setAttribute('aria-expanded', String(abrir))
+    $('#btnMenuTexto').textContent = abrir ? 'Fechar' : 'Menu'
+    document.body.style.overflow = abrir ? 'hidden' : ''
+    if (abrir) {
+      var a = menuTela.querySelector('a.ativo') || menuTela.querySelector('a'); a.focus({ preventScroll: true })
+      if (!calmo) {
+        var ini = performance.now()
+        menuTela.style.clipPath = 'inset(0 0 100% 0)'
+        requestAnimationFrame(function passo(t) {
+          var p = limite((t - ini) / 420), q = 1 - Math.pow(1 - p, 3)
+          menuTela.style.clipPath = p < 1 ? 'inset(0 0 ' + (100 - q * 100) + '% 0)' : ''
+          if (p < 1) requestAnimationFrame(passo)
+        })
+      }
+    }
+  }
+  btnMenu.addEventListener('click', function () { abrirMenu(menuTela.hidden) })
+  menuTela.addEventListener('click', function (e) { if (e.target.closest('a')) abrirMenu(false) })
+  addEventListener('keydown', function (e) { if (e.key === 'Escape' && !menuTela.hidden) { abrirMenu(false); btnMenu.focus() } })
 
   // Contadores.
   var contador = new IntersectionObserver(function (itens) {
@@ -367,6 +619,15 @@ figure { margin: 0; }
     copia.innerHTML = cartao.innerHTML
     cartao.appendChild(copia)
   })
+  todos('.foto').forEach(function (foto) {
+    var copia = document.createElement('div')
+    copia.className = 'foto-cor revelada'
+    copia.setAttribute('aria-hidden', 'true')
+    var img = foto.querySelector('img').cloneNode()
+    img.alt = ''
+    copia.appendChild(img)
+    foto.appendChild(copia)
+  })
   todos('h2.grande').forEach(function (titulo) {
     titulo.classList.add('titulo-efeito')
     var copia = document.createElement('span')
@@ -387,20 +648,25 @@ figure { margin: 0; }
   // Boneco comandado pela rolagem.
   var escada = BP.boneco($('#fig-escada'), 'Escada de arremesso')
   var secaoEscada = $('.aquecimento'), faseVista = -1, alvoEscada = 0, atualEscada = 0
-  var ligacoes = todos('.lateral nav a')
+  var ligacoes = todos('.menu-tela a')
   var secoes = ligacoes.map(function (a) { return $(a.getAttribute('href')) })
   var flutuantes = todos('.flutua')
   var manifesto = $('.manifesto'), abertura = $('.abertura')
   var bolas = todos('.gira'), tA = $('#tituloA'), tB = $('#tituloB')
-  var n1 = $('#nomes1'), n2 = $('#nomes2'), jogue = $('.jogue')
 
   function rolagem() {
     var y = scrollY, h = innerHeight
-    $('#progresso').style.transform = 'scaleY(' + limite(y / (document.documentElement.scrollHeight - h)) + ')'
+    aparecer = aparecer.filter(function (e) {
+      if (e.getBoundingClientRect().top > h * .88) return true
+      e.classList.add('visivel')
+      return false
+    })
+    $('#progresso').style.transform = 'scaleX(' + limite(y / (document.documentElement.scrollHeight - h)) + ')'
 
     var ativa = 0
     secoes.forEach(function (s, i) { if (s.getBoundingClientRect().top <= h * .45) ativa = i })
     ligacoes.forEach(function (a, i) { a.classList.toggle('ativo', i === ativa) })
+    $('#secaoAtual').textContent = ligacoes[ativa].lastChild.textContent
 
     var pEscada = limite(-secaoEscada.getBoundingClientRect().top / (secaoEscada.offsetHeight - h))
     alvoEscada = pEscada * escada.total
@@ -420,11 +686,6 @@ figure { margin: 0; }
     palavras.forEach(function (w, i) { w.classList.toggle('aceso', i < acesas) })
     flutuantes.forEach(function (f) { f.style.transform = 'translateY(' + -(rm.top * +f.dataset.v) + 'px)' })
 
-    var rj = jogue.getBoundingClientRect()
-    if (rj.bottom > 0 && rj.top < h) {
-      n1.style.transform = 'translateX(' + (rj.top * .5 - 40) + 'px)'
-      n2.style.transform = 'translateX(' + (-rj.top * .5 - 700) + 'px)'
-    }
   }
 
   // Cada camada persegue o mouse com atraso: é isso que dá a sensação de líquido.
@@ -432,6 +693,7 @@ figure { margin: 0; }
   var camadaBola = $('#camadaBola')
   var furoBola = { x: innerWidth / 2, y: innerHeight / 2, x2: innerWidth / 2, y2: innerHeight / 2, r: 0 }
   var alvos = todos('.nivel').map(function (c) { return { caixa: c, el: c.querySelector('.nivel-copia'), raio: 240, x: 0, y: 0, r: 0 } })
+    .concat(todos('.foto').map(function (c) { return { caixa: c, el: c.querySelector('.foto-cor'), raio: 190, x: 0, y: 0, r: 0 } }))
     .concat(todos('.titulo-efeito').map(function (c) { return { caixa: c, el: c.querySelector('.copia'), raio: 170, x: 0, y: 0, r: 0 } }))
   addEventListener('pointermove', function (e) {
     if (e.pointerType === 'touch') return
