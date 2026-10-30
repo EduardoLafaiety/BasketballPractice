@@ -4,9 +4,9 @@
 
 # Basketball Practice
 
-**Seu treino de basquete organizado: rotina semanal, sessões guiadas e evolução em números.**
+**Do primeiro quique à jogada de decisão: treinos em três níveis, figuras animadas para cada movimento e sua evolução em números.**
 
-Um app web para atletas planejarem o que treinar, registrarem cada arremesso e acompanharem o próprio progresso.
+Um app web para atletas planejarem o que treinar, seguirem sessões guiadas e acompanharem o próprio progresso, numa página contínua que se anima conforme você rola.
 
 ![React](https://img.shields.io/badge/React_18-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
 ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
@@ -23,7 +23,7 @@ Um app web para atletas planejarem o que treinar, registrarem cada arremesso e a
 
 <br />
 
-<img src="docs/screenshots/inicio.png" alt="Tela inicial com o treino do dia, sequência de dias e números da semana" width="900" />
+<img src="docs/screenshots/inicio.png" alt="Abertura com a bola de basquete transparente sob o mouse, revelando o atleta dentro dela" width="900" />
 
 </div>
 
@@ -33,13 +33,14 @@ Um app web para atletas planejarem o que treinar, registrarem cada arremesso e a
 
 | | Recurso | O que faz |
 | :-: | --- | --- |
-| 🗓️ | **Rotina semanal** | Monte o que treinar em cada dia ou comece de um modelo pronto. A tela inicial já mostra o treino de hoje. |
-| 🏀 | **Página contínua** | A página inicial é uma rolagem única: a bola fica transparente sob o mouse e revela o atleta, o boneco anda com a rolagem e treinos, jogadores, rotina e números vão aparecendo. Menu em tela cheia no lugar da barra lateral. |
-| 📶 | **Níveis** | Treinos dividido em iniciante, intermediário e avançado, cada um com pelo menos 50 exercícios e um aquecimento próprio, sempre do mais simples ao mais difícil. |
+| 🏀 | **Página contínua** | A página inicial é uma rolagem única: a bola fica transparente sob o mouse e revela o atleta, o boneco anda com a rolagem e treinos, jogadores, rotina e números vão aparecendo. A navegação fica num menu em tela cheia. |
+| 📶 | **Três níveis** | Iniciante, intermediário e avançado, com 50 exercícios em cada um e um aquecimento próprio, sempre do mais simples ao mais difícil. O iniciante foca em controle de bola e na forma certa de arremessar. |
+| 🔥 | **Aquecimento em ordem** | De 10 a 11 passos por nível, do geral ao específico e, no arremesso, de perto para longe da cesta: ninguém começa arremessando de três. |
+| 🗓️ | **Rotina semanal** | Monte o que treinar em cada dia ou comece de um modelo pronto. A página inicial já mostra o treino de hoje. |
 | ⚡ | **Gerador de treino** | Diga quanto tempo tem, o nível e o foco (arremesso, drible, defesa…): o app começa pelo aquecimento e monta a sessão do mais fácil ao mais difícil. |
-| 🏀 | **Jogue como** | Escolha um jogador da NBA (Luka, Curry, Jokić, Wembanyama e mais 16) e treine os movimentos que definem o estilo dele, com uma sessão pronta. |
-| 🎬 | **Como fazer** | Cada exercício do catálogo tem uma animação de um manequim mostrando o movimento passo a passo, com os músculos em ação, o rastro das poses e as pegadas vistas de cima. |
-| ▶️ | **Sessão guiada** | Passo a passo do treino com cronômetro, contador de acertos e registro automático no fim. |
+| 🌟 | **Jogue como** | Escolha um jogador da NBA (Luka, Curry, Jokić, Wembanyama e mais 16) e treine os movimentos que definem o estilo dele, com uma sessão pronta. |
+| 🎬 | **Como fazer** | Cada um dos 181 exercícios do catálogo tem uma animação de um manequim mostrando o movimento passo a passo, com os músculos em ação, o rastro das poses e as pegadas vistas de cima. |
+| ▶️ | **Sessão guiada** | Passo a passo do treino com a animação do movimento ao lado do cronômetro, contador de acertos e registro automático no fim. |
 | 🎯 | **Mapa de arremessos** | Acertos e tentativas por zona da quadra, com cores do quente ao frio. |
 | 📈 | **Desempenho** | Totais, aproveitamento, comparação semana × semana e mês × mês, gráfico dos últimos 7 dias e evolução de 12 semanas. |
 | 🏆 | **Metas e conquistas** | Metas com barra de progresso, sequência de dias seguidos e medalhas desbloqueáveis. |
@@ -70,19 +71,19 @@ Um app web para atletas planejarem o que treinar, registrarem cada arremesso e a
     <td align="center"><b>Gerador</b> · um treino completo em um clique</td>
   </tr>
   <tr>
-    <td><img src="docs/screenshots/treinos.png" alt="Biblioteca de treinos por categoria" /></td>
+    <td><img src="docs/screenshots/treinos.png" alt="Treinos divididos em iniciante, intermediário e avançado, com o aquecimento em ordem" /></td>
     <td><img src="docs/screenshots/ferramentas.png" alt="Ferramentas: timer de intervalos, contador, metrônomo, vídeo e calculadoras" /></td>
   </tr>
   <tr>
-    <td align="center"><b>Treinos</b> · biblioteca por categoria</td>
+    <td align="center"><b>Treinos</b> · três níveis, com o aquecimento primeiro</td>
     <td align="center"><b>Ferramentas</b> · timer, contador, metrônomo e mais</td>
   </tr>
   <tr>
-    <td><img src="docs/screenshots/jogue-como.png" alt="Aba Jogue como com os cards dos jogadores da NBA e filtro por posição" /></td>
+    <td><img src="docs/screenshots/jogue-como.png" alt="Grade da aba Jogue como, com as fotos em preto e branco e o mouse revelando a cor de uma delas" /></td>
     <td><img src="docs/screenshots/jogue-como-perfil.png" alt="Perfil do Luka Dončić com a divisão do treino e os movimentos-assinatura" /></td>
   </tr>
   <tr>
-    <td align="center"><b>Jogue como</b> · 20 jogadores da NBA, filtro por posição</td>
+    <td align="center"><b>Jogue como</b> · 20 jogadores; o mouse revela a cor da foto</td>
     <td align="center"><b>Perfil do jogador</b> · estilo, movimentos e treino pronto</td>
   </tr>
 </table>
@@ -180,7 +181,7 @@ flowchart LR
 
 | Camada | Tecnologias |
 | --- | --- |
-| **Frontend** | React 18, TypeScript, Vite, React Router, CSS puro, service worker, IndexedDB (vídeos) |
+| **Frontend** | React 18, TypeScript, Vite, React Router, CSS puro, animações em SVG sem biblioteca externa, service worker, IndexedDB (vídeos) |
 | **Backend** | Node.js 24, Express 5, Zod, JWT, senhas com `scrypt`, SQL escrito à mão com `pg` |
 | **Banco** | PostgreSQL 17 no Docker Compose, migrações versionadas |
 | **Testes** | `node:test` + PGlite na API; Vitest + Testing Library no site; Playwright + Postgres de ponta a ponta |
@@ -194,7 +195,7 @@ BasketballPractice/
 │   ├── src/
 │   │   ├── app.ts            montagem do Express e das rotas
 │   │   ├── server.ts         ponto de entrada
-│   │   ├── db/               conexão, migrações e catálogo de exercícios
+│   │   ├── db/               conexão, migrações e catálogo de exercícios por nível (catalog.ts)
 │   │   ├── lib/              senha, JWT, validação e erros HTTP
 │   │   ├── middleware/       autenticação, admin e tratamento de erros
 │   │   ├── routes/           auth, admin, exercises, workouts, sessions, stats, goals, tests, plans, styles, settings, data
@@ -205,7 +206,9 @@ BasketballPractice/
 │   ├── public/               ícone, manifest e service worker
 │   └── src/
 │       ├── pages/            uma página por rota
-│       ├── components/       quadra, gráficos, cartões e layout
+│       ├── components/       quadra, gráficos, cartões, menu e peças animadas pela rolagem
+│       ├── demonstracoes/    motor das animações e as figuras de cada exercício
+│       ├── lib/              efeitos de rolagem e mouse, níveis, lembretes e tema
 │       ├── ferramentas/      timer, contador, metrônomo, vídeo e calculadoras
 │       ├── assets/jogadores/ fotos dos jogadores (Wikimedia Commons) e créditos
 │       ├── demo/             versão de demonstração: a API rodando no navegador
@@ -224,9 +227,8 @@ BasketballPractice/
 
 | Onde | Comando | Ferramentas | O que cobre |
 | --- | --- | --- | --- |
-| **API** | `cd backend && npm test` | `node:test` + PGlite | A API inteira contra um Postgres em memória: cadastro e login, tokens adulterados e vencidos, isolamento entre atletas em cada recurso, validações, sessões, estatísticas com fuso horário, mapa de arremessos, metas, conquistas, gerador, estilos de jogo ligados ao catálogo, catálogo que recebe exercícios novos em bancos antigos, backup tudo-ou-nada, permissões de admin e notícias (busca no GNews sem gastar a cota à toa, manchetes do admin, prazo e remoção) |
-| **Site** | `cd frontend && npm test` | Vitest + Testing Library | Cálculos, CSV, lembretes, cliente da API, quadra, contador, login e cadastro, rotas protegidas, painel admin, início, biblioteca e criação de exercícios, desempenho (totais, comparações, gráficos, mapa, excluir sessão), ferramentas (calculadoras, timer, metrônomo, contador de arremessos), sessão guiada, registro de treino, rotina, metas, gerador, a aba Jogue como (lista, filtro, perfil, sessão guiada) com foto e crédito para cada jogador, barra de notícias e configurações |
-
+| **API** | `cd backend && npm test` | `node:test` + PGlite | A API inteira contra um Postgres em memória: cadastro e login, tokens adulterados e vencidos, isolamento entre atletas em cada recurso, validações, sessões, estatísticas com fuso horário, mapa de arremessos, metas, conquistas, gerador, estilos de jogo ligados ao catálogo, catálogo em três níveis que atualiza bancos antigos, gerador com aquecimento e progressão, backup tudo-ou-nada, permissões de admin e notícias (busca no GNews sem gastar a cota à toa, manchetes do admin, prazo e remoção) |
+| **Site** | `cd frontend && npm test` | Vitest + Testing Library | Cálculos, CSV, lembretes, cliente da API, quadra, contador, login e cadastro, rotas protegidas, painel admin, início, biblioteca e criação de exercícios, desempenho (totais, comparações, gráficos, mapa, excluir sessão), ferramentas (calculadoras, timer, metrônomo, contador de arremessos), sessão guiada, registro de treino, rotina, metas, gerador, a aba Jogue como (lista, filtro, perfil, sessão guiada) com foto e crédito para cada jogador, barra de notícias, configurações, menu em tela cheia, efeitos de rolagem e as 181 figuras (cena, fases e pés no chão) |
 | **Ponta a ponta** | `cd e2e && npm test` | Playwright + Chrome + Postgres 17 | O site de produção no navegador falando com a API real e um Postgres de verdade: cadastro, login e volta à página pedida, e-mail repetido, rotina do dia → sessão guiada → desempenho, metas e conquistas, exercício próprio que não pode ser excluído quando está em uso, meta semanal no fuso do atleta, tema salvo na conta, backup sem duplicar, painel admin, manchete do admin na barra de notícias, navegação no celular e a aba Jogue como (os 20 estilos ligados ao catálogo do Postgres, filtro, perfil, sessão guiada salva no banco e treino do estilo na rotina) |
 
 Os testes da API e do site não precisam de Docker nem de servidor rodando. Os de ponta a ponta precisam do Postgres do Docker (`cd backend && npm run db:up`) e do Google Chrome instalado. Eles sobem sozinhos a API e o site em portas próprias (3410 e 4410) e usam um banco separado, `basketball_e2e`, recriado vazio a cada execução: o banco de desenvolvimento não é tocado. Na primeira vez, rode `npm install` dentro de `e2e`. O relatório de cada execução fica em `npm run report`.
@@ -241,6 +243,8 @@ A [documentação técnica](docs/DOCUMENTACAO.md) detalha a arquitetura, todas a
 
 - [x] Testes automatizados do frontend
 - [x] Testes de ponta a ponta (navegador + API + banco)
+- [x] Exercícios em três níveis, com aquecimento e figuras animadas
+- [x] Página contínua com efeitos de rolagem e mouse
 - [ ] Notificações push com o app fechado
 - [ ] Edição de treinos salvos com séries e metas
 - [ ] Deploy em produção
