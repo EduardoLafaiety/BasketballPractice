@@ -29,6 +29,7 @@ function abrirPainel(rotas: Parameters<typeof apiFalsa>[0] = {}) {
     'GET /auth/me': usuarioFalso({ id: 1, isAdmin: true }),
     'GET /settings': configFalsa,
     'GET /admin/users': contas(),
+    'GET /news': [],
     ...rotas,
   })
   abrirApp('/admin')
@@ -109,5 +110,86 @@ describe('Painel admin', () => {
     falhar = false
     await user.click(screen.getByRole('button', { name: 'Tentar de novo' }))
     expect(await screen.findByText('3 contas · 1 admin')).toBeInTheDocument()
+  })
+})
+
+describe('Painel admin: barra de notícias', () => {
+  const manchete = (extra: object = {}) => ({
+    id: 9,
+    origin: 'admin',
+    title: 'LeBron muda de time',
+    sourceName: 'ESPN',
+    url: 'https://espn.example/lebron',
+    publishedAt: new Date().toISOString(),
+    expiresAt: new Date(Date.now() + 6 * 3_600_000).toISOString(),
+    ...extra,
+  })
+  const painel = () => screen.findByRole('heading', { name: 'Barra de notícias' }).then((h) => h.closest('section') as HTMLElement)
+
+  it('publica a manchete e ela aparece na lista e na barra na hora', async () => {
+    const user = userEvent.setup()
+    let publicadas: object[] = []
+    const { ultima } = abrirPainel({
+      'GET /news': () => publicadas,
+      'POST /admin/news': () => {
+        publicadas = [manchete()]
+        return new Resposta(201, manchete())
+      },
+    })
+    const secao = within(await painel())
+
+    await user.type(secao.getByLabelText('Manchete'), '  LeBron muda de time  ')
+    await user.type(secao.getByLabelText('Fonte (opcional)'), 'ESPN')
+    await user.type(secao.getByLabelText('Link da matéria (opcional)'), 'https://espn.example/lebron')
+    await user.selectOptions(secao.getByLabelText('Fica no ar por'), '6 horas')
+    await user.click(secao.getByRole('button', { name: 'Publicar manchete' }))
+
+    expect(await secao.findByText('Breaking news · ESPN · agora')).toBeInTheDocument()
+    expect(ultima('POST', '/admin/news')?.corpo).toEqual({
+      title: 'LeBron muda de time',
+      sourceName: 'ESPN',
+      url: 'https://espn.example/lebron',
+      hours: 6,
+    })
+    expect(secao.getByLabelText('Manchete')).toHaveValue('')
+    const barra = await screen.findByRole('region', { name: 'Notícias de basquete' })
+    expect(within(barra).getByRole('link', { name: 'LeBron muda de time' })).toBeInTheDocument()
+  })
+
+  it('manda fonte e link vazios como nulos', async () => {
+    const user = userEvent.setup()
+    const { ultima } = abrirPainel({ 'POST /admin/news': () => new Resposta(201, manchete({ sourceName: null, url: null })) })
+    const secao = within(await painel())
+
+    await user.type(secao.getByLabelText('Manchete'), 'Sem fonte')
+    await user.click(secao.getByRole('button', { name: 'Publicar manchete' }))
+    await waitFor(() => expect(ultima('POST', '/admin/news')).toBeDefined())
+    expect(ultima('POST', '/admin/news')?.corpo).toEqual({ title: 'Sem fonte', sourceName: null, url: null, hours: 24 })
+  })
+
+  it('só remove depois de confirmar, e mostra o erro quando a API recusa', async () => {
+    const user = userEvent.setup()
+    const confirmar = vi.spyOn(window, 'confirm').mockReturnValue(false)
+    let falhar = true
+    const { chamadas } = abrirPainel({
+      'GET /news': [manchete({ origin: 'gnews', title: 'Automática ruim', expiresAt: null })],
+      'DELETE /admin/news/9': () => (falhar ? new Resposta(500, { error: 'Erro interno' }) : new Resposta(204)),
+    })
+    const secao = within(await painel())
+    const remover = await secao.findByRole('button', { name: 'Remover' })
+    expect(secao.getByText(/^Automática · ESPN/)).toBeInTheDocument()
+
+    await user.click(remover)
+    expect(confirmar).toHaveBeenCalledWith(expect.stringContaining('Automática ruim'))
+    expect(chamadas.some((c) => c.metodo === 'DELETE')).toBe(false)
+
+    confirmar.mockReturnValue(true)
+    await user.click(remover)
+    expect(await screen.findByRole('alert')).toHaveTextContent('Erro interno')
+
+    falhar = false
+    await user.click(remover)
+    await waitFor(() => expect(secao.queryByRole('button', { name: 'Remover' })).toBeNull())
+    expect(secao.getByText('Nenhuma manchete na barra agora.')).toBeInTheDocument()
   })
 })

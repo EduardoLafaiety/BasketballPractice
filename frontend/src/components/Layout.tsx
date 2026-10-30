@@ -6,6 +6,7 @@ import { marcarLembrado, notificar, proximoLembrete } from '../lib/lembretes'
 import { aplicarTema } from '../lib/tema'
 import { diasAtras, useConfig } from '../store'
 import type { Config } from '../types'
+import BarraNoticias from './BarraNoticias'
 import Icone, { type NomeIcone } from './Icone'
 import FaixaDemo from '../demo/FaixaDemo'
 
@@ -101,6 +102,7 @@ export default function Layout() {
         {__DEMO__ && <FaixaDemo />}
         <Outlet />
       </main>
+      <BarraNoticias />
     </div>
   )
 }

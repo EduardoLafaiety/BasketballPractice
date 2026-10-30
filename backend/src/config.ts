@@ -21,4 +21,8 @@ export const config = {
   trustProxy: Number(process.env.TRUST_PROXY ?? 0),
   /** Tentativas erradas de login e cadastro por IP a cada 15 minutos. */
   authAttempts: Number(process.env.AUTH_ATTEMPTS ?? 10),
+  /** Chave do GNews; vazia, a barra de notícias mostra só as manchetes do admin. */
+  gnewsApiKey: process.env.GNEWS_API_KEY ?? '',
+  /** A cada 20 minutos são 72 das 100 consultas diárias do plano grátis; o resto fica para a demonstração. */
+  newsIntervalMinutes: Number(process.env.NEWS_INTERVAL_MINUTES ?? 20),
 }

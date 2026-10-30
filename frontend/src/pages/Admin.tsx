@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { api, type UsuarioAdmin } from '../api'
 import { useAuth } from '../auth'
+import AdminNoticias from '../components/AdminNoticias'
 import { Carregando, ErroCarga } from '../components/Estado'
 import { formatarData } from '../store'
 
@@ -88,6 +89,8 @@ export default function Admin() {
           })}
         </ul>
       )}
+
+      <AdminNoticias />
     </>
   )
 }

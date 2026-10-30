@@ -12,6 +12,7 @@ import { authRouter } from './routes/auth.js'
 import { dataRouter } from './routes/data.js'
 import { exercisesRouter } from './routes/exercises.js'
 import { goalsRouter } from './routes/goals.js'
+import { newsRouter } from './routes/news.js'
 import { plansRouter } from './routes/plans.js'
 import { sessionsRouter } from './routes/sessions.js'
 import { settingsRouter } from './routes/settings.js'
@@ -63,6 +64,7 @@ export function createApp(db: Database, { limiteTentativas = { maximo: config.au
   app.use('/api/styles', auth, stylesRouter(db))
   app.use('/api/settings', auth, settingsRouter(db))
   app.use('/api/data', auth, dataRouter(db))
+  app.use('/api/news', auth, newsRouter(db))
   app.use('/api/admin', auth, requireAdmin(db), adminRouter(db))
 
   app.use(notFoundHandler)
