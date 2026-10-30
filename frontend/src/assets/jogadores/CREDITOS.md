@@ -1,6 +1,6 @@
 # Créditos das fotos dos jogadores
 
-Todas as fotos vêm da [Wikimedia Commons](https://commons.wikimedia.org) e têm licença livre. Foram reduzidas para 520 px de largura. As versões reduzidas das fotos CC BY-SA seguem a mesma licença. O time e a data são de quando a foto foi tirada.
+Todas as fotos vêm da [Wikimedia Commons](https://commons.wikimedia.org) e têm licença livre. Foram reduzidas para 520 px de largura, e as do Devin Booker e do Trae Young também foram recortadas no tronco. As versões reduzidas das fotos CC BY-SA seguem a mesma licença. O time e a data são de quando a foto foi tirada.
 
 O Basketball Practice não tem relação com os jogadores, com a NBA nem com os times.
 
@@ -18,3 +18,11 @@ O Basketball Practice não tem relação com os jogadores, com a NBA nem com os 
 | Anthony Edwards | [Timberwolves, dez/2021](https://commons.wikimedia.org/wiki/File:Anthony_Edwards_Kentavious_Caldwell-Pope_(51734745028)_(cropped)_(cropped).jpg) | All-Pro Reels | CC BY-SA 2.0 |
 | Victor Wembanyama | [Spurs, dez/2024](https://commons.wikimedia.org/wiki/File:Victor_Wembanyama_San_Antonio_Spurs_2024.jpg) | Frenchieinportland | CC BY 4.0 |
 | Jalen Brunson | [Knicks, abr/2023](https://commons.wikimedia.org/wiki/File:Jalen_Brunson_2023_(cropped).jpg) | Erik Drost | CC BY 2.0 |
+| James Harden | [Nets, jan/2022](https://commons.wikimedia.org/wiki/File:Harden_dribbling_midcourt,_Cavaliers_vs_Nets_on_January_17,_2022_(cropped).jpg) | Erik Drost | CC BY 2.0 |
+| Damian Lillard | [Trail Blazers, nov/2021](https://commons.wikimedia.org/wiki/File:Damian_Lillard_(2021)_(cropped).jpg) | Erik Drost | CC BY 2.0 |
+| Ja Morant | [Grizzlies, nov/2021](https://commons.wikimedia.org/wiki/File:Ja_Morant_2021.jpg) | All-Pro Reels | CC BY-SA 2.0 |
+| Tyrese Haliburton | [Pacers, mar/2025](https://commons.wikimedia.org/wiki/File:1_tyrese_haliburton_2025_(cropped_2).jpg) | Chensiyuan | CC BY-SA 4.0 |
+| Devin Booker | [Suns, nov/2016](https://commons.wikimedia.org/wiki/File:Devin_Booker_(30362063153)_(cropped).jpg) | Keith Allison | CC BY-SA 2.0 |
+| Joel Embiid | [76ers, fev/2018](https://commons.wikimedia.org/wiki/File:Joel_Embiid_2018_(cropped2).jpg) | Keith Allison | CC BY-SA 2.0 |
+| Kawhi Leonard | [Raptors, mar/2019](https://commons.wikimedia.org/wiki/File:1_kawhi_leonard_2019_(cropped).jpg) | Chensiyuan | CC BY-SA 4.0 |
+| Trae Young | [Hawks, jan/2020](https://commons.wikimedia.org/wiki/File:Trae_Young.jpg) | Alexander Jonesi | CC BY-SA 2.0 |
