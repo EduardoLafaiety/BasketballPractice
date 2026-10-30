@@ -122,6 +122,40 @@ describe('Início', () => {
     expect(screen.queryByRole('link', { name: /Meta:/ })).toBeNull()
   })
 
+  it('a página mostra os níveis com a contagem real, a rotina da semana e todos os jogadores', async () => {
+    const estilo = (id: string, name: string) => ({ id, name, group: 'guard', archetype: 'Estilo', moveCount: 3, minutes: 40, mix: { arremesso: 100 } })
+    const doNivel = (id: number, level: string, warmup = false) => ({ id, name: `Exercício ${id}`, category: 'drible', metric: 'tempo', description: null, custom: false, level, warmup })
+    abrirInicio({
+      'GET /exercises': [doNivel(1, 'iniciante'), doNivel(2, 'iniciante'), doNivel(3, 'iniciante', true), doNivel(4, 'avancado'), ...catalogo],
+      'GET /styles': [estilo('luka-doncic', 'Luka Dončić'), estilo('stephen-curry', 'Stephen Curry')],
+      ...rotinaDe({ 1: [1] }),
+    })
+
+    const iniciante = (await screen.findByRole('heading', { name: 'Iniciante' })).closest('a') as HTMLElement
+    expect(iniciante).toHaveAttribute('href', '/treinos?nivel=iniciante')
+    // O aquecimento não conta como exercício do nível.
+    await within(iniciante).findByText('2 exercícios')
+    expect(within(screen.getByRole('heading', { name: 'Avançado' }).closest('a') as HTMLElement).getByText('1 exercícios')).toBeInTheDocument()
+
+    // Os dois jogadores têm link; os nomes que correm são decoração e não repetem o link.
+    expect(await screen.findByRole('link', { name: /Luka Dončić/ })).toHaveAttribute('href', '/jogue-como/luka-doncic')
+    expect(screen.getAllByRole('link', { name: /Dončić|Curry/ })).toHaveLength(2)
+    const nomes = document.querySelector('.nomes-linha') as HTMLElement
+    expect(nomes).toHaveTextContent('Luka Dončić')
+    expect(nomes).toHaveAttribute('aria-hidden', 'true')
+    expect(nomes.querySelector('a')).toBeNull()
+
+    const segunda = (await screen.findByRole('heading', { name: 'Seg' })).closest('article') as HTMLElement
+    await within(segunda).findByText('Exercício 1')
+    expect(screen.getByRole('heading', { name: 'Ter' }).closest('article')).toHaveTextContent('Descanso')
+  })
+
+  it('sem resposta dos jogadores, o resto da página continua', async () => {
+    abrirInicio({ 'GET /styles': new Resposta(500) })
+    expect(await screen.findByRole('heading', { name: 'Treino de hoje' })).toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: 'Jogue como' })).toBeNull()
+  })
+
   it('lista o treino da rotina de hoje e leva à sessão do dia', async () => {
     abrirInicio(rotinaDe({ 3: [3, 1], 4: [2] }))
 
@@ -130,13 +164,13 @@ describe('Início', () => {
     expect(cartoes.map((c) => c.querySelector('h3')?.textContent)).toEqual(['Crossover', 'Lance livre'])
     expect(cartoes[1]).toHaveAttribute('href', '/treinos/1')
     expect(screen.getByRole('link', { name: 'Começar treino de hoje' })).toHaveAttribute('href', '/sessao?hoje')
-    expect(screen.queryByRole('link', { name: 'Gerar um treino' })).toBeNull()
+    expect(screen.queryByRole('link', { name: 'Gerar treino rápido' })).toBeNull()
   })
 
   it('com um só exercício hoje, já oferece começar o treino', async () => {
     abrirInicio(rotinaDe({ 3: [2] }))
     expect(await screen.findByRole('link', { name: 'Começar treino de hoje' })).toBeInTheDocument()
-    expect(screen.queryByRole('link', { name: 'Gerar um treino' })).toBeNull()
+    expect(screen.queryByRole('link', { name: 'Gerar treino rápido' })).toBeNull()
   })
 
   it('sem treino planejado para hoje, sugere a rotina e o gerador', async () => {
@@ -144,7 +178,7 @@ describe('Início', () => {
 
     expect(await screen.findByText(/Nenhum treino planejado para quarta\./)).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Adicione à rotina' })).toHaveAttribute('href', '/rotina')
-    expect(screen.getByRole('link', { name: 'Gerar um treino' })).toHaveAttribute('href', '/gerador')
+    expect(screen.getByRole('link', { name: 'Gerar treino rápido' })).toHaveAttribute('href', '/gerador?minutos=15')
     expect(screen.queryByRole('link', { name: /Começar treino de hoje/ })).toBeNull()
   })
 

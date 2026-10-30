@@ -13,7 +13,7 @@ const plano = {
   ],
 }
 
-function abrirGerador(rotas: Parameters<typeof apiFalsa>[0] = {}) {
+function abrirGerador(rotas: Parameters<typeof apiFalsa>[0] = {}, rota = '/gerador') {
   definirToken('tk')
   const api = apiFalsa({
     'GET /auth/me': usuarioFalso(),
@@ -22,11 +22,23 @@ function abrirGerador(rotas: Parameters<typeof apiFalsa>[0] = {}) {
     'POST /plans/generate': plano,
     ...rotas,
   })
-  abrirApp('/gerador')
+  abrirApp(rota)
   return api
 }
 
 describe('Gerador de treino', () => {
+  it.each([
+    ['/gerador?minutos=15', 15],
+    ['/gerador', 45],
+    ['/gerador?minutos=7', 45],
+    ['/gerador?minutos=abc', 45],
+  ])('%s abre com %i minutos', async (rota, minutos) => {
+    const user = userEvent.setup()
+    const { ultima } = abrirGerador({}, rota)
+    await user.click(await screen.findByRole('button', { name: 'Gerar treino' }))
+    await waitFor(() => expect(ultima('POST', '/plans/generate')?.corpo).toMatchObject({ minutes: minutos }))
+  })
+
   it('pede o treino com o tempo, o foco e o aquecimento escolhidos', async () => {
     const user = userEvent.setup()
     const { ultima } = abrirGerador()

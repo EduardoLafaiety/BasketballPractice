@@ -1,9 +1,9 @@
 import { expect, test } from '@playwright/test'
-import { entrarCom, novaConta } from './ajuda'
+import { entrarCom, novaConta, irPara } from './ajuda'
 
 test.use({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true })
 
-test('no celular, o menu vira barra no topo, navega entre as telas e nada vaza para os lados', async ({
+test('no celular, o menu abre em tela cheia, navega entre as telas e nada vaza para os lados', async ({
   page,
   request,
 }) => {
@@ -14,10 +14,8 @@ test('no celular, o menu vira barra no topo, navega entre as telas e nada vaza p
 
   await page.goto('/')
   await expect(page.getByRole('heading', { name: /Bora pra quadra/ })).toBeVisible()
-  // A barra lateral fica em cima do conteúdo, não ao lado.
-  const menu = await page.locator('.lateral').boundingBox()
-  const conteudo = await page.locator('.conteudo').boundingBox()
-  expect(menu!.y + menu!.height).toBeLessThanOrEqual(conteudo!.y + 1)
+  // O menu fica fechado e não ocupa a tela.
+  await expect(page.getByRole('navigation', { name: 'Principal' })).toBeHidden()
   expect(await semRolagemLateral()).toBe(true)
 
   for (const [link, titulo] of [
@@ -25,7 +23,7 @@ test('no celular, o menu vira barra no topo, navega entre as telas e nada vaza p
     ['Ferramentas', 'Ferramentas'],
     ['Metas', 'Metas e conquistas'],
   ]) {
-    await page.getByRole('navigation', { name: 'Principal' }).getByRole('link', { name: link }).click()
+    await irPara(page, link)
     await expect(page.getByRole('heading', { name: titulo, level: 1 })).toBeVisible()
     expect(await semRolagemLateral()).toBe(true)
   }
