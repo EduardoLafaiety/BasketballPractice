@@ -27,7 +27,7 @@
 - 📶 **Três níveis**: iniciante, intermediário e avançado, com 50 exercícios em cada um e aquecimento próprio.
 - 🎬 **Como fazer**: os 181 exercícios do catálogo têm uma animação de um manequim mostrando o movimento.
 - ⚡ **Gerador de treino**: diga quanto tempo tem, o nível e o foco, e a sessão sai pronta.
-- 🌟 **Jogue como**: escolha um entre 20 jogadores da NBA e treine os movimentos que definem o estilo dele.
+- 🌟 **Jogue como**: escolha um entre 28 jogadores da NBA e treine os movimentos que definem o estilo dele.
 - ▶️ **Sessão guiada**: animação ao lado do cronômetro, contador de acertos e registro automático no fim.
 - 🗓️ **Rotina semanal**: monte o que treinar em cada dia ou comece de um modelo pronto.
 - 📈 **Desempenho**: comparativos, gráficos e mapa de arremessos por zona da quadra.
@@ -69,7 +69,7 @@
     <td><img src="docs/screenshots/jogue-como-perfil.png" alt="Perfil do Luka Dončić com a divisão do treino e os movimentos-assinatura" /></td>
   </tr>
   <tr>
-    <td align="center"><b>Jogue como</b> · 20 jogadores; o mouse revela a cor da foto</td>
+    <td align="center"><b>Jogue como</b> · 28 jogadores; o mouse revela a cor da foto</td>
     <td align="center"><b>Perfil do jogador</b> · estilo, movimentos e treino pronto</td>
   </tr>
 </table>
