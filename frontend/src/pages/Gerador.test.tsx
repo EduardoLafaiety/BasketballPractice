@@ -53,6 +53,30 @@ describe('Gerador de treino', () => {
     expect(screen.getByRole('button', { name: 'Gerar outro' })).toBeInTheDocument()
   })
 
+  it('os atalhos de tempo e o nível valem no pedido, e o resumo acompanha as escolhas', async () => {
+    const user = userEvent.setup()
+    const { ultima } = abrirGerador()
+    const resumo = await screen.findByText('45 min · Iniciante · Treino completo · Com aquecimento')
+    expect(screen.getByRole('button', { name: '45 min' })).toHaveAttribute('aria-pressed', 'true')
+
+    await user.click(screen.getByRole('button', { name: '30 min' }))
+    expect(screen.getByRole('button', { name: '30 min' })).toHaveAttribute('aria-pressed', 'true')
+    expect(screen.getByRole('button', { name: '45 min' })).toHaveAttribute('aria-pressed', 'false')
+    expect(screen.getByRole('slider')).toHaveValue('30')
+
+    await user.click(screen.getByRole('button', { name: /Avançado/ }))
+    expect(screen.getByRole('button', { name: /Avançado/ })).toHaveAttribute('aria-pressed', 'true')
+    await user.click(screen.getByRole('button', { name: 'Passe' }))
+    await user.click(screen.getByRole('button', { name: 'Defesa' }))
+    await user.click(screen.getByRole('checkbox', { name: /aquecimento/ }))
+    expect(resumo).toHaveTextContent('30 min · Avançado · Passe, Defesa · Sem aquecimento')
+
+    await user.click(screen.getByRole('button', { name: 'Gerar treino' }))
+    await waitFor(() =>
+      expect(ultima('POST', '/plans/generate')?.corpo).toEqual({ minutes: 30, focus: ['passe', 'defesa'], warmup: false, level: 'avancado' }),
+    )
+  })
+
   it('leva o plano para a sessão guiada com o título montado pelo foco', async () => {
     const user = userEvent.setup()
     abrirGerador()
@@ -91,8 +115,9 @@ describe('Gerador de treino', () => {
       'PUT /workouts/3': (corpo) => ({ id: 3, ...(corpo as object) }),
     })
     await user.click(await screen.findByRole('button', { name: 'Gerar treino' }))
-    const rotina = await screen.findByRole('combobox', { name: 'Usar na rotina' })
+    const rotina = await screen.findByRole('combobox', { name: 'Definir rotina' })
     await waitFor(() => expect(rotina).toBeEnabled())
+    expect(screen.getByRole('option', { name: 'Definir rotina' })).toHaveValue('')
 
     await user.selectOptions(rotina, 'Segunda')
     expect(confirmar).toHaveBeenCalledWith('Substituir os treinos de segunda na rotina?')
