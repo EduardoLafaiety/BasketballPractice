@@ -348,7 +348,7 @@ function Aplicativo() {
       ) : (
         <p className="muted">
           Para instalar: no Android/Chrome, use o menu ⋮ → “Instalar app”; no iPhone/Safari, Compartilhar → “Adicionar à Tela de Início”.
-          O timer, o metrônomo, as calculadoras e os vídeos funcionam mesmo sem internet.
+          O timer, o metrônomo e as calculadoras funcionam mesmo sem internet.
         </p>
       )}
     </section>
