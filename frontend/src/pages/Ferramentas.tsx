@@ -7,15 +7,18 @@ import Video from '../ferramentas/Video'
 import Icone, { type NomeIcone } from '../components/Icone'
 import { useConfig } from '../store'
 
-const ABAS: { id: 'timer' | 'arremessos' | 'metronomo' | 'video' | 'calculadoras'; rotulo: string; icone: NomeIcone; descricao: string }[] = [
-  { id: 'timer', rotulo: 'Timer de intervalos', icone: 'relogio', descricao: 'Blocos de trabalho e descanso com aviso sonoro, para condicionamento e circuitos.' },
-  { id: 'arremessos', rotulo: 'Contador de arremessos', icone: 'metas', descricao: 'Acerto ou erro com um toque, com sequência e recorde da sessão.' },
-  { id: 'metronomo', rotulo: 'Metrônomo de drible', icone: 'ritmo', descricao: 'Ritmo constante para treinar velocidade e controle de bola.' },
-  { id: 'video', rotulo: 'Vídeo do arremesso', icone: 'video', descricao: 'Grave, assista em câmera lenta e compare a mecânica lado a lado.' },
-  { id: 'calculadoras', rotulo: 'Calculadoras', icone: 'calculadora', descricao: 'FG%, eFG%, TS%, quanto falta para a meta e distâncias.' },
+const ABAS: { id: 'timer' | 'arremessos' | 'metronomo' | 'video' | 'calculadoras'; rotulo: string; resumo: string; icone: NomeIcone; descricao: string }[] = [
+  { id: 'timer', rotulo: 'Timer de intervalos', resumo: 'Trabalho e descanso', icone: 'relogio', descricao: 'Blocos de trabalho e descanso com aviso sonoro, para condicionamento e circuitos.' },
+  { id: 'arremessos', rotulo: 'Contador de arremessos', resumo: 'Acertos e sequência', icone: 'metas', descricao: 'Acerto ou erro com um toque, com sequência e recorde da sessão.' },
+  { id: 'metronomo', rotulo: 'Metrônomo de drible', resumo: 'Ritmo constante', icone: 'ritmo', descricao: 'Ritmo constante para treinar velocidade e controle de bola.' },
+  { id: 'video', rotulo: 'Vídeo do arremesso', resumo: 'Câmera lenta', icone: 'video', descricao: 'Grave, assista em câmera lenta e compare a mecânica lado a lado.' },
+  { id: 'calculadoras', rotulo: 'Calculadoras', resumo: 'Aproveitamento e metas', icone: 'calculadora', descricao: 'FG%, eFG%, TS%, quanto falta para a meta e distâncias.' },
 ]
 
 type Aba = (typeof ABAS)[number]['id']
+
+// O timer e o metrônomo já são um painel próprio, e as calculadoras trazem os seus cartões.
+const SEM_CARTAO: Aba[] = ['timer', 'metronomo', 'calculadoras']
 
 export default function Ferramentas() {
   const [params, setParams] = useSearchParams()
@@ -26,23 +29,23 @@ export default function Ferramentas() {
   return (
     <>
       <h1>Ferramentas</h1>
-      <div className="abas" role="tablist" aria-label="Ferramentas">
+      <div className="niveis niveis-abas" role="tablist" aria-label="Ferramentas">
         {ABAS.map((a) => (
           <button
             key={a.id}
             role="tab"
             aria-selected={a.id === aba}
-            className={`chip ${a.id === aba ? 'ativo' : ''}`}
+            className={`nivel-opcao ${a.id === aba ? 'ativo' : ''}`}
             onClick={() => setParams({ aba: a.id }, { replace: true })}
           >
-            <Icone nome={a.icone} tamanho={16} />
-            {a.rotulo}
+            <strong><Icone nome={a.icone} tamanho={16} />{a.rotulo}</strong>
+            <span>{a.resumo}</span>
           </button>
         ))}
       </div>
       <p className="muted">{atual.descricao}</p>
 
-      <section className="card" role="tabpanel">
+      <section className={SEM_CARTAO.includes(aba) ? undefined : 'card'} role="tabpanel">
         {aba === 'timer' && <TimerIntervalos />}
         {aba === 'arremessos' && <LancesLivres />}
         {aba === 'metronomo' && (

@@ -28,14 +28,16 @@ describe('Timer de intervalos', () => {
 
   it('calcula a duração total com o preparo e aplica os modelos prontos', async () => {
     montar()
-    expect(screen.getByText(/Duração total/)).toHaveTextContent('Duração total: 07:35 (com 5s de preparo)')
+    expect(screen.getByText('Duração total')).toBeInTheDocument()
+    expect(screen.getByText('07:35')).toBeInTheDocument()
+    expect(screen.getByText(/Com 5s de preparo/)).toBeInTheDocument()
 
     clicar('Drible 45/15')
     expect(screen.getByLabelText('Trabalho (s)')).toHaveValue(45)
     expect(screen.getByLabelText('Descanso (s)')).toHaveValue(15)
     expect(screen.getByLabelText('Rodadas')).toHaveValue(6)
     // 5 + 6 × 45 + 5 × 15 = 350 s.
-    expect(screen.getByText(/Duração total/)).toHaveTextContent('05:50')
+    expect(screen.getByText('05:50')).toBeInTheDocument()
   })
 
   it('não aceita trabalho nem rodadas abaixo de 1, nem descanso negativo', () => {
@@ -53,7 +55,7 @@ describe('Timer de intervalos', () => {
     mudar('Trabalho (s)', '3')
     mudar('Descanso (s)', '2')
     mudar('Rodadas', '2')
-    expect(screen.getByText(/Duração total/)).toHaveTextContent('00:13')
+    expect(screen.getByText('00:13')).toBeInTheDocument()
 
     clicar('Iniciar')
     expect([fase(), relogio()]).toEqual(['Prepare-se', '00:05'])

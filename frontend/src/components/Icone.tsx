@@ -61,6 +61,7 @@ const CAMINHOS = {
     </>
   ),
   check: <path d="M5 12.5 10 17 19 7" />,
+  xis: <path d="M6 6l12 12M18 6 6 18" />,
   medalha: (
     <>
       <circle cx="12" cy="15" r="6" />

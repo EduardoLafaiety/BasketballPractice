@@ -33,6 +33,9 @@ describe('Contador de arremessos', () => {
     const p = within(placar())
     expect(p.getByText('4/5')).toBeInTheDocument()
     expect(p.getByText('80%')).toBeInTheDocument()
+    // Cada botão mostra a própria contagem.
+    expect(within(acertou).getByText('4')).toBeInTheDocument()
+    expect(within(errou).getByText('1')).toBeInTheDocument()
     expect(ultimoEstado.sequenciaAtual).toBe(1)
     expect(ultimoEstado.melhorSequencia).toBe(3)
     // Som agudo no acerto e grave no erro.
@@ -52,7 +55,15 @@ describe('Contador de arremessos', () => {
     await user.click(desfazer)
 
     expect(within(placar()).getByText('1/1')).toBeInTheDocument()
+    expect(within(screen.getByRole('button', { name: /errou/i })).getByText('0')).toBeInTheDocument()
     expect(ultimoEstado.sequenciaAtual).toBe(1)
+  })
+
+  it('sem arremessos ainda não mostra aproveitamento', () => {
+    render(<ContadorDeTeste />)
+    const p = within(placar())
+    expect(p.getByText('–')).toBeInTheDocument()
+    expect(p.getByText('0/0')).toBeInTheDocument()
   })
 
   it('só zera depois de confirmar', async () => {
