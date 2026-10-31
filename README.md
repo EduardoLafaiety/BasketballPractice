@@ -12,7 +12,7 @@
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL_17-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)
 ![PWA](https://img.shields.io/badge/PWA-5A0FC8?style=for-the-badge&logo=pwa&logoColor=white)
 
-**[▶ Experimente a demonstração](https://eduardolafaiety.github.io/BasketballPractice/)**: sem cadastro, direto no navegador.
+**[▶ Experimente a demonstração](https://eduardolafaiety.github.io/BasketballPractice/)**: entre com qualquer e-mail e senha ou sem conta, direto no navegador.
 
 <br />
 

@@ -41,8 +41,7 @@ export class ApiError extends Error {
   }
 }
 
-// Na demonstração não há login: o visitante já entra com a sessão aberta.
-let token: string | null = __DEMO__ ? 'demo' : lerToken()
+let token: string | null = lerToken()
 let aoExpirar: (() => void) | null = null
 
 function lerToken() {

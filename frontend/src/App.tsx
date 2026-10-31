@@ -20,9 +20,9 @@ import Admin from './pages/Admin'
 export default function App() {
   return (
     <Routes>
-      {/* Na demonstração não há contas: login e cadastro levam direto ao app. */}
-      <Route path="entrar" element={__DEMO__ ? <Navigate to="/" replace /> : <Entrar modo="entrar" />} />
-      <Route path="cadastro" element={__DEMO__ ? <Navigate to="/" replace /> : <Entrar modo="cadastro" />} />
+      <Route path="entrar" element={<Entrar modo="entrar" />} />
+      {/* Na demonstração não há contas para criar: o login já aceita qualquer e-mail e senha. */}
+      <Route path="cadastro" element={__DEMO__ ? <Navigate to="/entrar" replace /> : <Entrar modo="cadastro" />} />
       <Route
         element={
           <RequerLogin>

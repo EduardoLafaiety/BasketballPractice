@@ -211,7 +211,7 @@ function Dados() {
         </p>
       )}
       <hr className="divisor" />
-      {!__DEMO__ && <button className="btn" onClick={sair}>Sair da conta</button>}
+      <button className="btn" onClick={sair}>Sair da conta</button>
     </section>
   )
 }
