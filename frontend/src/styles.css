@@ -578,9 +578,8 @@ section + section, .card + section { margin-top: 1.5rem; }
 .contador-botoes { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
 .contador-botoes .btn { padding: 1.1rem; font-size: 1.15rem; touch-action: manipulation; }
 .contador-botoes:has(> :nth-child(3)) { grid-template-columns: 2fr 1fr 1fr; }
-.btn-acerto { background: color-mix(in srgb, var(--verde) 20%, var(--superficie-2)); border-color: var(--verde); }
 .btn-erro { background: color-mix(in srgb, var(--vermelho) 18%, var(--superficie-2)); border-color: var(--vermelho); }
-.btn-acerto:active, .btn-erro:active { transform: scale(0.97); }
+.btn-erro:active { transform: scale(0.97); }
 /* Blocos de placar: fundo preto nos dois temas, então as cores do número não seguem o tema. */
 .contador-botoes .contador-toque { flex-direction: column; gap: 0.15rem; min-height: 120px; padding: 0.75rem; border-color: #383838; border-radius: 20px; background: var(--lateral); color: #ffffff; font-size: 0.78rem; font-weight: 800; letter-spacing: 0.12em; transition: transform 0.08s, background-color 0.15s; }
 .contador-toque:hover { background: #202020; }
@@ -1233,7 +1232,7 @@ section + section, .card + section { margin-top: 1.5rem; }
 /* Textos pequenos: todos em maiúsculas, um pouco menores que o botão Gerar treino. Títulos, números e campos ficam fora. */
 .conteudo p:not(.manifesto-frase), .conteudo .muted, .conteudo .meta, .conteudo .nivel, .conteudo .chip, .conteudo label, .conteudo legend,
 .conteudo h1 + .muted, .conteudo .secao-topo + .muted, .conteudo .semana-dia li, .conteudo .semana-dia span, .conteudo .nivel-opcao span, .conteudo .nivel-opcao strong,
-.conteudo .link, .conteudo dt, .conteudo dd:not(.resultados dd), .conteudo .estilo-divisao-linha span, .conteudo section.card li > span, .conteudo section.card li > strong, .conteudo .semana-dia h3, .conteudo .escada-fase strong, .conteudo .vazio, .conteudo .demo-passos span, .conteudo .demo-opcao, .conteudo .cartao-jogador-rodape, .auth-card .muted {
+.conteudo .link, .conteudo dt, .conteudo dd:not(.resultados dd), .conteudo .estilo-divisao-linha span, .conteudo section.card li > span, .conteudo section.card li > strong, .conteudo .semana-dia h3, .conteudo .dia-topo h3, .conteudo .escada-fase strong, .conteudo .vazio, .conteudo .demo-passos span, .conteudo .demo-opcao, .conteudo .cartao-jogador-rodape, .auth-card .muted {
   font-size: 0.7rem;
   font-weight: 700;
   letter-spacing: 0.06em;

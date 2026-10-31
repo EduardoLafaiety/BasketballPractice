@@ -225,9 +225,9 @@ function Execucao({ plano }: { plano: PlanoGuiado }) {
                 </div>
               </div>
               <div className="contador-botoes">
-                <button className="btn btn-acerto" onClick={() => setReps((r) => r + 1)}>+1</button>
-                <button className="btn" onClick={() => setReps((r) => r + 5)}>+5</button>
-                <button className="btn" onClick={() => setReps((r) => Math.max(0, r - 1))}>−1</button>
+                <button className="btn contador-toque contador-toque-acerto" onClick={() => setReps((r) => r + 1)}><strong>+1</strong></button>
+                <button className="btn contador-toque contador-toque-acerto" onClick={() => setReps((r) => r + 5)}><strong>+5</strong></button>
+                <button className="btn contador-toque contador-toque-erro" onClick={() => setReps((r) => Math.max(0, r - 1))}><strong>−1</strong></button>
               </div>
             </div>
           )}
