@@ -210,6 +210,15 @@ export function LinhasQuadra() {
   )
 }
 
+/** Listra no topo da seção: uma fatia da bola, com as costuras esticadas na largura da tela. */
+export function ListraBola() {
+  return (
+    <svg className="listra-bola" viewBox="0 120 400 160" preserveAspectRatio="none" aria-hidden>
+      <path vectorEffect="non-scaling-stroke" d="M10 200h380M200 10v380M64 68c70 62 70 202 0 264M336 68c-70 62-70 202 0 264" />
+    </svg>
+  )
+}
+
 /** Frase que acende palavra por palavra conforme a rolagem. */
 export function FraseRolagem({ texto }: { texto: string }) {
   const caixa = useRef<HTMLElement>(null)

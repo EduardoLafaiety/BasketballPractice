@@ -68,7 +68,7 @@ export default function Admin() {
                     {u.isAdmin && <span className="tag admin-tag">admin</span>}
                     {eu && <span className="meta"> (você)</span>}
                   </strong>
-                  <span className="meta">{u.email}</span>
+                  <span className="meta texto-literal">{u.email}</span>
                   <span className="meta">
                     Desde {formatarData(u.createdAt)} · {u.workouts} treinos · {u.sessions} sessões
                     {u.lastSessionAt && ` · última em ${formatarData(u.lastSessionAt)}`}

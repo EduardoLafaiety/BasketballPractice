@@ -10,3 +10,6 @@ backend/data/
 .claude/settings.local.json
 *.tsbuildinfo
 backend/admin-local.txt
+
+# Gerado ao rodar a demonstração (npm run dev:demo); ao publicar, sai do workflow.
+frontend/public/noticias.json

@@ -4,7 +4,7 @@ import { api } from '../api'
 import { AvisoDesatualizado, Carregando, ErroCarga } from '../components/Estado'
 import GradeJogadores from '../components/GradeJogadores'
 import Icone from '../components/Icone'
-import { AberturaBola, EscadaRolagem, Figura, FraseRolagem, NomesRolagem } from '../components/rolagem'
+import { AberturaBola, EscadaRolagem, Figura, FraseRolagem, ListraBola, NomesRolagem } from '../components/rolagem'
 import { NIVEIS } from '../lib/niveis'
 import { DIAS, ROTULO_METRICA, aproveitamento, diasAtras, useDrills, useMetas, useProgresso, useResumo, useRotina } from '../store'
 import type { DiaSemana, Drill, EstiloResumo, Nivel } from '../types'
@@ -197,7 +197,8 @@ export default function Inicio() {
         </div>
       </section>
 
-      <section className="faixa-laranja banda" aria-busy={!resumo}>
+      <section className="faixa-laranja banda com-listra" aria-busy={!resumo}>
+        <ListraBola />
         <h2 className="titulo-gigante">Seus números</h2>
         {erroResumo && <p className="erro" role="alert">Não foi possível carregar seus números: {erroResumo.message}</p>}
         <div className="stats faixa">
@@ -211,7 +212,8 @@ export default function Inicio() {
         </div>
       </section>
 
-      <section className="faixa-preta banda">
+      <section className="faixa-preta banda com-listra">
+        <ListraBola />
         <h2 className="titulo-gigante">Ferramentas</h2>
         <div className="ferramentas-lista">
           {FERRAMENTAS.map((f) => (

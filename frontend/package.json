@@ -9,6 +9,7 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
+    "predev:demo": "cd ../backend && npx tsx src/scripts/export-news.ts ../frontend/public/noticias.json",
     "dev:demo": "vite --mode demo",
     "build:demo": "tsc -b && vite build --mode demo",
     "fotos": "node scripts/otimizar-fotos.mjs"
