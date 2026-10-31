@@ -130,11 +130,11 @@ export default function EstiloDetalhe() {
           <select
             className="input select"
             value=""
-            aria-label="Usar na rotina"
+            aria-label="Definir rotina"
             disabled={!rotina.carregado}
             onChange={(e) => e.target.value && usarNaRotina(Number(e.target.value) as DiaSemana)}
           >
-            <option value="">Usar na rotina de…</option>
+            <option value="">Definir rotina</option>
             {ORDEM_DIAS.map((d) => (
               <option key={d} value={d}>{DIAS[d]}</option>
             ))}
