@@ -32,7 +32,7 @@
 - 🗓️ **Rotina semanal**: monte o que treinar em cada dia ou comece de um modelo pronto.
 - 📈 **Desempenho**: comparativos, gráficos e mapa de arremessos por zona da quadra.
 - 🏆 **Metas e conquistas**: barras de progresso, sequência de dias seguidos e medalhas.
-- 🧰 **Ferramentas**: timer de intervalos, contador de arremessos, metrônomo de drible, vídeo em câmera lenta e calculadoras.
+- 🧰 **Ferramentas**: timer de intervalos, contador de arremessos, metrônomo de drible e calculadoras; o vídeo em câmera lenta chega em breve.
 - 📰 **Barra de notícias**: as últimas manchetes do basquete correndo no rodapé do site.
 - 🏀 **Visual de quadra**: a bola da abertura amplia sem perder nitidez ao rolar a página, e uma listra com as costuras dela abre as seções de números e ferramentas.
 - 📱 **PWA**: instalável no celular, com tema claro/escuro e lembretes de treino.

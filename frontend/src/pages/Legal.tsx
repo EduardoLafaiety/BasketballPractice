@@ -40,7 +40,7 @@ export function PoliticaPrivacidade() {
       </ul>
 
       <h2>O que fica só no seu navegador</h2>
-      <p>O site guarda a sessão de acesso, o tema e os lembretes no próprio navegador. Os vídeos de treino também ficam nele e não são enviados ao servidor.</p>
+      <p>O site guarda a sessão de acesso, o tema e os lembretes no próprio navegador.</p>
 
       <h2>Para que usamos</h2>
       <p>Para manter sua conta, mostrar seu histórico e sua evolução, proteger o acesso e enviar os e-mails de ativação e de recuperação de senha. Não há e-mail de propaganda.</p>

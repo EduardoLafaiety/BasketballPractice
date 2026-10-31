@@ -622,7 +622,7 @@ Outros pontos:
 - A página **Desempenho** lista até 50 sessões (`/sessions?limit=50`) e calcula o gráfico "últimos 7 dias" no próprio navegador a partir delas — [Desempenho.tsx:45](../frontend/src/pages/Desempenho.tsx#L45).
 - A tela **Treinos** cria exercícios próprios; o detalhe de um exercício próprio permite editar e excluir.
 - **Cache compartilhado** ([store.ts](../frontend/src/store.ts)): componentes que mostram a mesma chave recebem as mudanças na hora (ex.: o tema salvo em Configurações chega ao Layout). Salvar ou apagar uma sessão invalida `resumo`, `zonas`, `progresso` e `metas`, e o que está na tela é recarregado sem piscar.
-- **Só no navegador**: vídeos (IndexedDB, [lib/videos.ts](../frontend/src/lib/videos.ts)), o tema da última visita (para não piscar antes do login) e o dia do último lembrete. O resto fica no servidor.
+- **Só no navegador**: vídeos, cuja ferramenta está indisponível na tela por enquanto (IndexedDB, [lib/videos.ts](../frontend/src/lib/videos.ts)), o tema da última visita (para não piscar antes do login) e o dia do último lembrete. O resto fica no servidor.
 - **Lembretes** ([Layout.tsx](../frontend/src/components/Layout.tsx)): notificações do próprio navegador, sem servidor de push. Só disparam com o site ou o app aberto em alguma aba e não avisam se já houve sessão no dia.
 - **PWA** ([public/sw.js](../frontend/public/sw.js)): o service worker só é registrado no build de produção. Ele guarda a casca do site e nunca as respostas da API; assim timer, metrônomo, calculadoras e vídeos abrem sem internet.
 - Mensagens de validação do Zod chegam em inglês e são traduzidas na tela de login — [Entrar.tsx:106](../frontend/src/pages/Entrar.tsx#L106).

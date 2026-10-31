@@ -3,7 +3,6 @@ import Calculadoras from '../ferramentas/Calculadoras'
 import LancesLivres from '../ferramentas/LancesLivres'
 import Metronomo from '../ferramentas/Metronomo'
 import TimerIntervalos from '../ferramentas/TimerIntervalos'
-import Video from '../ferramentas/Video'
 import Icone, { type NomeIcone } from '../components/Icone'
 import { useConfig } from '../store'
 
@@ -11,7 +10,7 @@ const ABAS: { id: 'timer' | 'arremessos' | 'metronomo' | 'video' | 'calculadoras
   { id: 'timer', rotulo: 'Timer de intervalos', resumo: 'Trabalho e descanso', icone: 'relogio', descricao: 'Blocos de trabalho e descanso com aviso sonoro, para condicionamento e circuitos.' },
   { id: 'arremessos', rotulo: 'Contador de arremessos', resumo: 'Acertos e sequência', icone: 'metas', descricao: 'Acerto ou erro com um toque, com sequência e recorde da sessão.' },
   { id: 'metronomo', rotulo: 'Metrônomo de drible', resumo: 'Ritmo constante', icone: 'ritmo', descricao: 'Ritmo constante para treinar velocidade e controle de bola.' },
-  { id: 'video', rotulo: 'Vídeo do arremesso', resumo: 'Câmera lenta', icone: 'video', descricao: 'Grave, assista em câmera lenta e compare a mecânica lado a lado.' },
+  { id: 'video', rotulo: 'Vídeo do arremesso', resumo: 'Em breve', icone: 'video', descricao: 'Em breve: grave, assista em câmera lenta e compare a mecânica lado a lado.' },
   { id: 'calculadoras', rotulo: 'Calculadoras', resumo: 'Aproveitamento e metas', icone: 'calculadora', descricao: 'FG%, eFG%, TS%, quanto falta para a meta e distâncias.' },
 ]
 
@@ -19,6 +18,16 @@ type Aba = (typeof ABAS)[number]['id']
 
 // O timer e o metrônomo já são um painel próprio, e as calculadoras trazem os seus cartões.
 const SEM_CARTAO: Aba[] = ['timer', 'metronomo', 'calculadoras']
+
+// A ferramenta está em ferramentas/Video.tsx; para liberá-la, basta voltar a mostrá-la aqui.
+function VideoIndisponivel() {
+  return (
+    <div className="ferramenta-em-breve" role="status">
+      <h2 className="sem-margem">Ainda não disponível</h2>
+      <p className="muted">O vídeo do arremesso ainda não pode ser usado. Estamos preparando esta ferramenta, e ela chega em uma próxima versão.</p>
+    </div>
+  )
+}
 
 export default function Ferramentas() {
   const [params, setParams] = useSearchParams()
@@ -54,7 +63,7 @@ export default function Ferramentas() {
             aoSalvarBpm={(bpm) => void salvar({ ...config, metronomoBpm: bpm }).catch((e: Error) => window.alert(e.message))}
           />
         )}
-        {aba === 'video' && <Video />}
+        {aba === 'video' && <VideoIndisponivel />}
         {aba === 'calculadoras' && <Calculadoras />}
       </section>
     </>

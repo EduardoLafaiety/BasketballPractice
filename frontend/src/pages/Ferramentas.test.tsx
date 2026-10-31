@@ -41,6 +41,18 @@ const aba = (nome: RegExp) => screen.getByRole('tab', { name: nome })
 const bpm = () => document.querySelector('.timer-relogio')?.textContent
 const clicar = (user: ReturnType<typeof userEvent.setup>, nome: string | RegExp) => user.click(screen.getByRole('button', { name: nome }))
 
+describe('Ferramentas: vídeo do arremesso', () => {
+  it('avisa que ainda não está disponível e não oferece câmera nem envio de vídeo', async () => {
+    abrirFerramentas('video')
+
+    const titulo = await screen.findByRole('heading', { name: 'Ainda não disponível' })
+    expect(titulo.closest('[role="status"]')).toHaveTextContent('ainda não pode ser usado')
+    expect(screen.queryByRole('button', { name: /Abrir câmera/i })).toBeNull()
+    expect(screen.queryByRole('button', { name: /Escolher vídeo/i })).toBeNull()
+    expect(document.querySelector('input[type="file"]')).toBeNull()
+  })
+})
+
 describe('Ferramentas: abas', () => {
   it('abre no timer e troca de ferramenta pelas abas', async () => {
     const user = userEvent.setup()
@@ -67,7 +79,7 @@ describe('Ferramentas: abas', () => {
     const user = userEvent.setup()
     abrirFerramentas(null)
     await screen.findByRole('button', { name: 'Iniciar' })
-    expect(aba(/Vídeo do arremesso/)).toHaveTextContent('Câmera lenta')
+    expect(aba(/Vídeo do arremesso/)).toHaveTextContent('Em breve')
     expect(screen.getByRole('tabpanel')).not.toHaveClass('card')
 
     await user.click(aba(/Contador de arremessos/))
