@@ -16,7 +16,7 @@ export const settingsSchema = z.object({
         .default('18:00'),
       days: z.array(z.number().int().min(0).max(6)).max(7).default([1, 2, 3, 4, 5]),
     })
-    .default({}),
+    .prefault({}),
   metronomeBpm: z.number().int().min(30).max(240).default(90),
 })
 
