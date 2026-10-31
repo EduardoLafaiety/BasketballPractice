@@ -59,3 +59,16 @@ export function aceitarDialogos(page: Page) {
   })
   return mensagens
 }
+
+/** Abre o menu em tela cheia (a navegação principal fica nele). */
+export async function abrirMenu(page: Page) {
+  await page.getByRole('button', { name: 'Menu', exact: true }).click()
+  return page.getByRole('navigation', { name: 'Principal' })
+}
+
+/** Vai para uma seção pelo menu. */
+export async function irPara(page: Page, secao: string) {
+  const menu = await abrirMenu(page)
+  await menu.getByRole('link', { name: secao, exact: false }).click()
+  await expect(page.getByRole('button', { name: 'Menu', exact: true })).toHaveAttribute('aria-expanded', 'false')
+}

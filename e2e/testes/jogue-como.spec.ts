@@ -1,11 +1,11 @@
 import { expect, test, type Page } from '@playwright/test'
-import { autorizacao, entrarCom, novaConta, numero } from './ajuda'
+import { autorizacao, entrarCom, novaConta, numero, irPara } from './ajuda'
 
 const DIAS = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado']
 
 /** Quantas fotos da página terminaram de carregar de verdade (sem imagem quebrada). */
 async function fotosCarregadas(page: Page) {
-  return page.locator('.foto-jogador img').evaluateAll(async (imagens: HTMLImageElement[]) => {
+  return page.locator('.foto-jogador img:not(.foto-cor)').evaluateAll(async (imagens: HTMLImageElement[]) => {
     for (const img of imagens) img.loading = 'eager'
     await Promise.all(imagens.map((img) => img.decode().catch(() => undefined)))
     return imagens.filter((img) => img.complete && img.naturalWidth > 0).length
@@ -39,7 +39,7 @@ test('escolhe um jogador pelo menu, vê o perfil e abre o exercício de um movim
   await entrarCom(page, token)
 
   await page.goto('/')
-  await page.getByRole('navigation', { name: 'Principal' }).getByRole('link', { name: 'Jogue como' }).click()
+  await irPara(page, 'Jogue como')
   await expect(page.getByRole('heading', { name: 'Jogue como', level: 1 })).toBeVisible()
   await expect(page.locator('.cartao-jogador')).toHaveCount(20)
   expect(await fotosCarregadas(page)).toBe(20)
