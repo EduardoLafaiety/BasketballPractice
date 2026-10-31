@@ -1,6 +1,7 @@
 import { useCallback, useState } from 'react'
 import { bipe, vibrar } from '../lib/audio'
 import type { ArremessosZona, Zona } from '../types'
+import Icone from './Icone'
 import Quadra, { NOME_ZONA, type DadosZonas } from './Quadra'
 
 interface Toque {
@@ -70,10 +71,8 @@ export default function Contador({ contador, comQuadra = true }: { contador: Est
     <div className="contador">
       <div className="contador-placar" aria-live="polite">
         <div>
-          <strong>
-            {acertos}/{tentativas}
-          </strong>
-          <span className="meta">{pct === null ? 'acertos' : `${pct}%`}</span>
+          <strong>{pct === null ? '–' : `${pct}%`}</strong>
+          <span className="meta">{acertos}/{tentativas}</span>
         </div>
         <div>
           <strong>{sequenciaAtual}</strong>
@@ -107,11 +106,13 @@ export default function Contador({ contador, comQuadra = true }: { contador: Est
       )}
 
       <div className="contador-botoes">
-        <button type="button" className="btn btn-acerto" onClick={() => contador.registrar(true)}>
-          ✓ Acertou
+        <button type="button" className="btn contador-toque contador-toque-acerto" onClick={() => contador.registrar(true)}>
+          <strong>{acertos}</strong>
+          <span><Icone nome="check" tamanho={16} />Acertou</span>
         </button>
-        <button type="button" className="btn btn-erro" onClick={() => contador.registrar(false)}>
-          ✗ Errou
+        <button type="button" className="btn contador-toque contador-toque-erro" onClick={() => contador.registrar(false)}>
+          <strong>{tentativas - acertos}</strong>
+          <span><Icone nome="xis" tamanho={16} />Errou</span>
         </button>
       </div>
       <div className="acoes contador-extra">
