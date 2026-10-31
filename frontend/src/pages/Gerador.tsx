@@ -2,12 +2,13 @@ import { useState, type FormEvent } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { api } from '../api'
 import { CATEGORIAS } from '../components/FormExercicio'
-import { NIVEIS } from '../lib/niveis'
+import { NIVEIS, ROTULO_NIVEL } from '../lib/niveis'
 import { DIAS, ROTULO_METRICA, useRotina } from '../store'
 import type { BlocoPlano, Categoria, DiaSemana, Nivel } from '../types'
 import type { PlanoGuiado } from './SessaoGuiada'
 
 const ORDEM_DIAS: DiaSemana[] = [1, 2, 3, 4, 5, 6, 0]
+const ATALHOS_MINUTOS = [15, 30, 45, 60, 90]
 
 export default function Gerador() {
   const navigate = useNavigate()
@@ -43,7 +44,14 @@ export default function Gerador() {
     }
   }
 
-  const titulo = nome.trim() || `Treino de ${minutos} min${foco.length ? ` — ${foco.join(', ').toLowerCase()}` : ''}`
+  const resumo = [
+    `${minutos} min`,
+    ROTULO_NIVEL[nivel],
+    foco.length ? foco.join(', ') : 'Treino completo',
+    aquecimento ? 'Com aquecimento' : 'Sem aquecimento',
+  ].join(' · ')
+
+  const titulo = nome.trim() ||`Treino de ${minutos} min${foco.length ? ` — ${foco.join(', ').toLowerCase()}` : ''}`
 
   function iniciar() {
     if (!blocos) return
@@ -76,44 +84,64 @@ export default function Gerador() {
       <h1>Gerador de treino</h1>
       <p className="muted">Diga quanto tempo você tem e o que quer treinar: o app monta a sessão com a biblioteca de exercícios.</p>
 
-      <form className="card form form-solto" onSubmit={gerar}>
-        <label>
-          Tempo disponível: <strong>{minutos} min</strong>
-          <input type="range" min={10} max={120} step={5} value={minutos} onChange={(e) => setMinutos(Number(e.target.value))} />
-        </label>
-        <fieldset className="fieldset">
-          <legend>Nível</legend>
+      <form className="gerador" onSubmit={gerar}>
+        <div className="gerador-tempo placar-preto">
+          <label>
+            <span className="meta">Tempo disponível</span>
+            <strong className="timer-relogio">{minutos}<small> min</small></strong>
+            <input type="range" min={10} max={120} step={5} value={minutos} onChange={(e) => setMinutos(Number(e.target.value))} />
+          </label>
+          <div className="gerador-escala meta" aria-hidden><span>10 min</span><span>120 min</span></div>
           <div className="chips">
-            {NIVEIS.map((n) => (
-              <button key={n.id} type="button" className={`chip ${nivel === n.id ? 'ativo' : ''}`} aria-pressed={nivel === n.id} onClick={() => setNivel(n.id)}>
-                {n.rotulo}
+            {ATALHOS_MINUTOS.map((m) => (
+              <button key={m} type="button" className={`chip ${minutos === m ? 'ativo' : ''}`} aria-pressed={minutos === m} onClick={() => setMinutos(m)}>
+                {m} min
               </button>
             ))}
           </div>
-        </fieldset>
-        <fieldset className="fieldset">
-          <legend>Foco (vazio = treino completo)</legend>
-          <div className="chips">
-            {CATEGORIAS.map((c) => (
-              <button
-                key={c}
-                type="button"
-                className={`chip ${foco.includes(c) ? 'ativo' : ''}`}
-                aria-pressed={foco.includes(c)}
-                onClick={() => alternar(c)}
-              >
-                {c}
-              </button>
-            ))}
-          </div>
-        </fieldset>
-        <label className="check">
-          <input type="checkbox" checked={aquecimento} onChange={(e) => setAquecimento(e.target.checked)} />
-          Começar com aquecimento do nível
-        </label>
-        <button className="btn btn-primario" type="submit" disabled={gerando}>
-          {gerando ? 'Montando…' : blocos ? 'Gerar outro' : 'Gerar treino'}
-        </button>
+        </div>
+
+        <div className="gerador-passos card">
+          <fieldset className="gerador-passo">
+            <legend><span aria-hidden>01</span>Nível</legend>
+            <div className="niveis">
+              {NIVEIS.map((n) => (
+                <button key={n.id} type="button" className={`nivel-opcao ${nivel === n.id ? 'ativo' : ''}`} aria-pressed={nivel === n.id} onClick={() => setNivel(n.id)}>
+                  <strong>{n.rotulo}</strong>
+                  <span>{n.foco}</span>
+                </button>
+              ))}
+            </div>
+          </fieldset>
+          <fieldset className="gerador-passo">
+            <legend><span aria-hidden>02</span>Foco<small className="meta">Vazio = treino completo</small></legend>
+            <div className="gerador-focos">
+              {CATEGORIAS.map((c) => (
+                <button
+                  key={c}
+                  type="button"
+                  className={`gerador-foco tag tag-${c} ${foco.includes(c) ? 'ativo' : ''}`}
+                  aria-pressed={foco.includes(c)}
+                  onClick={() => alternar(c)}
+                >
+                  {c}
+                </button>
+              ))}
+            </div>
+          </fieldset>
+          <label className="gerador-passo gerador-aquecimento">
+            <span className="gerador-numero" aria-hidden>03</span>
+            <span>Começar com aquecimento do nível</span>
+            <input type="checkbox" checked={aquecimento} onChange={(e) => setAquecimento(e.target.checked)} />
+          </label>
+        </div>
+
+        <div className="gerador-acao placar-preto">
+          <p className="meta">{resumo}</p>
+          <button className="btn btn-primario btn-grande" type="submit" disabled={gerando}>
+            {gerando ? 'Montando…' : blocos ? 'Gerar outro' : 'Gerar treino'}
+          </button>
+        </div>
       </form>
 
       {erro && <p className="erro" role="alert">{erro}</p>}
@@ -144,11 +172,11 @@ export default function Gerador() {
             <select
               className="input select"
               value=""
-              aria-label="Usar na rotina"
+              aria-label="Definir rotina"
               disabled={!rotina.carregado}
               onChange={(e) => e.target.value && usarNaRotina(Number(e.target.value) as DiaSemana)}
             >
-              <option value="">Usar na rotina de…</option>
+              <option value="">Definir rotina</option>
               {ORDEM_DIAS.map((d) => (
                 <option key={d} value={d}>{DIAS[d]}</option>
               ))}

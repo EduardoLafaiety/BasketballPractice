@@ -136,7 +136,7 @@ test('coloca o treino do estilo na rotina de hoje e ele continua lá depois de r
   const salvou = page.waitForResponse(
     (r) => r.url().endsWith('/api/workouts') && r.request().method() === 'POST' && r.status() === 201,
   )
-  await page.getByRole('combobox', { name: 'Usar na rotina' }).selectOption({ label: DIAS[hoje] })
+  await page.getByRole('combobox', { name: 'Definir rotina' }).selectOption({ label: DIAS[hoje] })
   await expect(page.getByRole('status')).toContainText(`rotina de ${DIAS[hoje].toLowerCase()}`)
   await salvou
 
