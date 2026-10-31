@@ -1,8 +1,8 @@
 import { z, type ZodTypeAny } from 'zod'
 import { HttpError } from './http-error.js'
 
-// O maior backup que cabe nos 10 MB da importação tem bem menos itens que isto. Sem este teto, o Zod valida cada item
-// de um array acima do .max() e guarda um erro por item: 5 milhões de zeros travam a API por 5 s e custam 2 GB.
+// O maior backup que cabe nos 10 MB da importação tem bem menos itens que isto. O .max() de cada schema vale para um
+// array só; este teto vale para o corpo inteiro, e limita o trabalho com muitos arrays aninhados dentro do próprio limite.
 export const MAX_ARRAY_ITEMS = 250_000
 
 /**

@@ -7,15 +7,26 @@ import { signToken } from '../lib/token.js'
 import { parse } from '../lib/validate.js'
 import { currentUser, requireAuth } from '../middleware/auth.js'
 
+// A tela mostra estas mensagens ao lado de cada campo: o texto não pode depender da versão do Zod.
+const EMAIL = 'E-mail inválido.'
+const email = z.string({ error: EMAIL }).trim().toLowerCase().email()
+
 const registerSchema = z.object({
-  name: z.string().trim().min(2).max(80),
-  email: z.string().trim().toLowerCase().email(),
-  password: z.string().min(8).max(128),
+  name: z
+    .string({ error: 'Informe o nome.' })
+    .trim()
+    .min(2, 'O nome precisa ter pelo menos 2 letras.')
+    .max(80, 'O nome pode ter até 80 letras.'),
+  email,
+  password: z
+    .string({ error: 'Informe a senha.' })
+    .min(8, 'A senha precisa ter pelo menos 8 caracteres.')
+    .max(128, 'A senha pode ter até 128 caracteres.'),
 })
 
 const loginSchema = z.object({
-  email: z.string().trim().toLowerCase().email(),
-  password: z.string().min(1),
+  email,
+  password: z.string({ error: 'Informe a senha.' }).min(1),
 })
 
 type User = { id: number; name: string; email: string; isAdmin: boolean; createdAt: Date }

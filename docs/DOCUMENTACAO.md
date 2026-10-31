@@ -158,7 +158,7 @@ As versões vêm de [frontend/package.json](../frontend/package.json) e [backend
 - **No projeto:** libera só a origem de `CORS_ORIGIN` (padrão `http://localhost:5173`) — [app.ts:17](../backend/src/app.ts#L17).
 - **Por que:** em produção o site e a API podem estar em domínios diferentes (`VITE_API_URL`, ver [frontend/.env.example](../frontend/.env.example)). Em dev o proxy do Vite torna isso desnecessário.
 
-#### Zod (^3.24.1)
+#### Zod (^4.6.7)
 - **O que é:** biblioteca de validação por esquema com inferência de tipos TypeScript.
 - **No projeto:** cada rota declara o esquema do corpo/query (ex.: `sessionSchema` em [routes/sessions.ts:25](../backend/src/routes/sessions.ts#L25)); o helper `parse()` transforma falhas em HTTP 400 com os erros por campo — [lib/validate.ts:4](../backend/src/lib/validate.ts#L4). Também normaliza dados (`trim`, `toLowerCase` no e-mail, `z.coerce` em query strings, `.default([])`).
 - **Por que:** um único esquema serve de validação **e** de tipo (`z.infer`), sem duplicar interfaces.

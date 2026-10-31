@@ -139,6 +139,42 @@ describe('Limite por conta e de cadastros', () => {
   })
 })
 
+describe('Mensagens do cadastro e do login', () => {
+  const detalhes = async (caminho: string, corpo: object) => {
+    const resposta = await livre.api('POST', caminho, corpo)
+    assert.equal(resposta.status, 400)
+    return resposta.body.details
+  }
+
+  it('saem em português em cada campo, do jeito que a tela mostra', async () => {
+    assert.deepEqual(await detalhes('/auth/register', { name: 'M', email: 'marina@', password: 'curta' }), {
+      name: ['O nome precisa ter pelo menos 2 letras.'],
+      email: ['E-mail inválido.'],
+      password: ['A senha precisa ter pelo menos 8 caracteres.'],
+    })
+    assert.deepEqual(await detalhes('/auth/register', { name: 'x'.repeat(81), email: 'a@example.com', password: 'x'.repeat(129) }), {
+      name: ['O nome pode ter até 80 letras.'],
+      password: ['A senha pode ter até 128 caracteres.'],
+    })
+    assert.deepEqual(await detalhes('/auth/login', { email: 'marina@', password: '' }), {
+      email: ['E-mail inválido.'],
+      password: ['Informe a senha.'],
+    })
+  })
+
+  it('campo faltando também', async () => {
+    assert.deepEqual(await detalhes('/auth/register', {}), {
+      name: ['Informe o nome.'],
+      email: ['E-mail inválido.'],
+      password: ['Informe a senha.'],
+    })
+    assert.deepEqual(await detalhes('/auth/login', {}), {
+      email: ['E-mail inválido.'],
+      password: ['Informe a senha.'],
+    })
+  })
+})
+
 describe('Tempo do login recusado', () => {
   it('e-mail sem conta demora o mesmo que senha errada', async () => {
     const { email } = await livre.register()
