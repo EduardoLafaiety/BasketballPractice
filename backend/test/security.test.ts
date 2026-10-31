@@ -2,9 +2,10 @@ import assert from 'node:assert/strict'
 import { before, describe, it } from 'node:test'
 import jwt from 'jsonwebtoken'
 import { config } from '../src/config.js'
+import { criarConta } from './caixa.js'
 import { startApi } from './http.js'
 
-const { api, register, db, baseUrl } = await startApi()
+const { api, register, db, baseUrl, caixa } = await startApi()
 
 describe('Autenticação', () => {
   it('aceita só o formato "Bearer <token>"', async () => {
@@ -20,13 +21,17 @@ describe('Autenticação', () => {
 
   it('compara o e-mail sem diferenciar maiúsculas no login e no cadastro', async () => {
     const credentials = { name: 'Caixa', email: 'Caixa.Alta@Example.com', password: 'senha-segura' }
-    const created = await api('POST', '/auth/register', credentials)
-    assert.equal(created.body.user.email, 'caixa.alta@example.com')
+    const created = await criarConta(api, caixa, credentials)
+    assert.equal(created.user.email, 'caixa.alta@example.com')
 
     const login = await api('POST', '/auth/login', { email: '  CAIXA.ALTA@example.COM ', password: 'senha-segura' })
     assert.equal(login.status, 200)
-    assert.equal(login.body.user.id, created.body.user.id)
-    assert.equal((await api('POST', '/auth/register', { ...credentials, email: 'caixa.alta@EXAMPLE.com' })).status, 409)
+    assert.equal(login.body.user.id, created.user.id)
+
+    // A segunda tentativa, em outra caixa de letras, não cria outro pedido de ativação.
+    assert.equal((await api('POST', '/auth/register', { ...credentials, email: 'caixa.alta@EXAMPLE.com' })).status, 202)
+    await caixa.terminar()
+    assert.match(caixa.para('caixa.alta@example.com').at(-1)!.subject, /já tem conta/)
   })
 
   it('não revela se o e-mail existe e nunca devolve o hash da senha', async () => {

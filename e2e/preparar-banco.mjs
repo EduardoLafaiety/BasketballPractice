@@ -1,5 +1,6 @@
 // Recria o banco dos testes de ponta a ponta, vazio, antes de a API subir (ela aplica migrações e catálogo).
 // Usa o mesmo Postgres do projeto, num banco separado: o banco de desenvolvimento não é tocado.
+import { rmSync } from 'node:fs'
 import pg from 'pg'
 
 const url = new URL(process.env.DATABASE_URL)
@@ -8,6 +9,8 @@ if (!/^[a-z0-9_]*e2e[a-z0-9_]*$/.test(nome)) {
   // Trava de segurança: este script apaga o banco inteiro.
   throw new Error(`Recuso apagar "${nome}": o banco dos testes E2E precisa ter "e2e" no nome`)
 }
+
+rmSync(process.env.EMAIL_OUTBOX_FILE, { force: true })
 
 url.pathname = '/postgres'
 const cliente = new pg.Client({ connectionString: url.toString() })

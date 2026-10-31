@@ -2,12 +2,14 @@ import assert from 'node:assert/strict'
 import type { AddressInfo } from 'node:net'
 import { after, before, describe, it } from 'node:test'
 import { createApp } from '../src/app.js'
+import { caixaDeEmails, criarConta } from './caixa.js'
 import { generatePlan } from '../src/routes/plans.js'
 import { streaks } from '../src/routes/stats.js'
 import { openTestDatabase } from './pglite.js'
 
 const db = await openTestDatabase()
-const server = createApp(db).listen(0)
+const caixa = caixaDeEmails()
+const server = createApp(db, { emails: caixa.emails, segundoPlano: caixa.segundoPlano }).listen(0)
 let baseUrl = ''
 let token = ''
 
@@ -24,15 +26,12 @@ async function api(method: string, path: string, body?: unknown, auth = token) {
 const exercise = async (name: string) =>
   (await api('GET', '/exercises')).body.find((e: { name: string }) => e.name === name) as { id: number; name: string }
 
+const novaConta = (name: string, email: string) =>
+  criarConta((method, path, body) => api(method, path, body, ''), caixa, { name, email, password: 'senha-segura' })
+
 before(async () => {
   baseUrl = `http://127.0.0.1:${(server.address() as AddressInfo).port}/api`
-  const register = await api(
-    'POST',
-    '/auth/register',
-    { name: 'Atleta', email: 'ferramentas@example.com', password: 'senha-segura' },
-    '',
-  )
-  token = register.body.token
+  token = (await novaConta('Atleta', 'ferramentas@example.com')).token
 })
 
 after(async () => {
@@ -232,13 +231,13 @@ describe('Ferramentas na API', () => {
     assert.equal(again.body.skipped.sessions, exported.sessions.length)
 
     // Numa conta nova, recria o exercício personalizado e liga as sessões a ele.
-    const other = await api('POST', '/auth/register', { name: 'Outra', email: 'outra@example.com', password: 'senha-segura' }, '')
-    const imported = await api('POST', '/data/import', exported, other.body.token)
+    const other = await novaConta('Outra', 'outra@example.com')
+    const imported = await api('POST', '/data/import', exported, other.token)
     assert.equal(imported.status, 200)
     assert.equal(imported.body.created.exercises, 1)
     assert.equal(imported.body.created.sessions, exported.sessions.length)
     assert.equal(imported.body.created.goals, exported.goals.length)
-    const otherSessions = (await api('GET', '/sessions?limit=200', undefined, other.body.token)).body
+    const otherSessions = (await api('GET', '/sessions?limit=200', undefined, other.token)).body
     const floater = otherSessions.find((s: { entries: { exerciseName: string }[] }) => s.entries[0]?.exerciseName === 'Floater')
     assert.ok(floater)
     assert.notEqual(floater.entries[0].exerciseId, custom.body.id)

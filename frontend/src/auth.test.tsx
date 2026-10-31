@@ -6,7 +6,7 @@ import { AuthProvider, REVERIFICAR_MS, useAuth } from './auth'
 import { apiFalsa, configFalsa, Resposta, usuarioFalso } from './test/api-falsa'
 import { abrirApp } from './test/renderizar'
 
-const menu = () => screen.getByRole('navigation')
+const menu = () => screen.getByRole('navigation', { name: 'Principal' })
 
 describe('sessão do usuário', () => {
   it('reaproveita o token salvo e mostra o nome no topo', async () => {
@@ -264,7 +264,6 @@ describe('falha passageira ao conferir a sessão', () => {
 
   it.each([
     ['/entrar', 'POST /auth/login', 'Entrar'],
-    ['/cadastro', 'POST /auth/register', 'Criar conta'],
   ])('entrar por %s depois da falha para as novas tentativas', async (rota, post, botao) => {
     const user = usarRelogioFalso()
     definirToken('tk-antigo')

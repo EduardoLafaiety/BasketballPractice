@@ -1,5 +1,5 @@
-import { useRef, useState } from 'react'
-import { api, dataLocal, type ResultadoImportacao } from '../api'
+import { useRef, useState, type FormEvent } from 'react'
+import { api, ApiError, dataLocal, definirToken, type ResultadoImportacao } from '../api'
 import { useAuth } from '../auth'
 import { Carregando, ErroCarga } from '../components/Estado'
 import { baixarArquivo, sessoesParaCsv } from '../lib/arquivo'
@@ -54,6 +54,8 @@ export default function Configuracoes() {
       )}
 
       <Dados />
+      {/* Na demonstração não há conta de verdade para mudar a senha ou excluir. */}
+      {!__DEMO__ && <Conta />}
       <Aplicativo />
     </>
   )
@@ -212,7 +214,120 @@ function Dados() {
       )}
       <hr className="divisor" />
       <button className="btn" onClick={sair}>Sair da conta</button>
+      {!__DEMO__ && <p className="meta">Sair encerra a sessão em todos os aparelhos.</p>}
     </section>
+  )
+}
+
+function Conta() {
+  return (
+    <section className="card form form-solto">
+      <h2 className="sem-margem">Sua conta</h2>
+      <TrocarSenha />
+      <hr className="divisor" />
+      <ExcluirConta />
+    </section>
+  )
+}
+
+function TrocarSenha() {
+  const [atual, setAtual] = useState('')
+  const [nova, setNova] = useState('')
+  const [enviando, setEnviando] = useState(false)
+  const [erro, setErro] = useState<ApiError | Error | null>(null)
+  const [trocada, setTrocada] = useState(false)
+  const campos = erro instanceof ApiError ? erro.details : undefined
+
+  async function enviar(e: FormEvent) {
+    e.preventDefault()
+    setErro(null)
+    setTrocada(false)
+    setEnviando(true)
+    try {
+      // O token antigo acaba de deixar de valer; sem guardar o novo, o próximo pedido deslogaria a pessoa.
+      definirToken((await api.trocarSenha(atual, nova)).token)
+      setAtual('')
+      setNova('')
+      setTrocada(true)
+    } catch (falha) {
+      setErro(falha as Error)
+    } finally {
+      setEnviando(false)
+    }
+  }
+
+  return (
+    <form className="form" onSubmit={enviar} noValidate>
+      <h3 className="sem-margem">Trocar a senha</h3>
+      <label>
+        Senha atual
+        <input className="input" type="password" autoComplete="current-password" value={atual} onChange={(e) => setAtual(e.target.value)} />
+        {campos?.currentPassword && <span className="erro">{campos.currentPassword[0]}</span>}
+      </label>
+      <label>
+        Senha nova
+        <input className="input" type="password" autoComplete="new-password" value={nova} onChange={(e) => setNova(e.target.value)} />
+        {campos?.newPassword && <span className="erro">{campos.newPassword[0]}</span>}
+      </label>
+      {erro && !campos && <p className="erro" role="alert">{erro.message}</p>}
+      {trocada && <p className="sucesso" role="status">Senha trocada. As sessões em outros aparelhos foram encerradas.</p>}
+      <div className="acoes">
+        <button className="btn btn-primario" type="submit" disabled={enviando || !atual || !nova}>
+          {enviando ? 'Trocando…' : 'Trocar a senha'}
+        </button>
+      </div>
+    </form>
+  )
+}
+
+function ExcluirConta() {
+  const { encerrarLocal } = useAuth()
+  const [aberto, setAberto] = useState(false)
+  const [senha, setSenha] = useState('')
+  const [enviando, setEnviando] = useState(false)
+  const [erro, setErro] = useState<ApiError | Error | null>(null)
+  const doCampo = erro instanceof ApiError ? erro.details?.password?.[0] : undefined
+
+  async function enviar(e: FormEvent) {
+    e.preventDefault()
+    setErro(null)
+    setEnviando(true)
+    try {
+      await api.excluirConta(senha)
+      encerrarLocal()
+    } catch (falha) {
+      setErro(falha as Error)
+      setEnviando(false)
+    }
+  }
+
+  if (!aberto) {
+    return (
+      <div className="acoes">
+        <button className="btn btn-perigo" type="button" onClick={() => setAberto(true)}>Excluir minha conta</button>
+      </div>
+    )
+  }
+
+  return (
+    <form className="form" onSubmit={enviar} noValidate>
+      <h3 className="sem-margem">Excluir minha conta</h3>
+      <p className="muted">
+        Isto apaga sua conta, sessões, treinos, metas e testes, e não pode ser desfeito. Se quiser guardar uma cópia, baixe o backup antes.
+      </p>
+      <label>
+        Confirme com sua senha
+        <input className="input" type="password" autoComplete="current-password" value={senha} onChange={(e) => setSenha(e.target.value)} />
+        {doCampo && <span className="erro">{doCampo}</span>}
+      </label>
+      {erro && !doCampo && <p className="erro" role="alert">{erro.message}</p>}
+      <div className="acoes">
+        <button className="btn btn-perigo" type="submit" disabled={enviando || !senha}>
+          {enviando ? 'Excluindo…' : 'Excluir definitivamente'}
+        </button>
+        <button className="btn" type="button" disabled={enviando} onClick={() => { setAberto(false); setSenha(''); setErro(null) }}>Cancelar</button>
+      </div>
+    </form>
   )
 }
 

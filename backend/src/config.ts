@@ -1,3 +1,5 @@
+import { assertProductionEmail, type EmailConfig } from './lib/email.js'
+
 try {
   process.loadEnvFile()
 } catch {
@@ -22,12 +24,26 @@ const isProduction = process.env.NODE_ENV === 'production'
 if (isProduction) assertProductionSecret(process.env.JWT_SECRET ?? '')
 const jwtSecret = process.env.JWT_SECRET || 'dev-secret-change-me'
 
+const email: EmailConfig = {
+  provider: process.env.EMAIL_PROVIDER ?? '',
+  from: process.env.EMAIL_FROM ?? '',
+  resendApiKey: process.env.RESEND_API_KEY ?? '',
+  resendUrl: process.env.RESEND_URL ?? 'https://api.resend.com/emails',
+  outboxFile: process.env.EMAIL_OUTBOX_FILE ?? 'emails-enviados.jsonl',
+}
+if (isProduction) assertProductionEmail(email)
+
+const corsOrigin = process.env.CORS_ORIGIN ?? 'http://localhost:5173'
+
 export const config = {
   port: Number(process.env.PORT ?? 3333),
   jwtSecret,
   jwtExpiresIn: process.env.JWT_EXPIRES_IN ?? '7d',
   databaseUrl: process.env.DATABASE_URL ?? 'postgres://basketball:basketball@localhost:5433/basketball',
-  corsOrigin: process.env.CORS_ORIGIN ?? 'http://localhost:5173',
+  corsOrigin,
+  /** Endereço do site, para os links dos e-mails. Vem da configuração, nunca do pedido: um Host forjado desviaria o link. */
+  appUrl: (process.env.APP_URL || corsOrigin).replace(/\/$/, ''),
+  email,
   // Atrás de um proxy (Nginx, Render, Railway…), defina TRUST_PROXY=1 para o req.ip ser o do atleta, não o do proxy.
   trustProxy: Number(process.env.TRUST_PROXY ?? 0),
   /** Tentativas erradas de login e cadastro por IP a cada 15 minutos. */
@@ -36,6 +52,10 @@ export const config = {
   accountAttempts: Number(process.env.ACCOUNT_ATTEMPTS ?? 20),
   /** Contas criadas com sucesso por IP a cada hora. Folgado para uma equipe se cadastrar na mesma rede. */
   registrationsPerHour: Number(process.env.REGISTRATIONS_PER_HOUR ?? 30),
+  /** Pedidos de "esqueci a senha" por IP a cada hora. */
+  recoveryRequestsPerHour: Number(process.env.RECOVERY_REQUESTS_PER_HOUR ?? 10),
+  /** E-mails de cadastro e de recuperação que cada endereço recebe por hora. */
+  emailsPerAddressPerHour: Number(process.env.EMAILS_PER_ADDRESS_PER_HOUR ?? 5),
   /** Importações de backup ao mesmo tempo nesta instância. */
   maxImports: Number(process.env.MAX_IMPORTS ?? 2),
   /** Chave do GNews; vazia, a barra de notícias mostra só as manchetes do admin. */

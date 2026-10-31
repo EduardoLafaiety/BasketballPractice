@@ -246,7 +246,7 @@ As versões vêm de [frontend/package.json](../frontend/package.json) e [backend
 | **Middleware** | Funções que rodam em sequência antes/depois das rotas: CORS, leitura do JSON (limite 100 kB), autenticação, 404 e tratamento de erros. | [app.ts:16](../backend/src/app.ts#L16), [middleware/auth.ts](../backend/src/middleware/auth.ts), [middleware/errors.ts](../backend/src/middleware/errors.ts) |
 | **Tratamento central de erros** | As rotas lançam `HttpError(status, mensagem)`; um middleware único transforma isso em `{ error, details }`. Erros inesperados viram 500 sem vazar detalhes. | [lib/http-error.ts](../backend/src/lib/http-error.ts), [middleware/errors.ts:8](../backend/src/middleware/errors.ts#L8) |
 | **Validação de esquema** | Descreve o formato esperado (tipos, tamanhos, faixas) e rejeita o que não bate antes de tocar no banco. | [lib/validate.ts](../backend/src/lib/validate.ts), regra "acertos ≤ tentativas" em [routes/sessions.ts:20](../backend/src/routes/sessions.ts#L20) |
-| **Autenticação stateless (JWT)** | No login o servidor devolve um token assinado; o cliente o envia em todo pedido (`Authorization: Bearer`). O servidor só verifica a assinatura, sem guardar sessão. | criação em [lib/token.ts:4](../backend/src/lib/token.ts#L4), verificação em [middleware/auth.ts:13](../backend/src/middleware/auth.ts#L13), envio em [api.ts:52](../frontend/src/api.ts#L52), logout automático ao receber 401 em [api.ts:70](../frontend/src/api.ts#L70) |
+| **Autenticação stateless (JWT)** | No login o servidor devolve um token assinado; o cliente o envia em todo pedido (`Authorization: Bearer`). O servidor verifica a assinatura e compara a versão do token com a da conta no banco: sair ou trocar a senha revoga o que já foi emitido. | criação em [lib/token.ts:5](../backend/src/lib/token.ts#L5), verificação em [middleware/auth.ts:15](../backend/src/middleware/auth.ts#L15), envio em [api.ts:52](../frontend/src/api.ts#L52), logout automático ao receber 401 em [api.ts:70](../frontend/src/api.ts#L70) |
 | **Hash de senha com salt** | A senha nunca é salva; guarda-se um resumo irreversível com um valor aleatório (salt) por usuário. | [lib/password.ts](../backend/src/lib/password.ts) |
 | **Isolamento por usuário** | Toda consulta filtra por `user_id`; o catálogo padrão tem `user_id NULL` e é visível a todos, mas não pode ser alterado (403). | [routes/exercises.ts:34](../backend/src/routes/exercises.ts#L34), [routes/exercises.ts:63](../backend/src/routes/exercises.ts#L63); teste em [api.test.ts:119](../backend/test/api.test.ts#L119) |
 | **Variáveis de ambiente** | Configurações que mudam por máquina (porta, segredo, URL do banco) ficam fora do código, num `.env` que não vai para o git. | [config.ts](../backend/src/config.ts), [backend/.env.example](../backend/.env.example), [frontend/.env.example](../frontend/.env.example), [vite-env.d.ts](../frontend/src/vite-env.d.ts) |
@@ -385,9 +385,15 @@ Erros seguem o formato `{ "error": "mensagem", "details": { "campo": ["..."] } }
 
 | Método | Rota | Auth | Corpo | Resposta |
 | --- | --- | --- | --- | --- |
-| POST | `/api/auth/register` | não | `{ name (2–80), email, password (8–128) }` | `201 { token, user }`; `409` se o e-mail já existe (sem diferenciar maiúsculas) |
-| POST | `/api/auth/login` | não | `{ email, password }` | `200 { token, user }`; `401` se incorreto |
+| POST | `/api/auth/register` | não | `{ name (2–80), email, password (8–128, sem senhas óbvias) }` | `202 { message }`, igual com ou sem conta. E-mail novo recebe o link de ativação (24 h); quem já tem conta recebe um aviso |
+| POST | `/api/auth/confirm` | não | `{ token, password }` (a senha do cadastro) | `201 { token, user }`; `400` se o link for inválido ou vencido; `403` se a senha não for a do cadastro |
+| POST | `/api/auth/login` | não | `{ email, password }` | `200 { token, user }`; `401` se incorreto ou ainda não ativado; `429` no limite, indicando a recuperação |
+| POST | `/api/auth/forgot-password` | não | `{ email }` | `202 { message }`, igual com ou sem conta. Envia um link de uso único (30 min), guardado só como hash |
+| POST | `/api/auth/reset-password` | não | `{ token, password }` | `200 { token, user }`, revogando as sessões antigas e zerando o limite de login da conta; `400` se o link for inválido ou vencido |
+| POST | `/api/auth/logout` | sim | — | `204`; revoga os tokens da conta em todos os aparelhos |
+| PUT | `/api/auth/password` | sim | `{ currentPassword, newPassword }` | `200 { token, user }`, revogando os outros tokens; `403` se a senha atual estiver errada |
 | GET | `/api/auth/me` | sim | — | `{ id, name, email, isAdmin, createdAt }` |
+| DELETE | `/api/auth/me` | sim | `{ password }` | `204`, apagando a conta e os dados; `403` se a senha estiver errada; `409` para o único administrador |
 
 ### Administração — [routes/admin.ts](../backend/src/routes/admin.ts)
 

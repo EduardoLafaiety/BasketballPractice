@@ -30,12 +30,17 @@ describe('Senhas', () => {
 })
 
 describe('Tokens', () => {
-  it('devolve o id de quem assinou', () => {
-    assert.equal(verifyToken(signToken(42)), 42)
+  it('devolve o id e a versão de quem assinou', () => {
+    assert.deepEqual(verifyToken(signToken(42, 3)), { userId: 42, version: 3 })
+  })
+
+  it('token emitido antes da versão existir vale como a versão 0; versão que não é número não vale', () => {
+    assert.deepEqual(verifyToken(jwt.sign({}, config.jwtSecret, { subject: '7' })), { userId: 7, version: 0 })
+    assert.equal(verifyToken(jwt.sign({ tv: 'x' }, config.jwtSecret, { subject: '7' })), null)
   })
 
   it('recusa token adulterado, vencido, de outro segredo ou sem id numérico', () => {
-    const [header, , signature] = signToken(1).split('.')
+    const [header, , signature] = signToken(1, 0).split('.')
     const forgedPayload = Buffer.from(JSON.stringify({ sub: '2' })).toString('base64url')
     assert.equal(verifyToken(`${header}.${forgedPayload}.${signature}`), null)
 

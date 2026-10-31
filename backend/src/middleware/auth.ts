@@ -11,16 +11,18 @@ declare global {
   }
 }
 
-// Confere também se a conta ainda existe: o token de quem foi excluído vale até expirar, mas não dá mais acesso.
+// Confere no banco se a conta ainda existe e se o token não foi revogado: sair, trocar ou recuperar a senha vale na hora.
 export function requireAuth(db: Database) {
   return async (req: Request, _res: Response, next: NextFunction) => {
     const [scheme, token] = req.headers.authorization?.split(' ') ?? []
-    const userId = scheme === 'Bearer' && token ? verifyToken(token) : null
-    if (!userId || !(await one(db, 'SELECT 1 FROM users WHERE id = $1', [userId]))) {
+    const session = scheme === 'Bearer' && token ? verifyToken(token) : null
+    const user =
+      session && (await one<{ version: number }>(db, 'SELECT token_version AS version FROM users WHERE id = $1', [session.userId]))
+    if (!session || user?.version !== session.version) {
       throw new HttpError(401, 'Não autenticado')
     }
 
-    req.userId = userId
+    req.userId = session.userId
     next()
   }
 }

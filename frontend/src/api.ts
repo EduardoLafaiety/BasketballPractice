@@ -138,7 +138,7 @@ export interface Noticia {
 
 export type NovaManchete = Pick<Noticia, 'title' | 'sourceName' | 'url'> & { hours: number }
 
-interface AuthResposta {
+export interface AuthResposta {
   token: string
   user: Usuario
 }
@@ -346,7 +346,20 @@ function filtroPeriodo(desde?: Date, ate?: Date) {
 
 export const api = {
   cadastrar: (nome: string, email: string, senha: string) =>
-    request<AuthResposta>('POST', '/auth/register', { name: nome, email, password: senha }),
+    request<{ message: string }>('POST', '/auth/register', { name: nome, email, password: senha }),
+
+  confirmarConta: (token: string, senha: string) => request<AuthResposta>('POST', '/auth/confirm', { token, password: senha }),
+
+  esqueciSenha: (email: string) => request<{ message: string }>('POST', '/auth/forgot-password', { email }),
+
+  redefinirSenha: (token: string, senha: string) => request<AuthResposta>('POST', '/auth/reset-password', { token, password: senha }),
+
+  trocarSenha: (atual: string, nova: string) =>
+    request<AuthResposta>('PUT', '/auth/password', { currentPassword: atual, newPassword: nova }),
+
+  excluirConta: (senha: string) => request<null>('DELETE', '/auth/me', { password: senha }),
+
+  sair: () => request<null>('POST', '/auth/logout'),
 
   entrar: (email: string, senha: string) => request<AuthResposta>('POST', '/auth/login', { email, password: senha }),
 

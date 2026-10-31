@@ -5,6 +5,7 @@ import pg from 'pg'
 import { createApp } from '../src/app.js'
 import { fromPool, isDatabaseUnavailable, openDatabase, type Database } from '../src/db/index.js'
 import { migrate } from '../src/db/migrations.js'
+import { caixaDeEmails, criarConta } from './caixa.js'
 import { seed } from '../src/db/seed.js'
 
 // O que o PGlite não reproduz: conexões de verdade, travas entre conexões e os códigos de erro do Postgres.
@@ -25,6 +26,7 @@ describe('Postgres de verdade', { skip: ADMIN_URL ? false : 'defina TEST_POSTGRE
   let db: Database
   let baseUrl: string
   let close: () => Promise<void>
+  const caixa = caixaDeEmails()
   const urlDoBanco = () => {
     const url = new URL(ADMIN_URL!)
     url.pathname = `/${BANCO}`
@@ -35,7 +37,16 @@ describe('Postgres de verdade', { skip: ADMIN_URL ? false : 'defina TEST_POSTGRE
     await admin(`CREATE DATABASE ${BANCO}`)
     db = await openDatabase(urlDoBanco())
     const folga = { maximo: 100_000, janelaMs: 60_000 }
-    const server = createApp(db, { limiteTentativas: folga, limiteConta: folga, limiteCadastros: folga, maxImports: 2 }).listen(0)
+    const server = createApp(db, {
+      limiteTentativas: folga,
+      limiteConta: folga,
+      limiteCadastros: folga,
+      limiteRecuperacao: folga,
+      limiteEnvios: folga,
+      maxImports: 2,
+      emails: caixa.emails,
+      segundoPlano: caixa.segundoPlano,
+    }).listen(0)
     await new Promise((resolve) => server.once('listening', resolve))
     baseUrl = `http://127.0.0.1:${(server.address() as AddressInfo).port}/api`
     close = () => new Promise((resolve) => server.close(() => resolve()))
@@ -60,8 +71,8 @@ describe('Postgres de verdade', { skip: ADMIN_URL ? false : 'defina TEST_POSTGRE
   let contas = 0
   const conta = async () => {
     const email = `pg${++contas}-${Date.now()}@example.com`
-    const { body } = await api('POST', '/auth/register', { name: 'Atleta', email, password: 'senha-segura' })
-    return { token: body.token as string, id: body.user.id as number }
+    const { token, user } = await criarConta(api, caixa, { name: 'Atleta', email, password: 'senha-segura' })
+    return { token, id: user.id, email }
   }
 
   const sessoes = (quantas: number, ano = 2000) =>
@@ -206,20 +217,20 @@ describe('Postgres de verdade', { skip: ADMIN_URL ? false : 'defina TEST_POSTGRE
       }
     }
 
-    it('erro de SQL não descarta a conexão, inclusive pela rota de cadastro repetido', async () => {
+    it('erro de SQL não descarta a conexão, inclusive por uma rota que espera o erro', async () => {
       await comUmaConexao(async (alvo) => {
         const antes = await backend(alvo)
         await assert.rejects(alvo.query('SELECT 1/0'), { code: '22012' })
         assert.equal(await backend(alvo), antes)
       })
 
-      const email = `repetido-${Date.now()}@example.com`
-      const cadastro = { name: 'Atleta', email, password: 'senha-segura' }
-      assert.equal((await api('POST', '/auth/register', cadastro)).status, 201)
+      const { token } = await conta()
+      const exercicio = (await api('POST', '/exercises', { name: 'Em uso', category: 'drible', metric: 'tempo' }, token)).body.id
+      assert.equal((await api('POST', '/workouts', { name: 'Treino', exercises: [{ exerciseId: exercicio }] }, token)).status, 201)
       const pids = async () =>
         (await admin(`SELECT pid FROM pg_stat_activity WHERE datname = $1 ORDER BY pid`, [BANCO])).rows.map((r) => r.pid)
       const antes = await pids()
-      for (let i = 0; i < 3; i++) assert.equal((await api('POST', '/auth/register', cadastro)).status, 409)
+      for (let i = 0; i < 3; i++) assert.equal((await api('DELETE', `/exercises/${exercicio}`, undefined, token)).status, 409)
       assert.deepEqual(await pids(), antes)
     })
 
@@ -236,6 +247,117 @@ describe('Postgres de verdade', { skip: ADMIN_URL ? false : 'defina TEST_POSTGRE
         assert.notEqual(await backend(alvo), antes)
         assert.equal(pool.totalCount, 1)
       })
+    })
+  })
+
+  describe('Contas', () => {
+    const SENHA = 'senha-segura'
+
+    it('excluir a própria conta passa pelo RESTRICT de verdade: exercício próprio em treino, sessão e meta', async () => {
+      const { token, id } = await conta()
+      const outra = await conta()
+      const exercicio = (await api('POST', '/exercises', { name: 'Floater', category: 'finalizacao', metric: 'acertos' }, token)).body.id
+      assert.equal((await api('POST', '/workouts', { name: 'Treino', exercises: [{ exerciseId: exercicio }] }, token)).status, 201)
+      assert.equal((await api('POST', '/sessions', { performedAt: '2026-10-20', entries: [{ exerciseId: exercicio, makes: 1, attempts: 2 }] }, token)).status, 201)
+      assert.equal((await api('POST', '/goals', { title: 'Meta', kind: 'cestas_total', target: 10, exerciseId: exercicio }, token)).status, 201)
+
+      assert.equal((await api('DELETE', '/auth/me', { password: SENHA }, token)).status, 204)
+      for (const tabela of ['exercises', 'workouts', 'practice_sessions', 'goals']) {
+        assert.equal((await db.query(`SELECT 1 FROM ${tabela} WHERE user_id = $1`, [id])).rows.length, 0, tabela)
+      }
+      assert.equal((await api('GET', '/auth/me', undefined, token)).status, 401)
+      assert.equal((await api('GET', '/auth/me', undefined, outra.token)).status, 200)
+    })
+
+    it('o mesmo link de recuperação em conexões simultâneas: só um pedido troca a senha', async () => {
+      const { email } = await conta()
+      await api('POST', '/auth/forgot-password', { email })
+      const token = await caixa.ultimoToken(email)
+      const respostas = await Promise.all(
+        Array.from({ length: 8 }, (_, i) => api('POST', '/auth/reset-password', { token, password: `tentativa-numero-${i}` })),
+      )
+      assert.equal(respostas.filter((r) => r.status === 200).length, 1)
+      assert.equal(respostas.filter((r) => r.status === 400).length, 7)
+    })
+
+    it('o mesmo link de ativação em conexões simultâneas: só uma conta nasce', async () => {
+      const email = `ativa-${Date.now()}@example.com`
+      await api('POST', '/auth/register', { name: 'Atleta', email, password: SENHA })
+      const token = await caixa.ultimoToken(email)
+      const respostas = await Promise.all(Array.from({ length: 8 }, () => api('POST', '/auth/confirm', { token, password: SENHA })))
+      assert.equal(respostas.filter((r) => r.status === 201).length, 1)
+      assert.equal(respostas.filter((r) => r.status === 400).length, 7)
+      assert.equal((await db.query('SELECT 1 FROM users WHERE email = $1', [email])).rows.length, 1)
+    })
+
+    // Corrida: o deadlock só aparece quando os dois pedidos se cruzam, por isso repete. Sem a ordem das travas, dá 500.
+    it('dois links do mesmo e-mail ativados ao mesmo tempo: uma conta só, sem deadlock', async () => {
+      for (let i = 0; i < 12; i++) {
+        const email = `duas-${i}-${Date.now()}@example.com`
+        await api('POST', '/auth/register', { name: 'Primeira', email, password: SENHA })
+        const primeiro = await caixa.ultimoToken(email)
+        await api('POST', '/auth/register', { name: 'Segunda', email, password: SENHA })
+        const segundo = await caixa.ultimoToken(email)
+        const respostas = await Promise.all([primeiro, segundo].map((token) => api('POST', '/auth/confirm', { token, password: SENHA })))
+        assert.deepEqual(respostas.map((r) => r.status).sort(), [201, 400])
+        assert.equal((await db.query('SELECT 1 FROM users WHERE lower(email) = $1', [email])).rows.length, 1)
+      }
+    })
+
+    it('dois links da mesma conta usados ao mesmo tempo: um vale, sem deadlock', async () => {
+      for (let i = 0; i < 12; i++) {
+        const { email } = await conta()
+        await api('POST', '/auth/forgot-password', { email })
+        const primeiro = await caixa.ultimoToken(email)
+        await api('POST', '/auth/forgot-password', { email })
+        const segundo = await caixa.ultimoToken(email)
+        const respostas = await Promise.all(
+          [primeiro, segundo].map((token, j) => api('POST', '/auth/reset-password', { token, password: `senha-nova-numero-${j}` })),
+        )
+        assert.deepEqual(respostas.map((r) => r.status).sort(), [200, 400])
+      }
+    })
+
+    it('a troca de senha trava a conta antes dos links, na ordem da recuperação (sem deadlock)', async () => {
+      const { email, token, id } = await conta()
+      await api('POST', '/auth/forgot-password', { email })
+      await caixa.ultimoToken(email)
+
+      let troca: ReturnType<typeof api> | undefined
+      await db.transaction(async (tx) => {
+        await tx.query('SELECT 1 FROM users WHERE id = $1 FOR UPDATE', [id])
+        troca = api('PUT', '/auth/password', { currentPassword: SENHA, newPassword: 'senha-da-troca-boa' }, token)
+        for (let i = 0; i < 200; i++) {
+          const presas = await admin(`SELECT 1 FROM pg_stat_activity WHERE datname = $1 AND wait_event_type = 'Lock'`, [BANCO], urlDoBanco())
+          if (presas.rows.length) break
+          await espera(25)
+        }
+        // A troca está parada na conta e ainda não pode ter tocado nos links: é isso que evita a trava cruzada.
+        await db.query('SELECT 1 FROM password_reset_tokens WHERE user_id = $1 FOR UPDATE NOWAIT', [id])
+      })
+      assert.equal((await troca!).status, 200)
+    })
+
+    it('os dois últimos administradores se excluindo ao mesmo tempo: um fica', async () => {
+      await db.query('UPDATE users SET is_admin = false')
+      const a = await conta()
+      const b = await conta()
+      await db.query('UPDATE users SET is_admin = true WHERE id = ANY($1)', [[a.id, b.id]])
+      try {
+        const respostas = await Promise.all([a, b].map(({ token }) => api('DELETE', '/auth/me', { password: SENHA }, token)))
+        assert.deepEqual(respostas.map((r) => r.status).sort(), [204, 409])
+        assert.equal((await db.query('SELECT 1 FROM users WHERE is_admin')).rows.length, 1)
+      } finally {
+        await db.query('UPDATE users SET is_admin = false')
+      }
+    })
+
+    it('sair em conexões simultâneas não perde nenhuma revogação', async () => {
+      const { token, id } = await conta()
+      const antes = (await db.query<{ v: number }>('SELECT token_version AS v FROM users WHERE id = $1', [id])).rows[0].v
+      await Promise.all(Array.from({ length: 5 }, () => api('POST', '/auth/logout', undefined, token)))
+      assert.equal((await api('GET', '/auth/me', undefined, token)).status, 401)
+      assert.ok((await db.query<{ v: number }>('SELECT token_version AS v FROM users WHERE id = $1', [id])).rows[0].v > antes)
     })
   })
 
