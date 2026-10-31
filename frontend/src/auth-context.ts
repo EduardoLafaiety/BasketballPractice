@@ -5,6 +5,11 @@ export interface AuthValor {
   usuario: Usuario | null
   /** true enquanto confere um token salvo de uma visita anterior. */
   verificando: boolean
+  /** true enquanto há token salvo, mesmo sem usuario confirmado. */
+  temToken: boolean
+  /** Última falha passageira (503, rede) ao conferir o token; ele segue salvo e a conferência é refeita sozinha. */
+  erroSessao: Error | null
+  reconferirSessao: () => void
   entrar: (email: string, senha: string) => Promise<void>
   cadastrar: (nome: string, email: string, senha: string) => Promise<void>
   sair: () => void
