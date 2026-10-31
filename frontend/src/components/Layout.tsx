@@ -154,11 +154,9 @@ export default function Layout() {
           <NavLink to="/configuracoes" className="botao-icone" aria-label="Configurações" title="Configurações" onClick={() => setMenuAberto(false)}>
             <Icone nome="config" />
           </NavLink>
-          {!__DEMO__ && (
-            <button className="botao-icone" onClick={sair} aria-label="Sair" title="Sair">
-              <Icone nome="sair" />
-            </button>
-          )}
+          <button className="botao-icone" onClick={sair} aria-label="Sair" title="Sair">
+            <Icone nome="sair" />
+          </button>
         </div>
       </div>
 

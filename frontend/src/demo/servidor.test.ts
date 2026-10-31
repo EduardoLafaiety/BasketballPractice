@@ -42,6 +42,13 @@ describe('Servidor da demonstração', () => {
   }, 60_000)
   afterAll(() => servidor.fechar())
 
+  it('qualquer e-mail e senha entram como o visitante, sem guardar o que foi digitado', async () => {
+    const { status, body } = await servidor.executar('POST', '/auth/login', { email: 'alguem@exemplo.com', password: 'qualquer' })
+    expect(status).toBe(200)
+    expect(body).toEqual({ token: 'demo', user: { id: 1, name: 'Visitante', email: 'visitante@demo.local', isAdmin: false } })
+    expect(await get('/auth/me')).toMatchObject({ email: 'visitante@demo.local' })
+  })
+
   it('abre já com o visitante, sem login e sem acesso de admin', async () => {
     expect(await get('/auth/me')).toEqual({ id: 1, name: 'Visitante', email: 'visitante@demo.local', isAdmin: false })
     expect(await servidor.executar('GET', '/admin/users')).toEqual({

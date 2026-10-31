@@ -1,23 +1,12 @@
-import { useState, type CSSProperties, type FormEvent, type PointerEvent } from 'react'
+import { useRef, useState, type FormEvent } from 'react'
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { ApiError } from '../api'
 import { useAuth } from '../auth'
 import Icone from '../components/Icone'
-import { COREOGRAFIAS } from '../demonstracoes/coreografias'
-import Manequim from '../demonstracoes/Manequim'
-
-const FAIXA = ['Arremesso', 'Drible', 'Passe', 'Finalização', 'Defesa', 'Condicionamento']
-const TITULO = ['Treine', 'Registre', 'Evolua']
-
-/** A luz do palco segue o ponteiro (só posição, em variáveis CSS: nada de re-render). */
-function moverLuz(e: PointerEvent<HTMLElement>) {
-  const caixa = e.currentTarget.getBoundingClientRect()
-  e.currentTarget.style.setProperty('--mx', `${e.clientX - caixa.left}px`)
-  e.currentTarget.style.setProperty('--my', `${e.clientY - caixa.top}px`)
-}
+import { BolaCouro, BolaVazada, Figura, LinhasQuadra, ListraBola, useFuroBola } from '../components/rolagem'
 
 /** Tela de login e de cadastro (modo definido pela rota). */
-export default function Entrar({ modo }: { modo: 'entrar' | 'cadastro' }) {
+export default function Entrar({ modo, demonstracao = __DEMO__ }: { modo: 'entrar' | 'cadastro'; demonstracao?: boolean }) {
   const { usuario, entrar, cadastrar } = useAuth()
   const navigate = useNavigate()
   const local = useLocation()
@@ -30,12 +19,14 @@ export default function Entrar({ modo }: { modo: 'entrar' | 'cadastro' }) {
   const [erro, setErro] = useState<string | null>(null)
   const [campos, setCampos] = useState<Record<string, string[] | undefined>>({})
   const [verSenha, setVerSenha] = useState(false)
+  const camada = useRef<HTMLDivElement>(null)
+  useFuroBola(camada)
 
   if (usuario) return <Navigate to={destino} replace />
 
   const cadastro = modo === 'cadastro'
 
-  async function enviar(e: FormEvent) {
+  function enviar(e: FormEvent) {
     e.preventDefault()
     setErro(null)
     setCampos({})
@@ -43,10 +34,13 @@ export default function Entrar({ modo }: { modo: 'entrar' | 'cadastro' }) {
       setCampos({ password: ['A senha precisa ter pelo menos 8 caracteres.'] })
       return
     }
+    return acessar(() => (cadastro ? cadastrar(nome.trim(), email.trim(), senha) : entrar(email.trim(), senha)))
+  }
+
+  async function acessar(acao: () => Promise<void>) {
     setEnviando(true)
     try {
-      if (cadastro) await cadastrar(nome.trim(), email.trim(), senha)
-      else await entrar(email.trim(), senha)
+      await acao()
       navigate(destino, { replace: true })
     } catch (e) {
       setErro((e as Error).message)
@@ -57,46 +51,27 @@ export default function Entrar({ modo }: { modo: 'entrar' | 'cadastro' }) {
 
   return (
     <div className="auth">
-      <section className="auth-palco" aria-hidden="true" onPointerMove={moverLuz}>
-        <div className="auth-luz" />
-        <svg className="auth-quadra" viewBox="0 0 600 600" preserveAspectRatio="xMidYMid slice">
-          <path d="M60 600 V430 A240 240 0 0 1 540 430 V600" />
-          <path d="M220 600 V380 H380 V600" />
-          <circle cx="300" cy="380" r="60" />
-          <path d="M0 40 H600" />
-        </svg>
+      <Link to="/entrar" className="auth-marca" aria-label="Basketball Practice">
+        <span className="marca"><Icone nome="bola" tamanho={28} /></span>
+        <span className="topo-secao">Basketball Practice</span>
+      </Link>
+      <section className="auth-palco" aria-hidden="true">
+        <LinhasQuadra />
+        <div className="abertura-palco">
+          <BolaVazada />
+          <div className="abertura-dentro"><Figura nome="Mikan drill" viewBox="220 10 240 300" /></div>
+        </div>
+        <div className="abertura-palco abertura-furada" ref={camada}>
+          <BolaCouro />
+        </div>
         <h2 className="auth-titulo">
-          {TITULO.map((palavra, i) => (
-            <span key={palavra} className="auth-linha">
-              <span className={`auth-palavra auth-palavra-${i}`} style={{ '--i': i } as CSSProperties}>{palavra}</span>
-            </span>
-          ))}
+          <span className="auth-titulo-a">Bora pra</span>
+          <span className="auth-titulo-b">quadra.</span>
         </h2>
-        <div className="auth-manequim">
-          <Manequim coreografia={COREOGRAFIAS['Step-back de três']} viewBox="95 110 320 200" />
-        </div>
-        <div className="auth-faixa">
-          <div className="auth-faixa-trilho">
-            {[0, 1].map((copia) => (
-              <span key={copia}>
-                {FAIXA.map((f) => <span key={f}>{f}<i>✦</i></span>)}
-              </span>
-            ))}
-          </div>
-        </div>
-        <ul className="auth-numeros">
-          <li><strong>23</strong> exercícios com demonstração</li>
-          <li><strong>20</strong> estilos de jogadores da NBA</li>
-          <li><strong>100%</strong> do seu treino em números</li>
-        </ul>
-        <div className="auth-grao" />
       </section>
 
-      <section className="auth-lado">
-        <Link to="/entrar" className="marca auth-marca">
-          <span className="marca-bola"><Icone nome="bola" tamanho={28} /></span>
-          Basketball Practice
-        </Link>
+      <section className="auth-lado faixa-preta com-listra">
+        <ListraBola />
         <form className="auth-card" onSubmit={enviar} noValidate>
           <span className="auth-sobretitulo">{cadastro ? 'Nova conta' : 'De volta à quadra'}</span>
           <h1>{cadastro ? 'Criar conta' : 'Entrar'}</h1>
@@ -144,11 +119,21 @@ export default function Entrar({ modo }: { modo: 'entrar' | 'cadastro' }) {
 
           {erro && Object.keys(campos).length === 0 && <p className="erro" role="alert">{erro}</p>}
 
-          <button className="auth-botao" type="submit" disabled={enviando || !email || !senha || (cadastro && !nome)}>
-            <span>{enviando ? 'Aguarde…' : cadastro ? 'Criar conta' : 'Entrar'}</span>
-            <span className="auth-botao-seta" aria-hidden="true">→</span>
+          <button className="btn btn-primario btn-grande" type="submit" disabled={enviando || !email || !senha || (cadastro && !nome)}>
+            {enviando ? 'Aguarde…' : cadastro ? 'Criar conta' : 'Entrar'}
+            <Icone nome="seta" />
           </button>
 
+          {demonstracao ? (
+            <>
+              <button type="button" className="btn btn-grande auth-sem-conta" disabled={enviando} onClick={() => acessar(() => entrar('visitante@demo.local', '-'))}>
+                Entrar sem conta
+              </button>
+              <p className="muted auth-troca">
+                Demonstração: use qualquer e-mail e senha. Nada é enviado, e seus treinos ficam só neste navegador.
+              </p>
+            </>
+          ) : (
           <p className="muted auth-troca">
             {cadastro ? (
               <>Já tem conta? <Link to="/entrar" state={local.state} className="link">Entrar</Link></>
@@ -156,6 +141,7 @@ export default function Entrar({ modo }: { modo: 'entrar' | 'cadastro' }) {
               <>Ainda não tem conta? <Link to="/cadastro" state={local.state} className="link">Criar conta</Link></>
             )}
           </p>
+          )}
         </form>
       </section>
     </div>

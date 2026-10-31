@@ -1,5 +1,5 @@
 // Peças animadas pela rolagem: a bola da abertura, o boneco comandado pela rolagem e os nomes que correm.
-import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
+import { forwardRef, useEffect, useMemo, useRef, useState, type ReactNode, type RefObject } from 'react'
 import { COREOGRAFIAS } from '../demonstracoes/coreografias'
 import { PARTES, pintar, posicionar } from '../demonstracoes/desenho'
 import { CHAO, instante, preparar, RAIO_BOLA } from '../demonstracoes/motor'
@@ -109,26 +109,43 @@ export function Figura({ nome, viewBox = '0 0 680 330', className, apiRef }: { n
   )
 }
 
-/** Abertura: a bola fica transparente sob o mouse e mostra o atleta dentro dela. */
-export function AberturaBola({ titulo, children }: { titulo: ReactNode; children: ReactNode }) {
-  const secao = useRef<HTMLElement>(null)
-  const camada = useRef<HTMLDivElement>(null)
-  const bolas = useRef<(SVGSVGElement | null)[]>([])
-  const dentro = useRef<HTMLDivElement>(null)
+/** A bola por dentro: a grade que aparece sob o furo. */
+export const BolaVazada = forwardRef<SVGSVGElement>(function BolaVazada(_, ref) {
+  return (
+    <svg ref={ref} className="abertura-bola" viewBox="0 0 400 400">
+      <circle cx="200" cy="200" r="190" className="bola-vazada" />
+      <path className="bola-grade" d="M10 200h380M200 10v380M64 68c70 62 70 202 0 264M336 68c-70 62-70 202 0 264M30 110h340M30 290h340M110 30v340M290 30v340M15 155h370M15 245h370M155 15v370M245 15v370" />
+    </svg>
+  )
+})
 
-  useRolagem(() => {
-    if (!secao.current || movimentoReduzido()) return
-    const p = progressoDoPino(secao.current)
-    bolas.current.forEach((b) => { if (b) b.style.transform = `rotate(${p * 260}deg) scale(${1 + p * 1.7})` })
-    if (dentro.current) dentro.current.style.transform = `scale(${1 + p * 1.2})`
-    secao.current.style.setProperty('--saida', String(p))
-  })
+/** A bola por fora: o couro que o furo deixa transparente. */
+export const BolaCouro = forwardRef<SVGSVGElement>(function BolaCouro(_, ref) {
+  return (
+    <svg ref={ref} className="abertura-bola" viewBox="0 0 400 400">
+      <defs>
+        <radialGradient id="couro-bola" cx=".36" cy=".3" r=".8">
+          <stop offset="0" stopColor="#ff9a52" />
+          <stop offset=".62" stopColor="#ee6210" />
+          <stop offset="1" stopColor="#a83d05" />
+        </radialGradient>
+      </defs>
+      <circle cx="200" cy="200" r="190" fill="url(#couro-bola)" />
+      <path className="bola-costura" d="M10 200h380M200 10v380M64 68c70 62 70 202 0 264M336 68c-70 62-70 202 0 264" />
+    </svg>
+  )
+})
 
+/** Faz o furo da camada seguir o mouse; sem mouse (celular, ou antes do primeiro movimento), ele passeia pela bola. */
+export function useFuroBola(camada: RefObject<HTMLElement>) {
   useEffect(() => {
     if (movimentoReduzido() || !camada.current) return
     const el = camada.current
     const mouse = { x: 0, y: 0, usou: false }
-    const furo = { x: window.innerWidth / 2, y: window.innerHeight / 2, x2: window.innerWidth / 2, y2: window.innerHeight / 2, r: 0 }
+    const inicio = el.getBoundingClientRect()
+    const meioX = inicio.left + inicio.width / 2
+    const meioY = inicio.top + inicio.height / 2
+    const furo = { x: meioX, y: meioY, x2: meioX, y2: meioY, r: 0 }
     const aoMover = (e: PointerEvent) => {
       if (e.pointerType === 'touch') return
       mouse.x = e.clientX
@@ -139,10 +156,9 @@ export function AberturaBola({ titulo, children }: { titulo: ReactNode; children
     const passo = (t: number) => {
       const caixa = el.getBoundingClientRect()
       if (caixa.bottom > 0 && caixa.top < window.innerHeight) {
-        const menor = Math.min(window.innerWidth, window.innerHeight)
-        // Sem mouse (celular, ou antes do primeiro movimento), o furo passeia pela bola para mostrar o efeito.
-        const alvoX = mouse.usou ? mouse.x : window.innerWidth / 2 + Math.cos(t / 1400) * menor * 0.17
-        const alvoY = mouse.usou ? mouse.y : window.innerHeight / 2 + Math.sin(t / 1000) * menor * 0.15
+        const menor = Math.min(caixa.width, caixa.height)
+        const alvoX = mouse.usou ? mouse.x : caixa.left + caixa.width / 2 + Math.cos(t / 1400) * menor * 0.17
+        const alvoY = mouse.usou ? mouse.y : caixa.top + caixa.height / 2 + Math.sin(t / 1000) * menor * 0.15
         furo.x += (alvoX - furo.x) * 0.16
         furo.y += (alvoY - furo.y) * 0.16
         furo.x2 += (alvoX - furo.x2) * 0.06
@@ -162,31 +178,36 @@ export function AberturaBola({ titulo, children }: { titulo: ReactNode; children
       window.removeEventListener('pointermove', aoMover)
       cancelAnimationFrame(quadro)
     }
-  }, [])
+  }, [camada])
+}
+
+/** Abertura: a bola fica transparente sob o mouse e mostra o atleta dentro dela. */
+export function AberturaBola({ titulo, children }: { titulo: ReactNode; children: ReactNode }) {
+  const secao = useRef<HTMLElement>(null)
+  const camada = useRef<HTMLDivElement>(null)
+  const bolas = useRef<(SVGSVGElement | null)[]>([])
+  const dentro = useRef<HTMLDivElement>(null)
+
+  useRolagem(() => {
+    if (!secao.current || movimentoReduzido()) return
+    const p = progressoDoPino(secao.current)
+    bolas.current.forEach((b) => { if (b) b.style.transform = `rotate(${p * 260}deg) scale(${1 + p * 1.7})` })
+    if (dentro.current) dentro.current.style.transform = `scale(${1 + p * 1.2})`
+    secao.current.style.setProperty('--saida', String(p))
+  })
+
+  useFuroBola(camada)
 
   return (
     <section className="abertura" ref={secao}>
       <div className="abertura-fixa">
         <LinhasQuadra />
         <div className="abertura-palco" aria-hidden>
-          <svg ref={(el) => { bolas.current[0] = el }} className="abertura-bola" viewBox="0 0 400 400">
-            <circle cx="200" cy="200" r="190" className="bola-vazada" />
-            <path className="bola-grade" d="M10 200h380M200 10v380M64 68c70 62 70 202 0 264M336 68c-70 62-70 202 0 264M30 110h340M30 290h340M110 30v340M290 30v340M15 155h370M15 245h370M155 15v370M245 15v370" />
-          </svg>
+          <BolaVazada ref={(el) => { bolas.current[0] = el }} />
           <div className="abertura-dentro" ref={dentro}><Figura nome="Mikan drill" viewBox="220 10 240 300" /></div>
         </div>
         <div className="abertura-palco abertura-furada" ref={camada} aria-hidden>
-          <svg ref={(el) => { bolas.current[1] = el }} className="abertura-bola" viewBox="0 0 400 400">
-            <defs>
-              <radialGradient id="couro-bola" cx=".36" cy=".3" r=".8">
-                <stop offset="0" stopColor="#ff9a52" />
-                <stop offset=".62" stopColor="#ee6210" />
-                <stop offset="1" stopColor="#a83d05" />
-              </radialGradient>
-            </defs>
-            <circle cx="200" cy="200" r="190" fill="url(#couro-bola)" />
-            <path className="bola-costura" d="M10 200h380M200 10v380M64 68c70 62 70 202 0 264M336 68c-70 62-70 202 0 264" />
-          </svg>
+          <BolaCouro ref={(el) => { bolas.current[1] = el }} />
         </div>
         <div className="abertura-conteudo">
           {titulo}

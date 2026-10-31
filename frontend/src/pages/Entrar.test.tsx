@@ -1,11 +1,38 @@
-import { screen, waitFor } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { describe, expect, it } from 'vitest'
 import { tokenAtual } from '../api'
+import { AuthProvider } from '../auth'
 import { apiFalsa, configFalsa, Resposta, usuarioFalso } from '../test/api-falsa'
 import { abrirApp } from '../test/renderizar'
+import Entrar from './Entrar'
 
 const campo = (nome: RegExp) => screen.getByLabelText(nome)
+
+describe('Entrar na demonstração', () => {
+  it('avisa que é demonstração, entra sem conta e não oferece criar conta', async () => {
+    const user = userEvent.setup()
+    const { ultima } = apiFalsa({ 'POST /auth/login': { token: 'demo', user: usuarioFalso() } })
+    render(
+      <MemoryRouter initialEntries={['/entrar']}>
+        <AuthProvider>
+          <Routes>
+            <Route path="/entrar" element={<Entrar modo="entrar" demonstracao />} />
+            <Route path="/" element={<p>Dentro do app</p>} />
+          </Routes>
+        </AuthProvider>
+      </MemoryRouter>,
+    )
+
+    expect(screen.getByText(/use qualquer e-mail e senha/i)).toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: 'Criar conta' })).not.toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Entrar sem conta' }))
+    expect(await screen.findByText('Dentro do app')).toBeInTheDocument()
+    expect(ultima('POST', '/auth/login')?.corpo).toEqual({ email: 'visitante@demo.local', password: '-' })
+  })
+})
 
 describe('Entrar', () => {
   it('sem login, manda para /entrar e depois volta para a página pedida', async () => {
