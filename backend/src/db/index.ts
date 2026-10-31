@@ -43,42 +43,60 @@ export function isDatabaseUnavailable(error: unknown) {
   return typeof message === 'string' && /timeout exceeded when trying to connect|Connection terminated|not queryable/.test(message)
 }
 
+// Fora do pool, ninguém escuta o client: sem este listener, uma conexão que cai aqui derruba o processo.
+async function withClient<R>(pool: pg.Pool, fn: (client: pg.PoolClient, lose: (error: Error) => void) => Promise<R>) {
+  const client = await pool.connect()
+  let lost: Error | undefined
+  const lose = (error: Error) => {
+    lost ??= error
+  }
+  const onConnectionError = (error: Error) => {
+    lose(error)
+    console.error('Conexão com o Postgres caiu durante o uso', error)
+  }
+  client.on('error', onConnectionError)
+  try {
+    return await fn(client, lose)
+  } finally {
+    client.off('error', onConnectionError)
+    // Com erro, o pool descarta a conexão em vez de entregá-la quebrada ao próximo pedido.
+    client.release(lost)
+  }
+}
+
 export function fromPool(pool: pg.Pool): Database {
   return {
-    async query(sql, params) {
-      const result = await pool.query(sql, params)
-      return { rows: result.rows, rowCount: result.rowCount ?? 0 }
+    // Não usa pool.query: ele descarta a conexão a cada erro de SQL, e abrir outra custa muito mais que a consulta.
+    query(sql, params) {
+      return withClient(pool, async (client, lose) => {
+        try {
+          const result = await client.query(sql, params)
+          return { rows: result.rows, rowCount: result.rowCount ?? 0 }
+        } catch (error) {
+          // Erro de SQL (e-mail repetido, por exemplo) é resposta do servidor e a conexão segue boa; FATAL a encerra.
+          if (!(error instanceof pg.DatabaseError && error.severity === 'ERROR')) lose(error as Error)
+          throw error
+        }
+      })
     },
-    async transaction(fn) {
-      const client = await pool.connect()
-      // Fora do pool, ninguém escuta o client: sem este listener, uma conexão que cai aqui derruba o processo.
-      let lost: Error | undefined
-      const onConnectionError = (error: Error) => {
-        lost = error
-        console.error('Conexão com o Postgres caiu durante uma transação', error)
-      }
-      client.on('error', onConnectionError)
-      try {
-        await client.query('BEGIN')
-        const result = await fn({
-          async query(sql, params) {
-            const r = await client.query(sql, params)
-            return { rows: r.rows, rowCount: r.rowCount ?? 0 }
-          },
-        })
-        await client.query('COMMIT')
-        return result
-      } catch (error) {
-        // Em conexão morta o ROLLBACK também falha: quem chamou recebe o erro original.
-        await client.query('ROLLBACK').catch((rollbackError: Error) => {
-          lost ??= rollbackError
-        })
-        throw error
-      } finally {
-        client.off('error', onConnectionError)
-        // Com erro, o pool descarta a conexão em vez de entregá-la quebrada ao próximo pedido.
-        client.release(lost)
-      }
+    transaction(fn) {
+      return withClient(pool, async (client, lose) => {
+        try {
+          await client.query('BEGIN')
+          const result = await fn({
+            async query(sql, params) {
+              const r = await client.query(sql, params)
+              return { rows: r.rows, rowCount: r.rowCount ?? 0 }
+            },
+          })
+          await client.query('COMMIT')
+          return result
+        } catch (error) {
+          // Em conexão morta o ROLLBACK também falha: quem chamou recebe o erro original.
+          await client.query('ROLLBACK').catch(lose)
+          throw error
+        }
+      })
     },
     close: () => pool.end(),
   }
@@ -90,20 +108,35 @@ export async function prepareDatabase(db: Database) {
   return db
 }
 
+// Abrir uma conexão (processo novo no Postgres + SCRAM) pode levar segundos numa máquina ocupada; usar uma, milissegundos.
+// Por isso o pool tem tamanho fixo e abre tudo antes de a API atender: um pico de pedidos não vira rajada de conexões novas.
+const POOL_SIZE = 10
+
+async function warmUp(pool: pg.Pool) {
+  const opened = await Promise.allSettled(Array.from({ length: POOL_SIZE }, () => pool.connect()))
+  for (const result of opened) {
+    if (result.status === 'fulfilled') result.value.release()
+    // A API sobe assim mesmo: a conexão que faltou é aberta quando for preciso.
+    else console.warn('Conexão não aberta ao aquecer o pool', result.reason)
+  }
+}
+
 export async function openDatabase(connectionString: string) {
   // Datas sempre em UTC, independente do fuso do servidor.
   const pool = new pg.Pool({
     connectionString,
     options: '-c TimeZone=UTC',
-    max: 10,
+    min: POOL_SIZE,
+    max: POOL_SIZE,
     keepAlive: true,
     // Com o pool cheio, o pedido desiste em vez de esperar para sempre.
     connectionTimeoutMillis: 5_000,
-    idleTimeoutMillis: 30_000,
     // Nenhuma consulta nem transação parada prende uma conexão indefinidamente. Migrações desligam o limite.
     statement_timeout: 30_000,
     idle_in_transaction_session_timeout: 60_000,
   })
   pool.on('error', (error) => console.error('Erro em conexão ociosa do Postgres', error))
-  return prepareDatabase(fromPool(pool))
+  const db = await prepareDatabase(fromPool(pool))
+  await warmUp(pool)
+  return db
 }

@@ -178,6 +178,67 @@ describe('Postgres de verdade', { skip: ADMIN_URL ? false : 'defina TEST_POSTGRE
     }
   })
 
+  it('as conexões abrem antes do primeiro pedido e continuam abertas com o pool ocioso', async () => {
+    const url = new URL(urlDoBanco())
+    url.searchParams.set('application_name', 'teste_aquecimento')
+    const abertas = async () =>
+      (await admin(`SELECT count(*)::int AS n FROM pg_stat_activity WHERE application_name = 'teste_aquecimento'`)).rows[0].n
+    const aquecido = await openDatabase(url.toString())
+    try {
+      assert.equal(await abertas(), 10)
+      // Passa do tempo que o pg usa para fechar conexão ociosa acima do mínimo (10 s).
+      await espera(10_500)
+      assert.equal(await abertas(), 10)
+    } finally {
+      await aquecido.close()
+    }
+  })
+
+  describe('reaproveitamento da conexão', () => {
+    const backend = async (alvo: Database) => (await alvo.query<{ pid: number }>('SELECT pg_backend_pid() AS pid')).rows[0].pid
+    const comUmaConexao = async (fn: (alvo: Database, pool: pg.Pool) => Promise<void>) => {
+      const pool = new pg.Pool({ connectionString: urlDoBanco(), max: 1 })
+      pool.on('error', () => {})
+      try {
+        await fn(fromPool(pool), pool)
+      } finally {
+        await pool.end()
+      }
+    }
+
+    it('erro de SQL não descarta a conexão, inclusive pela rota de cadastro repetido', async () => {
+      await comUmaConexao(async (alvo) => {
+        const antes = await backend(alvo)
+        await assert.rejects(alvo.query('SELECT 1/0'), { code: '22012' })
+        assert.equal(await backend(alvo), antes)
+      })
+
+      const email = `repetido-${Date.now()}@example.com`
+      const cadastro = { name: 'Atleta', email, password: 'senha-segura' }
+      assert.equal((await api('POST', '/auth/register', cadastro)).status, 201)
+      const pids = async () =>
+        (await admin(`SELECT pid FROM pg_stat_activity WHERE datname = $1 ORDER BY pid`, [BANCO])).rows.map((r) => r.pid)
+      const antes = await pids()
+      for (let i = 0; i < 3; i++) assert.equal((await api('POST', '/auth/register', cadastro)).status, 409)
+      assert.deepEqual(await pids(), antes)
+    })
+
+    it('conexão derrubada no meio da consulta: erro para quem pediu, processo no ar e conexão nova', async () => {
+      await comUmaConexao(async (alvo, pool) => {
+        const antes = await backend(alvo)
+        const presa = assert.rejects(alvo.query('SELECT pg_sleep(30)'), (erro) => isDatabaseUnavailable(erro))
+        for (let i = 0; i < 100; i++) {
+          if ((await admin(`SELECT 1 FROM pg_stat_activity WHERE pid = $1 AND wait_event = 'PgSleep'`, [antes])).rows.length) break
+          await espera(20)
+        }
+        await admin('SELECT pg_terminate_backend($1)', [antes])
+        await presa
+        assert.notEqual(await backend(alvo), antes)
+        assert.equal(pool.totalCount, 1)
+      })
+    })
+  })
+
   it('com o pool cheio, o pedido desiste em 503 em vez de esperar para sempre', async () => {
     const { token } = await conta()
     const presas = Array.from({ length: 10 }, () => db.transaction((tx) => tx.query('SELECT pg_sleep(6)')))

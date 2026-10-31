@@ -178,7 +178,7 @@ As versões vêm de [frontend/package.json](../frontend/package.json) e [backend
 
 #### pg (^8.23.1)
 - **O que é:** driver oficial de PostgreSQL para Node.
-- **No projeto:** um `pg.Pool` com fuso UTC forçado — [db/index.ts:68](../backend/src/db/index.ts#L68). O pool é embrulhado na interface própria `Database` (`query`, `transaction`, `close`) — [db/index.ts:8](../backend/src/db/index.ts#L8) — com helpers `one()` e `many()`. Todo SQL usa parâmetros `$1, $2…`.
+- **No projeto:** um `pg.Pool` com fuso UTC forçado — [db/index.ts:68](../backend/src/db/index.ts#L68). O pool é embrulhado na interface própria `Database` (`query`, `transaction`, `close`) — [db/index.ts:8](../backend/src/db/index.ts#L8) — com helpers `one()` e `many()`. Todo SQL usa parâmetros `$1, $2…`. O pool tem 10 conexões fixas, abertas antes de a API atender, e só descarta uma conexão que caiu, não por um erro de SQL: abrir conexão é caro e, com a máquina ocupada, chega ao limite de 5 s.
 - **Por que:** SQL escrito à mão dá controle total (ex.: `unnest ... WITH ORDINALITY` para inserir várias linhas de uma vez em [routes/sessions.ts:118](../backend/src/routes/sessions.ts#L118), agregados por semana em [routes/stats.ts:40](../backend/src/routes/stats.ts#L40)) e a interface `Database` permite trocar o banco por PGlite nos testes.
 - **Alternativas descartadas:** **ORMs** como Prisma/TypeORM/Sequelize (geração de código, migrações próprias e abstrações que escondem o SQL; não funcionariam tão facilmente com PGlite); query builders como Knex/Kysely (mais uma camada para seis tabelas).
 
