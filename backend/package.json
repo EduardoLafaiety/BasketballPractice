@@ -18,7 +18,7 @@
     "db:psql": "docker compose exec postgres psql -U basketball -d basketball"
   },
   "dependencies": {
-    "compression": "^1.8.1",
+    "compression": "^1.8.2",
     "cors": "^2.8.5",
     "express": "^5.1.0",
     "helmet": "^8.1.0",

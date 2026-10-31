@@ -2,7 +2,7 @@ import { Router } from 'express'
 import { z } from 'zod'
 import { many, one, type Database, type Queryable } from '../db/index.js'
 import { notFound } from '../lib/http-error.js'
-import { idParam, parse } from '../lib/validate.js'
+import { dbId, idParam, parse } from '../lib/validate.js'
 import { currentUser } from '../middleware/auth.js'
 import { assertExercisesVisible } from './exercises.js'
 
@@ -12,7 +12,7 @@ export const workoutSchema = z.object({
   exercises: z
     .array(
       z.object({
-        exerciseId: z.number().int().positive(),
+        exerciseId: dbId,
         sets: z.number().int().min(1).max(100).nullish(),
         targetReps: z.number().int().min(1).max(10000).nullish(),
         targetSeconds: z.number().int().min(1).max(86400).nullish(),

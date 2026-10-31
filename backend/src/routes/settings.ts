@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { z } from 'zod'
-import { one, type Database } from '../db/index.js'
+import { one, type Database, type Queryable } from '../db/index.js'
 import { parse } from '../lib/validate.js'
 import { currentUser } from '../middleware/auth.js'
 
@@ -29,7 +29,7 @@ export async function readSettings(db: Database, userId: number) {
   return parsed.success ? parsed.data : settingsSchema.parse({})
 }
 
-export async function writeSettings(db: Database, userId: number, settings: Settings) {
+export async function writeSettings(db: Queryable, userId: number, settings: Settings) {
   await db.query(
     `INSERT INTO user_settings (user_id, data, updated_at) VALUES ($1, $2::jsonb, now())
      ON CONFLICT (user_id) DO UPDATE SET data = EXCLUDED.data, updated_at = now()`,

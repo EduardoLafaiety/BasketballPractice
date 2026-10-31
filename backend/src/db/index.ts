@@ -36,7 +36,14 @@ export const isPgError = (error: unknown, code: string) =>
 export const isStillReferenced = (error: unknown) =>
   isPgError(error, RESTRICT_VIOLATION) || isPgError(error, FOREIGN_KEY_VIOLATION)
 
-function fromPool(pool: pg.Pool): Database {
+/** O pedido falhou por causa do banco (consulta longa demais, pool cheio, conexão caída), não por causa dos dados. */
+export function isDatabaseUnavailable(error: unknown) {
+  const { code, message } = (error ?? {}) as { code?: unknown; message?: unknown }
+  if (typeof code === 'string' && /^(57014|57P0\d|08\w{3}|ECONN\w+|ETIMEDOUT)$/.test(code)) return true
+  return typeof message === 'string' && /timeout exceeded when trying to connect|Connection terminated|not queryable/.test(message)
+}
+
+export function fromPool(pool: pg.Pool): Database {
   return {
     async query(sql, params) {
       const result = await pool.query(sql, params)
@@ -44,6 +51,13 @@ function fromPool(pool: pg.Pool): Database {
     },
     async transaction(fn) {
       const client = await pool.connect()
+      // Fora do pool, ninguém escuta o client: sem este listener, uma conexão que cai aqui derruba o processo.
+      let lost: Error | undefined
+      const onConnectionError = (error: Error) => {
+        lost = error
+        console.error('Conexão com o Postgres caiu durante uma transação', error)
+      }
+      client.on('error', onConnectionError)
       try {
         await client.query('BEGIN')
         const result = await fn({
@@ -55,10 +69,15 @@ function fromPool(pool: pg.Pool): Database {
         await client.query('COMMIT')
         return result
       } catch (error) {
-        await client.query('ROLLBACK')
+        // Em conexão morta o ROLLBACK também falha: quem chamou recebe o erro original.
+        await client.query('ROLLBACK').catch((rollbackError: Error) => {
+          lost ??= rollbackError
+        })
         throw error
       } finally {
-        client.release()
+        client.off('error', onConnectionError)
+        // Com erro, o pool descarta a conexão em vez de entregá-la quebrada ao próximo pedido.
+        client.release(lost)
       }
     },
     close: () => pool.end(),
@@ -73,7 +92,18 @@ export async function prepareDatabase(db: Database) {
 
 export async function openDatabase(connectionString: string) {
   // Datas sempre em UTC, independente do fuso do servidor.
-  const pool = new pg.Pool({ connectionString, options: '-c TimeZone=UTC' })
+  const pool = new pg.Pool({
+    connectionString,
+    options: '-c TimeZone=UTC',
+    max: 10,
+    keepAlive: true,
+    // Com o pool cheio, o pedido desiste em vez de esperar para sempre.
+    connectionTimeoutMillis: 5_000,
+    idleTimeoutMillis: 30_000,
+    // Nenhuma consulta nem transação parada prende uma conexão indefinidamente. Migrações desligam o limite.
+    statement_timeout: 30_000,
+    idle_in_transaction_session_timeout: 60_000,
+  })
   pool.on('error', (error) => console.error('Erro em conexão ociosa do Postgres', error))
   return prepareDatabase(fromPool(pool))
 }

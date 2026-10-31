@@ -2,7 +2,7 @@ import { Router } from 'express'
 import { z } from 'zod'
 import { many, one, type Database, type Queryable } from '../db/index.js'
 import { HttpError, notFound } from '../lib/http-error.js'
-import { idParam, isoDate, parse } from '../lib/validate.js'
+import { dbId, idParam, isoDate, parse } from '../lib/validate.js'
 import { currentUser } from '../middleware/auth.js'
 import { assertExercisesVisible } from './exercises.js'
 import { localDay, localToday, streaks, tzQuery } from './stats.js'
@@ -27,7 +27,7 @@ export const goalSchema = z
     title: z.string().trim().min(2).max(100),
     kind: z.enum(GOAL_KINDS),
     target: z.number().int().min(1).max(1_000_000),
-    exerciseId: z.number().int().positive().nullish(),
+    exerciseId: dbId.nullish(),
     deadline: isoDate.nullish(),
   })
   .refine((goal) => goal.kind !== 'aproveitamento' || goal.target <= 100, {
@@ -69,7 +69,7 @@ async function currentValue(db: Queryable, userId: number, goal: GoalRow, tzOffs
     case 'aproveitamento': {
       const row = await one<{ makes: number; attempts: number }>(
         db,
-        `SELECT COALESCE(SUM(se.makes), 0)::int AS makes, COALESCE(SUM(se.attempts), 0)::int AS attempts
+        `SELECT COALESCE(SUM(se.makes), 0)::float8 AS makes, COALESCE(SUM(se.attempts), 0)::float8 AS attempts
          FROM session_entries se JOIN practice_sessions s ON s.id = se.session_id
          WHERE s.user_id = $1 AND s.performed_at >= now() - interval '30 days'
            AND ($2::int IS NULL OR se.exercise_id = $2)`,
@@ -81,7 +81,7 @@ async function currentValue(db: Queryable, userId: number, goal: GoalRow, tzOffs
     case 'minutos_semana': {
       const row = await one<{ sessions: number; minutes: number }>(
         db,
-        `SELECT COUNT(*)::int AS sessions, COALESCE(SUM(s.duration_minutes), 0)::int AS minutes
+        `SELECT COUNT(*)::int AS sessions, COALESCE(SUM(s.duration_minutes), 0)::float8 AS minutes
          FROM practice_sessions s WHERE s.user_id = $1 AND ${localDay('$2')} >= $3::date`,
         [userId, tzOffset, mondayOf(today)],
       )
@@ -91,7 +91,7 @@ async function currentValue(db: Queryable, userId: number, goal: GoalRow, tzOffs
     case 'minutos_total': {
       const row = await one<{ sessions: number; minutes: number }>(
         db,
-        `SELECT COUNT(*)::int AS sessions, COALESCE(SUM(s.duration_minutes), 0)::int AS minutes
+        `SELECT COUNT(*)::int AS sessions, COALESCE(SUM(s.duration_minutes), 0)::float8 AS minutes
          FROM practice_sessions s WHERE s.user_id = $1 AND s.performed_at >= $2`,
         [userId, goal.createdAt],
       )
@@ -100,7 +100,7 @@ async function currentValue(db: Queryable, userId: number, goal: GoalRow, tzOffs
     case 'cestas_total': {
       const row = await one<{ makes: number }>(
         db,
-        `SELECT COALESCE(SUM(se.makes), 0)::int AS makes
+        `SELECT COALESCE(SUM(se.makes), 0)::float8 AS makes
          FROM session_entries se JOIN practice_sessions s ON s.id = se.session_id
          WHERE s.user_id = $1 AND s.performed_at >= $2 AND ($3::int IS NULL OR se.exercise_id = $3)`,
         [userId, goal.createdAt, goal.exerciseId],
