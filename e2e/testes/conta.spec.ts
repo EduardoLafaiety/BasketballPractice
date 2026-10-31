@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { SENHA, emailUnico, novaConta, numero } from './ajuda'
+import { SENHA, emailUnico, novaConta, numero, irPara, abrirMenu } from './ajuda'
 
 test('cadastro pelo formulário, sair e entrar de novo voltando à página pedida', async ({ page }) => {
   const email = emailUnico('cadastro')
@@ -23,11 +23,12 @@ test('cadastro pelo formulário, sair e entrar de novo voltando à página pedid
   await expect(page.getByText('Você ainda não registrou nenhuma sessão.')).toBeVisible()
 
   // Início zerado, com o nome no menu.
-  await page.getByRole('link', { name: 'Início' }).click()
+  await irPara(page, 'Início')
   await expect(page.getByRole('heading', { name: /Bora pra quadra/ })).toBeVisible()
   await expect(numero(page, 'sessões nos últimos 7 dias')).toHaveText('0')
   await expect(page.locator('.conta-nome')).toContainText('Marina')
 
+  await abrirMenu(page)
   await page.getByRole('button', { name: 'Sair' }).click()
   await expect(page).toHaveURL(/\/entrar$/)
 

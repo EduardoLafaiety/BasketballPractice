@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { api } from '../api'
 import { CATEGORIAS } from '../components/FormExercicio'
 import { NIVEIS } from '../lib/niveis'
@@ -12,7 +12,12 @@ const ORDEM_DIAS: DiaSemana[] = [1, 2, 3, 4, 5, 6, 0]
 export default function Gerador() {
   const navigate = useNavigate()
   const rotina = useRotina()
-  const [minutos, setMinutos] = useState(45)
+  const [parametros] = useSearchParams()
+  const [minutos, setMinutos] = useState(() => {
+    // O atalho "treino rápido" da página inicial já chega com o tempo escolhido; só valem os valores do controle.
+    const pedido = Number(parametros.get('minutos'))
+    return pedido >= 10 && pedido <= 120 && pedido % 5 === 0 ? pedido : 45
+  })
   const [nivel, setNivel] = useState<Nivel>('iniciante')
   const [foco, setFoco] = useState<Categoria[]>([])
   const [aquecimento, setAquecimento] = useState(true)

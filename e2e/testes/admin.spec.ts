@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test'
 import pg from 'pg'
 import { BANCO_E2E, PORTA_SITE } from '../ambiente'
-import { entrarCom, novaConta } from './ajuda'
+import { entrarCom, novaConta, abrirMenu } from './ajuda'
 
 // Mesmo efeito de `npm run admin -- email`, direto no banco dos testes.
 async function tornarAdmin(email: string) {
@@ -20,11 +20,13 @@ test('o painel admin só aparece depois de a conta virar admin, e vale na hora',
 
   await page.goto('/admin')
   await expect(page.getByRole('heading', { name: 'Página não encontrada' })).toBeVisible()
+  await abrirMenu(page)
   await expect(page.getByRole('link', { name: 'Admin' })).toHaveCount(0)
 
   await tornarAdmin(email)
   await page.reload()
 
+  await abrirMenu(page)
   await expect(page.getByRole('link', { name: 'Admin' })).toBeVisible()
   await expect(page.getByRole('heading', { name: 'Administração' })).toBeVisible()
   const propria = page.locator('.admin-usuario').filter({ hasText: email })

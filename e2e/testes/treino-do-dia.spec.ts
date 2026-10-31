@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { entrarCom, novaConta, numero } from './ajuda'
+import { entrarCom, novaConta, numero, irPara } from './ajuda'
 
 // A jornada principal: montar o treino de hoje, fazer a sessão guiada e ver a evolução em todas as telas.
 test('monta a rotina de hoje, faz a sessão guiada e vê o resultado em Desempenho, Metas e Início', async ({
@@ -22,7 +22,7 @@ test('monta a rotina de hoje, faz a sessão guiada e vê o resultado em Desempen
   await expect(page.locator('.dia.hoje').getByRole('button', { name: 'Remover Lance livre' })).toBeVisible()
 
   // Início mostra o treino do dia e leva à sessão guiada.
-  await page.getByRole('link', { name: 'Início' }).click()
+  await irPara(page, 'Início')
   await expect(page.locator('.lista-treino').getByRole('link', { name: /Lance livre/ })).toBeVisible()
   await page.getByRole('link', { name: 'Começar treino de hoje' }).click()
   await page.getByRole('button', { name: 'Começar', exact: true }).click()
@@ -50,13 +50,13 @@ test('monta a rotina de hoje, faz a sessão guiada e vê o resultado em Desempen
   await expect(page.locator('.historico > li')).toContainText('3/4 (75%)')
 
   // Metas: primeiro dia da sequência e a conquista do primeiro treino.
-  await page.getByRole('link', { name: 'Metas' }).click()
+  await irPara(page, 'Metas')
   await expect(page.locator('.sequencia strong').first()).toHaveText('1')
   await expect(page.locator('.conquista.desbloqueada')).toHaveCount(1)
   await expect(page.locator('.conquista.desbloqueada')).toContainText('Primeiro treino')
 
   // Início: números da semana e a sequência no topo.
-  await page.getByRole('link', { name: 'Início' }).click()
+  await irPara(page, 'Início')
   await expect(numero(page, 'sessões nos últimos 7 dias')).toHaveText('1')
   await expect(numero(page, 'aproveitamento nos arremessos')).toHaveText('75%')
   await expect(page.getByRole('link', { name: /1 dia seguido/ })).toBeVisible()
