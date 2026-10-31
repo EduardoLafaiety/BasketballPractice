@@ -692,7 +692,9 @@ section + section, .card + section { margin-top: 1.5rem; }
 
 /* Ferramentas */
 .abas { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 1rem 0 0.75rem; }
-.ferramenta { display: grid; gap: 1rem; }
+.ferramenta { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1rem; }
+.ferramenta .form-inline { max-width: 100%; }
+.ferramenta .form-inline .input { min-width: 0; }
 .ferramenta input[type='range'] { width: 100%; accent-color: var(--laranja); }
 .timer { display: grid; justify-items: center; gap: 0.75rem; padding: 2rem 1rem; border-radius: var(--raio); text-align: center; }
 .timer-fase { font-size: 1.4rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; margin: 0; }
@@ -1241,7 +1243,7 @@ section + section, .card + section { margin-top: 1.5rem; }
 .conteudo .demo-passos strong { font-weight: 800; }
 .conteudo label .input, .conteudo label input, .conteudo label select, .conteudo label textarea { text-transform: none; letter-spacing: normal; font-weight: 400; font-size: 1rem; }
 /* Todo seletor do site segue o mesmo rótulo: fonte pequena e maiúscula. */
-select.input, .conteudo label select, .conteudo label select.input { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
+select.input, .conteudo label select, .conteudo label select.input { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
 select.input option { text-transform: uppercase; }
 
 /* Ferramentas: abas em cartões, como os níveis de Treinos. */
