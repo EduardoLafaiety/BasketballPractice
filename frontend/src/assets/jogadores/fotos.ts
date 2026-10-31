@@ -43,4 +43,12 @@ export const FOTOS_JOGADORES: Record<string, FotoJogador> = {
   'joel-embiid': { ...fotos('joel-embiid'), autor: 'Keith Allison', licenca: 'CC BY-SA 2.0', fonte: commons('Joel_Embiid_2018_(cropped2).jpg'), legenda: '76ers, fev/2018' },
   'kawhi-leonard': { ...fotos('kawhi-leonard'), autor: 'Chensiyuan', licenca: 'CC BY-SA 4.0', fonte: commons('1_kawhi_leonard_2019_(cropped).jpg'), legenda: 'Raptors, mar/2019' },
   'trae-young': { ...fotos('trae-young'), autor: 'Alexander Jonesi', licenca: 'CC BY-SA 2.0', fonte: commons('Trae_Young.jpg'), legenda: 'Hawks, jan/2020' },
+  'jimmy-butler': { ...fotos('jimmy-butler'), autor: 'Joe Glorioso', licenca: 'CC BY-SA 2.0', fonte: commons('Jimmy Butler (cropped).jpg'), legenda: 'Heat, mar/2020' },
+  'paul-george': { ...fotos('paul-george'), autor: 'joshuak8', licenca: 'CC BY-SA 3.0', fonte: commons('Paul George Pacers.jpg'), legenda: 'Pacers, mar/2014' },
+  'pascal-siakam': { ...fotos('pascal-siakam'), autor: 'Chensiyuan', licenca: 'CC BY-SA 4.0', fonte: commons('1 pascal siakam 2025 (cropped).jpg'), legenda: 'Pacers, mar/2025' },
+  'zion-williamson': { ...fotos('zion-williamson'), autor: 'Erik Drost', licenca: 'CC BY 2.0', fonte: commons('Zion Williamson 2020 (cropped).jpg'), legenda: 'Pelicans, jan/2020' },
+  'scottie-barnes': { ...fotos('scottie-barnes'), autor: 'All-Pro Reels', licenca: 'CC BY-SA 2.0', fonte: commons('Scottie Barnes, Wizards vs Raptors on October 12, 2021.jpg'), legenda: 'Raptors, out/2021' },
+  'anthony-davis': { ...fotos('anthony-davis'), autor: 'Erik Drost', licenca: 'CC BY 2.0', fonte: commons('Anthony Davis pre-game (cropped).jpg'), legenda: 'Lakers, mar/2022' },
+  'karl-anthony-towns': { ...fotos('karl-anthony-towns'), autor: 'Erik Drost', licenca: 'CC BY 2.0', fonte: commons('Karl-Anthony Towns (51914283512) (cropped).jpg'), legenda: 'Timberwolves, fev/2022' },
+  'bam-adebayo': { ...fotos('bam-adebayo'), autor: 'Joe Glorioso', licenca: 'CC BY-SA 2.0', fonte: commons('Bam Adebayo (cropped).jpg'), legenda: 'Heat, mar/2020' },
 }

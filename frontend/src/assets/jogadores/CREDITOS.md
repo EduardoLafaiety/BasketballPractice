@@ -26,3 +26,11 @@ O Basketball Practice não tem relação com os jogadores, com a NBA nem com os 
 | Joel Embiid | [76ers, fev/2018](https://commons.wikimedia.org/wiki/File:Joel_Embiid_2018_(cropped2).jpg) | Keith Allison | CC BY-SA 2.0 |
 | Kawhi Leonard | [Raptors, mar/2019](https://commons.wikimedia.org/wiki/File:1_kawhi_leonard_2019_(cropped).jpg) | Chensiyuan | CC BY-SA 4.0 |
 | Trae Young | [Hawks, jan/2020](https://commons.wikimedia.org/wiki/File:Trae_Young.jpg) | Alexander Jonesi | CC BY-SA 2.0 |
+| Jimmy Butler | [Heat, mar/2020](https://commons.wikimedia.org/wiki/File:Jimmy_Butler_(cropped).jpg) | Joe Glorioso | CC BY-SA 2.0 |
+| Paul George | [Pacers, mar/2014](https://commons.wikimedia.org/wiki/File:Paul_George_Pacers.jpg) | joshuak8 | CC BY-SA 3.0 |
+| Pascal Siakam | [Pacers, mar/2025](https://commons.wikimedia.org/wiki/File:1_pascal_siakam_2025_(cropped).jpg) | Chensiyuan | CC BY-SA 4.0 |
+| Zion Williamson | [Pelicans, jan/2020](https://commons.wikimedia.org/wiki/File:Zion_Williamson_2020_(cropped).jpg) | Erik Drost | CC BY 2.0 |
+| Scottie Barnes | [Raptors, out/2021](https://commons.wikimedia.org/wiki/File:Scottie_Barnes,_Wizards_vs_Raptors_on_October_12,_2021.jpg) | All-Pro Reels | CC BY-SA 2.0 |
+| Anthony Davis | [Lakers, mar/2022](https://commons.wikimedia.org/wiki/File:Anthony_Davis_pre-game_(cropped).jpg) | Erik Drost | CC BY 2.0 |
+| Karl-Anthony Towns | [Timberwolves, fev/2022](https://commons.wikimedia.org/wiki/File:Karl-Anthony_Towns_(51914283512)_(cropped).jpg) | Erik Drost | CC BY 2.0 |
+| Bam Adebayo | [Heat, mar/2020](https://commons.wikimedia.org/wiki/File:Bam_Adebayo_(cropped).jpg) | Joe Glorioso | CC BY-SA 2.0 |

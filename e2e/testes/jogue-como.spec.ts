@@ -18,7 +18,7 @@ test('a API real tem os estilos ligados ao catálogo do Postgres', async ({ requ
 
   expect((await request.get('/api/styles')).status()).toBe(401)
   const lista = (await (await request.get('/api/styles', { headers })).json()) as { id: string; mix: Record<string, number> }[]
-  expect(lista).toHaveLength(20)
+  expect(lista).toHaveLength(28)
 
   const catalogo = (await (await request.get('/api/exercises', { headers })).json()) as { id: number; name: string }[]
   const ids = new Set(catalogo.map((e) => e.id))
@@ -41,14 +41,14 @@ test('escolhe um jogador pelo menu, vê o perfil e abre o exercício de um movim
   await page.goto('/')
   await irPara(page, 'Jogue como')
   await expect(page.getByRole('heading', { name: 'Jogue como', level: 1 })).toBeVisible()
-  await expect(page.locator('.cartao-jogador')).toHaveCount(20)
-  expect(await fotosCarregadas(page)).toBe(20)
+  await expect(page.locator('.cartao-jogador')).toHaveCount(28)
+  expect(await fotosCarregadas(page)).toBe(28)
 
   // Filtro por posição.
   await page.getByRole('button', { name: 'Pivôs' }).click()
-  await expect(page.locator('.cartao-jogador h3')).toHaveText(['Nikola Jokić', 'Victor Wembanyama', 'Joel Embiid'])
+  await expect(page.locator('.cartao-jogador h3')).toHaveText(['Nikola Jokić', 'Victor Wembanyama', 'Joel Embiid', 'Anthony Davis', 'Karl-Anthony Towns', 'Bam Adebayo'])
   await page.getByRole('button', { name: 'Todos' }).click()
-  await expect(page.locator('.cartao-jogador')).toHaveCount(20)
+  await expect(page.locator('.cartao-jogador')).toHaveCount(28)
 
   // Perfil do Luka: ficha, divisão do treino, movimentos e crédito da foto.
   await page.getByRole('link', { name: /Luka Dončić/ }).click()
@@ -69,7 +69,7 @@ test('escolhe um jogador pelo menu, vê o perfil e abre o exercício de um movim
   await page.goto('/jogue-como/michael-jordan')
   await expect(page.getByText('Jogador não encontrado.')).toBeVisible()
   await page.getByRole('link', { name: 'Ver todos os jogadores' }).click()
-  await expect(page.locator('.cartao-jogador')).toHaveCount(20)
+  await expect(page.locator('.cartao-jogador')).toHaveCount(28)
 })
 
 test('faz o treino do estilo na sessão guiada e a sessão é salva no banco', async ({ page, request }) => {
@@ -157,7 +157,7 @@ test.describe('no celular', () => {
     const semRolagemLateral = () => page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)
 
     await page.goto('/jogue-como')
-    await expect(page.locator('.cartao-jogador')).toHaveCount(20)
+    await expect(page.locator('.cartao-jogador')).toHaveCount(28)
     expect(await semRolagemLateral()).toBe(true)
 
     await page.getByRole('link', { name: /Victor Wembanyama/ }).click()
