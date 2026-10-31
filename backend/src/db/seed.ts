@@ -14,6 +14,8 @@ export async function seed(db: Database) {
   const rows = `unnest($1::text[], $2::text[], $3::text[], $4::text[], $5::text[], $6::boolean[], $7::int[])
                 AS c(name, category, metric, description, level, warmup, position)`
   await db.transaction(async (tx) => {
+    // Pode esperar a migração de outra instância, sem o limite de tempo das consultas normais.
+    await tx.query('SET LOCAL statement_timeout = 0')
     await tx.query('SELECT pg_advisory_xact_lock(4242)')
     await tx.query(
       `INSERT INTO exercises (name, category, metric, description, level, warmup, position)

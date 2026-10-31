@@ -11,6 +11,17 @@ export async function hashPassword(password: string) {
   return `scrypt$${salt.toString('hex')}$${hash.toString('hex')}`
 }
 
+// Login de e-mail sem conta faz a mesma conta do scrypt: pelo tempo da resposta, não dá para saber quem tem cadastro.
+let decoy: Promise<string> | undefined
+export function prepareDecoyHash() {
+  decoy ??= hashPassword(randomBytes(32).toString('hex'))
+  return decoy
+}
+
+export async function verifyAgainstDecoy(password: string) {
+  await verifyPassword(password, await prepareDecoyHash())
+}
+
 export async function verifyPassword(password: string, stored: string) {
   const [algorithm, saltHex, hashHex] = stored.split('$')
   if (algorithm !== 'scrypt' || !saltHex || !hashHex) return false

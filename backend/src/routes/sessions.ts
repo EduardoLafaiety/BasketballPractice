@@ -2,7 +2,7 @@ import { Router } from 'express'
 import { z } from 'zod'
 import { many, one, type Database, type Queryable } from '../db/index.js'
 import { HttpError, notFound } from '../lib/http-error.js'
-import { idParam, isoDate, parse } from '../lib/validate.js'
+import { dbId, idParam, isoDate, MAX_INT, parse } from '../lib/validate.js'
 import { currentUser } from '../middleware/auth.js'
 import { assertExercisesVisible } from './exercises.js'
 
@@ -37,7 +37,7 @@ const shotSchema = z
 
 const entrySchema = z
   .object({
-    exerciseId: z.number().int().positive(),
+    exerciseId: dbId,
     attempts: count,
     makes: count,
     reps: count,
@@ -55,7 +55,7 @@ const entrySchema = z
   })
 
 export const sessionSchema = z.object({
-  workoutId: z.number().int().positive().nullish(),
+  workoutId: dbId.nullish(),
   performedAt: isoDate.transform((value) => new Date(value).toISOString()),
   durationMinutes: z.number().int().min(1).max(1440).nullish(),
   rating: z.number().int().min(1).max(5).nullish(),
@@ -80,7 +80,7 @@ export const dateRangeQuery = tzQuery.extend({
 
 const listQuery = dateRangeQuery.extend({
   limit: z.coerce.number().int().min(1).max(200).default(50),
-  offset: z.coerce.number().int().min(0).default(0),
+  offset: z.coerce.number().int().min(0).max(MAX_INT).default(0),
 })
 
 export type SessionInput = z.infer<typeof sessionSchema>
@@ -166,7 +166,9 @@ async function shotsBySession(db: Queryable, sessionIds: number[]) {
 
 // Entries e shots de várias sessões, prontos para anexar a cada uma.
 export async function sessionDetails(db: Queryable, sessionIds: number[]) {
-  const [entries, shots] = await Promise.all([entriesBySession(db, sessionIds), shotsBySession(db, sessionIds)])
+  // Uma de cada vez: dentro de uma transação, as duas dividiriam a mesma conexão.
+  const entries = await entriesBySession(db, sessionIds)
+  const shots = await shotsBySession(db, sessionIds)
   return (id: number) => ({ entries: entries.get(id) ?? [], shots: shots.get(id) ?? [] })
 }
 

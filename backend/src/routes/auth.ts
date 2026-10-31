@@ -2,7 +2,7 @@ import { Router } from 'express'
 import { z } from 'zod'
 import { isPgError, one, UNIQUE_VIOLATION, type Database } from '../db/index.js'
 import { HttpError, notFound } from '../lib/http-error.js'
-import { hashPassword, verifyPassword } from '../lib/password.js'
+import { hashPassword, prepareDecoyHash, verifyAgainstDecoy, verifyPassword } from '../lib/password.js'
 import { signToken } from '../lib/token.js'
 import { parse } from '../lib/validate.js'
 import { currentUser, requireAuth } from '../middleware/auth.js'
@@ -24,6 +24,7 @@ const USER_COLUMNS = `id, name, email, is_admin AS "isAdmin", created_at AS "cre
 
 export function authRouter(db: Database) {
   const router = Router()
+  void prepareDecoyHash()
 
   const findUser = (id: number) => one<User>(db, `SELECT ${USER_COLUMNS} FROM users WHERE id = $1`, [id])
 
@@ -54,6 +55,7 @@ export function authRouter(db: Database) {
       [body.email],
     )
 
+    if (!row) await verifyAgainstDecoy(body.password)
     if (!row || !(await verifyPassword(body.password, row.passwordHash))) {
       throw new HttpError(401, 'E-mail ou senha incorretos')
     }

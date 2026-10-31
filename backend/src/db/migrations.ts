@@ -151,10 +151,42 @@ const migrations: string[] = [
   ALTER TABLE exercises ADD COLUMN warmup boolean NOT NULL DEFAULT false;
   ALTER TABLE exercises ADD COLUMN position integer;
   `,
+  `
+  -- O banco também recusa o que a API já valida, para nada entrar errado por outro caminho.
+  ALTER TABLE session_entries
+    ADD CONSTRAINT session_entries_attempts_check CHECK (attempts >= 0),
+    ADD CONSTRAINT session_entries_makes_check CHECK (makes >= 0),
+    ADD CONSTRAINT session_entries_reps_check CHECK (reps >= 0),
+    ADD CONSTRAINT session_entries_seconds_check CHECK (seconds >= 0);
+  ALTER TABLE practice_sessions ADD CONSTRAINT practice_sessions_duration_check CHECK (duration_minutes >= 0);
+  ALTER TABLE session_shots ADD CONSTRAINT session_shots_zone_check CHECK (zone IN (
+    'garrafao', 'lance_livre',
+    'media_canto_e', 'media_ala_e', 'media_topo', 'media_ala_d', 'media_canto_d',
+    'tres_canto_e', 'tres_ala_e', 'tres_topo', 'tres_ala_d', 'tres_canto_d'
+  ));
+  ALTER TABLE goals ADD CONSTRAINT goals_kind_check CHECK (kind IN (
+    'aproveitamento', 'sessoes_semana', 'minutos_semana', 'sessoes_total', 'minutos_total', 'cestas_total', 'dias_seguidos'
+  ));
+  ALTER TABLE physical_tests ADD CONSTRAINT physical_tests_kind_check CHECK (kind IN (
+    'impulsao', 'sprint', 'agilidade', 'suicidio', 'lances_1min'
+  ));
+
+  CREATE UNIQUE INDEX idx_exercises_catalog_name ON exercises (name) WHERE user_id IS NULL;
+
+  CREATE INDEX idx_sessions_workout ON practice_sessions(workout_id);
+  CREATE INDEX idx_goals_exercise ON goals(exercise_id);
+
+  -- Apagar um exercício não leva mais a meta junto. Excluir a conta segue funcionando: a meta sai pela cascata
+  -- de users antes de o Postgres conferir o RESTRICT dos exercícios apagados pela mesma cascata.
+  ALTER TABLE goals DROP CONSTRAINT goals_exercise_id_fkey;
+  ALTER TABLE goals ADD CONSTRAINT goals_exercise_id_fkey
+    FOREIGN KEY (exercise_id) REFERENCES exercises(id) ON DELETE RESTRICT;
+  `,
 ]
 
 export async function migrate(db: Database) {
   await db.transaction(async (tx) => {
+    await tx.query('SET LOCAL statement_timeout = 0')
     // Impede que duas instâncias da API migrem ao mesmo tempo.
     await tx.query('SELECT pg_advisory_xact_lock(4242)')
     await tx.query(`CREATE TABLE IF NOT EXISTS schema_migrations (

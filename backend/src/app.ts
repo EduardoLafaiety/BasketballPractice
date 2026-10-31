@@ -6,7 +6,7 @@ import { config } from './config.js'
 import type { Database } from './db/index.js'
 import { requireAdmin, requireAuth } from './middleware/auth.js'
 import { errorHandler, notFoundHandler } from './middleware/errors.js'
-import { limitarTentativas, type LimiteTentativas } from './middleware/rate-limit.js'
+import { emailDoLogin, limitarTentativas, type LimiteTentativas } from './middleware/rate-limit.js'
 import { adminRouter } from './routes/admin.js'
 import { authRouter } from './routes/auth.js'
 import { dataRouter } from './routes/data.js'
@@ -23,9 +23,20 @@ import { workoutsRouter } from './routes/workouts.js'
 
 export interface AppOptions {
   limiteTentativas?: LimiteTentativas
+  limiteConta?: LimiteTentativas
+  limiteCadastros?: LimiteTentativas
+  maxImports?: number
 }
 
-export function createApp(db: Database, { limiteTentativas = { maximo: config.authAttempts, janelaMs: 15 * 60_000 } }: AppOptions = {}) {
+export function createApp(
+  db: Database,
+  {
+    limiteTentativas = { maximo: config.authAttempts, janelaMs: 15 * 60_000 },
+    limiteConta = { maximo: config.accountAttempts, janelaMs: 15 * 60_000 },
+    limiteCadastros = { maximo: config.registrationsPerHour, janelaMs: 60 * 60_000 },
+    maxImports = config.maxImports,
+  }: AppOptions = {},
+) {
   const app = express()
   const auth = requireAuth(db)
 
@@ -51,8 +62,11 @@ export function createApp(db: Database, { limiteTentativas = { maximo: config.au
 
   // Login e cadastro: cada IP tem um número limitado de tentativas erradas.
   const tentativas = limitarTentativas(limiteTentativas)
-  app.use('/api/auth/login', tentativas)
-  app.use('/api/auth/register', tentativas)
+  // Trocar de IP não renova os palpites contra uma conta, e o IP não cria contas sem fim.
+  const porConta = limitarTentativas({ ...limiteConta, chave: emailDoLogin, conta: (status) => status === 401 })
+  const cadastros = limitarTentativas({ ...limiteCadastros, conta: (status) => status === 201 })
+  app.use('/api/auth/login', tentativas, porConta)
+  app.use('/api/auth/register', tentativas, cadastros)
   app.use('/api/auth', authRouter(db))
   app.use('/api/exercises', auth, exercisesRouter(db))
   app.use('/api/workouts', auth, workoutsRouter(db))
@@ -63,7 +77,7 @@ export function createApp(db: Database, { limiteTentativas = { maximo: config.au
   app.use('/api/plans', auth, plansRouter(db))
   app.use('/api/styles', auth, stylesRouter(db))
   app.use('/api/settings', auth, settingsRouter(db))
-  app.use('/api/data', auth, dataRouter(db))
+  app.use('/api/data', auth, dataRouter(db, { maxImports }))
   app.use('/api/news', auth, newsRouter(db))
   app.use('/api/admin', auth, requireAdmin(db), adminRouter(db))
 

@@ -1,6 +1,7 @@
 import type { AddressInfo } from 'node:net'
 import { after } from 'node:test'
 import { createApp, type AppOptions } from '../src/app.js'
+import type { Database } from '../src/db/index.js'
 import { openTestDatabase } from './pglite.js'
 
 export type ApiResponse = { status: number; body: any }
@@ -10,9 +11,10 @@ export type Api = (method: string, path: string, body?: unknown, token?: string)
  * Sobe a API inteira numa porta livre com um banco PGlite novo; fecha tudo ao fim do arquivo de teste.
  * Os testes erram senha de propósito várias vezes, então o limite de tentativas fica alto, salvo pedido.
  */
-export async function startApi(options: AppOptions = { limiteTentativas: { maximo: 1000, janelaMs: 60_000 } }) {
+export async function startApi(options: AppOptions = {}, envolver: (db: Database) => Database = (db) => db) {
+  const folga = { maximo: 1000, janelaMs: 60_000 }
   const db = await openTestDatabase()
-  const server = createApp(db, options).listen(0)
+  const server = createApp(envolver(db), { limiteTentativas: folga, limiteConta: folga, limiteCadastros: folga, ...options }).listen(0)
   await new Promise((resolve) => server.once('listening', resolve))
   const baseUrl = `http://127.0.0.1:${(server.address() as AddressInfo).port}/api`
 

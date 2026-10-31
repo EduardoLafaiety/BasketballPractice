@@ -11,12 +11,15 @@ npm run db:up          # sobe o Postgres no Docker (porta 5433)
 npm run dev            # http://localhost:3333/api
 ```
 
+Em produção (`NODE_ENV=production`), a API não sobe se `JWT_SECRET` estiver vazio, tiver menos de 32 caracteres ou for o valor de `.env.example`. Gere um com `openssl rand -hex 32`.
+
 Ao iniciar, a API aplica as migrações pendentes e popula o catálogo padrão de exercícios. Para usar outro Postgres, mude `DATABASE_URL` no `.env`.
 
 | Script | O que faz |
 | --- | --- |
 | `npm run dev` | Servidor com reload automático |
 | `npm test` | Testes de integração (Postgres em memória via PGlite, sem Docker) |
+| `TEST_POSTGRES_URL=postgres://basketball:basketball@localhost:5433/postgres npm test` | Inclui `test/postgres.test.ts`, que cria e apaga um banco próprio para testar o que o PGlite não reproduz: queda de conexão, travas e códigos de erro reais |
 | `npm run db:up` / `db:down` | Sobe / para o container do Postgres (os dados ficam no volume `postgres-data`) |
 | `npm run db:psql` | Abre o `psql` no banco de desenvolvimento |
 | `npm run build` / `npm start` | Compila para `dist/` e roda a versão compilada |
@@ -89,7 +92,16 @@ Treino realizado (`POST /api/sessions`):
 
 `GET /api/health` responde 503 quando o banco está fora do ar.
 
-Erros seguem o formato `{ "error": "mensagem", "details": { ... } }`.
+Erros seguem o formato `{ "error": "mensagem", "details": { ... } }`. Consulta longa demais, pool cheio ou conexão caída respondem 503 com `Retry-After`.
+
+Limites (ajustáveis no `.env`, por instância da API):
+
+| Variável | Padrão | O que limita |
+| --- | --- | --- |
+| `AUTH_ATTEMPTS` | 10 | Tentativas erradas de login e cadastro por IP, a cada 15 minutos |
+| `ACCOUNT_ATTEMPTS` | 20 | Senhas erradas por conta, de qualquer IP, a cada 15 minutos |
+| `REGISTRATIONS_PER_HOUR` | 30 | Contas criadas por IP, a cada hora |
+| `MAX_IMPORTS` | 2 | Importações de backup ao mesmo tempo; as demais recebem 503 com `Retry-After` |
 
 ## Estrutura
 
@@ -102,7 +114,7 @@ src/
   lib/              senha (scrypt), JWT, validação, erros HTTP
   middleware/       autenticação e tratamento de erros
   routes/           auth, exercises, workouts, sessions, stats
-test/               testes de integração com node:test + PGlite
+test/               testes de integração com node:test + PGlite (e Postgres real, com TEST_POSTGRES_URL)
 ```
 
 Para mudar o schema, adicione uma nova entrada no fim do array em `src/db/migrations.ts`. Não edite as migrações que já existem.

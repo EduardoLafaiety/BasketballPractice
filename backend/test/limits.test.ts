@@ -34,7 +34,7 @@ describe('Limite de tentativas de login', () => {
       } catch (erro) {
         return { passou, erro: erro as { status: number }, res }
       }
-      res.emit('finish')
+      res.emit('close')
       return { passou, erro: null, res }
     }
 
@@ -62,5 +62,99 @@ describe('Respostas', () => {
     assert.equal(estilos.status, 200)
     assert.equal(estilos.headers.get('content-encoding'), 'gzip')
     assert.equal(estilos.headers.get('cache-control'), 'private, max-age=300')
+  })
+})
+
+describe('Limite por conta e de cadastros', () => {
+  const folga = { maximo: 1000, janelaMs: 60_000 }
+
+  it('palpites contra uma conta param no limite dela, sem travar outra conta nem contar outro erro', async () => {
+    const app = await startApi({ limiteTentativas: folga, limiteConta: { maximo: 3, janelaMs: 60_000 } })
+    const alvo = await app.register()
+    const outra = await app.register()
+    const errada = { email: alvo.email, password: 'palpite-errado' }
+
+    // Validação recusada não é palpite de senha.
+    for (let i = 0; i < 5; i++) assert.equal((await app.api('POST', '/auth/login', { email: alvo.email })).status, 400)
+    assert.equal((await app.api('POST', '/auth/login', { email: alvo.email, password: 'senha-segura' })).status, 200)
+
+    for (let i = 0; i < 3; i++) assert.equal((await app.api('POST', '/auth/login', errada)).status, 401)
+    // Maiúsculas e espaços não abrem outra contagem, e a senha certa também espera.
+    const variacao = { email: `  ${alvo.email.toUpperCase()} `, password: 'senha-segura' }
+    assert.equal((await app.api('POST', '/auth/login', variacao)).status, 429)
+    assert.equal((await app.api('POST', '/auth/login', { email: outra.email, password: 'senha-segura' })).status, 200)
+  })
+
+  it('e-mail sem conta tem o mesmo limite: o 429 não revela quem está cadastrado', async () => {
+    const app = await startApi({ limiteTentativas: folga, limiteConta: { maximo: 2, janelaMs: 60_000 } })
+    const login = { email: 'ninguem@example.com', password: 'palpite-errado' }
+    for (let i = 0; i < 2; i++) assert.equal((await app.api('POST', '/auth/login', login)).status, 401)
+    assert.equal((await app.api('POST', '/auth/login', login)).status, 429)
+  })
+
+  it('cadastros que deram certo param no limite do IP; e-mail repetido não gasta vaga', async () => {
+    const app = await startApi({ limiteTentativas: folga, limiteCadastros: { maximo: 2, janelaMs: 60_000 } })
+    const nova = (i: number) => ({ name: 'Atleta', email: `robo${i}@example.com`, password: 'senha-segura' })
+    assert.equal((await app.api('POST', '/auth/register', nova(1))).status, 201)
+    for (let i = 0; i < 3; i++) assert.equal((await app.api('POST', '/auth/register', nova(1))).status, 409)
+    assert.equal((await app.api('POST', '/auth/register', nova(2))).status, 201)
+    assert.equal((await app.api('POST', '/auth/register', nova(3))).status, 429)
+    // O login do mesmo IP segue livre.
+    assert.equal((await app.api('POST', '/auth/login', { email: nova(1).email, password: 'senha-segura' })).status, 200)
+  })
+
+  it('uma rajada simultânea de cadastros não passa do limite', async () => {
+    const app = await startApi({ limiteTentativas: folga, limiteCadastros: { maximo: 3, janelaMs: 60_000 } })
+    const respostas = await Promise.all(
+      Array.from({ length: 12 }, (_, i) => app.api('POST', '/auth/register', { name: 'Robô', email: `rajada${i}@example.com`, password: 'senha-segura' })),
+    )
+    assert.equal(respostas.filter((r) => r.status === 201).length, 3)
+    assert.equal(respostas.filter((r) => r.status === 429).length, 9)
+  })
+
+  it('uma rajada simultânea de senhas erradas não passa do limite do IP', async () => {
+    const app = await startApi({ limiteTentativas: { maximo: 3, janelaMs: 60_000 } })
+    const respostas = await Promise.all(
+      Array.from({ length: 12 }, () => app.api('POST', '/auth/login', { email: 'x@example.com', password: 'palpite-errado' })),
+    )
+    assert.equal(respostas.filter((r) => r.status === 401).length, 3)
+    assert.equal(respostas.filter((r) => r.status === 429).length, 9)
+  })
+
+  it('chaves inventadas não fazem a contagem crescer sem fim', () => {
+    let n = 0
+    const limite = limitarTentativas({ maximo: 1, janelaMs: 1000, chave: () => (n === 0 ? 'primeira' : `k${n}`) }, () => 0)
+    const res = Object.assign(new EventEmitter(), { statusCode: 401, setHeader() {} })
+    const pedir = () => {
+      limite({} as Request, res as unknown as Response, () => {})
+      res.emit('close')
+      res.removeAllListeners()
+    }
+    pedir()
+    assert.throws(pedir, /Muitas tentativas/, 'a primeira chave já esgotou')
+    for (n = 1; n <= 10_000; n++) pedir()
+    // A mais antiga saiu para abrir espaço: a contagem ficou limitada.
+    n = 0
+    assert.doesNotThrow(pedir)
+  })
+})
+
+describe('Tempo do login recusado', () => {
+  it('e-mail sem conta demora o mesmo que senha errada', async () => {
+    const { email } = await livre.register()
+    const medir = async (login: object) => {
+      const t0 = performance.now()
+      assert.equal((await livre.api('POST', '/auth/login', login)).status, 401)
+      return performance.now() - t0
+    }
+    const mediana = (lista: number[]) => [...lista].sort((a, b) => a - b)[Math.floor(lista.length / 2)]
+    const comConta: number[] = []
+    const semConta: number[] = []
+    for (let i = 0; i < 15; i++) {
+      comConta.push(await medir({ email, password: 'palpite-errado' }))
+      semConta.push(await medir({ email: `ninguem${i}@example.com`, password: 'palpite-errado' }))
+    }
+    // Sem o scrypt falso a diferença é de mais de 10 vezes; a folga é para o ruído da máquina.
+    assert.ok(mediana(semConta) > mediana(comConta) * 0.5, `com conta ${mediana(comConta)} ms, sem conta ${mediana(semConta)} ms`)
   })
 })

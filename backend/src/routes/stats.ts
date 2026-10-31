@@ -6,6 +6,7 @@ import { dateRangeFilter, dateRangeQuery, tzQuery, ZONES } from './sessions.js'
 
 export { tzQuery }
 
+// Somas saem em float8, e não ::int: valores válidos acumulados passam de 2 bilhões e estourariam o integer.
 const percentage = (makes: number | null, attempts: number | null) =>
   attempts ? Math.round(((makes ?? 0) / attempts) * 1000) / 10 : null
 
@@ -71,17 +72,17 @@ async function progress(db: Queryable, userId: number, tzOffset: number) {
       db,
       `SELECT
          (SELECT COUNT(*) FROM practice_sessions WHERE user_id = $1)::int AS sessions,
-         (SELECT COALESCE(SUM(duration_minutes), 0) FROM practice_sessions WHERE user_id = $1)::int AS minutes,
+         (SELECT COALESCE(SUM(duration_minutes), 0) FROM practice_sessions WHERE user_id = $1)::float8 AS minutes,
          (SELECT COALESCE(SUM(se.makes), 0) FROM session_entries se
-            JOIN practice_sessions s ON s.id = se.session_id WHERE s.user_id = $1)::int AS makes,
+            JOIN practice_sessions s ON s.id = se.session_id WHERE s.user_id = $1)::float8 AS makes,
          (SELECT COALESCE(SUM(se.attempts), 0) FROM session_entries se
-            JOIN practice_sessions s ON s.id = se.session_id WHERE s.user_id = $1)::int AS attempts,
+            JOIN practice_sessions s ON s.id = se.session_id WHERE s.user_id = $1)::float8 AS attempts,
          (SELECT COALESCE(MAX(se.best_streak), 0) FROM session_entries se
             JOIN practice_sessions s ON s.id = se.session_id WHERE s.user_id = $1)::int AS "bestFreeThrowStreak",
          (SELECT COALESCE(MAX(day_makes), 0) FROM (
             SELECT SUM(se.makes) AS day_makes FROM session_entries se
             JOIN practice_sessions s ON s.id = se.session_id
-            WHERE s.user_id = $1 GROUP BY ${localDay('$2')}) d)::int AS "bestDayMakes",
+            WHERE s.user_id = $1 GROUP BY ${localDay('$2')}) d)::float8 AS "bestDayMakes",
          (SELECT COUNT(*) FROM physical_tests WHERE user_id = $1)::int AS tests`,
       [userId, tzOffset],
     ),
@@ -114,7 +115,7 @@ export function statsRouter(db: Database) {
     const [totals, byExercise, byWeek] = await Promise.all([
       one(
         db,
-        `SELECT COUNT(*)::int AS sessions, COALESCE(SUM(s.duration_minutes), 0)::int AS minutes,
+        `SELECT COUNT(*)::int AS sessions, COALESCE(SUM(s.duration_minutes), 0)::float8 AS minutes,
                 ROUND(AVG(s.rating), 1)::float8 AS "averageRating",
                 ROUND(AVG(s.fatigue), 1)::float8 AS "averageFatigue"
          FROM practice_sessions s WHERE s.user_id = $1 AND ${range.sql}`,
@@ -124,8 +125,8 @@ export function statsRouter(db: Database) {
         db,
         `SELECT e.id AS "exerciseId", e.name, e.category, e.metric,
                 COUNT(DISTINCT s.id)::int AS sessions,
-                SUM(se.makes)::int AS makes, SUM(se.attempts)::int AS attempts,
-                SUM(se.reps)::int AS reps, SUM(se.seconds)::int AS seconds,
+                SUM(se.makes)::float8 AS makes, SUM(se.attempts)::float8 AS attempts,
+                SUM(se.reps)::float8 AS reps, SUM(se.seconds)::float8 AS seconds,
                 MAX(se.best_streak)::int AS "bestStreak"
          FROM session_entries se
          JOIN practice_sessions s ON s.id = se.session_id
@@ -139,8 +140,8 @@ export function statsRouter(db: Database) {
       many<{ makes: number | null; attempts: number | null }>(
         db,
         `SELECT to_char(date_trunc('week', ${localDay('$4')}::timestamp), 'YYYY-MM-DD') AS "weekStart",
-                COUNT(*)::int AS sessions, COALESCE(SUM(s.duration_minutes), 0)::int AS minutes,
-                SUM(t.makes)::int AS makes, SUM(t.attempts)::int AS attempts
+                COUNT(*)::int AS sessions, COALESCE(SUM(s.duration_minutes), 0)::float8 AS minutes,
+                SUM(t.makes)::float8 AS makes, SUM(t.attempts)::float8 AS attempts
          FROM practice_sessions s
          LEFT JOIN (
            SELECT session_id, SUM(makes) AS makes, SUM(attempts) AS attempts FROM session_entries GROUP BY session_id
@@ -170,7 +171,7 @@ export function statsRouter(db: Database) {
     const range = dateRangeFilter(parse(dateRangeQuery, req.query), 2)
     const rows = await many<{ zone: string; makes: number; attempts: number }>(
       db,
-      `SELECT sh.zone, SUM(sh.makes)::int AS makes, SUM(sh.attempts)::int AS attempts
+      `SELECT sh.zone, SUM(sh.makes)::float8 AS makes, SUM(sh.attempts)::float8 AS attempts
        FROM session_shots sh JOIN practice_sessions s ON s.id = sh.session_id
        WHERE s.user_id = $1 AND ${range.sql}
        GROUP BY sh.zone`,

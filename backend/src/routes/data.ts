@@ -2,11 +2,11 @@ import { Router } from 'express'
 import { z } from 'zod'
 import { many, one, type Database, type Queryable } from '../db/index.js'
 import { HttpError } from '../lib/http-error.js'
-import { parse } from '../lib/validate.js'
+import { dbId, parse } from '../lib/validate.js'
 import { currentUser } from '../middleware/auth.js'
 import { CATEGORIES, METRICS } from './exercises.js'
 import { assertGoalExerciseKind, goalSchema } from './goals.js'
-import { insertSession, sessionDetails, sessionSchema } from './sessions.js'
+import { insertSession, sessionDetails, sessionSchema, type SessionInput } from './sessions.js'
 import { readSettings, settingsSchema, writeSettings } from './settings.js'
 import { testSchema } from './tests.js'
 import { workoutSchema } from './workouts.js'
@@ -16,7 +16,7 @@ const VERSION = 1
 
 // Referência a um exercício no arquivo: o id vale para os exercícios exportados junto;
 // os do catálogo padrão são achados pelo nome (os ids mudam de um banco para outro).
-const exerciseRef = { exerciseId: z.number().int().positive().nullish(), exerciseName: z.string().min(1).max(100) }
+const exerciseRef = { exerciseId: dbId.nullish(), exerciseName: z.string().min(1).max(100) }
 
 const importSchema = z.object({
   format: z.literal(FORMAT),
@@ -24,7 +24,7 @@ const importSchema = z.object({
   exercises: z
     .array(
       z.object({
-        id: z.number().int().positive(),
+        id: dbId,
         name: z.string().trim().min(2).max(100),
         category: z.enum(CATEGORIES),
         metric: z.enum(METRICS),
@@ -133,6 +133,43 @@ async function exportData(db: Queryable, userId: number) {
   }
 }
 
+type SessionContent = Pick<SessionInput, 'performedAt' | 'durationMinutes' | 'rating' | 'fatigue' | 'notes'> & {
+  entries: { [K in keyof SessionInput['entries'][number]]?: unknown }[]
+  shots: { zone: string; makes: number; attempts: number }[]
+}
+
+// O que torna uma sessão a mesma do backup: o instante e tudo o que foi registrado nele. O treino fica de fora
+// porque é só um vínculo: renomeá-lo depois do backup não faz o treino feito naquele dia virar outro.
+const sessionFingerprint = (session: SessionContent) =>
+  JSON.stringify([
+    new Date(session.performedAt).toISOString(),
+    session.durationMinutes ?? null,
+    session.rating ?? null,
+    session.fatigue ?? null,
+    session.notes ?? null,
+    session.entries.map((e) => [e.exerciseId, e.attempts ?? null, e.makes ?? null, e.reps ?? null, e.seconds ?? null, e.bestStreak ?? null, e.notes ?? null]),
+    session.shots.map((s) => [s.zone, s.makes, s.attempts]),
+  ])
+
+// Quantas sessões iguais a cada uma do arquivo já estão no banco. Só lê as dos mesmos instantes.
+async function existingFingerprints(tx: Queryable, userId: number, sessions: SessionInput[]) {
+  const counts = new Map<string, number>()
+  if (!sessions.length) return counts
+  const rows = await many<Omit<SessionContent, 'entries' | 'shots'> & { id: number }>(
+    tx,
+    `SELECT id, performed_at AS "performedAt", duration_minutes AS "durationMinutes", rating, fatigue, notes
+     FROM practice_sessions WHERE user_id = $1 AND performed_at = ANY($2::timestamptz[])`,
+    [userId, sessions.map((session) => session.performedAt)],
+  )
+  const details = await sessionDetails(tx, rows.map((row) => row.id))
+  for (const row of rows) {
+    const { entries, shots } = details(row.id)
+    const key = sessionFingerprint({ ...row, entries, shots })
+    counts.set(key, (counts.get(key) ?? 0) + 1)
+  }
+  return counts
+}
+
 async function importData(tx: Queryable, userId: number, data: z.infer<typeof importSchema>) {
   const created = { exercises: 0, workouts: 0, sessions: 0, goals: 0, physicalTests: 0 }
   const skipped = { sessions: 0, goals: 0, physicalTests: 0 }
@@ -204,27 +241,24 @@ async function importData(tx: Queryable, userId: number, data: z.infer<typeof im
     workoutIds.set(workout.name, id)
   }
 
-  // Sessões: a data/hora exata identifica um registro já importado.
-  const existingSessions = new Set(
-    (
-      await many<{ at: string }>(tx, `SELECT to_char(performed_at, 'YYYY-MM-DD"T"HH24:MI:SS.MS') AS at FROM practice_sessions WHERE user_id = $1`, [
-        userId,
-      ])
-    ).map((row) => row.at),
-  )
-  for (const raw of data.sessions) {
+  const sessions = data.sessions.map((raw) => {
     const { workoutName, ...rest } = raw
-    const session = parse(sessionSchema, {
+    return parse(sessionSchema, {
       ...rest,
       workoutId: workoutName ? (workoutIds.get(workoutName) ?? null) : null,
       entries: raw.entries.map((entry) => ({ ...entry, exerciseId: resolve(entry) })),
     })
-    const key = session.performedAt.slice(0, 23)
-    if (existingSessions.has(key)) {
+  })
+  // Cada sessão do banco cobre uma do arquivo: importar de novo não duplica, e duas sessões iguais no arquivo ficam.
+  const existing = await existingFingerprints(tx, userId, sessions)
+  for (const session of sessions) {
+    const key = sessionFingerprint(session)
+    const remaining = existing.get(key) ?? 0
+    if (remaining > 0) {
+      existing.set(key, remaining - 1)
       skipped.sessions++
       continue
     }
-    existingSessions.add(key)
     await insertSession(tx, userId, session)
     created.sessions++
   }
@@ -276,8 +310,15 @@ async function importData(tx: Queryable, userId: number, data: z.infer<typeof im
   return { created, skipped }
 }
 
-export function dataRouter(db: Database) {
+// Uma importação grande prende uma conexão por dezenas de segundos: acima deste limite, o pool ficaria sem
+// conexões para os outros atletas. Vale por instância da API.
+export const DEFAULT_MAX_IMPORTS = 2
+// Namespace do advisory lock por usuário, separado da trava de migração (chave única 4242).
+const IMPORT_LOCK = 4243
+
+export function dataRouter(db: Database, { maxImports = DEFAULT_MAX_IMPORTS }: { maxImports?: number } = {}) {
   const router = Router()
+  let running = 0
 
   router.get('/export', async (req, res) => {
     const userId = currentUser(req)
@@ -289,10 +330,25 @@ export function dataRouter(db: Database) {
   router.post('/import', async (req, res) => {
     const userId = currentUser(req)
     const data = parse(importSchema, req.body)
-    // Tudo ou nada: um registro inválido desfaz a importação inteira.
-    const result = await db.transaction((tx) => importData(tx, userId, data))
-    if (data.settings) await writeSettings(db, userId, data.settings)
-    res.json(result)
+    if (running >= maxImports) {
+      res.setHeader('Retry-After', '30')
+      throw new HttpError(503, 'Muitas importações em andamento. Tente de novo em instantes.')
+    }
+
+    running++
+    try {
+      // Tudo ou nada: um registro inválido desfaz a importação inteira.
+      const result = await db.transaction(async (tx) => {
+        // O mesmo backup enviado duas vezes ao mesmo tempo: a segunda espera e enxerga o que a primeira gravou.
+        await tx.query('SELECT pg_advisory_xact_lock($1::int, $2::int)', [IMPORT_LOCK, userId])
+        const imported = await importData(tx, userId, data)
+        if (data.settings) await writeSettings(tx, userId, data.settings)
+        return imported
+      })
+      res.json(result)
+    } finally {
+      running--
+    }
   })
 
   return router

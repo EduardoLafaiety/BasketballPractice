@@ -116,12 +116,13 @@ export function exercisesRouter(db: Database) {
     const { id } = parse(idParam, req.params)
     await findOwned(id, currentUser(req))
 
-    // As FKs com ON DELETE RESTRICT barram a exclusão de exercícios em uso, sem corrida entre checar e apagar.
+    // As FKs barram a exclusão de exercícios em uso, sem corrida entre checar e apagar.
     try {
       await db.query('DELETE FROM exercises WHERE id = $1', [id])
     } catch (error) {
       if (isStillReferenced(error)) {
-        throw new HttpError(409, 'Exercício está em uso por treinos ou registros')
+        const goal = await one(db, 'SELECT 1 FROM goals WHERE exercise_id = $1 LIMIT 1', [id])
+        throw new HttpError(409, goal ? 'Exercício está em uso por uma meta' : 'Exercício está em uso por treinos ou registros')
       }
       throw error
     }
