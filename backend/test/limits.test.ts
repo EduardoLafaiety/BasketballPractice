@@ -92,15 +92,16 @@ describe('Limite por conta e de cadastros', () => {
     assert.equal((await app.api('POST', '/auth/login', login)).status, 429)
   })
 
-  it('cadastros que deram certo param no limite do IP; e-mail repetido não gasta vaga', async () => {
+  it('cadastros aceitos param no limite do IP', async () => {
     const app = await startApi({ limiteTentativas: folga, limiteCadastros: { maximo: 2, janelaMs: 60_000 } })
     const nova = (i: number) => ({ name: 'Atleta', email: `robo${i}@example.com`, password: 'senha-segura' })
-    assert.equal((await app.api('POST', '/auth/register', nova(1))).status, 201)
-    for (let i = 0; i < 3; i++) assert.equal((await app.api('POST', '/auth/register', nova(1))).status, 409)
-    assert.equal((await app.api('POST', '/auth/register', nova(2))).status, 201)
+    // Cadastro recusado pela validação não gasta vaga.
+    for (let i = 0; i < 3; i++) assert.equal((await app.api('POST', '/auth/register', { ...nova(1), password: 'curta' })).status, 400)
+    assert.equal((await app.api('POST', '/auth/register', nova(1))).status, 202)
+    assert.equal((await app.api('POST', '/auth/register', nova(2))).status, 202)
     assert.equal((await app.api('POST', '/auth/register', nova(3))).status, 429)
     // O login do mesmo IP segue livre.
-    assert.equal((await app.api('POST', '/auth/login', { email: nova(1).email, password: 'senha-segura' })).status, 200)
+    assert.equal((await app.api('POST', '/auth/login', { email: nova(1).email, password: 'senha-segura' })).status, 401)
   })
 
   it('uma rajada simultânea de cadastros não passa do limite', async () => {
@@ -108,7 +109,7 @@ describe('Limite por conta e de cadastros', () => {
     const respostas = await Promise.all(
       Array.from({ length: 12 }, (_, i) => app.api('POST', '/auth/register', { name: 'Robô', email: `rajada${i}@example.com`, password: 'senha-segura' })),
     )
-    assert.equal(respostas.filter((r) => r.status === 201).length, 3)
+    assert.equal(respostas.filter((r) => r.status === 202).length, 3)
     assert.equal(respostas.filter((r) => r.status === 429).length, 9)
   })
 

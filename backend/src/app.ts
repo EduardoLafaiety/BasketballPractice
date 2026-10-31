@@ -4,6 +4,7 @@ import express from 'express'
 import helmet from 'helmet'
 import { config } from './config.js'
 import type { Database } from './db/index.js'
+import { createEmailSender, type EmailSender } from './lib/email.js'
 import { requireAdmin, requireAuth } from './middleware/auth.js'
 import { errorHandler, notFoundHandler } from './middleware/errors.js'
 import { emailDoLogin, limitarTentativas, type LimiteTentativas } from './middleware/rate-limit.js'
@@ -25,7 +26,12 @@ export interface AppOptions {
   limiteTentativas?: LimiteTentativas
   limiteConta?: LimiteTentativas
   limiteCadastros?: LimiteTentativas
+  limiteRecuperacao?: LimiteTentativas
+  limiteEnvios?: LimiteTentativas
   maxImports?: number
+  emails?: EmailSender
+  /** Recebe cada envio em segundo plano; os testes usam para esperar o e-mail sair. */
+  segundoPlano?: (tarefa: Promise<void>) => void
 }
 
 export function createApp(
@@ -34,7 +40,11 @@ export function createApp(
     limiteTentativas = { maximo: config.authAttempts, janelaMs: 15 * 60_000 },
     limiteConta = { maximo: config.accountAttempts, janelaMs: 15 * 60_000 },
     limiteCadastros = { maximo: config.registrationsPerHour, janelaMs: 60 * 60_000 },
+    limiteRecuperacao = { maximo: config.recoveryRequestsPerHour, janelaMs: 60 * 60_000 },
+    limiteEnvios = { maximo: config.emailsPerAddressPerHour, janelaMs: 60 * 60_000 },
     maxImports = config.maxImports,
+    emails = createEmailSender(config.email),
+    segundoPlano,
   }: AppOptions = {},
 ) {
   const app = express()
@@ -63,11 +73,32 @@ export function createApp(
   // Login e cadastro: cada IP tem um número limitado de tentativas erradas.
   const tentativas = limitarTentativas(limiteTentativas)
   // Trocar de IP não renova os palpites contra uma conta, e o IP não cria contas sem fim.
-  const porConta = limitarTentativas({ ...limiteConta, chave: emailDoLogin, conta: (status) => status === 401 })
-  const cadastros = limitarTentativas({ ...limiteCadastros, conta: (status) => status === 201 })
+  // Qualquer um pode esgotar o limite de uma conta alheia; a saída do dono é recuperar a senha, que zera a contagem.
+  const porConta = limitarTentativas({
+    ...limiteConta,
+    chave: emailDoLogin,
+    conta: (status) => status === 401,
+    mensagem: (minutos) => `Muitas tentativas nesta conta. Recupere a senha para entrar agora ou tente de novo em ${minutos} min.`,
+  })
+  const cadastros = limitarTentativas({ ...limiteCadastros, conta: (status) => status === 202 })
+  // Recuperar a senha tem contagem própria: quem estourou o limite do login ainda precisa conseguir sair por aqui.
+  const recuperacoes = limitarTentativas({ ...limiteRecuperacao, conta: (status) => status === 202 })
+  const links = limitarTentativas(limiteTentativas)
   app.use('/api/auth/login', tentativas, porConta)
   app.use('/api/auth/register', tentativas, cadastros)
-  app.use('/api/auth', authRouter(db))
+  app.use('/api/auth/forgot-password', recuperacoes)
+  app.use(['/api/auth/confirm', '/api/auth/reset-password'], links)
+  app.use(
+    '/api/auth',
+    authRouter(db, {
+      emails,
+      appUrl: config.appUrl,
+      limiteSenhaAtual: limiteConta,
+      limiteEnvios,
+      segundoPlano,
+      aoRedefinirSenha: porConta.liberar,
+    }),
+  )
   app.use('/api/exercises', auth, exercisesRouter(db))
   app.use('/api/workouts', auth, workoutsRouter(db))
   app.use('/api/sessions', auth, sessionsRouter(db))

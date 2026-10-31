@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test'
-import { SENHA, emailUnico, novaConta, numero, irPara, abrirMenu } from './ajuda'
+import { SENHA, emailUnico, esperarEmail, linkDoEmail, novaConta, numero, irPara, abrirMenu } from './ajuda'
 
-test('cadastro pelo formulário, sair e entrar de novo voltando à página pedida', async ({ page }) => {
+test('cadastro pelo formulário, ativação pelo e-mail, sair e entrar de novo voltando à página pedida', async ({ page }) => {
   const email = emailUnico('cadastro')
 
   // Sem login, uma página protegida manda para o login.
@@ -17,13 +17,20 @@ test('cadastro pelo formulário, sair e entrar de novo voltando à página pedid
 
   await page.getByLabel('Senha').fill(SENHA)
   await page.getByRole('button', { name: 'Criar conta' }).click()
+  await expect(page.getByRole('heading', { name: 'Confira seu e-mail' })).toBeVisible()
 
-  // Volta à página que tinha pedido antes do login, já com a conta nova (sem nenhuma sessão).
-  await expect(page).toHaveURL(/\/desempenho$/)
-  await expect(page.getByText('Você ainda não registrou nenhuma sessão.')).toBeVisible()
+  // Antes de ativar, a conta não entra; depois do link e da senha do cadastro, sim.
+  const recusa = await page.request.post('/api/auth/login', { data: { email, password: SENHA } })
+  expect(recusa.status()).toBe(401)
+
+  await page.goto(linkDoEmail(await esperarEmail(email, /Ative sua conta/)))
+  await page.getByLabel('Senha').fill('senha-de-outra-pessoa')
+  await page.getByRole('button', { name: 'Ativar e entrar' }).click()
+  await expect(page.getByText('Esta não é a senha escolhida no cadastro.')).toBeVisible()
+  await page.getByLabel('Senha').fill(SENHA)
+  await page.getByRole('button', { name: 'Ativar e entrar' }).click()
 
   // Início zerado, com o nome no menu.
-  await irPara(page, 'Início')
   await expect(page.getByRole('heading', { name: /Bora pra quadra/ })).toBeVisible()
   await expect(numero(page, 'sessões nos últimos 7 dias')).toHaveText('0')
   await expect(page.locator('.conta-nome')).toContainText('Marina')
@@ -45,15 +52,19 @@ test('cadastro pelo formulário, sair e entrar de novo voltando à página pedid
   await expect(page.getByRole('heading', { name: 'Metas e conquistas' })).toBeVisible()
 })
 
-test('não deixa cadastrar o mesmo e-mail duas vezes, nem com maiúsculas', async ({ page, request }) => {
+test('cadastrar um e-mail que já tem conta não revela isso na tela: o aviso vai para o dono', async ({ page, request }) => {
   const { email } = await novaConta(request)
 
   await page.goto('/cadastro')
   await page.getByLabel('Nome').fill('Outra pessoa')
   await page.getByLabel('E-mail').fill(email.toUpperCase())
-  await page.getByLabel('Senha').fill(SENHA)
+  await page.getByLabel('Senha').fill('Outra-senha-qualquer')
   await page.getByRole('button', { name: 'Criar conta' }).click()
 
-  await expect(page.getByRole('alert')).toHaveText('E-mail já cadastrado')
-  await expect(page).toHaveURL(/\/cadastro$/)
+  await expect(page.getByRole('status')).toContainText('Se este e-mail puder ser cadastrado')
+  await esperarEmail(email, /já tem conta/)
+
+  // A senha da conta continua a mesma.
+  const login = await request.post('/api/auth/login', { data: { email, password: SENHA } })
+  expect(login.status()).toBe(200)
 })

@@ -1,4 +1,6 @@
+import { existsSync, readFileSync } from 'node:fs'
 import { expect, type APIRequestContext, type Page } from '@playwright/test'
+import { CAIXA_E2E } from '../ambiente'
 
 export const SENHA = 'Senha-dos-testes-e2e'
 
@@ -6,12 +8,44 @@ export const SENHA = 'Senha-dos-testes-e2e'
 export const emailUnico = (rotulo: string) =>
   `${rotulo}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}@e2e.test`
 
-/** Cria a conta direto na API (mais rápido que o formulário, que tem um teste só dele). */
+interface EmailEnviado {
+  to: string
+  subject: string
+  text: string
+}
+
+const emailsPara = (endereco: string): EmailEnviado[] =>
+  existsSync(CAIXA_E2E)
+    ? readFileSync(CAIXA_E2E, 'utf8')
+        .split('\n')
+        .filter(Boolean)
+        .map((linha) => JSON.parse(linha) as EmailEnviado)
+        .filter((e) => e.to === endereco)
+    : []
+
+/** Espera chegar o e-mail com esse assunto (o envio é em segundo plano) e devolve o mais recente. */
+export async function esperarEmail(endereco: string, assunto: RegExp, quantos = 1) {
+  const comAssunto = () => emailsPara(endereco).filter((e) => assunto.test(e.subject))
+  await expect.poll(() => comAssunto().length, { message: `e-mail "${assunto}" para ${endereco}` }).toBeGreaterThanOrEqual(quantos)
+  return comAssunto().at(-1)!
+}
+
+/** O link de uso único que está no texto do e-mail. */
+export function linkDoEmail(email: EmailEnviado) {
+  const link = /https?:\S+#token=[\w-]+/.exec(email.text)?.[0]
+  if (!link) throw new Error(`Sem link no e-mail: ${email.subject}`)
+  return link
+}
+
+/** Cria e ativa a conta direto na API (mais rápido que o formulário, que tem um teste só dele). */
 export async function novaConta(request: APIRequestContext, nome = 'Atleta E2E') {
   const email = emailUnico('atleta')
-  const resposta = await request.post('/api/auth/register', { data: { name: nome, email, password: SENHA } })
-  expect(resposta.status()).toBe(201)
-  const { token } = (await resposta.json()) as { token: string }
+  const cadastro = await request.post('/api/auth/register', { data: { name: nome, email, password: SENHA } })
+  expect(cadastro.status()).toBe(202)
+  const link = linkDoEmail(await esperarEmail(email, /Ative sua conta/))
+  const ativacao = await request.post('/api/auth/confirm', { data: { token: link.split('#token=')[1], password: SENHA } })
+  expect(ativacao.status()).toBe(201)
+  const { token } = (await ativacao.json()) as { token: string }
   return { email, token }
 }
 

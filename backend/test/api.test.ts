@@ -3,10 +3,12 @@ import type { AddressInfo } from 'node:net'
 import { after, before, describe, it } from 'node:test'
 import { createApp } from '../src/app.js'
 import { isPgError, prepareDatabase, UNIQUE_VIOLATION } from '../src/db/index.js'
+import { caixaDeEmails, criarConta } from './caixa.js'
 import { openTestDatabase } from './pglite.js'
 
 const db = await openTestDatabase()
-const server = createApp(db).listen(0)
+const caixa = caixaDeEmails()
+const server = createApp(db, { emails: caixa.emails, segundoPlano: caixa.segundoPlano }).listen(0)
 let baseUrl = ''
 let token = ''
 
@@ -19,6 +21,9 @@ async function api(method: string, path: string, body?: unknown, auth = token) {
   const text = await response.text()
   return { status: response.status, body: text ? JSON.parse(text) : null }
 }
+
+const novaConta = (name: string, email: string) =>
+  criarConta((method, path, body) => api(method, path, body, ''), caixa, { name, email, password: 'senha-segura' })
 
 before(() => {
   baseUrl = `http://127.0.0.1:${(server.address() as AddressInfo).port}/api`
@@ -36,11 +41,9 @@ describe('API', () => {
 
   it('cadastra, faz login e bloqueia rotas sem token', async () => {
     const credentials = { name: 'Atleta', email: 'atleta@example.com', password: 'senha-segura' }
-    const register = await api('POST', '/auth/register', credentials, '')
-    assert.equal(register.status, 201)
-    assert.equal(register.body.user.email, credentials.email)
+    const pedir = (method: string, path: string, body?: unknown) => api(method, path, body, '')
+    assert.equal((await criarConta(pedir, caixa, credentials)).user.email, credentials.email)
 
-    assert.equal((await api('POST', '/auth/register', credentials, '')).status, 409)
     assert.equal((await api('POST', '/auth/login', { ...credentials, password: 'errada123' }, '')).status, 401)
 
     const login = await api('POST', '/auth/login', credentials, '')
@@ -128,8 +131,7 @@ describe('API', () => {
   })
 
   it('conta dias e semanas no fuso do cliente (tzOffset)', async () => {
-    const user = await api('POST', '/auth/register', { name: 'Fuso', email: 'fuso@example.com', password: 'senha-segura' }, '')
-    const auth = user.body.token
+    const auth = (await novaConta('Fuso', 'fuso@example.com')).token
     // Domingo 25/10 às 23h em Brasília = segunda 26/10 02h em UTC.
     await api('POST', '/sessions', { performedAt: '2026-10-25T23:00:00-03:00', durationMinutes: 45 }, auth)
     const brt = 'tzOffset=180'
@@ -152,8 +154,7 @@ describe('API', () => {
   })
 
   it('isola os dados entre usuários', async () => {
-    const other = await api('POST', '/auth/register', { name: 'Outro', email: 'outro@example.com', password: 'senha-segura' }, '')
-    const otherToken = other.body.token
+    const otherToken = (await novaConta('Outro', 'outro@example.com')).token
     assert.equal((await api('GET', '/workouts', undefined, otherToken)).body.length, 0)
     assert.equal((await api('GET', '/sessions', undefined, otherToken)).body.length, 0)
     assert.equal((await api('GET', '/workouts/1', undefined, otherToken)).status, 404)
@@ -161,9 +162,9 @@ describe('API', () => {
 
   it('libera o painel admin só para administradores', async () => {
     const credentials = { name: 'Chefe', email: 'chefe@example.com', password: 'senha-segura' }
-    const register = await api('POST', '/auth/register', credentials, '')
-    assert.equal(register.body.user.isAdmin, false)
-    const adminToken = register.body.token
+    const register = await novaConta(credentials.name, credentials.email)
+    assert.equal(register.user.isAdmin, false)
+    const adminToken = register.token
     assert.equal((await api('GET', '/admin/users', undefined, adminToken)).status, 403)
     assert.equal((await api('GET', '/admin/users', undefined, '')).status, 401)
 
@@ -201,7 +202,7 @@ describe('Banco de dados', () => {
     await prepareDatabase(db)
     const afterRun = await db.query('SELECT COUNT(*)::int AS n FROM exercises WHERE user_id IS NULL')
     assert.deepEqual(afterRun.rows, before.rows)
-    assert.deepEqual((await db.query('SELECT MAX(version) AS v FROM schema_migrations')).rows, [{ v: 6 }])
+    assert.deepEqual((await db.query('SELECT MAX(version) AS v FROM schema_migrations')).rows, [{ v: 7 }])
   })
 
   it('garante e-mail único sem diferenciar maiúsculas', async () => {

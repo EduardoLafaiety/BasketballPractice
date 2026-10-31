@@ -15,7 +15,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // Espelha o token no estado: sem isso, sair com usuario ainda null não redesenharia as rotas protegidas.
   const [temToken, setTemToken] = useState(() => tokenAtual() !== null)
 
-  const sair = useCallback(() => {
+  const encerrarLocal = useCallback(() => {
     definirToken(null)
     limparCache()
     setUsuario(null)
@@ -23,10 +23,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setTemToken(false)
   }, [])
 
+  // A tela sai na hora, sem esperar a rede. O pedido já partiu com o token: o fetch monta os cabeçalhos ao ser chamado.
+  // Sem conexão, o token não é revogado no servidor e vale até expirar, mas some deste navegador.
+  const sair = useCallback(() => {
+    if (tokenAtual()) void api.sair().catch(() => {})
+    encerrarLocal()
+  }, [encerrarLocal])
+
   useEffect(() => {
-    aoTokenExpirar(sair)
+    aoTokenExpirar(encerrarLocal)
     return () => aoTokenExpirar(null)
-  }, [sair])
+  }, [encerrarLocal])
 
   const conferirSessao = useCallback(() => {
     const conferido = tokenAtual()
@@ -40,10 +47,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       })
       .catch((e) => {
         // Só descarta o token se ele for inválido; falha de rede mantém a sessão.
-        if (e instanceof ApiError && e.status === 401) sair()
+        if (e instanceof ApiError && e.status === 401) encerrarLocal()
         else if (tokenAtual() === conferido) setErroSessao(e)
       })
-  }, [sair])
+  }, [encerrarLocal])
 
   useEffect(() => {
     if (!tokenAtual()) return
@@ -75,14 +82,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         void conferirSessao()
       },
       sair,
+      encerrarLocal,
+      abrirSessao,
       async entrar(email, senha) {
         abrirSessao(await api.entrar(email, senha))
       },
       async cadastrar(nome, email, senha) {
-        abrirSessao(await api.cadastrar(nome, email, senha))
+        return (await api.cadastrar(nome, email, senha)).message
       },
     }),
-    [usuario, verificando, temToken, erroSessao, conferirSessao, abrirSessao, sair],
+    [usuario, verificando, temToken, erroSessao, conferirSessao, abrirSessao, sair, encerrarLocal],
   )
 
   return <AuthContext.Provider value={valor}>{children}</AuthContext.Provider>

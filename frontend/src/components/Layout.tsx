@@ -9,6 +9,7 @@ import { diasAtras, useConfig } from '../store'
 import type { Config } from '../types'
 import BarraNoticias from './BarraNoticias'
 import Icone from './Icone'
+import { LinksLegais } from './TelaAuth'
 
 const LINKS: { to: string; rotulo: string; fim?: boolean }[] = [
   { to: '/', rotulo: 'Início', fim: true },
@@ -163,6 +164,7 @@ export default function Layout() {
       <main className="conteudo" ref={conteudo}>
         <Outlet />
       </main>
+      <footer className="rodape"><LinksLegais /></footer>
       <BarraNoticias />
     </div>
   )

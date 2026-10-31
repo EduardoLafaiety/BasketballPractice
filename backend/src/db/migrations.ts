@@ -182,6 +182,31 @@ const migrations: string[] = [
   ALTER TABLE goals ADD CONSTRAINT goals_exercise_id_fkey
     FOREIGN KEY (exercise_id) REFERENCES exercises(id) ON DELETE RESTRICT;
   `,
+  `
+  -- Sobe a cada saída ou troca de senha; token com versão antiga deixa de valer.
+  ALTER TABLE users ADD COLUMN token_version integer NOT NULL DEFAULT 0;
+
+  -- Links de "esqueci a senha": só o hash do token, para o banco não guardar nada que abra uma conta.
+  CREATE TABLE password_reset_tokens (
+    token_hash text PRIMARY KEY,
+    user_id    integer NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    expires_at timestamptz NOT NULL,
+    created_at timestamptz NOT NULL DEFAULT now()
+  );
+  CREATE INDEX idx_password_reset_tokens_user ON password_reset_tokens(user_id);
+
+  -- Cadastro à espera da confirmação por e-mail. Fica fora de users: até confirmar, o login trata o e-mail como sem
+  -- conta, e cada pedido tem linha própria, para o cadastro de um estranho não atrapalhar o do dono do e-mail.
+  CREATE TABLE pending_registrations (
+    token_hash    text PRIMARY KEY,
+    name          text NOT NULL,
+    email         text NOT NULL,
+    password_hash text NOT NULL,
+    expires_at    timestamptz NOT NULL,
+    created_at    timestamptz NOT NULL DEFAULT now()
+  );
+  CREATE INDEX idx_pending_registrations_email ON pending_registrations(email);
+  `,
 ]
 
 export async function migrate(db: Database) {

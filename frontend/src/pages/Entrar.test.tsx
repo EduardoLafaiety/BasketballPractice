@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { describe, expect, it } from 'vitest'
@@ -106,14 +106,10 @@ describe('Entrar', () => {
     expect(screen.queryByText('Dados inválidos')).toBeNull()
   })
 
-  it('cria a conta e entra direto no app', async () => {
+  it('pede a ativação por e-mail em vez de entrar, mostrando o aviso da API', async () => {
     const user = userEvent.setup()
     const { ultima } = apiFalsa({
-      'POST /auth/register': (corpo) => {
-        const { name, email } = corpo as { name: string; email: string }
-        return new Resposta(201, { token: 'tk-novo', user: usuarioFalso({ name, email }) })
-      },
-      'GET /settings': configFalsa,
+      'POST /auth/register': new Resposta(202, { message: 'Se este e-mail puder ser cadastrado, enviamos um link.' }),
     })
     abrirApp('/cadastro')
 
@@ -122,8 +118,10 @@ describe('Entrar', () => {
     await user.type(campo(/senha/i), 'senha-segura')
     await user.click(screen.getByRole('button', { name: 'Criar conta' }))
 
-    await waitFor(() => expect(tokenAtual()).toBe('tk-novo'))
+    expect(await screen.findByRole('status')).toHaveTextContent('Se este e-mail puder ser cadastrado, enviamos um link.')
+    expect(screen.getByRole('heading', { name: 'Confira seu e-mail' })).toBeInTheDocument()
     expect(ultima('POST', '/auth/register')?.corpo).toMatchObject({ name: 'Joana Lima', email: 'joana@example.com' })
-    expect(await screen.findByText('Joana')).toBeInTheDocument()
+    expect(tokenAtual()).toBeNull()
+    expect(screen.getByTestId('caminho')).toHaveTextContent('/cadastro')
   })
 })

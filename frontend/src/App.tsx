@@ -15,6 +15,9 @@ import Gerador from './pages/Gerador'
 import SessaoGuiada from './pages/SessaoGuiada'
 import Configuracoes from './pages/Configuracoes'
 import NaoEncontrada from './pages/NaoEncontrada'
+import RecuperarSenha from './pages/RecuperarSenha'
+import { ConfirmarConta, RedefinirSenha } from './pages/LinkDeConta'
+import { PoliticaPrivacidade, TermosDeUso } from './pages/Legal'
 import Admin from './pages/Admin'
 
 export default function App() {
@@ -23,6 +26,11 @@ export default function App() {
       <Route path="entrar" element={<Entrar modo="entrar" />} />
       {/* Na demonstração não há contas para criar: o login já aceita qualquer e-mail e senha. */}
       <Route path="cadastro" element={__DEMO__ ? <Navigate to="/entrar" replace /> : <Entrar modo="cadastro" />} />
+      <Route path="recuperar-senha" element={__DEMO__ ? <Navigate to="/entrar" replace /> : <RecuperarSenha />} />
+      <Route path="redefinir-senha" element={__DEMO__ ? <Navigate to="/entrar" replace /> : <RedefinirSenha />} />
+      <Route path="confirmar-conta" element={__DEMO__ ? <Navigate to="/entrar" replace /> : <ConfirmarConta />} />
+      <Route path="privacidade" element={<PoliticaPrivacidade />} />
+      <Route path="termos" element={<TermosDeUso />} />
       <Route
         element={
           <RequerLogin>

@@ -1,5 +1,5 @@
 import { createContext } from 'react'
-import type { Usuario } from './api'
+import type { AuthResposta, Usuario } from './api'
 
 export interface AuthValor {
   usuario: Usuario | null
@@ -11,8 +11,14 @@ export interface AuthValor {
   erroSessao: Error | null
   reconferirSessao: () => void
   entrar: (email: string, senha: string) => Promise<void>
-  cadastrar: (nome: string, email: string, senha: string) => Promise<void>
+  /** Não entra na conta: devolve o aviso de que o link de ativação foi enviado. */
+  cadastrar: (nome: string, email: string, senha: string) => Promise<string>
+  /** Entra com a sessão devolvida por um link de e-mail. */
+  abrirSessao: (sessao: AuthResposta) => void
+  /** Revoga o token na API e limpa o navegador. */
   sair: () => void
+  /** Só limpa o navegador: o token já não vale (conta excluída). */
+  encerrarLocal: () => void
 }
 
 // Fica num módulo só seu (sem imports de valor) para que o HMR do Vite, ao recarregar

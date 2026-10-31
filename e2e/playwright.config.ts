@@ -1,5 +1,5 @@
 import { defineConfig, devices } from '@playwright/test'
-import { BANCO_E2E, PORTA_API, PORTA_SITE } from './ambiente'
+import { BANCO_E2E, CAIXA_E2E, PORTA_API, PORTA_SITE } from './ambiente'
 
 // Testes de ponta a ponta: o site de produção (build + preview) falando com a API real,
 // que usa um Postgres de verdade num banco só dos testes (recriado vazio a cada execução).
@@ -27,7 +27,18 @@ export default defineConfig({
       command: 'node preparar-banco.mjs && node ../backend/node_modules/tsx/dist/cli.mjs ../backend/src/server.ts',
       url: `http://localhost:${PORTA_API}/api/health`,
       // Chave vazia: os testes não gastam a cota do GNews mesmo que o .env do backend tenha uma.
-      env: { PORT: String(PORTA_API), DATABASE_URL: BANCO_E2E, JWT_SECRET: 'segredo-dos-testes-e2e', GNEWS_API_KEY: '' },
+      env: {
+        PORT: String(PORTA_API),
+        DATABASE_URL: BANCO_E2E,
+        JWT_SECRET: 'segredo-dos-testes-e2e',
+        GNEWS_API_KEY: '',
+        EMAIL_PROVIDER: 'arquivo',
+        EMAIL_OUTBOX_FILE: CAIXA_E2E,
+        APP_URL: `http://localhost:${PORTA_SITE}`,
+        // Todos os testes vêm do mesmo IP.
+        REGISTRATIONS_PER_HOUR: '1000',
+        RECOVERY_REQUESTS_PER_HOUR: '1000',
+      },
       reuseExistingServer: false,
       timeout: 60_000,
     },

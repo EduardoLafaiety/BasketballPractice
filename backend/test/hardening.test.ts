@@ -319,7 +319,8 @@ describe('Importação e o resto da API', () => {
     const portao = new Promise<void>((resolve) => { soltar = resolve })
     // Só a primeira importação fica parada, já com a vaga ocupada. Antes de abrir a transação, porque o PGlite
     // tem uma conexão só: dentro dela, a parada travaria também o pedido que confere o resto da API.
-    let parou = false
+    // A ativação das contas também abre transação: o portão só arma depois dela.
+    let parou = true
     const limitada = await startApi({ maxImports: 1 }, (real) => ({
       ...real,
       transaction: async (fn) => {
@@ -334,6 +335,7 @@ describe('Importação e o resto da API', () => {
     const a = await limitada.register()
     const b = await limitada.register()
     const corpo = backup({ sessions: [{ performedAt: '2026-01-01', entries: [] }] })
+    parou = false
 
     const primeira = limitada.api('POST', '/data/import', corpo, a.token)
     await presa

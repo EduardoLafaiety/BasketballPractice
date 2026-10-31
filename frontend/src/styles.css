@@ -1302,3 +1302,22 @@ select.input option { text-transform: uppercase; }
   .nomes-linha { display: none; }
   .menu-tela, .menu-tela.aberto { transition: none; }
 }
+
+/* Links dos documentos: rodapé do app, telas de conta e as próprias páginas */
+.links-legais { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.4rem 1.5rem; }
+.links-legais a { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: inherit; text-decoration: none; }
+.links-legais a:hover { color: var(--laranja-texto); text-decoration: underline; }
+.rodape { padding: 0 1.25rem 2rem; }
+/* A barra de notícias é fixa: sem esta folga, cobriria os links. */
+.app:has(.noticias) .rodape { padding-bottom: calc(44px + 1.25rem); }
+
+.legal { min-height: 100vh; min-height: 100dvh; display: grid; align-content: start; gap: 2.5rem; padding: 0.8rem clamp(1.25rem, 4vw, 4rem) 3rem; background: var(--bg); }
+.legal-marca { display: flex; align-items: center; gap: 0.6rem; text-decoration: none; }
+.legal-texto { width: min(70ch, 100%); margin: 0 auto; }
+.legal-texto h2 { font-size: 1.4rem; margin-top: 2.25rem; }
+/* Texto corrido: sem a maiúscula em cada palavra que o resto do site usa em rótulos curtos. */
+.legal-texto p, .legal-texto li, .legal-rascunho { text-transform: none; }
+.legal-texto p, .legal-texto li { line-height: 1.6; overflow-wrap: anywhere; }
+.legal-texto ul { display: grid; gap: 0.5rem; padding-left: 1.2rem; }
+.legal-rascunho { margin-top: 1.25rem; padding: 1rem 1.25rem; border: 2px solid var(--laranja); border-radius: 14px; line-height: 1.55; }
+.legal-rascunho strong { color: var(--laranja-texto); }

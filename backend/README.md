@@ -13,6 +13,8 @@ npm run dev            # http://localhost:3333/api
 
 Em produção (`NODE_ENV=production`), a API não sobe se `JWT_SECRET` estiver vazio, tiver menos de 32 caracteres ou for o valor de `.env.example`. Gere um com `openssl rand -hex 32`.
 
+A conta nova só é ativada pelo link enviado por e-mail, e a recuperação de senha depende do mesmo envio. Em desenvolvimento, `EMAIL_PROVIDER=console` (o valor de `.env.example`) mostra os e-mails no terminal. Em produção use `EMAIL_PROVIDER=resend`, com `RESEND_API_KEY` e `EMAIL_FROM`, e `APP_URL` com o endereço do site: `console` e `arquivo` impedem a API de subir e, vazio, ela sobe com um aviso, sem enviar nada, e ninguém consegue ativar conta nova. Outro provedor é só outra implementação de `EmailSender`, em `src/lib/email.ts`.
+
 Ao iniciar, a API aplica as migrações pendentes e popula o catálogo padrão de exercícios. Para usar outro Postgres, mude `DATABASE_URL` no `.env`.
 
 | Script | O que faz |
@@ -28,7 +30,7 @@ O frontend (Vite) já faz proxy de `/api` para `http://localhost:3333`.
 
 ## Autenticação
 
-`POST /api/auth/register` ou `POST /api/auth/login` retornam `{ token, user }`. Envie o token nas demais rotas:
+`POST /api/auth/confirm` (a ativação da conta) ou `POST /api/auth/login` retornam `{ token, user }`. Envie o token nas demais rotas:
 
 ```
 Authorization: Bearer <token>
@@ -39,9 +41,15 @@ Authorization: Bearer <token>
 | Método | Rota | Descrição |
 | --- | --- | --- |
 | GET | `/api/health` | Status da API |
-| POST | `/api/auth/register` | `{ name, email, password }` |
+| POST | `/api/auth/register` | `{ name, email, password }` → `202`, igual com ou sem conta; envia o link de ativação |
+| POST | `/api/auth/confirm` | `{ token, password }` → `201 { token, user }` |
 | POST | `/api/auth/login` | `{ email, password }` |
+| POST | `/api/auth/forgot-password` | `{ email }` → `202`, igual com ou sem conta |
+| POST | `/api/auth/reset-password` | `{ token, password }` → `{ token, user }`; zera o limite de login da conta |
+| POST | `/api/auth/logout` | Revoga os tokens em todos os aparelhos |
+| PUT | `/api/auth/password` | `{ currentPassword, newPassword }` → `{ token, user }` |
 | GET | `/api/auth/me` | Usuário logado |
+| DELETE | `/api/auth/me` | `{ password }` → `204`, apaga a conta e os dados |
 | GET | `/api/exercises?category=` | Catálogo padrão + exercícios do usuário |
 | GET/PUT/DELETE | `/api/exercises/:id` | Só exercícios próprios podem ser alterados |
 | POST | `/api/exercises` | `{ name, category, metric, description? }` |
