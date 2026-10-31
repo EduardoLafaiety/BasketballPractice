@@ -91,7 +91,11 @@ body {
   margin: 0;
   background: var(--bg);
   color: var(--texto);
+  text-transform: capitalize;
 }
+/* Botões e listas não herdam do body por padrão; o que a pessoa digita nos campos fica como foi escrito. */
+button, select, option, ::placeholder { text-transform: capitalize; }
+.texto-literal { text-transform: none; }
 
 :focus-visible { outline: 2px solid var(--laranja); outline-offset: 2px; }
 
@@ -148,9 +152,7 @@ p { margin: 0 0 1rem; }
   font-size: 0.8rem;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  text-decoration: underline;
-  text-decoration-thickness: 2px;
-  text-underline-offset: 6px;
+  text-decoration: none;
 }
 .link-forte:hover { color: var(--laranja-texto); }
 .voltar { display: inline-block; margin-bottom: 1rem; }
@@ -231,7 +233,7 @@ p { margin: 0 0 1rem; }
 
 .secao-topo { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; flex-wrap: wrap; }
 .secao-topo h2 { margin-bottom: 1rem; }
-.secao-forte { align-items: flex-end; margin-top: 3.5rem; padding-bottom: 1rem; border-bottom: 4px solid var(--texto); }
+.secao-forte { align-items: flex-end; margin-top: 3.5rem; }
 .secao-forte h2 { margin: 0; font-size: clamp(2.2rem, 4vw, 3.2rem); }
 
 .lista-treino { list-style: none; margin: 0; padding: 0; }
@@ -1125,6 +1127,9 @@ section + section, .card + section { margin-top: 1.5rem; }
 .faixa-clara { background: var(--bg); color: var(--texto); }
 .faixa-laranja { --texto: #111111; --muted: #2b1505; background: var(--laranja); color: #111111; }
 .banda { padding: clamp(5rem, 14vh, 9rem) clamp(1.25rem, 5vw, 5rem); }
+.com-listra { --listra: clamp(44px, 8vh, 76px); position: relative; padding-top: calc(clamp(5rem, 14vh, 9rem) + var(--listra)); }
+.listra-bola { position: absolute; inset: 0 0 auto; display: block; width: 100%; height: var(--listra); pointer-events: none; fill: none; stroke: var(--laranja); stroke-width: 3px; }
+.faixa-laranja .listra-bola { stroke: #111111; }
 .banda-texto { max-width: 26em; margin: 0; font-size: clamp(1.1rem, 1.8vw, 1.5rem); }
 .conteudo .titulo-gigante { margin: 0; font-size: clamp(4rem, 14vw, 14rem); font-weight: var(--peso-display); line-height: 0.86; }
 
@@ -1234,7 +1239,8 @@ section + section, .card + section { margin-top: 1.5rem; }
 .abertura-fixa { position: sticky; top: 0; height: 100vh; overflow: hidden; }
 .linhas-quadra { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; fill: none; stroke: var(--borda); stroke-width: 1.5; opacity: 0.8; }
 .abertura-palco { position: absolute; inset: 0; display: grid; place-items: center; }
-.abertura-bola, .abertura-dentro { grid-area: 1 / 1; will-change: transform; }
+/* Sem will-change: com ele o navegador amplia o bitmap da escala 1 e a bola borra no zoom da rolagem. */
+.abertura-bola, .abertura-dentro { grid-area: 1 / 1; }
 .abertura-bola { width: min(72vh, 66vw); aspect-ratio: 1; }
 .abertura-dentro { height: min(68vh, 62vw); aspect-ratio: 240 / 300; color: var(--texto); }
 .abertura-dentro .figura { width: 100%; height: 100%; }
@@ -1358,9 +1364,11 @@ section + section, .card + section { margin-top: 1.5rem; }
 .nivel-opcao:hover { box-shadow: var(--sombra-alta); }
 .nivel-opcao.ativo { background: var(--laranja); color: #111111; }
 .nivel-opcao.ativo span { color: inherit; }
-.semana-dia, .semana-dia.folga { border: 0; }
-.semana-dia.folga { box-shadow: none; background: transparent; outline: 1px dashed var(--borda); outline-offset: -1px; }
-.semana-dia.hoje { box-shadow: var(--sombra), inset 0 0 0 2px var(--laranja); }
+.semana-dia, .semana-dia.hoje { min-height: 0; padding: 0.8rem 0 1.2rem; border: 0; border-bottom: 2px solid var(--texto); border-radius: 0; background: transparent; box-shadow: none; }
+.semana-dia.hoje { border-bottom-color: var(--laranja); }
+.semana-dia.folga { color: var(--muted); }
+.secao-forte ~ .vazio, .secao-forte ~ .lista-treino { margin-top: 1rem; padding-bottom: 1.5rem; border: 0; border-bottom: 2px solid var(--texto); border-radius: 0; }
+.secao-forte ~ .vazio { padding: 1rem 0 1.5rem; text-align: left; }
 .chip { border: 0; border-radius: 999px; background: var(--superficie); box-shadow: 0 3px 10px rgba(40, 34, 15, 0.08); }
 .chip.ativo { background: var(--texto); color: var(--bg); }
 .btn, .topo-acao, .topo-menu { border-radius: 999px; }
