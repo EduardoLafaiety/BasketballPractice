@@ -1221,7 +1221,7 @@ section + section, .card + section { margin-top: 1.5rem; }
 .semana-dia.hoje { border-bottom-color: var(--laranja); }
 .semana-dia.folga { color: var(--muted); }
 .secao-forte ~ .vazio, .secao-forte ~ .lista-treino { margin-top: 1rem; padding-bottom: 1.5rem; border: 0; border-bottom: 2px solid var(--texto); border-radius: 0; }
-.secao-forte ~ .vazio { padding: 1rem 0 1.5rem; text-align: left; }
+.secao-forte ~ .vazio { padding: 1rem 0 1.5rem; background: transparent; box-shadow: none; text-align: left; }
 .chip { border: 0; border-radius: 999px; background: var(--superficie); box-shadow: 0 3px 10px rgba(40, 34, 15, 0.08); }
 .chip.ativo { background: var(--texto); color: var(--bg); }
 .btn, .topo-acao, .topo-menu { border-radius: 999px; }
@@ -1249,11 +1249,11 @@ select.input { padding-inline: 1rem; border-color: var(--texto); border-radius: 
 select.input:hover:not(:disabled) { border-color: var(--laranja); }
 .estilo-lado .select { width: 100%; text-align: center; }
 
-/* Início: o resumo do dia num cartão, centrado no espaço entre a borda e a bola. */
-.abertura-painel { left: max(1rem, calc((100vw - min(72vh, 66vw)) / 4 - 160px)); top: 50%; bottom: auto; translate: 0 -50%; width: 320px; justify-items: center; gap: 0.75rem; padding: 1.5rem 1.25rem; border-radius: 28px; background: var(--superficie); box-shadow: var(--sombra); text-align: center; }
+/* Início: o resumo do dia num cartão, com o conteúdo centrado. */
+.abertura-painel { width: 320px; justify-items: center; gap: 0.75rem; padding: 1.5rem 1.25rem; border-radius: 28px; background: var(--superficie); box-shadow: var(--sombra); text-align: center; }
 .abertura-painel .hero-kicker, .abertura-painel .hero-acoes { justify-content: center; }
 @media (max-width: 860px) {
-  .abertura-painel { left: 1rem; right: 1rem; top: auto; bottom: 3.4rem; translate: none; width: auto; padding: 1rem; gap: 0.5rem; }
+  .abertura-painel { width: auto; padding: 1rem; gap: 0.5rem; }
 }
 
 /* Gerador: tempo e ação em painéis de placar, escolhas em passos numerados. */
