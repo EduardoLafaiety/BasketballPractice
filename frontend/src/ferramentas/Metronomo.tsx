@@ -53,7 +53,7 @@ export default function Metronomo({ bpmInicial, aoSalvarBpm }: { bpmInicial: num
   }
 
   return (
-    <div className="ferramenta metronomo">
+    <div className="ferramenta metronomo placar-preto">
       <div className="metronomo-luzes" aria-hidden>
         {Array.from({ length: compasso }, (_, i) => (
           <span key={i} className={tocando && batida >= 0 && batida % compasso === i ? (i === 0 ? 'acento' : 'ativa') : ''} />

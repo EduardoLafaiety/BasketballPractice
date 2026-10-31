@@ -63,6 +63,23 @@ describe('Ferramentas: abas', () => {
     expect(aba(/Metrônomo/)).toHaveAttribute('aria-selected', 'true')
   })
 
+  it('cada aba resume a ferramenta, e só as que não têm painel próprio ficam num cartão', async () => {
+    const user = userEvent.setup()
+    abrirFerramentas(null)
+    await screen.findByRole('button', { name: 'Iniciar' })
+    expect(aba(/Vídeo do arremesso/)).toHaveTextContent('Câmera lenta')
+    expect(screen.getByRole('tabpanel')).not.toHaveClass('card')
+
+    await user.click(aba(/Contador de arremessos/))
+    expect(screen.getByRole('tabpanel')).toHaveClass('card')
+    await user.click(aba(/Metrônomo/))
+    expect(screen.getByRole('tabpanel')).not.toHaveClass('card')
+    await user.click(aba(/Vídeo do arremesso/))
+    expect(screen.getByRole('tabpanel')).toHaveClass('card')
+    await user.click(aba(/Calculadoras/))
+    expect(screen.getByRole('tabpanel')).not.toHaveClass('card')
+  })
+
   it('aba desconhecida mostra o timer', async () => {
     abrirFerramentas('nada')
     expect(await screen.findByRole('button', { name: 'Iniciar' })).toBeInTheDocument()

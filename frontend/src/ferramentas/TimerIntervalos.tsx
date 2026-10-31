@@ -71,7 +71,7 @@ export default function TimerIntervalos() {
 
   if (fase) {
     return (
-      <div className={`timer timer-${fase}`}>
+      <div className={`timer placar-preto timer-${fase}`}>
         <p className="timer-fase">
           {fase === 'preparar' ? 'Prepare-se' : fase === 'trabalho' ? 'Trabalho' : fase === 'descanso' ? 'Descanso' : 'Fim! 💪'}
         </p>
@@ -103,7 +103,12 @@ export default function TimerIntervalos() {
   }
 
   return (
-    <div className="form form-solto ferramenta">
+    <div className="ferramenta placar-preto">
+      <div className="placar-tempo">
+        <span className="meta">Duração total</span>
+        <strong className="timer-relogio">{fmt(totalSeg)}</strong>
+        <span className="meta">Com {PREPARO}s de preparo. A tela fica acesa durante o timer.</span>
+      </div>
       <div className="chips">
         {PRESETS.map((p) => (
           <button
@@ -119,7 +124,7 @@ export default function TimerIntervalos() {
           </button>
         ))}
       </div>
-      <div className="linha linha-3">
+      <div className="placar-campos">
         <label>
           Trabalho (s)
           <input className="input" type="number" min={1} max={600} value={trabalho} onChange={(e) => setTrabalho(Math.max(1, Number(e.target.value)))} />
@@ -133,9 +138,6 @@ export default function TimerIntervalos() {
           <input className="input" type="number" min={1} max={50} value={rodadas} onChange={(e) => setRodadas(Math.max(1, Number(e.target.value)))} />
         </label>
       </div>
-      <p className="meta">
-        Duração total: {fmt(totalSeg)} (com {PREPARO}s de preparo). A tela fica acesa durante o timer.
-      </p>
       <button className="btn btn-primario btn-grande" onClick={iniciar}>
         Iniciar
       </button>
