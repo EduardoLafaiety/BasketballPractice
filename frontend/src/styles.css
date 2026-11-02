@@ -269,6 +269,8 @@ p { margin: 0 0 1rem; }
   margin: 1.5rem 0;
 }
 .filtros > .input[type='search'] { flex: 1 1 220px; max-width: 320px; }
+/* Toda caixa de busca: o texto de exemplo segue os rótulos pequenos do site; o que a pessoa digita fica normal. */
+.input[type='search']::placeholder { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
 .chips { display: flex; flex-wrap: wrap; gap: 0.4rem; }
 .chip {
   display: inline-flex;
@@ -1419,8 +1421,6 @@ select.input:hover:not(:disabled) { border-color: var(--laranja); }
   .dieta-abas { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .dieta-abas .nivel-opcao:last-child { grid-column: auto; }
 }
-/* O texto de exemplo da busca segue os rótulos pequenos do site; o que a pessoa digita fica normal. */
-.dieta-busca::placeholder { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
 
 /* Início: chamada discreta para a Alimentação, logo depois do Jogue como */
 .dieta-chamada { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: 2rem clamp(2rem, 6vw, 6rem); align-items: center; padding: clamp(3rem, 8vh, 5rem) clamp(1.25rem, 5vw, 5rem); border-top: 1px solid var(--borda); }

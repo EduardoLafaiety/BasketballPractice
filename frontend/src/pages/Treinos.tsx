@@ -80,7 +80,7 @@ export default function Treinos() {
         <input
           type="search"
           className="input"
-          placeholder="Buscar treino…"
+          placeholder="Buscar treino"
           value={busca}
           onChange={(e) => setBusca(e.target.value)}
         />

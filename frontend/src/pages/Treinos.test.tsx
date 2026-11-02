@@ -131,7 +131,7 @@ describe('Biblioteca de treinos', () => {
   it('busca no nome e na descrição sem diferenciar maiúsculas nem acentos', async () => {
     const user = userEvent.setup()
     abrir(servidorDeExercicios().rotas)
-    const busca = await screen.findByPlaceholderText('Buscar treino…')
+    const busca = await screen.findByPlaceholderText('Buscar treino')
 
     await user.type(busca, 'MEDIA')
     expect(nomesNaTela()).toEqual(['Arremesso de média'])
