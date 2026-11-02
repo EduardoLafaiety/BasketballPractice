@@ -209,7 +209,9 @@ function Despensa() {
   return (
     <>
       <p className="muted">Os alimentos que aparecem nos cardápios, separados pelo que fazem por você em quadra.</p>
-      <input className="input dieta-busca" type="search" placeholder="Buscar alimento… ex.: ovo" aria-label="Buscar alimento" value={busca} onChange={(e) => setBusca(e.target.value)} />
+      <div className="filtros">
+        <input className="input" type="search" placeholder="Buscar alimento…" aria-label="Buscar alimento" value={busca} onChange={(e) => setBusca(e.target.value)} />
+      </div>
       <div className="grade dieta-grupos">
         {DESPENSA.map((g) => (
           <article key={g.nome} className="card" style={{ '--c': g.cor } as CSSProperties}>

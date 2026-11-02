@@ -1376,7 +1376,7 @@ select.input:hover:not(:disabled) { border-color: var(--laranja); }
 .dieta-porcoes { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0; }
 .dieta-porcoes div { min-width: 7.5rem; padding: 0.6rem 0.9rem; background: var(--superficie); border: 1px solid var(--borda); border-radius: var(--raio); }
 .dieta-porcoes dt { color: var(--muted); font-size: 0.7rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
-.conteudo .dieta-porcoes div dd { margin: 0; letter-spacing: 0; text-transform: none; line-height: 1.1; font-family: var(--fonte-display); font-weight: var(--peso-display); font-size: 1.6rem; }
+.conteudo .dieta-porcoes div dd { margin: 0; letter-spacing: 0; text-transform: uppercase; line-height: 1.1; font-family: var(--fonte-display); font-weight: var(--peso-display); font-size: 1.6rem; }
 .dieta-refeicoes { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 .dieta-refeicao { display: flex; flex-direction: column; gap: 0.8rem; border-top: 5px solid var(--c); }
 .dieta-refeicao h3 { margin: 0; }
@@ -1385,6 +1385,8 @@ select.input:hover:not(:disabled) { border-color: var(--laranja); }
 .dieta-porque { margin: auto 0 0; padding-left: 0.7rem; border-left: 3px solid var(--borda); color: var(--muted); font-size: 0.85rem; }
 .dieta-extras { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); margin-top: 1.2rem; }
 .dieta-extras .tag { --c: var(--c-defesa); margin-bottom: 0.4rem; }
+.dieta-extras .card { display: grid; justify-items: center; align-content: start; text-align: center; }
+.dieta-extras .alimentos { justify-content: center; }
 .alimentos { display: flex; flex-wrap: wrap; gap: 0.35rem; margin: 0; padding: 0; list-style: none; }
 .alimentos li { display: inline-flex; align-items: baseline; gap: 0.4rem; padding: 0.2rem 0.65rem; border: 1px solid var(--borda); border-radius: 999px; background: var(--superficie); font-size: 0.82rem; transition: opacity 0.2s; }
 .alimentos li.apagado { opacity: 0.25; }
@@ -1394,7 +1396,6 @@ select.input:hover:not(:disabled) { border-color: var(--laranja); }
 .dieta-linha > li::before { content: ''; position: absolute; left: calc(-1.6rem - 8px); top: 1.5rem; width: 14px; height: 14px; border-radius: 50%; background: var(--c); box-shadow: 0 0 0 4px var(--bg); }
 .dieta-quando { display: grid; align-content: start; gap: 0.3rem; font-family: var(--fonte-display); font-weight: var(--peso-display); font-size: 1.8rem; line-height: 1; text-transform: uppercase; color: var(--c); }
 .dieta-quando .meta { font-family: 'Manrope Variable', system-ui, sans-serif; font-weight: 600; font-size: 0.78rem; text-transform: none; color: var(--muted); }
-.dieta-busca { width: 100%; max-width: 26rem; margin-bottom: 1.5rem; }
 .dieta-grupos { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .dieta-grupos .card { border-top: 5px solid var(--c); }
 .dieta-grupo { display: flex; align-items: center; gap: 0.6rem; }
@@ -1403,15 +1404,18 @@ select.input:hover:not(:disabled) { border-color: var(--laranja); }
   .dieta-posicoes { grid-template-columns: 1fr; }
 }
 @media (max-width: 640px) {
-  .dieta-abas { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .dieta-abas .nivel-opcao:last-child { grid-column: auto; }
   .dieta-refeicoes, .dieta-grupos { grid-template-columns: 1fr; }
   .dieta-cabecalho, .dieta-linha > li { grid-template-columns: 1fr; }
 }
 .dieta-medidas { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 .dieta-medidas .card { display: grid; gap: 0.2rem; }
-.dieta-peso { font-family: var(--fonte-display); font-weight: var(--peso-display); font-size: 1.8rem; line-height: 1; text-transform: none; }
-.alimento-qtd { color: var(--laranja-texto); font-weight: 700; font-size: 0.75rem; text-transform: none; white-space: nowrap; }
+.dieta-peso { font-family: var(--fonte-display); font-weight: var(--peso-display); font-size: 1.8rem; line-height: 1; text-transform: uppercase; }
+.alimento-qtd { color: var(--laranja-texto); font-weight: 700; font-size: 0.7rem; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; }
 .dieta-refeicao-topo { display: flex; align-items: center; gap: 0.75rem; }
 .icone-refeicao { flex-shrink: 0; color: var(--texto); }
 @media (max-width: 960px) { .dieta-medidas { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+/* Com 4 abas, a grade de 2 colunas fecha certinho: nenhuma aba ocupa a linha sozinha. */
+@media (max-width: 860px) {
+  .dieta-abas { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .dieta-abas .nivel-opcao:last-child { grid-column: auto; }
+}
