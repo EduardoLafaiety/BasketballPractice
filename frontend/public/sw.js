@@ -1,7 +1,7 @@
 // Service worker do Basketball Practice: deixa o app abrir sem internet.
 // Guarda só a "casca" do site (HTML, JS, CSS, ícones). Respostas da API nunca são guardadas:
 // os dados do atleta ficam no servidor e não sobram no aparelho depois do logout.
-const VERSAO = 'bp-v3'
+const VERSAO = 'bp-v4'
 // Caminhos relativos ao escopo: o site pode estar em / ou numa subpasta (ex.: /BasketballPractice/ no GitHub Pages).
 const BASE = new URL(self.registration.scope).pathname
 const INDEX = BASE + 'index.html'
@@ -25,13 +25,15 @@ self.addEventListener('fetch', (evento) => {
   const url = new URL(request.url)
   if (request.method !== 'GET' || url.origin !== self.location.origin || url.pathname.startsWith(BASE + 'api/')) return
 
-  // Páginas: rede primeiro (versão nova), cache se estiver offline.
+  // Páginas: rede primeiro, pulando o cache HTTP (senão o HTML antigo aponta para o JS antigo); cache se estiver offline.
   if (request.mode === 'navigate') {
     evento.respondWith(
-      fetch(request)
+      fetch(request, { cache: 'no-cache' })
         .then((resposta) => {
-          const copia = resposta.clone()
-          caches.open(VERSAO).then((cache) => cache.put(INDEX, copia))
+          if (resposta.ok) {
+            const copia = resposta.clone()
+            caches.open(VERSAO).then((cache) => cache.put(INDEX, copia))
+          }
           return resposta
         })
         .catch(() => caches.match(INDEX)),
