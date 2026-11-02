@@ -2,7 +2,8 @@
 // Tudo é só visual: sem estes efeitos a página continua completa e legível.
 const SURGE = '.surge, .card, .treino-linha, .stat, .plano-item, .semana-dia'
 const SEM_SURGE = '.guiada, .menu-tela, .topo'
-const REVELA = '.foto-jogador, .semana-dia, .drill-card, .cartao-jogador, .nivel-cartao, .ferramenta-linha, .treino-linha, .conteudo div.card, .conteudo h1, .conteudo h2'
+// Só onde o mouse troca uma cor de verdade; cartões e listas com texto miúdo ficam de fora.
+const REVELA = '.foto-jogador, .cartao-jogador, .conteudo h1, .conteudo h2'
 const SEM_REVELA = '.guiada, .abertura, .menu-tela'
 const TEXTO = /^H[12]$/
 
@@ -84,7 +85,8 @@ export function iniciarEfeitos(raiz: HTMLElement) {
     if (sob && !ativos.has(sob)) {
       const caixa = sob.getBoundingClientRect()
       ativos.set(sob, { x: mouse.x - caixa.left, y: mouse.y - caixa.top, r: 0 })
-      if (TEXTO.test(sob.tagName)) sob.dataset.texto = sob.textContent ?? ''
+      // innerText guarda as quebras dos <br>; sem elas a cópia laranja quebra as linhas em outro lugar.
+      if (TEXTO.test(sob.tagName)) sob.dataset.texto = sob.innerText
     }
     if (ativos.size && !quadro) quadro = requestAnimationFrame(passo)
   }

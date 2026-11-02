@@ -18,7 +18,6 @@
   --faixa-linha: #cfcfcf;
   --faixa-destaque: #b8400a;
   color-scheme: dark;
-  --mistura: screen;
   --fundo-quadra: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 620' preserveAspectRatio='xMidYMid slice'%3E%3Cg fill='none' stroke='%2345463a' stroke-width='1.5'%3E%3Ccircle cx='500' cy='310' r='110'/%3E%3Ccircle cx='500' cy='310' r='245'/%3E%3Crect x='-40' y='190' width='240' height='240'/%3E%3Crect x='800' y='190' width='240' height='240'/%3E%3Cpath d='M500 -20V640M-40 40C120 40 240 170 240 310S120 580-40 580M1040 40C880 40 760 170 760 310S880 580 1040 580'/%3E%3C/g%3E%3C/svg%3E");
 
   --laranja: #ff6a13;
@@ -60,7 +59,6 @@
     --faixa-linha: #333333;
     --faixa-destaque: #ff7a1a;
     color-scheme: light;
-    --mistura: multiply;
     --fundo-quadra: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 620' preserveAspectRatio='xMidYMid slice'%3E%3Cg fill='none' stroke='%23cfccbf' stroke-width='1.5'%3E%3Ccircle cx='500' cy='310' r='110'/%3E%3Ccircle cx='500' cy='310' r='245'/%3E%3Crect x='-40' y='190' width='240' height='240'/%3E%3Crect x='800' y='190' width='240' height='240'/%3E%3Cpath d='M500 -20V640M-40 40C120 40 240 170 240 310S120 580-40 580M1040 40C880 40 760 170 760 310S880 580 1040 580'/%3E%3C/g%3E%3C/svg%3E");
   }
 }
@@ -81,7 +79,6 @@
   --faixa-linha: #333333;
   --faixa-destaque: #ff7a1a;
   color-scheme: light;
-    --mistura: multiply;
     --fundo-quadra: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 620' preserveAspectRatio='xMidYMid slice'%3E%3Cg fill='none' stroke='%23cfccbf' stroke-width='1.5'%3E%3Ccircle cx='500' cy='310' r='110'/%3E%3Ccircle cx='500' cy='310' r='245'/%3E%3Crect x='-40' y='190' width='240' height='240'/%3E%3Crect x='800' y='190' width='240' height='240'/%3E%3Cpath d='M500 -20V640M-40 40C120 40 240 170 240 310S120 580-40 580M1040 40C880 40 760 170 760 310S880 580 1040 580'/%3E%3C/g%3E%3C/svg%3E");
 }
 
@@ -974,7 +971,6 @@ section + section, .card + section { margin-top: 1.5rem; }
 /* Faixas: redefinem as cores, e tudo o que está dentro acompanha */
 .faixa-escura, .faixa-preta {
   --bg: #1f2019; --superficie: #26271f; --superficie-2: #2f3027; --borda: #45463a; --texto: #f4f2ea; --muted: #b5b3a6; --laranja-texto: #ff8a33;
-  --mistura: screen;
   background: var(--bg); color: var(--texto);
 }
 .faixa-preta { --bg: #101010; --superficie: #171717; --superficie-2: #202020; --borda: #383838; }
@@ -1046,22 +1042,12 @@ section + section, .card + section { margin-top: 1.5rem; }
 [data-surge='espera'] .foto-jogador { clip-path: inset(100% 0 0 0); }
 [data-surge='ok'] .foto-jogador { clip-path: inset(0); transition: clip-path 1s cubic-bezier(0.7, 0, 0.2, 1) var(--atraso, 0s); }
 
-/* Efeitos: o mouse revela. Fundo claro multiplica e fundo escuro soma, para o texto continuar legível. */
+/* Efeitos: o mouse troca a cor só onde há troca de verdade: títulos grandes e fotos dos jogadores. */
 .card, .nivel-cartao, .ferramenta-linha, .treino-linha, .semana-dia { position: relative; isolation: isolate; }
-.drill-card::after, .semana-dia::after, .cartao-jogador .cartao-jogador-info::after, .nivel-cartao::after, .ferramenta-linha::after, .treino-linha::after, .conteudo div.card::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: 3;
-  pointer-events: none;
-  mix-blend-mode: var(--mistura, multiply);
-  background: radial-gradient(circle var(--r, 0px) at var(--x, 50%) var(--y, 50%), var(--laranja) 72%, transparent 100%);
-}
-.cartao-jogador .cartao-jogador-info::after { display: none; }
-.cartao-jogador::after { content: none; }
 .conteudo h1, .conteudo h2 { position: relative; }
 .conteudo h1[data-texto]::after, .conteudo h2[data-texto]::after {
   content: attr(data-texto);
+  white-space: pre-line;
   position: absolute;
   inset: 0;
   color: var(--laranja);
