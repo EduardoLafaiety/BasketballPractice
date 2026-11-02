@@ -57,6 +57,23 @@ describe('Entrar', () => {
     expect(screen.getByText('Marina')).toBeInTheDocument()
   })
 
+  it('depois do login volta ao endereço pedido com a query string (?aba=despensa)', async () => {
+    const user = userEvent.setup()
+    apiFalsa({
+      'POST /auth/login': { token: 'tk-1', user: usuarioFalso() },
+      'GET /settings': configFalsa,
+    })
+    abrirApp('/alimentacao?aba=despensa')
+
+    await screen.findByRole('heading', { name: 'Entrar' })
+    await user.type(campo(/e-mail/i), 'marina@example.com')
+    await user.type(campo(/senha/i), 'senha-segura')
+    await user.click(screen.getByRole('button', { name: 'Entrar' }))
+
+    expect(await screen.findByRole('tab', { name: /Despensa/ })).toHaveAttribute('aria-selected', 'true')
+    expect(screen.getByTestId('caminho')).toHaveTextContent('/alimentacao')
+  })
+
   it('mostra o erro de senha incorreta e libera nova tentativa', async () => {
     const user = userEvent.setup()
     apiFalsa({ 'POST /auth/login': new Resposta(401, { error: 'E-mail ou senha incorretos' }) })
