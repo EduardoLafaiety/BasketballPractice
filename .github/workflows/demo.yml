@@ -63,6 +63,21 @@ jobs:
         env:
           GNEWS_API_KEY: ${{ secrets.GNEWS_API_KEY }}
 
+      # Prévia para avaliar: se existir a branch `teste`, ela sai em /teste/ junto da demonstração.
+      # O site oficial (a main) continua na raiz; apagar a branch `teste` tira a prévia na próxima publicação.
+      - name: Prévia da branch teste
+        run: |
+          if git ls-remote --exit-code --heads origin teste > /dev/null; then
+            git fetch --depth 1 origin teste
+            git worktree add ../teste FETCH_HEAD
+            (cd ../teste/backend && npm ci)
+            (cd ../teste/frontend && npm ci && VITE_BASE=/${{ github.event.repository.name }}/teste/ npm run build:demo)
+            cp -r ../teste/frontend/dist frontend/dist/teste
+            cp frontend/dist/noticias.json frontend/dist/teste/noticias.json
+          else
+            echo "Sem branch teste: nada a publicar em /teste/."
+          fi
+
       - uses: actions/configure-pages@v6
 
       - uses: actions/upload-pages-artifact@v5
