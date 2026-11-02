@@ -4,18 +4,20 @@ import {
   DESPENSA,
   DIA_DE_JOGO,
   EVITAR_NO_JOGO,
-  MAOS,
+  MEDIDAS_CASEIRAS,
   POS_TREINO,
   POSICOES,
   PRE_TREINO,
   REFEICOES,
   type CardapioPosicao,
+  type Item,
   type PosicaoDieta,
 } from '../alimentacao/dados'
+import IconeRefeicao from '../alimentacao/icones'
 import Icone from '../components/Icone'
 
 const ABAS = [
-  { id: 'inicio', rotulo: 'Início', resumo: 'Posições e medidas' },
+  { id: 'inicio', rotulo: 'Início', resumo: 'Posições e quantidades' },
   { id: 'cardapio', rotulo: 'Cardápio', resumo: 'As 4 refeições' },
   { id: 'jogo', rotulo: 'Dia de jogo', resumo: 'O que comer e quando' },
   { id: 'despensa', rotulo: 'Despensa', resumo: 'Lista de mercado' },
@@ -29,10 +31,18 @@ const COR: Record<PosicaoDieta, string> = {
   pivo: 'var(--c-drible)',
 }
 
-function Alimentos({ lista }: { lista: string[] }) {
+function Alimentos({ lista }: { lista: (string | Item)[] }) {
   return (
     <ul className="alimentos">
-      {lista.map((a) => <li key={a}>{a}</li>)}
+      {lista.map((a) => {
+        const item = typeof a === 'string' ? { nome: a } : a
+        return (
+          <li key={item.nome}>
+            <span>{item.nome}</span>
+            {item.qtd && <span className="alimento-qtd">{item.qtd}</span>}
+          </li>
+        )
+      })}
     </ul>
   )
 }
@@ -59,16 +69,16 @@ function Inicio({ escolher }: { escolher: (p: PosicaoDieta) => void }) {
         ))}
       </div>
 
-      <h2>Medida na mão, sem balança</h2>
+      <h2>Como ler as quantidades</h2>
       <p className="muted">
-        Em vez de gramas, a aba usa a sua própria mão como medida. Ela cresce junto com você, então a porção acompanha o seu tamanho.
+        Os pesos são do alimento pronto para comer: arroz cozido, carne grelhada. São uma referência para um atleta adulto; se você é
+        mais leve ou mais pesado, ajuste um pouco para menos ou para mais.
       </p>
-      <div className="grade dieta-maos">
-        {MAOS.map((m) => (
-          <div key={m.nome} className="card">
-            <span className="dieta-mao" aria-hidden>{m.icone}</span>
-            <h3>{m.nome}</h3>
-            <p className="meta sem-margem">{m.texto}</p>
+      <div className="grade dieta-medidas">
+        {MEDIDAS_CASEIRAS.map((m) => (
+          <div key={m.medida} className="card">
+            <strong className="dieta-peso">{m.peso}</strong>
+            <span className="meta">{m.medida}</span>
           </div>
         ))}
       </div>
@@ -103,7 +113,7 @@ function Cardapio({ posicao, descanso, mudar }: { posicao: CardapioPosicao; desc
           {posicao.porcoes.map((p) => (
             <div key={p.rotulo}>
               <dt>{p.rotulo}</dt>
-              <dd>{p.rotulo === 'Carboidrato' && descanso ? `${p.valor} − 1` : p.valor}</dd>
+              <dd>{descanso && p.descanso ? p.descanso : p.valor}</dd>
             </div>
           ))}
         </dl>
@@ -114,9 +124,12 @@ function Cardapio({ posicao, descanso, mudar }: { posicao: CardapioPosicao; desc
           const ref = posicao.refeicoes[r.id]
           return (
             <article key={r.id} className="card dieta-refeicao">
-              <div>
-                <h3>{r.nome}</h3>
-                <span className="meta">por volta das {r.hora}</span>
+              <div className="dieta-refeicao-topo">
+                <IconeRefeicao refeicao={r.id} />
+                <div>
+                  <h3>{r.nome}</h3>
+                  <span className="meta">por volta das {r.hora}</span>
+                </div>
               </div>
               {ref.opcoes.map((o, i) => (
                 <div key={i} className="dieta-opcao">
@@ -135,7 +148,7 @@ function Cardapio({ posicao, descanso, mudar }: { posicao: CardapioPosicao; desc
           <article className="card">
             <span className="tag">Dia de descanso</span>
             <h3>Mesma comida, um pouco menos de carboidrato</h3>
-            <p className="meta sem-margem">Tire um punho de carboidrato por refeição. A proteína continua igual: é no descanso que o músculo se reconstrói.</p>
+            <p className="meta sem-margem">Use as mesmas opções, com cerca de 50 g a menos de carboidrato (arroz, macarrão, batata, pão) em cada refeição. A proteína continua igual: é no descanso que o músculo se reconstrói.</p>
           </article>
         ) : (
           <>
