@@ -1,0 +1,44 @@
+# API no Render (Blueprint). O passo a passo completo está em docs/PUBLICAR.md.
+# O banco fica no Neon e o site no Cloudflare Pages; aqui é só a API.
+services:
+  - type: web
+    name: basketball-practice-api
+    runtime: node
+    # Grátis: dorme depois de 15 minutos sem visitas e leva cerca de 1 minuto para acordar.
+    # Com usuários de verdade, troque para starter (sem soneca).
+    plan: free
+    # Mesma região do banco no Neon (AWS us-east-1): cada consulta atravessa menos distância.
+    region: virginia
+    branch: main
+    rootDir: backend
+    # NODE_ENV=production faria o npm pular o TypeScript, que só existe em devDependencies.
+    buildCommand: npm ci --include=dev && npm run build
+    startCommand: npm start
+    # Responde 200 só com a API e o banco de pé.
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_VERSION
+        value: '22'
+      - key: NODE_ENV
+        value: production
+      # O Render gera um valor aleatório na criação; não precisa (nem deve) ser digitado.
+      - key: JWT_SECRET
+        generateValue: true
+      # A API fica atrás do proxy do Render: sem isto, o limite de tentativas trataria todo mundo como um IP só.
+      - key: TRUST_PROXY
+        value: '1'
+      - key: EMAIL_PROVIDER
+        value: resend
+      # sync: false = o Render pede o valor na criação do Blueprint (fica fora do git).
+      - key: DATABASE_URL
+        sync: false
+      - key: CORS_ORIGIN
+        sync: false
+      - key: APP_URL
+        sync: false
+      - key: EMAIL_FROM
+        sync: false
+      - key: RESEND_API_KEY
+        sync: false
+      - key: GNEWS_API_KEY
+        sync: false
