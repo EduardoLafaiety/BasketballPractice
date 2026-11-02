@@ -1,4 +1,4 @@
-# API no Render (Blueprint). O passo a passo completo está em docs/PUBLICAR.md.
+# API no Render (Blueprint): cria o serviço a partir deste arquivo; os segredos são pedidos na criação.
 # O banco fica no Neon e o site no Cloudflare Pages; aqui é só a API.
 services:
   - type: web
