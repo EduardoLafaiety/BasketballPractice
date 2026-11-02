@@ -1,5 +1,7 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, type CSSProperties } from 'react'
 import { Link } from 'react-router-dom'
+import { COR, POSICOES, REFEICOES } from '../alimentacao/dados'
+import IconeRefeicao from '../alimentacao/icones'
 import { api } from '../api'
 import { AvisoDesatualizado, Carregando, ErroCarga } from '../components/Estado'
 import GradeJogadores from '../components/GradeJogadores'
@@ -174,6 +176,30 @@ export default function Inicio() {
           </div>
         </section>
       )}
+
+      <section className="faixa-escura dieta-chamada" aria-labelledby="dieta-chamada-titulo">
+        <div className="dieta-chamada-texto">
+          <span className="rotulo-forte">Alimentação</span>
+          <h2 id="dieta-chamada-titulo">Coma como quem joga</h2>
+          <p className="muted">Café da manhã, almoço, café da tarde e janta para cada posição, com as quantidades em gramas.</p>
+          <div className="dieta-chamada-icones" aria-hidden>
+            {REFEICOES.map((r) => <IconeRefeicao key={r.id} refeicao={r.id} tamanho={34} />)}
+          </div>
+          <Link to="/alimentacao" className="link-forte">Ver alimentação</Link>
+        </div>
+        <div className="dieta-chamada-posicoes">
+          {POSICOES.map((p) => (
+            <Link key={p.id} to={`/alimentacao?aba=cardapio&posicao=${p.id}`} className="dieta-chamada-posicao" style={{ '--c': COR[p.id] } as CSSProperties}>
+              <span className="dieta-chamada-numeros" aria-hidden>{p.numeros}</span>
+              <span className="dieta-chamada-nome">
+                <strong>{p.nome}</strong>
+                <span className="meta">{p.titulo}</span>
+              </span>
+              <Icone nome="seta" />
+            </Link>
+          ))}
+        </div>
+      </section>
 
       <section className="faixa-clara banda">
         <div className="secao-topo">

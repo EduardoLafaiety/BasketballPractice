@@ -1421,3 +1421,17 @@ select.input:hover:not(:disabled) { border-color: var(--laranja); }
 }
 /* O texto de exemplo da busca segue os rótulos pequenos do site; o que a pessoa digita fica normal. */
 .dieta-busca::placeholder { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
+
+/* Início: chamada discreta para a Alimentação, logo depois do Jogue como */
+.dieta-chamada { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: 2rem clamp(2rem, 6vw, 6rem); align-items: center; padding: clamp(3rem, 8vh, 5rem) clamp(1.25rem, 5vw, 5rem); border-top: 1px solid var(--borda); }
+.conteudo .dieta-chamada h2 { margin: 0.5rem 0 0.75rem; font-size: clamp(2rem, 4vw, 3.2rem); }
+.dieta-chamada-texto .muted { max-width: 30em; margin-bottom: 1.2rem; }
+.dieta-chamada-icones { display: flex; gap: 0.6rem; margin-bottom: 1.4rem; }
+.dieta-chamada-posicoes { display: grid; gap: 0.6rem; }
+.dieta-chamada-posicao { display: grid; grid-template-columns: 4.5rem 1fr auto; align-items: center; gap: 1rem; padding: 0.9rem 1.2rem; background: var(--superficie); border: 1px solid var(--borda); border-left: 4px solid var(--c); border-radius: var(--raio); color: var(--texto); text-decoration: none; }
+.dieta-chamada-posicao:hover { border-color: var(--c); }
+.dieta-chamada-posicao > .icone-svg { color: var(--muted); }
+.dieta-chamada-posicao:hover > .icone-svg { color: var(--c); }
+.dieta-chamada-numeros { font-family: var(--fonte-display); font-weight: var(--peso-display); font-size: 2.2rem; line-height: 1; color: var(--c); }
+.dieta-chamada-nome { display: grid; gap: 0.1rem; }
+@media (max-width: 800px) { .dieta-chamada { grid-template-columns: 1fr; } }
