@@ -1419,3 +1419,5 @@ select.input:hover:not(:disabled) { border-color: var(--laranja); }
   .dieta-abas { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .dieta-abas .nivel-opcao:last-child { grid-column: auto; }
 }
+/* O texto de exemplo da busca segue os rótulos pequenos do site; o que a pessoa digita fica normal. */
+.dieta-busca::placeholder { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
