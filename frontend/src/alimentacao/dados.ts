@@ -24,6 +24,13 @@ export interface CardapioPosicao {
   ceia?: Item[]
 }
 
+/** Cor de cada posição, a mesma dos cartões da aba. */
+export const COR: Record<PosicaoDieta, string> = {
+  armador: 'var(--c-arremesso)',
+  ala: 'var(--c-finalizacao)',
+  pivo: 'var(--c-drible)',
+}
+
 export const REFEICOES: { id: Refeicao; nome: string; hora: string }[] = [
   { id: 'cafe', nome: 'Café da manhã', hora: '7h' },
   { id: 'almoco', nome: 'Almoço', hora: '12h' },

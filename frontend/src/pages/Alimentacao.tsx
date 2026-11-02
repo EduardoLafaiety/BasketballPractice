@@ -1,6 +1,7 @@
 import { useState, type CSSProperties } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import {
+  COR,
   DESPENSA,
   DIA_DE_JOGO,
   EVITAR_NO_JOGO,
@@ -24,12 +25,6 @@ const ABAS = [
 ] as const
 
 type Aba = (typeof ABAS)[number]['id']
-
-const COR: Record<PosicaoDieta, string> = {
-  armador: 'var(--c-arremesso)',
-  ala: 'var(--c-finalizacao)',
-  pivo: 'var(--c-drible)',
-}
 
 function Alimentos({ lista }: { lista: (string | Item)[] }) {
   return (
