@@ -8,6 +8,7 @@ import TreinoDetalhe from './pages/TreinoDetalhe'
 import JogueComo from './pages/JogueComo'
 import EstiloDetalhe from './pages/EstiloDetalhe'
 import Rotina from './pages/Rotina'
+import Alimentacao from './pages/Alimentacao'
 import Desempenho from './pages/Desempenho'
 import Metas from './pages/Metas'
 import Ferramentas from './pages/Ferramentas'
@@ -46,6 +47,7 @@ export default function App() {
         <Route path="jogue-como" element={<JogueComo />} />
         <Route path="jogue-como/:id" element={<EstiloDetalhe />} />
         <Route path="rotina" element={<Rotina />} />
+        <Route path="alimentacao" element={<Alimentacao />} />
         <Route path="desempenho" element={<Desempenho />} />
         <Route path="metas" element={<Metas />} />
         <Route path="ferramentas" element={<Ferramentas />} />

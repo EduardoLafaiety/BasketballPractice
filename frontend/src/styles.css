@@ -1355,3 +1355,58 @@ select.input:hover:not(:disabled) { border-color: var(--laranja); }
 
 .ferramenta-em-breve { display: grid; justify-items: center; gap: 0.75rem; padding: 2.5rem 1rem; text-align: center; }
 .ferramenta-em-breve p { max-width: 52ch; margin: 0; }
+
+/* Alimentação */
+.dieta-aviso { max-width: 52rem; margin: 1.2rem 0 0; padding: 0.8rem 1rem; border: 1px dashed var(--borda); border-radius: var(--raio); color: var(--muted); font-size: 0.9rem; }
+.dieta-aviso strong { color: var(--texto); }
+.dieta-abas { grid-template-columns: repeat(4, minmax(0, 1fr)); margin-top: 2rem; }
+.dieta-posicoes { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.dieta-posicao { display: grid; gap: 0.35rem; align-content: start; overflow: hidden; padding-top: 0; text-align: left; font: inherit; color: var(--texto); cursor: pointer; border-top: 5px solid var(--c); }
+.dieta-posicao:hover { border-color: var(--c); }
+.dieta-posicao .tag { margin-top: 0.4rem; }
+.dieta-posicao h3 { margin: 0; }
+.dieta-numeros { margin: 0 -1.25rem 0.6rem; padding: 1.2rem; background: var(--superficie-2); text-align: center; font-family: var(--fonte-display); font-weight: var(--peso-display); font-size: 5rem; line-height: 1; color: var(--c); opacity: 0.85; }
+.dieta-foco { display: flex; flex-wrap: wrap; gap: 0.35rem; margin: 0.6rem 0 0.4rem; }
+.dieta-foco span { padding: 0.2rem 0.6rem; border: 1px solid var(--borda); border-radius: 999px; font-size: 0.78rem; }
+.dieta-foco span:first-child { background: var(--c); border-color: var(--c); color: #111111; font-weight: 700; }
+.dieta-maos { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.dieta-mao { font-size: 1.8rem; line-height: 1; display: block; margin-bottom: 0.5rem; }
+.dieta-seletores { display: flex; flex-wrap: wrap; gap: 0.75rem 1.5rem; margin: 2rem 0 0; }
+.dieta-cabecalho { display: grid; grid-template-columns: 1fr auto; gap: 1rem 2rem; align-items: end; margin: 1.5rem 0; }
+.dieta-cabecalho .tag { --c: inherit; }
+.conteudo .dieta-nome { margin: 0.4rem 0 0.6rem; color: var(--c); font-size: clamp(2.8rem, 7vw, 5.5rem); }
+.dieta-porcoes { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0; }
+.dieta-porcoes div { min-width: 7.5rem; padding: 0.6rem 0.9rem; background: var(--superficie); border: 1px solid var(--borda); border-radius: var(--raio); }
+.dieta-porcoes dt { color: var(--muted); font-size: 0.7rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
+.conteudo .dieta-porcoes div dd { margin: 0; letter-spacing: 0; text-transform: none; line-height: 1.1; font-family: var(--fonte-display); font-weight: var(--peso-display); font-size: 1.6rem; }
+.dieta-refeicoes { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.dieta-refeicao { display: flex; flex-direction: column; gap: 0.8rem; border-top: 5px solid var(--c); }
+.dieta-refeicao h3 { margin: 0; }
+.dieta-opcao { padding: 0.75rem; background: var(--superficie-2); border-radius: var(--raio); }
+.dieta-rotulo { display: block; margin-bottom: 0.45rem; color: var(--muted); font-size: 0.68rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; }
+.dieta-porque { margin: auto 0 0; padding-left: 0.7rem; border-left: 3px solid var(--borda); color: var(--muted); font-size: 0.85rem; }
+.dieta-extras { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); margin-top: 1.2rem; }
+.dieta-extras .tag { --c: var(--c-defesa); margin-bottom: 0.4rem; }
+.alimentos { display: flex; flex-wrap: wrap; gap: 0.35rem; margin: 0; padding: 0; list-style: none; }
+.alimentos li { padding: 0.2rem 0.65rem; border: 1px solid var(--borda); border-radius: 999px; background: var(--superficie); font-size: 0.82rem; transition: opacity 0.2s; }
+.alimentos li.apagado { opacity: 0.25; }
+.alimentos-evitar li { border-color: color-mix(in srgb, var(--vermelho) 55%, var(--borda)); }
+.dieta-linha { display: grid; gap: 1rem; margin: 1.5rem 0 0; padding: 0 0 0 1.6rem; list-style: none; border-left: 2px solid var(--borda); }
+.dieta-linha > li { position: relative; display: grid; grid-template-columns: 11rem 1fr; gap: 1.2rem; }
+.dieta-linha > li::before { content: ''; position: absolute; left: calc(-1.6rem - 8px); top: 1.5rem; width: 14px; height: 14px; border-radius: 50%; background: var(--c); box-shadow: 0 0 0 4px var(--bg); }
+.dieta-quando { display: grid; align-content: start; gap: 0.3rem; font-family: var(--fonte-display); font-weight: var(--peso-display); font-size: 1.8rem; line-height: 1; text-transform: uppercase; color: var(--c); }
+.dieta-quando .meta { font-family: 'Manrope Variable', system-ui, sans-serif; font-weight: 600; font-size: 0.78rem; text-transform: none; color: var(--muted); }
+.dieta-busca { width: 100%; max-width: 26rem; margin-bottom: 1.5rem; }
+.dieta-grupos { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.dieta-grupos .card { border-top: 5px solid var(--c); }
+.dieta-grupo { display: flex; align-items: center; gap: 0.6rem; }
+@media (max-width: 960px) {
+  .dieta-refeicoes, .dieta-maos { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .dieta-posicoes { grid-template-columns: 1fr; }
+}
+@media (max-width: 640px) {
+  .dieta-abas { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .dieta-abas .nivel-opcao:last-child { grid-column: auto; }
+  .dieta-refeicoes, .dieta-maos, .dieta-grupos { grid-template-columns: 1fr; }
+  .dieta-cabecalho, .dieta-linha > li { grid-template-columns: 1fr; }
+}
