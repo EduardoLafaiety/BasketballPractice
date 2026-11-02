@@ -1,8 +1,13 @@
-// Conteúdo da aba Alimentação: sugestões gerais, sem gramas, medidas com a própria mão.
+// Conteúdo da aba Alimentação: sugestões gerais, com o peso do alimento pronto para comer.
 // Não é uma dieta: a página avisa que alergias, doenças e metas de peso pedem um nutricionista.
 
 export type PosicaoDieta = 'armador' | 'ala' | 'pivo'
 export type Refeicao = 'cafe' | 'almoco' | 'lanche' | 'janta'
+
+/** Um alimento com a quantidade sugerida (ex.: Arroz, 150 g). */
+export type Item = { nome: string; qtd?: string }
+
+const i = (nome: string, qtd?: string): Item => ({ nome, qtd })
 
 export interface CardapioPosicao {
   id: PosicaoDieta
@@ -12,10 +17,11 @@ export interface CardapioPosicao {
   subtitulo: string
   resumo: string
   foco: string[]
-  porcoes: { rotulo: string; valor: string }[]
-  refeicoes: Record<Refeicao, { opcoes: string[][]; porque: string }>
+  /** Quanto vai no prato por refeição principal; no descanso, o carboidrato diminui. */
+  porcoes: { rotulo: string; valor: string; descanso?: string }[]
+  refeicoes: Record<Refeicao, { opcoes: Item[][]; porque: string }>
   /** Só o pivô tem: algo leve antes de dormir. */
-  ceia?: string[]
+  ceia?: Item[]
 }
 
 export const REFEICOES: { id: Refeicao; nome: string; hora: string }[] = [
@@ -36,15 +42,39 @@ export const POSICOES: CardapioPosicao[] = [
       'Você corre mais que todo mundo: tiros curtos, troca de ritmo e defesa em cima da bola. O foco é ter energia o jogo inteiro sem pesar.',
     foco: ['Carboidrato distribuído', 'Peso estável', 'Hidratação'],
     porcoes: [
-      { rotulo: 'Proteína', valor: '1 palma' },
-      { rotulo: 'Carboidrato', valor: '1–2 punhos' },
-      { rotulo: 'Legumes', valor: '2 mãos' },
+      { rotulo: 'Proteína', valor: '100–120 g' },
+      { rotulo: 'Carboidrato', valor: '120–180 g', descanso: '80–120 g' },
+      { rotulo: 'Legumes', valor: '100 g' },
     ],
     refeicoes: {
-      cafe: { opcoes: [['Pão integral', 'Ovo mexido', 'Banana', 'Café com leite'], ['Tapioca', 'Queijo branco', 'Mamão']], porque: 'Carboidrato de manhã já abastece o treino do dia.' },
-      almoco: { opcoes: [['Arroz', 'Feijão', 'Frango grelhado', 'Salada'], ['Macarrão', 'Carne moída magra', 'Legumes']], porque: 'Prato completo, porção moderada: energia sem perder agilidade.' },
-      lanche: { opcoes: [['Iogurte natural', 'Aveia', 'Banana'], ['Fruta', 'Castanhas']], porque: 'Lanche leve segura a fome sem pesar no treino.' },
-      janta: { opcoes: [['Peixe', 'Batata-doce', 'Salada'], ['Omelete', 'Legumes', 'Arroz (pouco)']], porque: 'Proteína para recuperar; carboidrato menor se não treinou.' },
+      cafe: {
+        opcoes: [
+          [i('Pão integral', '2 fatias · 50 g'), i('Ovo mexido', '2 ovos · 100 g'), i('Banana', '100 g'), i('Café com leite', '200 ml')],
+          [i('Tapioca', '60 g de goma'), i('Queijo branco', '30 g'), i('Mamão', '150 g')],
+        ],
+        porque: 'Carboidrato de manhã já abastece o treino do dia.',
+      },
+      almoco: {
+        opcoes: [
+          [i('Arroz', '150 g'), i('Feijão', '100 g'), i('Frango grelhado', '120 g'), i('Salada', 'à vontade')],
+          [i('Macarrão', '180 g'), i('Carne moída magra', '120 g'), i('Legumes', '100 g')],
+        ],
+        porque: 'Prato completo, porção moderada: energia sem perder agilidade.',
+      },
+      lanche: {
+        opcoes: [
+          [i('Iogurte natural', '170 g'), i('Aveia', '30 g'), i('Banana', '100 g')],
+          [i('Fruta', '150 g'), i('Castanhas', '20 g')],
+        ],
+        porque: 'Lanche leve segura a fome sem pesar no treino.',
+      },
+      janta: {
+        opcoes: [
+          [i('Peixe', '120 g'), i('Batata-doce', '150 g'), i('Salada', 'à vontade')],
+          [i('Omelete', '2 ovos · 100 g'), i('Legumes', '100 g'), i('Arroz', '80 g')],
+        ],
+        porque: 'Proteína para recuperar; carboidrato menor se não treinou.',
+      },
     },
   },
   {
@@ -57,15 +87,39 @@ export const POSICOES: CardapioPosicao[] = [
       'Você precisa de explosão para atacar a cesta e velocidade para voltar na defesa. O foco é proteína em toda refeição e carboidrato perto do treino.',
     foco: ['Proteína em toda refeição', 'Carboidrato no treino', 'Ferro'],
     porcoes: [
-      { rotulo: 'Proteína', valor: '1–1,5 palma' },
-      { rotulo: 'Carboidrato', valor: '2 punhos' },
-      { rotulo: 'Legumes', valor: '2 mãos' },
+      { rotulo: 'Proteína', valor: '120–150 g' },
+      { rotulo: 'Carboidrato', valor: '150–200 g', descanso: '100–150 g' },
+      { rotulo: 'Legumes', valor: '100 g' },
     ],
     refeicoes: {
-      cafe: { opcoes: [['Ovos (2 ou 3)', 'Pão integral', 'Fruta', 'Leite'], ['Cuscuz', 'Ovo', 'Queijo branco', 'Café com leite']], porque: 'Ovo de manhã dá proteína cedo para o músculo do salto.' },
-      almoco: { opcoes: [['Arroz', 'Feijão', 'Patinho', 'Legumes'], ['Arroz', 'Feijão', 'Frango', 'Salada', 'Beterraba']], porque: 'Carne vermelha magra e feijão trazem ferro, ligado ao fôlego.' },
-      lanche: { opcoes: [['Pão integral', 'Frango desfiado', 'Suco natural'], ['Iogurte', 'Aveia', 'Banana']], porque: 'Carboidrato e proteína 2 a 3 horas antes do treino.' },
-      janta: { opcoes: [['Frango', 'Batata-doce', 'Brócolis'], ['Peixe', 'Arroz', 'Salada']], porque: 'Recupera as pernas para o próximo dia.' },
+      cafe: {
+        opcoes: [
+          [i('Ovos', '3 ovos · 150 g'), i('Pão integral', '2 fatias · 50 g'), i('Fruta', '150 g'), i('Leite', '200 ml')],
+          [i('Cuscuz', '150 g'), i('Ovo', '2 ovos · 100 g'), i('Queijo branco', '30 g'), i('Café com leite', '200 ml')],
+        ],
+        porque: 'Ovo de manhã dá proteína cedo para o músculo do salto.',
+      },
+      almoco: {
+        opcoes: [
+          [i('Arroz', '200 g'), i('Feijão', '120 g'), i('Patinho', '150 g'), i('Legumes', '100 g')],
+          [i('Arroz', '200 g'), i('Feijão', '120 g'), i('Frango', '150 g'), i('Salada', 'à vontade'), i('Beterraba', '50 g')],
+        ],
+        porque: 'Carne vermelha magra e feijão trazem ferro, ligado ao fôlego.',
+      },
+      lanche: {
+        opcoes: [
+          [i('Pão integral', '2 fatias · 50 g'), i('Frango desfiado', '80 g'), i('Suco natural', '300 ml')],
+          [i('Iogurte', '170 g'), i('Aveia', '40 g'), i('Banana', '100 g')],
+        ],
+        porque: 'Carboidrato e proteína 2 a 3 horas antes do treino.',
+      },
+      janta: {
+        opcoes: [
+          [i('Frango', '150 g'), i('Batata-doce', '200 g'), i('Brócolis', '100 g')],
+          [i('Peixe', '150 g'), i('Arroz', '150 g'), i('Salada', 'à vontade')],
+        ],
+        porque: 'Recupera as pernas para o próximo dia.',
+      },
     },
   },
   {
@@ -78,28 +132,57 @@ export const POSICOES: CardapioPosicao[] = [
       'Você vive no contato: briga por posição, rebote e bloqueio. O foco é volume maior no prato e proteína alta para sustentar o corpo.',
     foco: ['Mais volume no prato', 'Proteína alta', 'Ceia'],
     porcoes: [
-      { rotulo: 'Proteína', valor: '1,5–2 palmas' },
-      { rotulo: 'Carboidrato', valor: '2–3 punhos' },
-      { rotulo: 'Legumes', valor: '2 mãos' },
+      { rotulo: 'Proteína', valor: '150–180 g' },
+      { rotulo: 'Carboidrato', valor: '200–300 g', descanso: '150–220 g' },
+      { rotulo: 'Legumes', valor: '150 g' },
     ],
     refeicoes: {
-      cafe: { opcoes: [['Cuscuz', 'Ovos', 'Queijo', 'Vitamina de banana'], ['Pão', 'Ovos', 'Pasta de amendoim', 'Leite']], porque: 'Começar o dia com volume ajuda a fechar a energia do dia.' },
-      almoco: { opcoes: [['Arroz', 'Feijão', 'Carne', 'Batata', 'Salada'], ['Macarrão', 'Frango', 'Legumes']], porque: 'Prato maior: o corpo maior gasta mais.' },
-      lanche: { opcoes: [['Vitamina de banana com aveia'], ['Pão', 'Pasta de amendoim', 'Fruta']], porque: 'Vitamina é um jeito fácil de somar energia.' },
-      janta: { opcoes: [['Arroz', 'Feijão', 'Frango', 'Legumes'], ['Macarrão', 'Carne moída', 'Salada']], porque: 'Janta reforçada; antes de dormir ainda tem a ceia.' },
+      cafe: {
+        opcoes: [
+          [i('Cuscuz', '200 g'), i('Ovos', '3 ovos · 150 g'), i('Queijo', '40 g'), i('Vitamina de banana', '400 ml')],
+          [i('Pão', '3 fatias · 75 g'), i('Ovos', '3 ovos · 150 g'), i('Pasta de amendoim', '20 g'), i('Leite', '300 ml')],
+        ],
+        porque: 'Começar o dia com volume ajuda a fechar a energia do dia.',
+      },
+      almoco: {
+        opcoes: [
+          [i('Arroz', '250 g'), i('Feijão', '150 g'), i('Carne', '180 g'), i('Batata', '150 g'), i('Salada', 'à vontade')],
+          [i('Macarrão', '300 g'), i('Frango', '180 g'), i('Legumes', '150 g')],
+        ],
+        porque: 'Prato maior: o corpo maior gasta mais.',
+      },
+      lanche: {
+        opcoes: [
+          [i('Vitamina de banana com aveia', '400 ml · 40 g de aveia')],
+          [i('Pão', '2 fatias · 50 g'), i('Pasta de amendoim', '20 g'), i('Fruta', '150 g')],
+        ],
+        porque: 'Vitamina é um jeito fácil de somar energia.',
+      },
+      janta: {
+        opcoes: [
+          [i('Arroz', '200 g'), i('Feijão', '120 g'), i('Frango', '180 g'), i('Legumes', '150 g')],
+          [i('Macarrão', '250 g'), i('Carne moída', '150 g'), i('Salada', 'à vontade')],
+        ],
+        porque: 'Janta reforçada; antes de dormir ainda tem a ceia.',
+      },
     },
-    ceia: ['Iogurte', 'ou copo de leite'],
+    ceia: [i('Iogurte', '170 g'), i('ou leite', '250 ml')],
   },
 ]
 
-export const PRE_TREINO = ['Banana', 'Pasta de amendoim (1 polegar)', 'ou pão com mel']
-export const POS_TREINO = ['Leite com achocolatado', 'ou sanduíche de frango', 'Água']
+export const PRE_TREINO = [i('Banana', '100 g'), i('Pasta de amendoim', '15 g'), i('ou pão com mel', '50 g + 10 g')]
+export const POS_TREINO = [i('Leite com achocolatado', '300 ml'), i('ou sanduíche de frango', '50 g de pão + 80 g'), i('Água', '500 ml')]
 
-export const MAOS = [
-  { icone: '✋', nome: 'Palma', texto: 'Proteína: frango, carne, peixe, ovos' },
-  { icone: '✊', nome: 'Punho', texto: 'Carboidrato: arroz, macarrão, batata, pão' },
-  { icone: '🤲', nome: 'Duas mãos abertas', texto: 'Salada e legumes' },
-  { icone: '👍', nome: 'Polegar', texto: 'Gordura boa: azeite, castanhas, pasta de amendoim' },
+/** Para quem não tem balança: o peso aproximado de medidas de cozinha. */
+export const MEDIDAS_CASEIRAS = [
+  { medida: '1 colher de servir de arroz', peso: '≈ 45 g' },
+  { medida: '1 concha média de feijão', peso: '≈ 100 g' },
+  { medida: '1 filé médio de frango', peso: '≈ 120 g' },
+  { medida: '1 ovo', peso: '≈ 50 g' },
+  { medida: '1 fatia de pão de forma', peso: '≈ 25 g' },
+  { medida: '1 banana prata', peso: '≈ 100 g' },
+  { medida: '1 colher de sopa de aveia', peso: '≈ 15 g' },
+  { medida: '1 copo americano', peso: '≈ 190 ml' },
 ]
 
 export const DIA_DE_JOGO = [

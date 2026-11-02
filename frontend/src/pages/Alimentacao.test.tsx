@@ -24,6 +24,7 @@ describe('Alimentação', () => {
     abrir('/alimentacao')
     expect(await screen.findByText(/São sugestões, não uma dieta/)).toBeInTheDocument()
     expect(screen.getByText(/procure um nutricionista/)).toBeInTheDocument()
+    expect(screen.getByText('1 concha média de feijão')).toBeInTheDocument()
 
     await userEvent.click(screen.getByRole('button', { name: /Armador.*Leve e rápido/ }))
     expect(screen.getByRole('tab', { name: /Cardápio/ })).toHaveAttribute('aria-selected', 'true')
@@ -37,12 +38,16 @@ describe('Alimentação', () => {
     abrir('/alimentacao?aba=cardapio&posicao=ala')
     expect(await screen.findByRole('heading', { name: 'Ala', level: 2 })).toBeInTheDocument()
     expect(screen.getByText('Patinho')).toBeInTheDocument()
+    // As quantidades aparecem em gramas, ao lado de cada alimento e no quadro da posição.
+    expect(within(screen.getByText('Patinho').closest('li') as HTMLElement).getByText('150 g')).toBeInTheDocument()
+    expect(screen.getByText('150–200 g')).toBeInTheDocument()
 
     await userEvent.click(screen.getByRole('button', { name: 'Pivô' }))
     expect(screen.getByRole('heading', { name: 'Pivô', level: 2 })).toBeInTheDocument()
     expect(screen.getByText('Ceia · antes de dormir')).toBeInTheDocument()
 
     await userEvent.click(screen.getByRole('button', { name: 'Dia de descanso' }))
+    expect(screen.getByText('150–220 g')).toBeInTheDocument()
     expect(screen.getByText(/Mesma comida, um pouco menos de carboidrato/)).toBeInTheDocument()
     expect(screen.queryByText('Pré-treino · 1h antes')).not.toBeInTheDocument()
   })
