@@ -13,3 +13,8 @@ backend/admin-local.txt
 
 # Gerado ao rodar a demonstração (npm run dev:demo); ao publicar, sai do workflow.
 frontend/public/noticias.json
+
+# Documentos internos: ficam só no computador, fora do repositório público.
+docs/*.md
+backend/README.md
+.claude/
