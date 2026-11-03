@@ -1,6 +1,7 @@
 import { useState, type CSSProperties } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { buscaTime, linkAmazon, MARCAS, TIMES, type Conferencia } from '../equipamentos/dados'
+import Bola from '../equipamentos/Bola'
 import Icone from '../components/Icone'
 
 const ABAS = [
@@ -16,23 +17,10 @@ const CONFERENCIAS: { id: Conferencia | 'todas'; rotulo: string }[] = [
   { id: 'oeste', rotulo: 'Oeste' },
 ]
 
-/** Bola desenhada nas cores do produto; não usa logos nem fotos da Amazon. */
-function Bola({ cor, costura }: { cor: string; costura: string }) {
-  return (
-    <svg className="bola-desenho" viewBox="0 0 100 100" width="96" height="96" aria-hidden>
-      <circle cx="50" cy="50" r="46" fill={cor} />
-      <g fill="none" stroke={costura} strokeWidth="3.2" strokeLinecap="round">
-        <path d="M4 50h92M50 4v92" />
-        <path d="M18 17c14 15 14 51 0 66M82 17c-14 15-14 51 0 66" />
-      </g>
-      <circle cx="50" cy="50" r="46" fill="none" stroke="rgba(0,0,0,.35)" strokeWidth="2" />
-    </svg>
-  )
-}
-
 function CartaoProduto(p: {
   cor: string
   costura: string
+  impresso: string
   tag: string
   nome: string
   meta: string
@@ -49,7 +37,7 @@ function CartaoProduto(p: {
       rel="sponsored noopener noreferrer"
     >
       <span className="produto-vitrine">
-        <Bola cor={p.cor} costura={p.costura} />
+        <Bola cor={p.cor} costura={p.costura} nome={p.impresso} />
       </span>
       <span className="tag">{p.tag}</span>
       <h3>{p.nome}</h3>
@@ -101,6 +89,7 @@ function Times() {
               key={t.sigla}
               cor={t.cor}
               costura={t.costura}
+              impresso={t.nome}
               tag={`${t.sigla} · ${t.conferencia === 'leste' ? 'Leste' : 'Oeste'}`}
               nome={`${t.cidade} ${t.nome}`}
               meta="Bola nas cores do time"
@@ -122,6 +111,7 @@ function Marcas() {
           key={b.id}
           cor={b.cor}
           costura={b.costura}
+          impresso={b.marca}
           tag={b.marca}
           nome={b.nome}
           meta={b.material}

@@ -36,7 +36,7 @@ export const TIMES: Time[] = [
   { sigla: 'ATL', cidade: 'Atlanta', nome: 'Hawks', conferencia: 'leste', cor: '#E03A3E', costura: '#C1D32F' },
   { sigla: 'BOS', cidade: 'Boston', nome: 'Celtics', conferencia: 'leste', cor: '#007A33', costura: '#BA9653' },
   { sigla: 'BKN', cidade: 'Brooklyn', nome: 'Nets', conferencia: 'leste', cor: '#111111', costura: '#FFFFFF' },
-  { sigla: 'CHA', cidade: 'Charlotte', nome: 'Hornets', conferencia: 'leste', cor: '#1D1160', costura: '#00788C' },
+  { sigla: 'CHA', cidade: 'Charlotte', nome: 'Hornets', conferencia: 'leste', cor: '#1D1160', costura: '#1BA9BE' },
   { sigla: 'CHI', cidade: 'Chicago', nome: 'Bulls', conferencia: 'leste', cor: '#CE1141', costura: '#111111' },
   { sigla: 'CLE', cidade: 'Cleveland', nome: 'Cavaliers', conferencia: 'leste', cor: '#860038', costura: '#FDBB30' },
   { sigla: 'DET', cidade: 'Detroit', nome: 'Pistons', conferencia: 'leste', cor: '#C8102E', costura: '#1D42BA' },

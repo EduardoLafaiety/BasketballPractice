@@ -1447,3 +1447,5 @@ select.input:hover:not(:disabled) { border-color: var(--laranja); }
 .produto .dieta-foco { margin-bottom: 0; }
 .produto .dieta-foco span:first-child { background: none; border-color: var(--borda); color: inherit; font-weight: 400; }
 @media (max-width: 860px) { .produtos-abas .nivel-opcao:last-child { grid-column: auto; } }
+.produto-vitrine { padding: 1.1rem 1rem 0.6rem; }
+.bola-nome { font-family: var(--fonte-display); font-weight: 800; letter-spacing: 0.04em; text-transform: none; }
