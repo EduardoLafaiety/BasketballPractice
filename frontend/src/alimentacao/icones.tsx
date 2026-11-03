@@ -47,10 +47,21 @@ const DESENHOS: Record<Refeicao, JSX.Element> = {
   ),
 }
 
+// Os desenhos têm formas diferentes (a bisteca é um bloco cheio, a xícara tem vapor e pires finos). Cada um ganha
+// uma escala e um centro próprios para que os quatro pareçam do mesmo tamanho e fiquem na mesma altura.
+const AJUSTE: Record<Refeicao, { escala: number; centro: [number, number] }> = {
+  cafe: { escala: 1.05, centro: [25, 23.25] },
+  almoco: { escala: 1, centro: [24, 27.5] },
+  lanche: { escala: 0.97, centro: [24, 24.5] },
+  janta: { escala: 0.88, centro: [25.5, 23] },
+}
+
 export default function IconeRefeicao({ refeicao, tamanho = 40 }: { refeicao: Refeicao; tamanho?: number }) {
   return (
     <svg className="icone-refeicao" width={tamanho} height={tamanho} viewBox="0 0 48 48" aria-hidden focusable="false">
-      {DESENHOS[refeicao]}
+      <g transform={`translate(24 24.5) scale(${AJUSTE[refeicao].escala}) translate(${-AJUSTE[refeicao].centro[0]} ${-AJUSTE[refeicao].centro[1]})`}>
+        {DESENHOS[refeicao]}
+      </g>
     </svg>
   )
 }
