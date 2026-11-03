@@ -2,6 +2,7 @@ import { useState, type CSSProperties } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { buscaTime, linkAmazon, MARCAS, TIMES, type Conferencia } from '../equipamentos/dados'
 import Bola from '../equipamentos/Bola'
+import type { IconeTime } from '../equipamentos/icones-times'
 import Icone from '../components/Icone'
 
 const ABAS = [
@@ -21,6 +22,7 @@ function CartaoProduto(p: {
   cor: string
   costura: string
   impresso: string
+  icone?: IconeTime
   tag: string
   nome: string
   meta: string
@@ -37,7 +39,7 @@ function CartaoProduto(p: {
       rel="sponsored noopener noreferrer"
     >
       <span className="produto-vitrine">
-        <Bola cor={p.cor} costura={p.costura} nome={p.impresso} />
+        <Bola cor={p.cor} costura={p.costura} nome={p.impresso} icone={p.icone} />
       </span>
       <span className="tag">{p.tag}</span>
       <h3>{p.nome}</h3>
@@ -90,6 +92,7 @@ function Times() {
               cor={t.cor}
               costura={t.costura}
               impresso={t.nome}
+              icone={t.icone}
               tag={`${t.sigla} · ${t.conferencia === 'leste' ? 'Leste' : 'Oeste'}`}
               nome={`${t.cidade} ${t.nome}`}
               meta="Bola nas cores do time"
