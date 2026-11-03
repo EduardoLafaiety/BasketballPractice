@@ -444,9 +444,9 @@ p { margin: 0 0 1rem; }
 .auth-palco .abertura-dentro { height: min(64vh, 41vw); }
 .auth-marca { position: absolute; top: 0.8rem; left: clamp(0.8rem, 2vw, 1.4rem); z-index: 1; display: flex; align-items: center; gap: 0.6rem; text-decoration: none; }
 .auth-titulo { position: absolute; inset: 0; margin: 0; font-size: min(11.5vw, 25vh); line-height: 0.84; pointer-events: none; }
-.auth-titulo span { position: absolute; left: 0; right: 0; text-align: center; }
+.auth-titulo > span { position: absolute; left: 0; right: 0; text-align: center; }
 .auth-titulo-a { top: 8vh; }
-.auth-titulo-b { bottom: 6vh; color: var(--laranja); }
+.auth-titulo-b { bottom: 6vh; }
 .manequim { display: block; width: 100%; height: auto; overflow: visible; }
 .manequim .demo-corpo path { stroke: #0b0b0b; }
 
@@ -1100,8 +1100,8 @@ section + section, .card + section { margin-top: 1.5rem; }
 .conteudo .abertura-titulo { position: absolute; inset: 0; margin: 0; font-size: clamp(4rem, 15vw, 15rem); line-height: 0.84; }
 .abertura-a, .abertura-b { position: absolute; left: 0; right: 0; display: block; text-align: center; will-change: transform; }
 .abertura-a { top: 8vh; transform: translateX(calc(var(--saida) * -80vw)); }
-.abertura-b { bottom: 7vh; color: var(--laranja); transform: translateX(calc(var(--saida) * 80vw)); }
-.abertura-b .ponto { color: inherit; }
+.abertura-b { bottom: 7vh; transform: translateX(calc(var(--saida) * 80vw)); }
+.abertura-b .ponto { color: var(--laranja); }
 .abertura-painel { position: absolute; left: clamp(0.8rem, 2vw, 1.4rem); bottom: 3.6rem; width: min(290px, 23vw); display: grid; justify-items: start; gap: 0.6rem; opacity: calc(1 - var(--saida) * 3); }
 .abertura-painel .hero-texto { font-weight: 500; font-size: 1.05rem; line-height: 1.25; color: var(--texto); }
 .abertura-painel .hero-acoes { gap: 0.6rem 1rem; }
