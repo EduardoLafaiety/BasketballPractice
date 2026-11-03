@@ -1,4 +1,5 @@
 import { useId } from 'react'
+import { ICONES_TIMES, type IconeTime } from './icones-times'
 
 // Bola com volume, desenhada nas cores do produto: sombra no chão, couro com textura de gomos,
 // brilho, borda escurecida e o nome impresso no painel. Não usa logos nem fotos da Amazon.
@@ -12,9 +13,24 @@ function tom(hex: string, quanto: number) {
   return `#${((r << 16) | (g << 8) | b).toString(16).padStart(6, '0')}`
 }
 
-export default function Bola({ cor, costura, nome }: { cor: string; costura: string; nome: string }) {
+/** Luminância relativa (WCAG) de uma cor #rrggbb. */
+function luminancia(hex: string) {
+  const n = parseInt(hex.slice(1), 16)
+  const lin = (c: number) => ((c /= 255) <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4)
+  return 0.2126 * lin(n >> 16) + 0.7152 * lin((n >> 8) & 255) + 0.0722 * lin(n & 255)
+}
+
+/** A cor do que vai impresso: a secundária do time, ou branco/preto quando ela some na bola. */
+function tinta(cor: string, costura: string) {
+  const [a, b] = [luminancia(cor), luminancia(costura)].sort((x, y) => y - x)
+  if ((a + 0.05) / (b + 0.05) >= 3) return costura
+  return luminancia(cor) > 0.3 ? '#111111' : '#FFFFFF'
+}
+
+export default function Bola({ cor, costura, nome, icone }: { cor: string; costura: string; nome: string; icone?: IconeTime }) {
   const id = useId().replace(/[^a-zA-Z0-9]/g, '')
   const url = (s: string) => `url(#${s}${id})`
+  const impressao = tinta(cor, costura)
 
   return (
     <svg className="bola-desenho" viewBox="0 0 120 126" width="132" height="139" aria-hidden>
@@ -38,7 +54,7 @@ export default function Bola({ cor, costura, nome }: { cor: string; costura: str
           <circle cx="60" cy="60" r="52" />
         </clipPath>
         {/* Linha levemente curva do painel onde o nome é impresso, seguindo a curva da bola. */}
-        <path id={`painel${id}`} d="M38 53 Q60 47 84 52" />
+        <path id={`painel${id}`} d={icone ? 'M40 60 Q60 55 82 59' : 'M38 53 Q60 47 84 52'} />
       </defs>
 
       <ellipse cx="60" cy="118" rx="36" ry="4.5" fill="#000" opacity=".22" filter={url('desfoque')} />
@@ -46,8 +62,13 @@ export default function Bola({ cor, costura, nome }: { cor: string; costura: str
       <g clipPath={url('recorte')}>
         <circle cx="60" cy="60" r="52" fill={url('couro')} />
         <circle cx="60" cy="60" r="52" fill={url('gomos')} />
-        <text className="bola-nome" fill={costura} fontSize="13">
-          <textPath href={`#painel${id}`} startOffset="50%" textAnchor="middle" textLength={Math.min(44, nome.length * 7.5)} lengthAdjust="spacingAndGlyphs">
+        {icone && (
+          <g transform="translate(44 15) scale(1.3)" color={impressao} fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+            {ICONES_TIMES[icone]}
+          </g>
+        )}
+        <text className="bola-nome" fill={impressao} fontSize={icone ? 10 : 13}>
+          <textPath href={`#painel${id}`} startOffset="50%" textAnchor="middle" textLength={Math.min(icone ? 38 : 44, nome.length * (icone ? 6 : 7.5))} lengthAdjust="spacingAndGlyphs">
             {nome.toUpperCase()}
           </textPath>
         </text>

@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import { definirToken } from '../api'
 import { TAG_AFILIADO, TIMES } from '../equipamentos/dados'
+import { ICONES_TIMES } from '../equipamentos/icones-times'
 import { apiFalsa, configFalsa, usuarioFalso } from '../test/api-falsa'
 import { abrirApp } from '../test/renderizar'
 
@@ -55,5 +56,12 @@ describe('Equipamentos', () => {
     expect(screen.getByRole('link', { name: /NBA Official Game Ball/ })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: /TF-1000 Legacy/ })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: /BG4500/ })).toBeInTheDocument()
+  })
+})
+
+describe('Ícones dos times', () => {
+  it('cada time tem um ícone próprio, diferente dos outros', () => {
+    for (const t of TIMES) expect(ICONES_TIMES[t.icone], t.nome).toBeDefined()
+    expect(new Set(TIMES.map((t) => t.icone)).size).toBe(TIMES.length)
   })
 })
