@@ -64,3 +64,19 @@ describe('Menu em tela cheia', () => {
     expect(screen.getByText('Ferramentas', { selector: '.topo-secao' })).toBeInTheDocument()
   })
 })
+
+describe('Relógio no topo', () => {
+  it('mostra data e hora só no Início', async () => {
+    abrir('/')
+    const relogio = await screen.findByLabelText(/^Hoje, /)
+    expect(relogio).toHaveAttribute('aria-label', expect.stringMatching(/\d{2}:\d{2}$/))
+    // Placar de LED: 4 dígitos da hora e 2 dos segundos.
+    expect(relogio.querySelectorAll('.led-digito')).toHaveLength(6)
+  })
+
+  it('não aparece nas outras páginas', async () => {
+    abrir('/treinos')
+    await botaoMenu()
+    expect(screen.queryByLabelText(/^Hoje, /)).not.toBeInTheDocument()
+  })
+})
