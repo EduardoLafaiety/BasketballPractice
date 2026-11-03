@@ -1438,7 +1438,12 @@ select.input:hover:not(:disabled) { border-color: var(--laranja); }
 
 /* Equipamentos: bolas com link de afiliado da Amazon */
 .produtos-abas { grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: 40rem; margin-top: 2rem; }
-.produtos { grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); }
+/* Flex em vez de grade: a última linha, quando incompleta, fica centralizada. Mesmas colunas da grade de antes (mín. 230px). */
+.produtos { display: flex; flex-wrap: wrap; justify-content: center; container-type: inline-size; }
+.produtos > .produto { flex: 0 0 100%; min-width: 0; }
+@container (min-width: 476px) { .produtos > .produto { flex-basis: calc((100% - 1rem) / 2); } }
+@container (min-width: 722px) { .produtos > .produto { flex-basis: calc((100% - 2rem) / 3); } }
+@container (min-width: 968px) { .produtos > .produto { flex-basis: calc((100% - 3rem) / 4); } }
 .produto { display: flex; flex-direction: column; gap: 0.35rem; overflow: hidden; padding-top: 0; color: var(--texto); text-decoration: none; border-top: 5px solid var(--c); }
 .produto:hover { border-color: var(--c); }
 .produto h3 { margin: 0; }
