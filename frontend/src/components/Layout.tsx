@@ -17,6 +17,7 @@ const LINKS: { to: string; rotulo: string; fim?: boolean }[] = [
   { to: '/jogue-como', rotulo: 'Jogue como' },
   { to: '/rotina', rotulo: 'Rotina' },
   { to: '/alimentacao', rotulo: 'Alimentação' },
+  { to: '/equipamentos', rotulo: 'Equipamentos' },
   { to: '/desempenho', rotulo: 'Desempenho' },
   { to: '/metas', rotulo: 'Metas' },
   { to: '/ferramentas', rotulo: 'Ferramentas' },

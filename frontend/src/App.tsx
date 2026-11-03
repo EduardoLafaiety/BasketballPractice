@@ -9,6 +9,7 @@ import JogueComo from './pages/JogueComo'
 import EstiloDetalhe from './pages/EstiloDetalhe'
 import Rotina from './pages/Rotina'
 import Alimentacao from './pages/Alimentacao'
+import Equipamentos from './pages/Equipamentos'
 import Desempenho from './pages/Desempenho'
 import Metas from './pages/Metas'
 import Ferramentas from './pages/Ferramentas'
@@ -48,6 +49,7 @@ export default function App() {
         <Route path="jogue-como/:id" element={<EstiloDetalhe />} />
         <Route path="rotina" element={<Rotina />} />
         <Route path="alimentacao" element={<Alimentacao />} />
+        <Route path="equipamentos" element={<Equipamentos />} />
         <Route path="desempenho" element={<Desempenho />} />
         <Route path="metas" element={<Metas />} />
         <Route path="ferramentas" element={<Ferramentas />} />

@@ -1435,3 +1435,17 @@ select.input:hover:not(:disabled) { border-color: var(--laranja); }
 .dieta-chamada-numeros { font-family: var(--fonte-display); font-weight: var(--peso-display); font-size: 2.2rem; line-height: 1; color: var(--c); }
 .dieta-chamada-nome { display: grid; gap: 0.1rem; }
 @media (max-width: 800px) { .dieta-chamada { grid-template-columns: 1fr; } }
+
+/* Equipamentos: bolas com link de afiliado da Amazon */
+.produtos-abas { grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: 40rem; margin-top: 2rem; }
+.produtos { grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); }
+.produto { display: flex; flex-direction: column; gap: 0.35rem; overflow: hidden; padding-top: 0; color: var(--texto); text-decoration: none; border-top: 5px solid var(--c); }
+.produto:hover { border-color: var(--c); }
+.produto h3 { margin: 0; }
+.produto-vitrine { display: grid; place-items: center; margin: 0 -1.25rem 0.6rem; padding: 1.4rem; background: var(--superficie-2); }
+.produto-texto { font-size: 0.88rem; }
+.produto .dieta-foco { margin-bottom: 0; }
+.produto .dieta-foco span:first-child { background: none; border-color: var(--borda); color: inherit; font-weight: 400; }
+@media (max-width: 860px) { .produtos-abas .nivel-opcao:last-child { grid-column: auto; } }
+.produto-vitrine { padding: 1.1rem 1rem 0.6rem; }
+.bola-nome { font-family: var(--fonte-display); font-weight: 800; letter-spacing: 0.04em; text-transform: none; }
