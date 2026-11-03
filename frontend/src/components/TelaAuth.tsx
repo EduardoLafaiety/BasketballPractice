@@ -25,7 +25,7 @@ export default function TelaAuth({ children }: { children: ReactNode }) {
         </div>
         <h2 className="auth-titulo">
           <span className="auth-titulo-a">Bora pra</span>
-          <span className="auth-titulo-b">quadra.</span>
+          <span className="auth-titulo-b">quadra<span className="ponto">.</span></span>
         </h2>
       </section>
 
