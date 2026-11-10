@@ -28,7 +28,7 @@ test('esqueci a senha: o link do e-mail troca a senha, entra e derruba a sessão
 
   // O mesmo link não funciona uma segunda vez.
   await page.goto('/entrar')
-  await page.evaluate(() => localStorage.clear())
+  await page.evaluate(() => localStorage.removeItem('bp.token'))
   await page.goto(link)
   await page.getByLabel('Senha nova').fill('Mais-uma-senha-boa')
   await page.getByRole('button', { name: 'Salvar e entrar' }).click()

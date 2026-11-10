@@ -23,8 +23,18 @@ import RecuperarSenha from './pages/RecuperarSenha'
 import { ConfirmarConta, RedefinirSenha } from './pages/LinkDeConta'
 import { PoliticaPrivacidade, TermosDeUso } from './pages/Legal'
 import Admin from './pages/Admin'
+import AvisoCookies from './components/AvisoCookies'
 
 export default function App() {
+  return (
+    <>
+      <Rotas />
+      <AvisoCookies />
+    </>
+  )
+}
+
+function Rotas() {
   return (
     <Routes>
       <Route path="entrar" element={<Entrar modo="entrar" />} />

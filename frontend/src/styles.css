@@ -1416,6 +1416,17 @@ select.input:hover:not(:disabled) { border-color: var(--laranja); }
 .links-legais { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.4rem 1.5rem; }
 .links-legais a { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: inherit; text-decoration: none; }
 .links-legais a:hover { color: var(--laranja-texto); text-decoration: underline; }
+.links-legais button { padding: 0; border: 0; background: none; font: inherit; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: inherit; cursor: pointer; }
+.links-legais button:hover { color: var(--laranja-texto); text-decoration: underline; }
+
+/* Fica acima da barra de notícias e do menu até o visitante responder. */
+.aviso-cookies { position: fixed; inset: auto 1rem 1rem; z-index: 50; display: grid; gap: 0.75rem; width: min(36rem, calc(100% - 2rem)); margin: 0 auto; padding: 1.1rem 1.25rem; border: 2px solid var(--laranja); border-radius: 14px; background: var(--superficie); color: var(--texto); box-shadow: 0 12px 32px rgb(0 0 0 / 0.35); }
+body:has(.noticias) .aviso-cookies { bottom: calc(44px + 1rem); }
+.aviso-cookies p { margin: 0; font-size: 0.85rem; line-height: 1.5; text-transform: none; }
+.aviso-cookies a { color: var(--laranja-texto); }
+.aviso-cookies-atual { color: var(--muted); }
+.aviso-cookies-botoes { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 0.5rem; }
+.aviso-cookies-botoes .btn { flex: 1 1 8rem; }
 .rodape { padding: 0 1.25rem 2rem; }
 /* A barra de notícias é fixa: sem esta folga, cobriria os links. */
 .app:has(.noticias) .rodape { padding-bottom: calc(44px + 1.25rem); }
