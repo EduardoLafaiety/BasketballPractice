@@ -754,21 +754,69 @@ section + section, .card + section { margin-top: 1.5rem; }
   align-items: center;
   gap: 0.75rem;
   min-height: 44px;
-  padding: 0 0.25rem 0 1rem;
+  padding: 0 0.25rem 0 0;
   padding-bottom: env(safe-area-inset-bottom);
-  background: var(--lateral);
+  background: linear-gradient(#141414, #050505);
   color: #ffffff;
-  border-top: 1px solid #262626;
+  /* Fio laranja no alto, como a faixa de um canal de esporte. */
+  border-top: 2px solid var(--laranja);
   font-size: 0.85rem;
 }
-.noticias-rotulo {
+/* Peça da esquerda: selo "ao vivo" e o nome da faixa, cortados em diagonal. */
+.noticias-marca {
+  align-self: stretch;
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0 1.4rem 0 0.75rem;
+  background: linear-gradient(90deg, #1f1f1f, #2a2a2a);
+  clip-path: polygon(0 0, 100% 0, calc(100% - 14px) 100%, 0 100%);
+}
+.noticias-vivo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 3px;
+  background: #c8102e;
+  font-weight: 800;
+  font-size: 0.66rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.noticias-vivo i { width: 7px; height: 7px; border-radius: 50%; background: #ffffff; animation: noticias-pulsar 1.4s ease-in-out infinite; }
+@keyframes noticias-pulsar { 50% { opacity: 0.25; transform: scale(0.7); } }
+.noticias-rotulo {
+  display: grid;
+  line-height: 1.05;
   color: var(--laranja);
-  font-weight: 700;
+  font-weight: 800;
   font-size: 0.72rem;
   letter-spacing: 0.12em;
   text-transform: uppercase;
 }
+.noticias-hora { color: var(--lateral-muted); font-size: 0.6rem; font-weight: 600; letter-spacing: 0.06em; }
+/* Etiqueta do assunto antes de cada manchete. */
+.noticias-assunto {
+  --cor: #a3a3a3;
+  padding: 0.12rem 0.4rem;
+  border-radius: 2px;
+  background: var(--cor);
+  color: #0b0b0b;
+  font-weight: 800;
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.assunto-nba { --cor: #4da3ff; }
+.assunto-nbb { --cor: #2fbf71; }
+.assunto-mercado { --cor: #f5c542; }
+.assunto-lesao { --cor: #f25f5c; }
+.assunto-selecao { --cor: #43c59e; }
+.assunto-wnba { --cor: #ff7a1a; }
+/* Entre uma manchete e outra, uma bolinha laranja. */
+.noticias-item::before { content: ''; width: 6px; height: 6px; margin-right: 0.9rem; border-radius: 50%; background: var(--laranja); }
 .noticias-janela { flex: 1; min-width: 0; overflow: hidden; }
 .noticias-trilha { display: flex; width: max-content; animation: noticias-correr var(--duracao, 60s) linear infinite; }
 .noticias-janela:hover .noticias-trilha,
@@ -796,7 +844,9 @@ section + section, .card + section { margin-top: 1.5rem; }
 }
 @media (max-width: 560px) {
   .noticias-rotulo { display: none; }
+  .noticias-marca { padding-right: 1.1rem; }
 }
+:root[data-movimento='reduzido'] .noticias-vivo i { animation: none; }
 /* Sem animação: a faixa fica parada e rola com o dedo ou o mouse */
 :root[data-movimento='reduzido'] .noticias-janela { overflow-x: auto; }
 :root[data-movimento='reduzido'] .noticias-trilha { animation: none; }

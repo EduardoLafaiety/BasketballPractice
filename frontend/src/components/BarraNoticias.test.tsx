@@ -47,10 +47,20 @@ describe('Barra de notícias', () => {
     expect(within(barra).getByRole('list').querySelector('.noticias-selo')!.nextElementSibling).toHaveTextContent('LeBron muda de time')
   })
 
+  it('como faixa de TV: selo ao vivo, hora da atualização e o assunto de cada manchete', async () => {
+    abrir([noticia({}), noticia({ id: 3, title: 'Brandon Miller acerta extensão com o Hornets' }), noticia({ id: 4, title: 'NBB 2026/27 é lançado no Rio' })])
+    const barra = await screen.findByRole('region', { name: 'Notícias de basquete' })
+
+    expect(barra.querySelector('.noticias-vivo')).toHaveTextContent('Ao vivo')
+    expect(within(barra).getByText(/^Atualizado às \d{2}:\d{2}$/)).toBeInTheDocument()
+    const lista = within(barra).getByRole('list')
+    expect([...lista.querySelectorAll('.noticias-assunto')].map((e) => e.textContent)).toEqual(['Basquete', 'Mercado', 'NBB'])
+  })
+
   it('a cópia da trilha não recebe foco do teclado', async () => {
     abrir([noticia({})])
     const barra = await screen.findByRole('region', { name: 'Notícias de basquete' })
-    const copia = barra.querySelector('[aria-hidden="true"]')!
+    const copia = barra.querySelector('.noticias-lista[aria-hidden="true"]')!
     expect(copia.querySelector('a')).toHaveAttribute('tabindex', '-1')
   })
 
