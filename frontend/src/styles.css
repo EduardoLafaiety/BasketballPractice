@@ -167,6 +167,7 @@ p { margin: 0 0 1rem; }
 .select { width: auto; }
 
 .acoes { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+.secao-topo .acoes { align-items: center; gap: 0.75rem 1.5rem; }
 
 .vazio {
   padding: 2rem;
@@ -195,19 +196,8 @@ p { margin: 0 0 1rem; }
   stroke: var(--borda);
   stroke-width: 3;
 }
-.hero-kicker { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 1.5rem; }
 .hero-titulo { font-size: clamp(3.5rem, 10vw, 8.5rem); line-height: 0.9; max-width: 8ch; margin: 0; }
 .hero-titulo .ponto { color: var(--laranja); }
-.hero-texto { margin: 0; max-width: 46ch; font-size: 1.15rem; color: var(--muted); }
-.hero-acoes { align-items: center; gap: 1rem 1.75rem; }
-.eyebrow {
-  text-transform: uppercase;
-  letter-spacing: 0.16em;
-  font-size: 0.8rem;
-  font-weight: 700;
-  color: var(--texto);
-  margin: 0;
-}
 
 .stats {
   display: grid;
@@ -653,8 +643,6 @@ section + section, .card + section { margin-top: 1.5rem; }
 .sequencia > div strong { font-family: var(--fonte-display); font-weight: var(--peso-display); font-size: 3.2rem; font-variant-numeric: tabular-nums; }
 .sequencia p { margin: 0; }
 .sequencia-fogo { display: flex; align-self: center; color: var(--laranja); }
-.sequencia-mini { display: inline-flex; align-items: center; gap: 0.4rem; color: var(--laranja-texto); text-decoration: none; font-weight: 700; font-size: 0.8rem; letter-spacing: 0.12em; text-transform: uppercase; }
-.sequencia-mini:hover { text-decoration: underline; text-underline-offset: 4px; }
 .barra-progresso { height: 10px; border-radius: 999px; background: var(--superficie-2); overflow: hidden; }
 .barra-progresso > div { height: 100%; background: var(--laranja); border-radius: inherit; transition: width 0.3s; }
 .barra-progresso.completa > div { background: var(--verde); }
@@ -1161,11 +1149,6 @@ section + section, .card + section { margin-top: 1.5rem; }
 .abertura-a { top: 8vh; transform: translateX(calc(var(--saida) * -80vw)); }
 .abertura-b { bottom: 7vh; transform: translateX(calc(var(--saida) * 80vw)); }
 .abertura-b .ponto { color: var(--laranja); }
-.abertura-painel { position: absolute; left: clamp(0.8rem, 2vw, 1.4rem); bottom: 3.6rem; width: min(290px, 23vw); display: grid; justify-items: start; gap: 0.6rem; opacity: calc(1 - var(--saida) * 3); }
-.abertura-painel .hero-texto { font-weight: 500; font-size: 1.05rem; line-height: 1.25; color: var(--texto); }
-.abertura-painel .hero-acoes { gap: 0.6rem 1rem; }
-.abertura-painel .btn-grande { font-size: 0.78rem; white-space: nowrap; }
-.abertura-painel .link-forte { font-size: 0.68rem; }
 
 /* Figuras animadas */
 .figura { display: block; width: 100%; color: inherit; }
@@ -1296,12 +1279,6 @@ select.input { padding-inline: 1rem; border-color: var(--texto); border-radius: 
 select.input:hover:not(:disabled) { border-color: var(--laranja); }
 .estilo-lado .select { width: 100%; text-align: center; }
 
-/* Início: o resumo do dia num cartão, com o conteúdo centrado. */
-.abertura-painel { width: 320px; justify-items: center; gap: 0.75rem; padding: 1.5rem 1.25rem; border-radius: 28px; background: var(--superficie); box-shadow: var(--sombra); text-align: center; }
-.abertura-painel .hero-kicker, .abertura-painel .hero-acoes { justify-content: center; }
-@media (max-width: 860px) {
-  .abertura-painel { width: auto; padding: 1rem; gap: 0.5rem; }
-}
 
 /* Gerador: tempo e ação em painéis de placar, escolhas em passos numerados. */
 .gerador { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); grid-template-rows: auto 1fr; grid-template-areas: 'tempo passos' 'acao passos'; gap: 1rem; margin-top: 1rem; }
@@ -1367,8 +1344,6 @@ select.input:hover:not(:disabled) { border-color: var(--laranja); }
   .marca { width: 42px; height: 42px; }
   .topo-secao { display: none; }
   .conteudo { padding-top: 84px; }
-  .abertura-painel { left: 1rem; right: 1rem; bottom: 3.4rem; width: auto; }
-  .abertura-painel .hero-texto { font-size: 1.05rem; }
   .abertura-a { top: 12vh; }
   .abertura-b { bottom: auto; top: 58vh; }
   .abertura-palco { place-items: center; padding-bottom: 12vh; }

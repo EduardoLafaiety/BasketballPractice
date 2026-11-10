@@ -179,7 +179,7 @@ export function useFuroBola(camada: RefObject<HTMLElement>) {
 }
 
 /** Abertura: a bola fica transparente sob o mouse e mostra o atleta dentro dela. */
-export function AberturaBola({ titulo, children }: { titulo: ReactNode; children: ReactNode }) {
+export function AberturaBola({ titulo, children }: { titulo: ReactNode; children?: ReactNode }) {
   const secao = useRef<HTMLElement>(null)
   const camada = useRef<HTMLDivElement>(null)
   const bolas = useRef<(SVGSVGElement | null)[]>([])

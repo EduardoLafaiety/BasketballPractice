@@ -55,9 +55,8 @@ test('monta a rotina de hoje, faz a sessão guiada e vê o resultado em Desempen
   await expect(page.locator('.conquista.desbloqueada')).toHaveCount(1)
   await expect(page.locator('.conquista.desbloqueada')).toContainText('Primeiro treino')
 
-  // Início: números da semana e a sequência no topo.
+  // Início: números da semana.
   await irPara(page, 'Início')
   await expect(numero(page, 'sessões nos últimos 7 dias')).toHaveText('1')
   await expect(numero(page, 'aproveitamento nos arremessos')).toHaveText('75%')
-  await expect(page.getByRole('link', { name: /1 dia seguido/ })).toBeVisible()
 })
