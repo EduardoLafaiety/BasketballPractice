@@ -6,7 +6,7 @@ import { LinksLegais } from '../components/TelaAuth'
 // Quem responde pelo serviço e pelos dados. O e-mail de contato aparece nas duas páginas.
 const RESPONSAVEL = 'Eduardo Lopes'
 const CONTATO = '[e-mail de contato a definir]'
-const ATUALIZADO_EM = '2 de novembro de 2026'
+const ATUALIZADO_EM = '10 de novembro de 2026'
 
 function PaginaLegal({ titulo, children }: { titulo: string; children: ReactNode }) {
   // Links como /privacidade#cookies abrem já na seção (o roteador não rola sozinho até a âncora).
@@ -167,6 +167,11 @@ export function TermosDeUso() {
         O Basketball Practice ajuda você a montar treinos de basquete, seguir uma rotina, acompanhar sua evolução e ter ideias de
         alimentação para a sua posição. Ele é oferecido por {RESPONSAVEL}, pessoa física, e hoje é gratuito. Se isso mudar, quem
         tem conta será avisado antes, por e-mail e nesta página. Contato: {CONTATO}.
+      </p>
+      <p>
+        O site se mantém com anúncios do Google e com links de afiliado da Amazon na aba Equipamentos: quando você compra por
+        esses links, o Basketball Practice recebe uma comissão, sem custo a mais para você. Os preços e as condições de compra
+        são da Amazon. Como isso usa cookies está na <Link to="/privacidade#anuncios" className="link">Política de Privacidade</Link>.
       </p>
 
       <h2>Sua conta</h2>
