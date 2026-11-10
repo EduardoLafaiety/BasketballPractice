@@ -47,12 +47,13 @@ describe('Barra de notícias', () => {
     expect(within(barra).getByRole('list').querySelector('.noticias-selo')!.nextElementSibling).toHaveTextContent('LeBron muda de time')
   })
 
-  it('como faixa de TV: selo ao vivo, hora da atualização e o assunto de cada manchete', async () => {
+  it('como faixa de TV: selo ao vivo, "Últimas notícias" e o assunto de cada manchete', async () => {
     abrir([noticia({}), noticia({ id: 3, title: 'Brandon Miller acerta extensão com o Hornets' }), noticia({ id: 4, title: 'NBB 2026/27 é lançado no Rio' })])
     const barra = await screen.findByRole('region', { name: 'Notícias de basquete' })
 
     expect(barra.querySelector('.noticias-vivo')).toHaveTextContent('Ao vivo')
-    expect(within(barra).getByText(/^Atualizado às \d{2}:\d{2}$/)).toBeInTheDocument()
+    expect(barra.querySelector('.noticias-rotulo')).toHaveTextContent(/^Últimas notícias$/)
+    expect(within(barra).queryByText(/Atualizado/)).toBeNull()
     const lista = within(barra).getByRole('list')
     expect([...lista.querySelectorAll('.noticias-assunto')].map((e) => e.textContent)).toEqual(['Basquete', 'Mercado', 'NBB'])
   })

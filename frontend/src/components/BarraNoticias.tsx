@@ -8,7 +8,6 @@ const ATUALIZAR_MS = 5 * 60_000
 // Velocidade de leitura confortável: o tempo da volta cresce com a quantidade de texto.
 const SEGUNDOS_POR_LETRA = 0.2
 const VOLTA_MINIMA_S = 30
-const HORA = new Intl.DateTimeFormat('pt-BR', { hour: '2-digit', minute: '2-digit' })
 
 function Itens({ noticias, copia }: { noticias: Noticia[]; copia?: boolean }) {
   return (
@@ -42,19 +41,12 @@ export default function BarraNoticias() {
   const { pathname } = useLocation()
   const [noticias, setNoticias] = useState<Noticia[]>([])
   const [pausada, setPausada] = useState(false)
-  const [atualizada, setAtualizada] = useState<Date | null>(null)
   const janela = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const carregar = () => {
       if (document.hidden) return
-      api
-        .noticias()
-        .then((lista) => {
-          setNoticias(lista)
-          setAtualizada(new Date())
-        })
-        .catch(() => {})
+      api.noticias().then(setNoticias).catch(() => {})
     }
     carregar()
     const timer = window.setInterval(carregar, ATUALIZAR_MS)
@@ -81,16 +73,13 @@ export default function BarraNoticias() {
 
   return (
     <section className={`noticias${pausada ? ' pausada' : ''}`} aria-label="Notícias de basquete">
-      {/* Como a faixa de um canal de esporte: selo "ao vivo", o nome da faixa e a hora da última atualização. */}
+      {/* Como a faixa de um canal de esporte: selo "ao vivo" e o nome da faixa. */}
       <div className="noticias-marca">
         <span className="noticias-vivo" aria-hidden>
           <i />
           Ao vivo
         </span>
-        <span className="noticias-rotulo">
-          Últimas notícias
-          {atualizada && <small className="noticias-hora">Atualizado às {HORA.format(atualizada)}</small>}
-        </span>
+        <span className="noticias-rotulo">Últimas notícias</span>
       </div>
       <div className="noticias-janela" ref={janela} onBlur={aoSairDoFoco}>
         <div className="noticias-trilha" style={{ '--duracao': `${duracao}s` } as CSSProperties}>

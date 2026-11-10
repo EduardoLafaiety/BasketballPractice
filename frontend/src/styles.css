@@ -776,15 +776,12 @@ section + section, .card + section { margin-top: 1.5rem; }
 .noticias-vivo i { width: 7px; height: 7px; border-radius: 50%; background: #ffffff; animation: noticias-pulsar 1.4s ease-in-out infinite; }
 @keyframes noticias-pulsar { 50% { opacity: 0.25; transform: scale(0.7); } }
 .noticias-rotulo {
-  display: grid;
-  line-height: 1.05;
   color: var(--laranja);
   font-weight: 800;
   font-size: 0.72rem;
   letter-spacing: 0.12em;
   text-transform: uppercase;
 }
-.noticias-hora { color: var(--lateral-muted); font-size: 0.6rem; font-weight: 600; letter-spacing: 0.06em; }
 /* Etiqueta do assunto antes de cada manchete. */
 .noticias-assunto {
   --cor: #a3a3a3;
