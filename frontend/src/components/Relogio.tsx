@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 
-// Data e hora no topo do Início, no estilo de placar de ginásio: dígitos de LED de sete segmentos
-// (desenhados aqui, sem fonte externa), hora em âmbar como o relógio de jogo e segundos em vermelho
-// como o cronômetro de posse. Os segmentos apagados aparecem de leve, como num placar de verdade.
+// Data e hora no topo do Início, como o shot clock que fica em cima da tabela: a contagem da posse
+// (24 até 0) num anel vermelho que se fecha, a buzina acendendo no zero e o relógio de jogo em
+// âmbar. Os dígitos de LED de sete segmentos são desenhados aqui, sem fonte externa.
 
 const DIA = new Intl.DateTimeFormat('pt-BR', { weekday: 'short' })
 const DATA = new Intl.DateTimeFormat('pt-BR', { day: 'numeric', month: 'short' })
@@ -39,6 +39,12 @@ const Par = ({ n }: { n: number }) => (
   </>
 )
 
+/** Segundos que restam da posse: 24 até 0, e recomeça (um ciclo a cada 25 segundos do dia). */
+export function posse(agora: Date) {
+  const doDia = agora.getHours() * 3600 + agora.getMinutes() * 60 + agora.getSeconds()
+  return 24 - (doDia % 25)
+}
+
 export default function Relogio() {
   const [agora, setAgora] = useState(() => new Date())
 
@@ -57,29 +63,46 @@ export default function Relogio() {
   const h = agora.getHours()
   const m = agora.getMinutes()
   const s = agora.getSeconds()
+  const restam = posse(agora)
   const dia = limpa(DIA.format(agora))
   const data = limpa(DATA.format(agora))
 
   return (
     <time
-      className="placar-relogio"
+      className={`shot-relogio ${restam === 0 ? 'buzina' : ''}`}
       dateTime={agora.toISOString()}
       aria-label={`Hoje, ${dia} ${data}, ${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`}
     >
-      <span className="placar-legenda" aria-hidden>
+      <span className="shot-posse" aria-hidden>
+        <svg className="shot-anel" viewBox="0 0 40 40">
+          <circle className="shot-anel-fundo" cx="20" cy="20" r="17" />
+          {/* pathLength 24: cada segundo apaga um vinte e quatro avos do anel. */}
+          <circle
+            className={`shot-anel-tempo ${restam === 24 ? 'reinicio' : ''}`}
+            cx="20"
+            cy="20"
+            r="17"
+            pathLength="24"
+            strokeDasharray="24"
+            style={{ strokeDashoffset: 24 - restam }}
+            transform="rotate(-90 20 20)"
+          />
+        </svg>
+        <span className="shot-posse-num">
+          <Par n={restam} />
+        </span>
+      </span>
+      <span className="shot-legenda" aria-hidden>
         <strong>{dia}</strong>
         <span>{data}</span>
       </span>
-      <span className="placar-hora" aria-hidden>
+      <span className="shot-hora" aria-hidden>
         <Par n={h} />
-        <span className={`placar-dois-pontos ${s % 2 ? 'apagado' : ''}`}>
+        <span className={`shot-dois-pontos ${s % 2 ? 'apagado' : ''}`}>
           <i />
           <i />
         </span>
         <Par n={m} />
-      </span>
-      <span className="placar-segundos" aria-hidden>
-        <Par n={s} />
       </span>
     </time>
   )

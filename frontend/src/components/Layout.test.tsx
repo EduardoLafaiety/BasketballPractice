@@ -70,7 +70,7 @@ describe('Relógio no topo', () => {
     abrir('/')
     const relogio = await screen.findByLabelText(/^Hoje, /)
     expect(relogio).toHaveAttribute('aria-label', expect.stringMatching(/\d{2}:\d{2}$/))
-    // Placar de LED: 4 dígitos da hora e 2 dos segundos.
+    // Shot clock de LED: 4 dígitos da hora e 2 da posse.
     expect(relogio.querySelectorAll('.led-digito')).toHaveLength(6)
   })
 
