@@ -11,6 +11,9 @@ export const CATEGORIAS: { id: Categoria; nome: string; resumo: string; cor: str
   { id: 'recuperacao', nome: 'Recuperação', resumo: 'Água, descanso e carga', cor: 'var(--c-passe)' },
 ]
 
+/** Cartões por fileira na grade dos artigos: cada categoria tem um múltiplo disso, para nenhuma fileira ficar pela metade. */
+export const POR_FILEIRA = 4
+
 /** Um achado de pesquisa, contado em uma frase, com a referência ao lado. */
 export interface Estudo {
   achado: string
@@ -213,6 +216,109 @@ export const ARTIGOS: Artigo[] = [
       'NBA, histórico do draft e dos prêmios de temporada.',
       'Basketball-Reference, carreiras de Rolando Ferreira, Nenê, Anderson Varejão, Leandro Barbosa e Tiago Splitter.',
       'Confederação Brasileira de Basketball (CBB), histórico de Oscar Schmidt na seleção.',
+    ],
+  },
+
+  {
+    id: 'basquete-feminino',
+    categoria: 'historia',
+    titulo: 'O basquete feminino ganha a quadra inteira',
+    resumo: 'Das regras com zonas fixas à WNBA: como o jogo das mulheres conquistou espaço nos Jogos e nas ligas.',
+    secoes: [
+      {
+        titulo: 'Um jogo com zonas',
+        paragrafos: [
+          'Senda Berenson adaptou o basquete para as alunas do Smith College em 1892, poucos meses depois da invenção do jogo. Nas regras dela, a quadra era dividida em três zonas e cada jogadora ficava presa à sua, sem poder atravessar a quadra.',
+          'Por décadas o jogo feminino seguiu com versões de 6 jogadoras e campo dividido. O 5 contra 5 em quadra inteira, igual ao masculino, só virou regra nos Estados Unidos no começo dos anos 1970.',
+        ],
+      },
+      {
+        titulo: 'Mundial, Olimpíada e liga profissional',
+        paragrafos: [
+          'A FIBA fez o primeiro Mundial feminino em 1953, no Chile. Nos Jogos Olímpicos, o basquete feminino só estreou em Montreal, em 1976, quarenta anos depois do masculino.',
+          'A WNBA, liga profissional feminina dos Estados Unidos, foi criada em 1996 e fez a primeira temporada em 1997. Hoje ela reúne jogadoras do mundo inteiro.',
+        ],
+      },
+      {
+        titulo: 'E o Brasil',
+        paragrafos: [
+          'A seleção brasileira de Hortência, Paula e Janeth foi campeã mundial em 1994, na Austrália, e medalhista olímpica em 1996 e em 2000. Senda Berenson e Hortência estão no Hall da Fama do basquete.',
+        ],
+      },
+    ],
+    pratica: [
+      'Durante décadas as jogadoras não podiam atravessar a quadra. Treinar transição é treinar uma parte do jogo que custou a chegar.',
+      'Assista a jogos da WNBA e das seleções femininas: a leitura do jogo sem a bola é uma aula de posicionamento.',
+    ],
+    ciencia: [],
+    fontes: [
+      'Naismith Memorial Basketball Hall of Fame, perfis de Senda Berenson e de Hortência Marcari.',
+      'FIBA, história dos Mundiais femininos e do basquete feminino olímpico.',
+      'WNBA, história da liga.',
+    ],
+  },
+  {
+    id: 'basquete-3x3',
+    categoria: 'historia',
+    titulo: '3x3: o jogo da rua que virou olímpico',
+    resumo: 'Meia quadra, uma cesta, 12 segundos de posse e 21 pontos. Como o basquete de rua chegou aos Jogos.',
+    secoes: [
+      {
+        titulo: 'Da praça para a FIBA',
+        paragrafos: [
+          'O três contra três numa cesta só sempre foi o jeito mais comum de jogar na rua: precisa de pouca gente e de meia quadra. A FIBA começou a organizar a modalidade com regras oficiais na década de 2000.',
+          'O 3x3 estreou nos Jogos Olímpicos da Juventude de 2010, ganhou um Mundial próprio em 2012 e entrou nos Jogos Olímpicos em Tóquio, nas disputas realizadas em 2021.',
+        ],
+      },
+      {
+        titulo: 'Regras que aceleram tudo',
+        paragrafos: [
+          'Cada time tem 3 jogadores em quadra e 1 reserva. A posse dura só 12 segundos, a cesta de dentro do arco vale 1 ponto e a de fora vale 2. Ganha quem fizer 21 pontos primeiro ou estiver na frente depois de 10 minutos.',
+          'Não há técnico orientando do banco durante o jogo. Os próprios jogadores decidem as trocas e as jogadas, no meio da partida.',
+        ],
+      },
+    ],
+    pratica: [
+      'O 3x3 é ótimo para treinar: pouca gente, muita bola na mão e decisões rápidas.',
+      'Com 12 segundos de posse, o primeiro passe e o corte decidem a jogada. Treine atacar logo, sem segurar a bola.',
+      'Depois da cesta sofrida, a bola tem de sair para trás do arco antes de atacar. Use isso para treinar a transição curta.',
+    ],
+    ciencia: [],
+    fontes: [
+      'FIBA, regras oficiais e história do basquete 3x3.',
+      'Comitê Olímpico Internacional, o basquete 3x3 nos Jogos Olímpicos.',
+    ],
+    noApp: { to: '/gerador', rotulo: 'Montar um treino curto' },
+  },
+  {
+    id: 'basquete-em-cadeira-de-rodas',
+    categoria: 'historia',
+    titulo: 'Basquete em cadeira de rodas',
+    resumo: 'Nasceu na reabilitação de veteranos de guerra e está nos Jogos Paralímpicos desde a primeira edição, em 1960.',
+    secoes: [
+      {
+        titulo: 'Depois da guerra',
+        paragrafos: [
+          'O basquete em cadeira de rodas surgiu nos anos 1940, nos hospitais que atendiam veteranos da Segunda Guerra Mundial nos Estados Unidos e no Reino Unido. O esporte era parte da reabilitação e logo virou competição.',
+          'Na Inglaterra, o médico Ludwig Guttmann organizou jogos para pacientes do hospital de Stoke Mandeville. Desses jogos nasceram os Jogos Paralímpicos, e o basquete esteve na primeira edição, em Roma, em 1960. O torneio feminino entrou em 1968.',
+        ],
+      },
+      {
+        titulo: 'O mesmo aro, outras regras',
+        paragrafos: [
+          'A quadra e a altura do aro, 3,05 metros, são as mesmas do basquete convencional. O que muda é o deslocamento: com a bola no colo, o jogador pode dar até dois impulsos na roda e depois precisa driblar, passar ou arremessar.',
+          'Cada atleta recebe uma pontuação de classificação, de 1,0 a 4,5, conforme a limitação funcional. A soma dos 5 em quadra não pode passar de 14 pontos, o que obriga os times a usar atletas de todas as classes.',
+        ],
+      },
+    ],
+    pratica: [
+      'Arremessar sentado, sem a força das pernas, mostra o quanto a mecânica de braço e punho importa.',
+      'Procure um time de basquete em cadeira de rodas na sua cidade: muitos aceitam convidados nos treinos.',
+    ],
+    ciencia: [],
+    fontes: [
+      'IWBF, Federação Internacional de Basquete em Cadeira de Rodas: história e regras oficiais.',
+      'Comitê Paralímpico Internacional, o basquete em cadeira de rodas nos Jogos Paralímpicos.',
     ],
   },
 
@@ -420,6 +526,119 @@ export const ARTIGOS: Artigo[] = [
     noApp: { to: '/ferramentas', rotulo: 'Abrir o contador de arremessos' },
   },
 
+  {
+    id: 'treino-variado',
+    categoria: 'mentalidade',
+    titulo: 'Treino variado: errar mais hoje, acertar mais no jogo',
+    resumo: 'Repetir o mesmo arremesso em bloco parece render mais. Misturar os exercícios ensina mais.',
+    secoes: [
+      {
+        titulo: 'O treino que engana',
+        paragrafos: [
+          'Num experimento clássico, dois grupos aprenderam três sequências de movimento. Um treinou em blocos, repetindo a mesma sequência várias vezes antes de passar para a outra. O outro treinou as três misturadas, em ordem aleatória.',
+          'Durante o treino, o grupo dos blocos foi melhor. Mas nos testes feitos depois, minutos e dias mais tarde, e numa tarefa nova, o grupo do treino misturado ficou à frente.',
+        ],
+      },
+      {
+        titulo: 'Por que funciona',
+        paragrafos: [
+          'Quando o exercício muda a cada tentativa, o cérebro precisa reorganizar o movimento toda vez. Isso deixa o treino mais difícil e mais cheio de erros, mas fixa melhor o que foi aprendido.',
+          'No jogo nenhum arremesso se repete: muda a distância, o ângulo, o cansaço e o defensor. O treino que mistura situações fica mais parecido com o jogo.',
+        ],
+      },
+    ],
+    pratica: [
+      'Depois de aquecer o arremesso, troque de lugar a cada tentativa em vez de fazer 10 seguidas do mesmo ponto.',
+      'Misture os dribles: alterne mudança de direção, entre as pernas e por trás das costas numa mesma série.',
+      'Aproveitamento mais baixo no treino variado é normal. Avalie o progresso pelos jogos e pelas semanas, não pela série do dia.',
+    ],
+    ciencia: [
+      {
+        achado: 'O treino em blocos rendeu mais durante a prática, mas o treino em ordem aleatória foi melhor na retenção, 10 minutos e 10 dias depois, e numa tarefa nova.',
+        fonte: 'Shea JB, Morgan RL. Journal of Experimental Psychology: Human Learning and Memory, 1979.',
+      },
+    ],
+    fontes: ['Shea JB, Morgan RL. Contextual interference effects on the acquisition, retention, and transfer of a motor skill. Journal of Experimental Psychology: Human Learning and Memory, 1979.'],
+    noApp: { to: '/gerador', rotulo: 'Montar um treino variado' },
+  },
+  {
+    id: 'foco-no-aro',
+    categoria: 'mentalidade',
+    titulo: 'Pense no aro, não no punho',
+    resumo: 'Prestar atenção no alvo, e não no próprio corpo, deixa o arremesso mais preciso e mais solto.',
+    secoes: [
+      {
+        titulo: 'Foco interno e foco externo',
+        paragrafos: [
+          'Foco interno é prestar atenção no próprio corpo: "dobre o punho", "estique o cotovelo". Foco externo é prestar atenção no efeito do movimento: "a bola entra no fundo do aro", "a bola sobe alto".',
+          'Uma revisão de 15 anos de pesquisa concluiu que o foco externo melhora a precisão e a eficiência do movimento em muitos esportes, tanto em iniciantes quanto em atletas experientes.',
+        ],
+      },
+      {
+        titulo: 'No lance livre',
+        paragrafos: [
+          'Num estudo com lances livres, os jogadores acertaram mais quando pensavam no aro do que quando pensavam no movimento do punho. Com o foco no aro, os músculos do braço também trabalharam com menos tensão desnecessária.',
+          'A correção técnica continua importante. O truque é transformar a instrução em uma imagem de fora: em vez de "estique o braço", "coloque a mão dentro do aro".',
+        ],
+      },
+    ],
+    pratica: [
+      'Na hora de arremessar, escolha um ponto do aro e pense só nele.',
+      'Transforme as correções técnicas em alvos: "bola alta", "mão dentro do aro", "passe no peito do colega".',
+      'Deixe a atenção no corpo para os exercícios de técnica sem pressão, longe do jogo.',
+    ],
+    ciencia: [
+      {
+        achado: 'Com o foco no aro, os lances livres foram mais precisos e a atividade elétrica dos músculos do braço foi menor do que com o foco no punho.',
+        fonte: 'Zachry T, Wulf G, Mercer J, Bezodis N. Brain Research Bulletin, 2005.',
+      },
+      {
+        achado: 'Em 15 anos de estudos, o foco externo melhorou a eficácia e a eficiência do movimento em diferentes habilidades e níveis.',
+        fonte: 'Wulf G. International Review of Sport and Exercise Psychology, 2013.',
+      },
+    ],
+    fontes: [
+      'Zachry T, Wulf G, Mercer J, Bezodis N. Increased movement accuracy and reduced EMG activity as the result of adopting an external focus of attention. Brain Research Bulletin, 2005.',
+      'Wulf G. Attentional focus and motor learning: a review of 15 years. International Review of Sport and Exercise Psychology, 2013.',
+    ],
+    noApp: { to: '/treinos', rotulo: 'Treinar arremesso' },
+  },
+  {
+    id: 'fadiga-mental',
+    categoria: 'mentalidade',
+    titulo: 'Cabeça cansada, perna pesada',
+    resumo: 'Horas de celular ou de estudo antes do jogo cansam a mente, e o esforço passa a parecer maior.',
+    secoes: [
+      {
+        titulo: 'Fadiga que não é do músculo',
+        paragrafos: [
+          'Fadiga mental é o cansaço depois de um tempo longo de tarefa que exige atenção: prova, estudo, videogame, rolagem no celular. Uma revisão de estudos encontrou que ela piora o desempenho em esforços longos, de resistência.',
+          'Força máxima, potência e esforços curtos quase não mudaram. O que mudou foi a percepção: com a cabeça cansada, o mesmo esforço parece mais difícil, e a pessoa desiste ou diminui o ritmo antes.',
+        ],
+      },
+      {
+        titulo: 'No basquete',
+        paragrafos: [
+          'Um jogo de basquete tem 40 ou 48 minutos de esforço repetido e decisões a cada segundo. Chegar ao aquecimento já cansado da cabeça é começar o jogo em desvantagem.',
+          'Não é preciso cortar o celular do dia. Vale dar à mente um tempo de descanso antes de jogar, como você faz com as pernas.',
+        ],
+      },
+    ],
+    pratica: [
+      'Na última hora antes do jogo, deixe o celular de lado: música e conversa leve cansam menos.',
+      'Depois de um dia de prova ou estudo pesado, aqueça com mais calma e espere que o esforço pareça maior.',
+      'Uma caminhada curta ao ar livre ajuda a cabeça a se recuperar entre a escola e o treino.',
+    ],
+    ciencia: [
+      {
+        achado: 'A fadiga mental prejudicou o desempenho em exercícios de resistência, com maior percepção de esforço, sem afetar a força máxima e a potência.',
+        fonte: 'Van Cutsem J et al. Sports Medicine, 2017.',
+      },
+    ],
+    fontes: ['Van Cutsem J, Marcora S, De Pauw K, Bailey S, Meeusen R, Roelands B. The effects of mental fatigue on physical performance: a systematic review. Sports Medicine, 2017.'],
+    noApp: { to: '/rotina', rotulo: 'Organizar minha rotina' },
+  },
+
   // Condicionamento
   {
     id: 'o-que-o-jogo-exige',
@@ -611,6 +830,120 @@ export const ARTIGOS: Artigo[] = [
     noApp: { to: '/treinos', rotulo: 'Ver o aquecimento' },
   },
 
+  {
+    id: 'ligamento-do-joelho',
+    categoria: 'condicionamento',
+    titulo: 'Proteger o ligamento do joelho',
+    resumo: 'A lesão do ligamento cruzado é a mais temida do basquete, e o treino de salto e aterrissagem ajuda a evitá-la.',
+    secoes: [
+      {
+        titulo: 'Como acontece',
+        paragrafos: [
+          'A maioria das lesões do ligamento cruzado anterior acontece sem contato: numa aterrissagem, numa freada ou numa mudança de direção, com o joelho caindo para dentro e a perna quase esticada.',
+          'As meninas têm um risco maior do que os meninos no mesmo esporte. Parte disso vem da forma de aterrissar, e forma de aterrissar se treina.',
+        ],
+      },
+      {
+        titulo: 'Seis semanas que fazem diferença',
+        paragrafos: [
+          'Num estudo com atletas do ensino médio de futebol, vôlei e basquete, as meninas fizeram 6 semanas de treino de salto, aterrissagem e força antes da temporada, 3 vezes por semana. As que não treinaram tiveram 3,6 vezes mais lesões graves de joelho do que as que treinaram.',
+          'O treino ensinava a aterrissar macio, com o joelho dobrado e alinhado com o pé, e a corrigir a técnica com a ajuda do treinador.',
+        ],
+      },
+    ],
+    pratica: [
+      'Aterrisse com os dois pés, joelho dobrado e apontado para a ponta do pé, nunca para dentro.',
+      'Faça 10 a 15 minutos de exercícios de salto, aterrissagem e força de perna no aquecimento, 2 a 3 vezes por semana.',
+      'Peça para alguém filmar seus saltos de frente: o joelho caindo para dentro é o sinal para corrigir.',
+    ],
+    ciencia: [
+      {
+        achado: 'Meninas do ensino médio sem treino neuromuscular tiveram 3,6 vezes mais lesões graves de joelho do que as que fizeram 6 semanas de treino de salto antes da temporada.',
+        fonte: 'Hewett TE et al. The American Journal of Sports Medicine, 1999.',
+      },
+    ],
+    fontes: ['Hewett TE, Lindenfeld TN, Riccobene JV, Noyes FR. The effect of neuromuscular training on the incidence of knee injury in female athletes: a prospective study. The American Journal of Sports Medicine, 1999.'],
+    noApp: { to: '/treinos', rotulo: 'Ver os exercícios de físico' },
+  },
+  {
+    id: 'nordico',
+    categoria: 'condicionamento',
+    titulo: 'Nórdico: o exercício que protege a coxa',
+    resumo: 'Os programas que incluem o exercício nórdico reduzem pela metade as lesões na parte de trás da coxa.',
+    secoes: [
+      {
+        titulo: 'A lesão do sprint',
+        paragrafos: [
+          'Os músculos posteriores da coxa trabalham no limite quando você acelera e freia. É ali que aparecem muitas das distensões dos esportes de tiro curto, como o basquete.',
+          'O exercício nórdico fortalece esses músculos justamente na fase em que eles se alongam sob carga: de joelhos, com os tornozelos presos, você inclina o corpo para a frente bem devagar, segurando a queda com a coxa.',
+        ],
+      },
+      {
+        titulo: 'O que mostram os estudos',
+        paragrafos: [
+          'Uma meta-análise com mais de 8 mil atletas encontrou que os programas de prevenção com o nórdico cortaram as lesões de posterior da coxa pela metade.',
+          'Não precisa de equipamento: um colega segurando os tornozelos resolve. O cuidado é começar com poucas repetições, porque o exercício deixa a coxa bem dolorida nos primeiros dias.',
+        ],
+      },
+    ],
+    pratica: [
+      'Comece com 2 séries de 4 a 5 repetições, 1 ou 2 vezes por semana.',
+      'Desça o mais devagar que conseguir e use as mãos para amortecer no fim.',
+      'Aumente aos poucos ao longo de semanas e mantenha 1 sessão por semana durante a temporada.',
+      'Evite fazer o nórdico na véspera de jogo.',
+    ],
+    ciencia: [
+      {
+        achado: 'Em 15 estudos com 8.459 atletas, os programas que incluíam o exercício nórdico reduziram as lesões de posterior da coxa em até 51%.',
+        fonte: 'van Dyk N, Behan FP, Whiteley R. British Journal of Sports Medicine, 2019.',
+      },
+    ],
+    fontes: ['van Dyk N, Behan FP, Whiteley R. Including the Nordic hamstring exercise in injury prevention programmes halves the rate of hamstring injuries: a systematic review and meta-analysis of 8459 athletes. British Journal of Sports Medicine, 2019.'],
+    noApp: { to: '/rotina', rotulo: 'Encaixar na minha rotina' },
+  },
+  {
+    id: 'joelho-do-saltador',
+    categoria: 'condicionamento',
+    titulo: 'Joelho do saltador: a dor abaixo da patela',
+    resumo: 'Quase 1 em cada 3 jogadores de basquete de elite tem tendinite patelar. O tratamento passa pela força.',
+    secoes: [
+      {
+        titulo: 'A dor de quem salta',
+        paragrafos: [
+          'A tendinopatia patelar, conhecida como joelho do saltador, é uma dor no tendão logo abaixo da patela. Ela aparece com o volume de saltos e aterrissagens e costuma piorar no começo do treino e depois dele.',
+          'Num levantamento com atletas de elite de vários esportes, o problema apareceu em 32% dos jogadores de basquete e em 45% dos de vôlei, os dois esportes com mais saltos.',
+        ],
+      },
+      {
+        titulo: 'Força, não só repouso',
+        paragrafos: [
+          'Num estudo com pacientes com a lesão, a injeção de corticoide melhorou a dor no começo, mas a melhora não se manteve. O treino de força pesado e lento, como agachamento e leg press com 3 segundos na descida e 3 na subida, manteve o resultado depois de 6 meses e deixou mais pacientes satisfeitos.',
+          'O tendão se adapta à carga. Parar de vez alivia a dor, mas deixa o tendão mais fraco para quando você voltar a saltar.',
+        ],
+      },
+    ],
+    pratica: [
+      'Dor abaixo da patela por mais de 2 semanas pede avaliação de fisioterapeuta ou médico.',
+      'Enquanto isso, diminua o volume de saltos, mas mantenha o treino de força de perna.',
+      'Dor de até 3 numa escala de 0 a 10 durante o exercício costuma ser aceitável; se piorar no dia seguinte, reduza a carga.',
+    ],
+    ciencia: [
+      {
+        achado: 'A tendinopatia patelar apareceu em 31,9% dos jogadores de basquete e em 44,6% dos de vôlei entre atletas de elite.',
+        fonte: 'Lian ØB, Engebretsen L, Bahr R. The American Journal of Sports Medicine, 2005.',
+      },
+      {
+        achado: 'Depois de 6 meses, o treino de força pesado e lento manteve os bons resultados, enquanto a melhora com a injeção de corticoide se perdeu.',
+        fonte: 'Kongsgaard M et al. Scandinavian Journal of Medicine & Science in Sports, 2009.',
+      },
+    ],
+    fontes: [
+      "Lian ØB, Engebretsen L, Bahr R. Prevalence of jumper's knee among elite athletes from different sports: a cross-sectional study. The American Journal of Sports Medicine, 2005.",
+      'Kongsgaard M, Kovanen V, Aagaard P et al. Corticosteroid injections, eccentric decline squat training and heavy slow resistance training in patellar tendinopathy. Scandinavian Journal of Medicine & Science in Sports, 2009.',
+    ],
+    noApp: { to: '/treinos', rotulo: 'Ver os exercícios de físico' },
+  },
+
   // Sono
   {
     id: 'sono-e-arremesso',
@@ -796,6 +1129,113 @@ export const ARTIGOS: Artigo[] = [
       },
     ],
     fontes: ['Fullagar HH, Skorski S, Duffield R, Hammes D, Coutts AJ, Meyer T. Sleep and athletic performance: the effects of sleep loss on exercise performance, and physiological and cognitive responses to exercise. Sports Medicine, 2015.'],
+    noApp: { to: '/rotina', rotulo: 'Organizar minha rotina' },
+  },
+
+  {
+    id: 'tela-antes-de-dormir',
+    categoria: 'sono',
+    titulo: 'Tela antes de dormir: o que o estudo mediu',
+    resumo: 'Ler no tablet à noite atrasou o relógio do corpo e deixou as pessoas mais sonolentas na manhã seguinte.',
+    secoes: [
+      {
+        titulo: 'Livro de papel contra tablet',
+        paragrafos: [
+          'Num estudo de Harvard, adultos leram por cerca de 4 horas antes de dormir durante 5 noites seguidas, uma vez num tablet e outra num livro impresso. Tudo o mais era igual: o mesmo quarto, o mesmo horário de deitar.',
+          'Com o tablet, eles demoraram mais para pegar no sono, produziram menos melatonina, o hormônio que avisa ao corpo que é noite, e tiveram o relógio biológico atrasado. Na manhã seguinte, estavam mais sonolentos.',
+        ],
+      },
+      {
+        titulo: 'Não é só a luz',
+        paragrafos: [
+          'A luz da tela pesa, mas o conteúdo também: vídeo, jogo e rede social mantêm a cabeça ativa e fazem perder a noção da hora.',
+          'Para quem treina, o efeito se soma: menos sono à noite e mais sono de manhã, justamente quando o corpo precisaria estar inteiro.',
+        ],
+      },
+    ],
+    pratica: [
+      'Na última meia hora antes de dormir, troque a tela por livro, música ou alongamento leve.',
+      'Se usar o celular, baixe o brilho e ative o modo noturno, mas saiba que isso só reduz parte do efeito.',
+      'Carregue o celular fora do quarto ou longe da cama.',
+    ],
+    ciencia: [
+      {
+        achado: 'Ler num tablet antes de dormir, comparado com o livro impresso, atrasou o sono, reduziu a melatonina, atrasou o relógio biológico e piorou o alerta na manhã seguinte.',
+        fonte: 'Chang AM, Aeschbach D, Duffy JF, Czeisler CA. Proceedings of the National Academy of Sciences, 2015.',
+      },
+    ],
+    fontes: ['Chang AM, Aeschbach D, Duffy JF, Czeisler CA. Evening use of light-emitting eReaders negatively affects sleep, circadian timing, and next-morning alertness. Proceedings of the National Academy of Sciences, 2015.'],
+    noApp: { to: '/configuracoes', rotulo: 'Ajustar os lembretes' },
+  },
+  {
+    id: 'relogio-do-adolescente',
+    categoria: 'sono',
+    titulo: 'Por que o adolescente dorme tarde',
+    resumo: 'Não é preguiça: na adolescência, o relógio do corpo atrasa. O problema é a aula cedo.',
+    secoes: [
+      {
+        titulo: 'O relógio muda de lugar',
+        paragrafos: [
+          'Na puberdade, o relógio biológico se desloca para mais tarde. O sono só chega mais tarde da noite, e o corpo quer dormir até mais tarde de manhã. A necessidade de sono, porém, continua alta: de 8 a 10 horas.',
+          'Num estudo com estudantes que passaram para uma escola com aula mais cedo, o horário de dormir não acompanhou a mudança. Eles passaram a dormir menos e ficaram muito sonolentos de manhã; alguns pegavam no sono em poucos minutos durante os testes do começo do dia.',
+        ],
+      },
+      {
+        titulo: 'O que dá para fazer',
+        paragrafos: [
+          'Não dá para mudar o horário da aula, mas dá para ajudar o relógio: luz forte de manhã adianta o relógio, e luz forte à noite atrasa.',
+          'Acordar muito mais tarde no fim de semana atrasa o relógio de novo, e a segunda-feira vira um pequeno fuso horário.',
+        ],
+      },
+    ],
+    pratica: [
+      'Abra a janela ou saia ao sol logo depois de acordar.',
+      'À noite, luz baixa e tela longe na última meia hora.',
+      'No fim de semana, acorde no máximo 1 a 2 horas mais tarde do que nos dias de aula.',
+    ],
+    ciencia: [
+      {
+        achado: 'Na passagem para uma escola com aula mais cedo, os estudantes não adiantaram o horário de dormir, dormiram menos e ficaram mais sonolentos pela manhã.',
+        fonte: 'Carskadon MA et al. Sleep, 1998.',
+      },
+    ],
+    fontes: ['Carskadon MA, Wolfson AR, Acebo C, Tzischinsky O, Seifer R. Adolescent sleep patterns, circadian timing, and sleepiness at a transition to early school days. Sleep, 1998.'],
+    noApp: { to: '/rotina', rotulo: 'Organizar minha rotina' },
+  },
+  {
+    id: 'cochilo',
+    categoria: 'sono',
+    titulo: 'O cochilo do atleta',
+    resumo: 'Depois de uma noite curta, 30 minutos de cochilo depois do almoço melhoraram o alerta e o sprint.',
+    secoes: [
+      {
+        titulo: 'O que o estudo testou',
+        paragrafos: [
+          'Num estudo inglês, homens jovens dormiram só 4 horas numa noite. No dia seguinte, num dos testes eles tiraram um cochilo de 30 minutos depois do almoço; no outro, ficaram acordados.',
+          'Com o cochilo, ficaram mais alertas, foram melhor nos testes de memória e de precisão e correram os sprints de 2 e 20 metros mais rápido.',
+        ],
+      },
+      {
+        titulo: 'O tamanho certo',
+        paragrafos: [
+          'Cochilos curtos, de 20 a 30 minutos, recuperam o alerta sem deixar aquela sensação de ressaca ao acordar. Cochilos longos entram no sono profundo, e acordar no meio dele deixa a pessoa lenta por um tempo.',
+          'O cochilo complementa a noite, não a substitui. Se você precisa cochilar todo dia, o sono da noite provavelmente está curto.',
+        ],
+      },
+    ],
+    pratica: [
+      'Dormiu mal? Cochile 20 a 30 minutos no começo da tarde.',
+      'Em dia de jogo à noite, um cochilo curto depois do almoço ajuda a chegar mais desperto.',
+      'Deixe pelo menos 30 minutos entre acordar do cochilo e treinar ou jogar.',
+      'Evite cochilar depois das 16h para não atrapalhar a noite.',
+    ],
+    ciencia: [
+      {
+        achado: 'Depois de uma noite de 4 horas de sono, um cochilo de 30 minutos depois do almoço melhorou o alerta, a memória de curto prazo e o tempo de sprint.',
+        fonte: 'Waterhouse J, Atkinson G, Edwards B, Reilly T. Journal of Sports Sciences, 2007.',
+      },
+    ],
+    fontes: ['Waterhouse J, Atkinson G, Edwards B, Reilly T. The role of a short post-lunch nap in improving cognitive, motor, and sprint performance in participants with partial sleep deprivation. Journal of Sports Sciences, 2007.'],
     noApp: { to: '/rotina', rotulo: 'Organizar minha rotina' },
   },
 
@@ -991,6 +1431,110 @@ export const ARTIGOS: Artigo[] = [
       },
     ],
     fontes: ['Wiewelhove T, Döweling A, Schneider C et al. A meta-analysis of the effects of foam rolling on performance and recovery. Frontiers in Physiology, 2019.'],
+  },
+  {
+    id: 'carboidrato',
+    categoria: 'recuperacao',
+    titulo: 'Carboidrato: o combustível do treino',
+    resumo: 'Quanto mais tempo e mais forte você treina, mais carboidrato o corpo pede. Quanto comer em cada fase.',
+    secoes: [
+      {
+        titulo: 'A reserva do músculo',
+        paragrafos: [
+          'O músculo guarda carboidrato na forma de glicogênio, a principal fonte de energia nos tiros, saltos e mudanças de direção. Quando essa reserva acaba, as pernas pesam e as decisões ficam lentas no fim do jogo.',
+          'Arroz, pão, macarrão, batata, mandioca, aveia e frutas reabastecem a reserva. Cortar carboidrato é uma estratégia ruim para quem treina pesado.',
+        ],
+      },
+      {
+        titulo: 'Quanto por dia',
+        paragrafos: [
+          'As diretrizes esportivas ajustam a quantidade ao treino: de 3 a 5 g por quilo de peso nos dias leves, de 5 a 7 g com cerca de 1 hora de treino moderado e de 6 a 10 g quando o treino passa de 1 a 3 horas por dia.',
+          'Com dois treinos ou jogos no mesmo dia, a reposição precisa ser rápida: cerca de 1 g por quilo a cada hora, nas primeiras 4 horas depois do primeiro esforço.',
+        ],
+      },
+    ],
+    pratica: [
+      'Em toda refeição principal, metade do prato pode ser de carboidrato nos dias de treino forte.',
+      'Na refeição antes do jogo, 3 a 4 horas antes, prefira carboidrato fácil de digerir e pouca gordura.',
+      'Torneio com jogos seguidos: tenha à mão banana, pão, suco ou bebida esportiva para comer entre as partidas.',
+    ],
+    ciencia: [
+      {
+        achado: 'As recomendações variam de 3 a 5 g de carboidrato por quilo nos dias leves até 6 a 10 g com 1 a 3 horas de treino por dia, e 1 a 1,2 g por quilo por hora para reabastecer rápido.',
+        fonte: 'Burke LM, Hawley JA, Wong SHS, Jeukendrup AE. Journal of Sports Sciences, 2011.',
+      },
+    ],
+    fontes: ['Burke LM, Hawley JA, Wong SHS, Jeukendrup AE. Carbohydrates for training and competition. Journal of Sports Sciences, 2011.'],
+    noApp: { to: '/alimentacao?aba=jogo', rotulo: 'Ver o dia de jogo na Alimentação' },
+  },
+  {
+    id: 'cafeina',
+    categoria: 'recuperacao',
+    titulo: 'Cafeína: ajuda, com dose e hora certas',
+    resumo: 'A cafeína melhora o desempenho em adultos, mas dose alta e hora errada cobram no sono da noite.',
+    secoes: [
+      {
+        titulo: 'O que ela faz',
+        paragrafos: [
+          'A cafeína é um dos poucos suplementos com efeito bem comprovado. Ela diminui a sensação de esforço e de cansaço e melhora o desempenho em esforços de resistência, de força e nos esportes coletivos.',
+          'A Sociedade Internacional de Nutrição Esportiva fala em 3 a 6 mg por quilo de peso, cerca de 1 hora antes do exercício. Doses acima disso não melhoram mais o desempenho e aumentam os efeitos colaterais: tremor, ansiedade, coração acelerado e insônia.',
+        ],
+      },
+      {
+        titulo: 'O preço no sono',
+        paragrafos: [
+          'Num jogo à noite, a cafeína tomada no fim da tarde ainda está no corpo na hora de deitar. Uma noite mal dormida pode custar mais do que o ganho no jogo, principalmente quando há outro jogo ou treino no dia seguinte.',
+          'Para adolescentes, energéticos e pré-treinos não são uma boa ideia: as doses costumam ser altas e misturadas com outros estimulantes.',
+        ],
+      },
+    ],
+    pratica: [
+      'Menor de 18 anos: deixe energético e pré-treino de lado e converse com um médico ou nutricionista antes de usar cafeína para jogar.',
+      'Adulto: teste a cafeína em treino, nunca pela primeira vez em jogo importante.',
+      'Jogo à noite? Pense no sono antes de tomar a cafeína: a última dose deve ficar bem antes da hora de dormir.',
+    ],
+    ciencia: [
+      {
+        achado: 'Doses de 3 a 6 mg por quilo, cerca de 60 minutos antes, melhoraram o desempenho em vários tipos de exercício; doses de 9 mg por quilo ou mais aumentaram os efeitos colaterais.',
+        fonte: 'Guest NS et al. Journal of the International Society of Sports Nutrition, 2021.',
+      },
+    ],
+    fontes: ['Guest NS, VanDusseldorp TA, Nelson MT et al. International Society of Sports Nutrition position stand: caffeine and exercise performance. Journal of the International Society of Sports Nutrition, 2021.'],
+    noApp: { to: '/alimentacao', rotulo: 'Ver os cardápios da Alimentação' },
+  },
+  {
+    id: 'qual-recuperacao-funciona',
+    categoria: 'recuperacao',
+    titulo: 'Massagem, compressão, gelo: o que funciona mais',
+    resumo: 'Uma meta-análise comparou as técnicas de recuperação. A massagem foi a que mais aliviou dor e cansaço.',
+    secoes: [
+      {
+        titulo: 'Comparando tudo',
+        paragrafos: [
+          'Pesquisadores franceses juntaram cerca de cem estudos sobre as técnicas usadas depois do exercício e compararam o efeito de cada uma na dor muscular, na sensação de cansaço e nos sinais de dano e de inflamação.',
+          'A massagem foi a técnica que mais reduziu a dor muscular e a sensação de cansaço. Roupas de compressão e imersão em água também ajudaram. Alongamento e recuperação ativa, como trotar leve depois do jogo, praticamente não mudaram a dor.',
+        ],
+      },
+      {
+        titulo: 'O que isso não quer dizer',
+        paragrafos: [
+          'Os efeitos medidos são sobre dor e sensação de cansaço nos dias seguintes. Nenhuma técnica substitui o básico: dormir bem, comer e beber o suficiente e dosar a carga de treino.',
+          'Sentir menos dor ajuda a treinar melhor no dia seguinte. Mas, se a dor some e o cansaço continua por dias, o problema é carga demais, não falta de massagem.',
+        ],
+      },
+    ],
+    pratica: [
+      'Em torneio ou jogos seguidos, use as técnicas que você tem à mão: massagem, meia de compressão ou água fria.',
+      'Sem massagista? Uma automassagem com as mãos ou com o rolo de espuma já ajuda.',
+      'Priorize sono, comida e água antes de gastar com acessórios de recuperação.',
+    ],
+    ciencia: [
+      {
+        achado: 'Entre as técnicas de recuperação comparadas, a massagem foi a mais eficaz para reduzir a dor muscular tardia e a sensação de fadiga.',
+        fonte: 'Dupuy O et al. Frontiers in Physiology, 2018.',
+      },
+    ],
+    fontes: ['Dupuy O, Douzi W, Theurot D, Bosquet L, Dugué B. An evidence-based approach for choosing post-exercise recovery techniques to reduce markers of muscle damage, soreness, fatigue, and inflammation: a systematic review with meta-analysis. Frontiers in Physiology, 2018.'],
   },
 ]
 

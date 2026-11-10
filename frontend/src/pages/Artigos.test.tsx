@@ -2,7 +2,7 @@ import { screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import { definirToken } from '../api'
-import { ARTIGOS, CATEGORIAS, minutosDeLeitura } from '../artigos/dados'
+import { ARTIGOS, CATEGORIAS, POR_FILEIRA, minutosDeLeitura } from '../artigos/dados'
 import { apiFalsa, configFalsa, usuarioFalso } from '../test/api-falsa'
 import { abrirApp } from '../test/renderizar'
 
@@ -59,7 +59,9 @@ describe('Artigos', () => {
     const itens = within(fontes).getAllByRole('listitem')
     expect(itens.length).toBeGreaterThan(0)
     for (const item of itens) expect(within(item).getByRole('link')).toHaveAttribute('href', expect.stringMatching(/^https:\/\//))
-    expect(screen.getByRole('heading', { name: 'Leia também' })).toBeInTheDocument()
+    // Uma fileira cheia: os 4 seguintes da mesma categoria.
+    const leia = screen.getByRole('heading', { name: 'Leia também' }).nextElementSibling as HTMLElement
+    expect(within(leia).getAllByRole('link')).toHaveLength(POR_FILEIRA)
     expect(screen.getByRole('link', { name: /Higiene do sono/ })).toHaveAttribute('href', '/artigos/higiene-do-sono')
   })
 
@@ -79,7 +81,8 @@ describe('dados dos artigos', () => {
       expect(a.fontes.length).toBeGreaterThan(0)
       expect(minutosDeLeitura(a)).toBeGreaterThanOrEqual(1)
     }
-    // Toda categoria tem cinco artigos.
-    for (const c of CATEGORIAS) expect(ARTIGOS.filter((a) => a.categoria === c.id)).toHaveLength(5)
+    // Toda categoria tem oito artigos: duas fileiras cheias de 4, sem cartão sobrando.
+    for (const c of CATEGORIAS) expect(ARTIGOS.filter((a) => a.categoria === c.id)).toHaveLength(2 * POR_FILEIRA)
+    expect(ARTIGOS.length % POR_FILEIRA).toBe(0)
   })
 })
