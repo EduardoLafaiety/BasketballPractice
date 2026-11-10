@@ -1,6 +1,6 @@
 // Fotos dos artigos de História, da Wikimedia Commons, em domínio público ou com licença livre.
-// Todas foram recortadas em 3:2 e reduzidas para 1200 e 640 px; a do Amaury também foi clareada.
-// A do Splitter é CC BY-SA 2.0, e a versão recortada segue a mesma licença. Lista também em CREDITOS.md.
+// Todas foram recortadas em 3:2 e reduzidas para 1200 e 640 px (a de Roma 1960 só tem 900); a do Amaury também foi clareada.
+// As do Splitter (CC BY-SA 2.0) e do 3x3 (CC BY-SA 4.0) seguem a mesma licença nas versões recortadas. Lista também em CREDITOS.md.
 
 const ARQUIVOS = import.meta.glob<string>('./*.webp', { eager: true, import: 'default', query: '?url' })
 const fotos = (id: string) => ({ src: ARQUIVOS[`./${id}-1200.webp`], srcPequena: ARQUIVOS[`./${id}-640.webp`] })
@@ -55,5 +55,28 @@ export const FOTOS_ARTIGOS: Record<string, FotoArtigo> = {
     autor: 'Mike',
     licenca: 'CC BY-SA 2.0',
     fonte: commons('Tiago Splitter at the foul line Spurs-Magic100.jpg'),
+  },
+  'basquete-feminino': {
+    ...fotos('basquete-feminino'),
+    legenda: 'O time da Fort Shaw Indian School na Feira Mundial de St. Louis, em 1904',
+    autor: 'Jessie Tarbox Beals (atribuída), Missouri History Museum',
+    licenca: 'Domínio público',
+    fonte: commons(
+      '"Indian girls dressed for a ball game, U.S. Government Indian exhibit." (Fort Shaw Indian School basketball team) 1904 World\'s Fair (cropped).jpg',
+    ),
+  },
+  'basquete-3x3': {
+    ...fotos('basquete-3x3'),
+    legenda: 'Jogo do Azerbaijão no 3x3 feminino dos Jogos de Paris, em 2024',
+    autor: 'Dilaver Najafov',
+    licenca: 'CC BY-SA 4.0',
+    fonte: commons("Azerbaijan's 3x3 women's basketball team at the 2024 Summer Olympics 3.jpg"),
+  },
+  'basquete-em-cadeira-de-rodas': {
+    ...fotos('basquete-em-cadeira-de-rodas'),
+    legenda: 'Partida de basquete em cadeira de rodas nos primeiros Jogos Paralímpicos, em Roma, em 1960',
+    autor: 'INAIL',
+    licenca: 'Domínio público',
+    fonte: commons('Roma 1960 - Partita di basket.jpg'),
   },
 }

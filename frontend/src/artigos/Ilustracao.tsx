@@ -104,6 +104,46 @@ const DESENHOS: Record<string, ReactNode> = {
       <circle cx={467} cy={146} r={10} fill="none" stroke={COR} strokeWidth={5} />
     </>
   ),
+  'treino-variado': (
+    <>
+      {/* Em cima, o treino em bloco (tudo igual); embaixo, misturado, com as setas de embaralhar */}
+      {[0, 1, 2].map((i) => (
+        <rect key={i} x={90 + i * 90} y={80} width={64} height={64} rx={8} fill={CLARO} stroke={TINTA} strokeWidth={5} />
+      ))}
+      <rect x={90} y={250} width={64} height={64} rx={8} fill={COR} stroke={TINTA} strokeWidth={5} />
+      <circle cx={212} cy={282} r={34} fill={CLARO} stroke={TINTA} strokeWidth={5} />
+      <path d="M302 248l36 66h-72z" fill={COR} stroke={TINTA} strokeWidth={5} strokeLinejoin="round" />
+      <g fill="none" stroke={TINTA} strokeWidth={8} strokeLinecap="round" strokeLinejoin="round">
+        <path d="M400 150q50 0 70 50t70 50M400 250q50 0 70-50t70-50" />
+        <path d="M520 130l22 20-22 20M520 230l22 20-22 20" stroke={COR} />
+      </g>
+      <Bola x={470} y={330} r={30} />
+    </>
+  ),
+  'foco-no-aro': (
+    <>
+      <Cesta x={540} y={150} />
+      {/* A mira em volta do aro: a atenção vai para o alvo */}
+      <circle cx={505} cy={152} r={58} fill="none" stroke={COR} strokeWidth={7} />
+      <circle cx={505} cy={152} r={30} fill="none" stroke={COR} strokeWidth={4} opacity={0.6} />
+      <path d="M505 76v34M505 194v34M429 152h34" stroke={COR} strokeWidth={7} strokeLinecap="round" />
+      <path d="M150 300q150-260 300-150" fill="none" stroke={TINTA} strokeWidth={5} strokeDasharray="4 14" strokeLinecap="round" />
+      <Bola x={130} y={310} r={42} />
+    </>
+  ),
+  'fadiga-mental': (
+    <>
+      <rect x={110} y={60} width={150} height={280} rx={24} fill={CLARO} stroke={TINTA} strokeWidth={7} />
+      <rect x={128} y={92} width={114} height={210} rx={8} fill={COR} />
+      <path d="M160 320h50" stroke={TINTA} strokeWidth={6} strokeLinecap="round" />
+      <path d="M150 140h70M150 170h50M150 200h70M150 230h40" stroke={CLARO} strokeWidth={7} strokeLinecap="round" />
+      {/* Bateria quase vazia */}
+      <rect x={330} y={150} width={200} height={100} rx={14} fill={CLARO} stroke={TINTA} strokeWidth={7} />
+      <rect x={530} y={180} width={18} height={40} rx={4} fill={TINTA} />
+      <rect x={346} y={166} width={36} height={68} rx={6} fill={COR} />
+      <path d="M420 300l-20 30h40l-20 30" fill="none" stroke={TINTA} strokeWidth={6} strokeLinecap="round" strokeLinejoin="round" />
+    </>
+  ),
 
   // Condicionamento
   'o-que-o-jogo-exige': (
@@ -162,6 +202,45 @@ const DESENHOS: Record<string, ReactNode> = {
       <path d="M380 200h150" stroke={TINTA} strokeWidth={6} strokeLinecap="round" />
     </>
   ),
+  'ligamento-do-joelho': (
+    <>
+      {/* O joelho de frente: fêmur em cima, tíbia embaixo e os ligamentos cruzados no meio */}
+      <path d="M265 30h70v80q50 10 50 50a32 32 0 0 1-64 0h-42a32 32 0 0 1-64 0q0-40 50-50z" fill={CLARO} stroke={TINTA} strokeWidth={7} strokeLinejoin="round" />
+      <path d="M215 232h170q0 24-40 40v98h-90v-98q-40-16-40-40z" fill={CLARO} stroke={TINTA} strokeWidth={7} strokeLinejoin="round" />
+      <path d="M272 190l56 40M328 190l-56 40" stroke={COR} strokeWidth={14} strokeLinecap="round" />
+      <path d="M100 170q-30 30 0 60M500 170q30 30 0 60" fill="none" stroke={TINTA} strokeWidth={6} strokeLinecap="round" />
+      <path d="M70 150q-50 50 0 100M530 150q50 50 0 100" fill="none" stroke={TINTA} strokeWidth={6} strokeLinecap="round" opacity={0.5} />
+    </>
+  ),
+  'nordico': (
+    <>
+      <rect x={70} y={320} width={460} height={24} rx={10} fill={CLARO} stroke={TINTA} strokeWidth={5} />
+      {/* De joelhos, com os tornozelos presos, o corpo desce reto para a frente */}
+      <rect x={96} y={290} width={52} height={30} rx={8} fill={COR} stroke={TINTA} strokeWidth={5} />
+      <g stroke={TINTA} strokeWidth={14} strokeLinecap="round" strokeLinejoin="round" fill="none">
+        <path d="M120 306L250 312" />
+        <path d="M250 312L380 180" />
+        <path d="M352 208l60 26" strokeWidth={10} />
+      </g>
+      <circle cx={406} cy={150} r={30} fill={CLARO} stroke={TINTA} strokeWidth={7} />
+      <path d="M440 128q66 40 60 116" fill="none" stroke={COR} strokeWidth={7} strokeLinecap="round" strokeDasharray="4 14" />
+      <path d="M480 228l20 18 16-22" fill="none" stroke={COR} strokeWidth={7} strokeLinecap="round" strokeLinejoin="round" />
+    </>
+  ),
+  'joelho-do-saltador': (
+    <>
+      {/* A perna de lado: a patela e o tendão logo abaixo, onde dói */}
+      <path d="M150 60l90 150" stroke={TINTA} strokeWidth={40} strokeLinecap="round" />
+      <path d="M240 210l-40 150" stroke={TINTA} strokeWidth={36} strokeLinecap="round" />
+      <ellipse cx={270} cy={200} rx={24} ry={30} fill={CLARO} stroke={TINTA} strokeWidth={6} />
+      <path d="M262 232q-6 40-24 66" fill="none" stroke={COR} strokeWidth={12} strokeLinecap="round" />
+      <g stroke={COR} strokeWidth={6} strokeLinecap="round">
+        <path d="M300 250l30-10M304 280l34 6M290 306l24 20" />
+      </g>
+      <path d="M460 330V90M420 130l40-40 40 40" fill="none" stroke={TINTA} strokeWidth={9} strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M420 350h80" stroke={TINTA} strokeWidth={6} strokeLinecap="round" />
+    </>
+  ),
 
   // Sono
   'sono-e-arremesso': (
@@ -213,6 +292,50 @@ const DESENHOS: Record<string, ReactNode> = {
       <text x={520} y={130} textAnchor="middle" fontFamily="var(--fonte-display)" fontWeight={800} fontSize={70} fill={TINTA}>Z</text>
       <text x={480} y={80} textAnchor="middle" fontFamily="var(--fonte-display)" fontWeight={800} fontSize={44} fill={COR}>Z</text>
       <text x={550} y={60} textAnchor="middle" fontFamily="var(--fonte-display)" fontWeight={800} fontSize={30} fill={TINTA}>Z</text>
+    </>
+  ),
+  'tela-antes-de-dormir': (
+    <>
+      <Ceu />
+      {/* O tablet aceso no escuro, com a luz saindo da tela */}
+      <rect x={180} y={170} width={240} height={170} rx={18} fill={CLARO} stroke={TINTA} strokeWidth={7} />
+      <rect x={198} y={186} width={204} height={138} rx={6} fill={COR} />
+      <g stroke={COR} strokeWidth={7} strokeLinecap="round">
+        <path d="M150 180l-40-24M140 250h-50M150 320l-40 24M450 180l40-24M460 250h50M450 320l40 24" />
+      </g>
+      <path d="M240 230h120M240 256h90M240 282h110" stroke={CLARO} strokeWidth={7} strokeLinecap="round" />
+    </>
+  ),
+  'relogio-do-adolescente': (
+    <>
+      <Ceu />
+      <circle cx={260} cy={230} r={130} fill={CLARO} stroke={TINTA} strokeWidth={8} />
+      {/* O arco colorido: o sono que o relógio do corpo empurra mais para tarde */}
+      <path d="M260 230L163 143A130 130 0 0 1 325 117z" fill={COR} opacity={0.85} />
+      {Array.from({ length: 12 }, (_, i) => {
+        const a = (i * Math.PI) / 6
+        return <path key={i} d={`M${260 + 108 * Math.sin(a)} ${230 - 108 * Math.cos(a)}L${260 + 122 * Math.sin(a)} ${230 - 122 * Math.cos(a)}`} stroke={TINTA} strokeWidth={6} strokeLinecap="round" />
+      })}
+      <path d="M260 230V140M260 230l50 30" stroke={TINTA} strokeWidth={9} strokeLinecap="round" />
+      <circle cx={260} cy={230} r={11} fill={TINTA} />
+      <path d="M260 80A150 150 0 0 1 390 155" fill="none" stroke={COR} strokeWidth={8} strokeLinecap="round" />
+      <path d="M371 144L390 155L390 133" fill="none" stroke={COR} strokeWidth={8} strokeLinecap="round" strokeLinejoin="round" />
+    </>
+  ),
+  'cochilo': (
+    <>
+      <circle cx={480} cy={110} r={46} fill={COR} stroke={TINTA} strokeWidth={6} />
+      <g stroke={TINTA} strokeWidth={6} strokeLinecap="round">
+        {Array.from({ length: 8 }, (_, i) => {
+          const a = (i * Math.PI) / 4
+          return <path key={i} d={`M${480 + 62 * Math.cos(a)} ${110 + 62 * Math.sin(a)}L${480 + 82 * Math.cos(a)} ${110 + 82 * Math.sin(a)}`} />
+        })}
+      </g>
+      {/* O sofá com a almofada e os 30 minutos */}
+      <path d="M80 250h320v80H80z" fill={CLARO} stroke={TINTA} strokeWidth={6} />
+      <path d="M60 230h40v120H60zM380 230h40v120h-40z" fill={COR} stroke={TINTA} strokeWidth={6} />
+      <rect x={110} y={215} width={90} height={40} rx={16} fill={CLARO} stroke={TINTA} strokeWidth={5} />
+      <text x={290} y={190} textAnchor="middle" fontFamily="var(--fonte-display)" fontWeight={800} fontSize={110} fill={TINTA}>30’</text>
     </>
   ),
 
@@ -276,6 +399,51 @@ const DESENHOS: Record<string, ReactNode> = {
       {[210, 260, 310, 360].map((x) => <path key={x} d={`M${x} 205v100`} stroke={TINTA} strokeWidth={4} opacity={0.5} />)}
       <ellipse cx={440} cy={255} rx={22} ry={55} fill={CLARO} stroke={TINTA} strokeWidth={6} />
       <path d="M120 140h120M200 110l40 30-40 30M480 140H360M400 110l-40 30 40 30" fill="none" stroke={TINTA} strokeWidth={7} strokeLinecap="round" strokeLinejoin="round" />
+    </>
+  ),
+  'carboidrato': (
+    <>
+      {/* Tigela de arroz, pão e banana: a banana e o pão têm cor própria */}
+      <path d="M90 200h260q0 130-130 130T90 200z" fill={COR} stroke={TINTA} strokeWidth={7} strokeLinejoin="round" />
+      <path d="M100 200q120-80 240 0" fill={CLARO} stroke={TINTA} strokeWidth={6} />
+      {[[150, 180], [190, 165], [230, 162], [270, 170], [300, 185], [210, 185], [250, 188]].map(([x, y]) => (
+        <ellipse key={`${x}-${y}`} cx={x} cy={y} rx={9} ry={5} fill={TINTA} opacity={0.35} />
+      ))}
+      <path d="M400 120q-20 140 100 190q30 10 40-10q-110-50-100-190z" fill="#f5c542" stroke={TINTA} strokeWidth={6} strokeLinejoin="round" />
+      <path d="M396 112l8-18" stroke={TINTA} strokeWidth={8} strokeLinecap="round" />
+      <path d="M380 330q-10-60 40-60q40 0 40 30v40h-80z" fill="#d9a35c" stroke={TINTA} strokeWidth={6} strokeLinejoin="round" />
+    </>
+  ),
+  'cafeina': (
+    <>
+      <path d="M110 180h170v100a50 50 0 0 1-50 50h-70a50 50 0 0 1-50-50z" fill={COR} stroke={TINTA} strokeWidth={7} />
+      <path d="M280 205h22a30 30 0 0 1 0 60h-22" fill="none" stroke={TINTA} strokeWidth={7} />
+      <path d="M80 350h240" stroke={TINTA} strokeWidth={6} strokeLinecap="round" />
+      <path d="M160 150q-16-26 0-52M210 150q-16-26 0-52" fill="none" stroke={TINTA} strokeWidth={6} strokeLinecap="round" />
+      {/* O relógio: tomar longe da hora de dormir */}
+      <circle cx={450} cy={200} r={95} fill={CLARO} stroke={TINTA} strokeWidth={8} />
+      <path d="M450 200V130M450 200h50" stroke={TINTA} strokeWidth={9} strokeLinecap="round" />
+      <circle cx={450} cy={200} r={9} fill={TINTA} />
+      <path d="M450 105a95 95 0 0 1 95 95" fill="none" stroke={COR} strokeWidth={12} strokeLinecap="round" />
+    </>
+  ),
+  'qual-recuperacao-funciona': (
+    <>
+      {/* Pódio: massagem em primeiro, compressão em segundo, gelo em terceiro */}
+      <rect x={230} y={200} width={140} height={160} fill={COR} stroke={TINTA} strokeWidth={6} />
+      <rect x={90} y={250} width={140} height={110} fill={CLARO} stroke={TINTA} strokeWidth={6} />
+      <rect x={370} y={280} width={140} height={80} fill={CLARO} stroke={TINTA} strokeWidth={6} />
+      <text x={300} y={300} textAnchor="middle" fontFamily="var(--fonte-display)" fontWeight={800} fontSize={70} fill={TINTA}>1</text>
+      <text x={160} y={330} textAnchor="middle" fontFamily="var(--fonte-display)" fontWeight={800} fontSize={56} fill={TINTA}>2</text>
+      <text x={440} y={340} textAnchor="middle" fontFamily="var(--fonte-display)" fontWeight={800} fontSize={44} fill={TINTA}>3</text>
+      {/* Mão (massagem) */}
+      <path d="M262 190v-60q0-12 12-12t12 12v-20q0-12 12-12t12 12v10q0-12 12-12t12 12v20q0-10 10-10t10 10v48q0 30-30 30h-30q-26 0-26-30z" fill={CLARO} stroke={TINTA} strokeWidth={6} strokeLinejoin="round" />
+      {/* Meia de compressão */}
+      <path d="M140 140h40v60q0 14 14 20l16 8q14 8 6 20H150q-10 0-10-12z" fill={CLARO} stroke={TINTA} strokeWidth={6} strokeLinejoin="round" />
+      <path d="M140 160h40M140 180h40" stroke={TINTA} strokeWidth={4} />
+      {/* Cubo de gelo */}
+      <rect x={410} y={200} width={60} height={60} rx={10} fill={CLARO} stroke={TINTA} strokeWidth={6} transform="rotate(8 440 230)" />
+      <path d="M424 216l14-6" stroke={COR} strokeWidth={6} strokeLinecap="round" />
     </>
   ),
 }
