@@ -891,6 +891,7 @@ section + section, .card + section { margin-top: 1.5rem; }
 .demo-mapa { fill: var(--superficie-2); }
 .demo-legenda { font-size: 12px; fill: var(--muted); }
 .demo-trilha { stroke: var(--borda); stroke-dasharray: 3 5; }
+.demo-visor { fill: var(--laranja); fill-opacity: 0.08; stroke: var(--laranja); stroke-width: 1.2; stroke-opacity: 0.7; }
 .demo-corpo path { stroke: #3a3936; stroke-width: 1.4; stroke-linejoin: round; }
 .demo-perto { fill: #e4e2dc; }
 .demo-longe { fill: #a9a7a0; }

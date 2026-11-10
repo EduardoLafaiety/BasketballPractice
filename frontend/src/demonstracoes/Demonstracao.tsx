@@ -1,5 +1,6 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useId, useMemo, useRef, useState } from 'react'
 import { Atleta, Bola, novaBola, novoAtleta, SombraBola } from './Atleta'
+import { janela, mirar, QUADRO, seguir, type Mira } from './camera'
 import { caminhos, PARTES, pintar, posicionar } from './desenho'
 import {
   alturaQuadril,
@@ -30,6 +31,7 @@ export default function Demonstracao({ coreografia, nome }: { coreografia: Coreo
   const [tocando, setTocando] = useState(() => !prefereMenosMovimento())
   const [fase, setFase] = useState(0)
   const [rastro, setRastro] = useState(true)
+  const [camera, setCamera] = useState(true)
   const [velocidade, setVelocidade] = useState(0.5)
 
   const tempo = useRef(0)
@@ -41,13 +43,28 @@ export default function Demonstracao({ coreografia, nome }: { coreografia: Coreo
   const bola2 = useRef(novaBola())
   const parceiro = useRef<SVGGElement>(null)
   const marcasRef = useRef<(SVGGElement | null)[]>([])
-  const desenhar = useRef<(t: number) => void>(() => {})
+  const lente = useRef<SVGGElement>(null)
+  const visor = useRef<SVGRectElement>(null)
+  const mira = useRef<Mira | null>(null)
+  const cameraRef = useRef(camera)
+  const ajuste = useRef(0)
+  const desenhar = useRef<(t: number, dt?: number) => void>(() => {})
+  const recorte = `demo-recorte-${useId().replace(/:/g, '')}`
 
   tocandoRef.current = tocando
   velocidadeRef.current = velocidade
+  cameraRef.current = camera
 
-  desenhar.current = (t: number) => {
+  /** Desenha o instante t; sem dt (pulo de passo, troca de exercício), a câmera vai direto. */
+  desenhar.current = (t: number, dt?: number) => {
     const agora = instante(anim, t)
+    const alvo = cameraRef.current ? mirar(agora) : { cx: QUADRO.w / 2, z: 1 }
+    mira.current = mira.current && dt !== undefined ? seguir(mira.current, alvo, dt) : alvo
+    const j = janela(mira.current)
+    lente.current?.setAttribute('transform', `scale(${j.z.toFixed(4)}) translate(${(-j.x).toFixed(2)} ${(-j.y).toFixed(2)})`)
+    visor.current?.setAttribute('x', j.x.toFixed(1))
+    visor.current?.setAttribute('width', j.w.toFixed(1))
+    visor.current?.setAttribute('visibility', j.z > 1.01 ? 'visible' : 'hidden')
     pintar(anim, agora, atleta.current.partes, atleta.current.sombra)
     posicionar(bola.current, agora.bola, agora.solo)
     posicionar(bola2.current, agora.bola2, agora.solo)
@@ -78,7 +95,11 @@ export default function Demonstracao({ coreografia, nome }: { coreografia: Coreo
         }
         if (t > anim.total) t = 0
         tempo.current = t
-        desenhar.current(t)
+        desenhar.current(t, dt)
+      } else if (ajuste.current > 0) {
+        // Pausado, a câmera ainda termina de chegar ao enquadramento ao ligar ou desligar o zoom.
+        ajuste.current--
+        desenhar.current(tempo.current, dt)
       }
       quadro = requestAnimationFrame(passo)
     })
@@ -123,26 +144,36 @@ export default function Demonstracao({ coreografia, nome }: { coreografia: Coreo
   return (
     <section className="demo" aria-label={`Demonstração: ${nome}`}>
       <svg className="demo-cena" viewBox="0 0 680 400" role="img" aria-label={`Manequim demonstrando ${nome}, passo a passo`}>
-        <rect x="20" y={CHAO} width="640" height="18" className="demo-piso" />
-        <line x1="20" y1={CHAO} x2="660" y2={CHAO} className="demo-linha" />
-        <Cenario anim={anim} />
-        {fantasmas.map((c, i) => (
-          <g key={i} className="demo-fantasma" opacity={rastro && i < fase ? 1 : 0}>
-            {PARTES.map((p) => <path key={p.id} d={c[p.id]} />)}
+        <defs>
+          <clipPath id={recorte}>
+            <rect width={QUADRO.w} height={QUADRO.h} />
+          </clipPath>
+        </defs>
+        <g clipPath={`url(#${recorte})`}>
+          <g ref={lente}>
+            <rect x="20" y={CHAO} width="640" height="18" className="demo-piso" />
+            <line x1="20" y1={CHAO} x2="660" y2={CHAO} className="demo-linha" />
+            <Cenario anim={anim} />
+            {fantasmas.map((c, i) => (
+              <g key={i} className="demo-fantasma" opacity={rastro && i < fase ? 1 : 0}>
+                {PARTES.map((p) => <path key={p.id} d={c[p.id]} />)}
+              </g>
+            ))}
+            {corpoParceiro && (
+              <g ref={parceiro} className="demo-parceiro">
+                {PARTES.map((p) => <path key={p.id} d={corpoParceiro[p.id]} />)}
+              </g>
+            )}
+            <SombraBola els={bola} />
+            <SombraBola els={bola2} />
+            <Atleta els={atleta} frente={anim.frente} />
+            <Bola els={bola} />
+            <Bola els={bola2} />
           </g>
-        ))}
-        {corpoParceiro && (
-          <g ref={parceiro} className="demo-parceiro">
-            {PARTES.map((p) => <path key={p.id} d={corpoParceiro[p.id]} />)}
-          </g>
-        )}
-        <SombraBola els={bola} />
-        <SombraBola els={bola2} />
-        <Atleta els={atleta} frente={anim.frente} />
-        <Bola els={bola} />
-        <Bola els={bola2} />
+        </g>
 
         <rect x="20" y="324" width="640" height="70" rx="8" className="demo-mapa" />
+        <rect ref={visor} y="346" height="40" rx="4" width="0" className="demo-visor" visibility="hidden" />
         <text x="32" y="341" className="demo-legenda">Pegadas, vista de cima</text>
         <line x1="60" y1={Y_PEGADAS} x2="640" y2={Y_PEGADAS} className="demo-trilha" />
         {cena.cones?.map((c, i) => (
@@ -164,6 +195,9 @@ export default function Demonstracao({ coreografia, nome }: { coreografia: Coreo
         <button type="button" className="chip" onClick={proxima} aria-label="Próximo passo">⏭</button>
         <label className="demo-opcao">
           <input type="checkbox" checked={rastro} onChange={(e) => setRastro(e.target.checked)} /> Rastro
+        </label>
+        <label className="demo-opcao">
+          <input type="checkbox" checked={camera} onChange={(e) => { ajuste.current = 90; setCamera(e.target.checked) }} /> Câmera
         </label>
         <span className="demo-espaco" />
         <span className="demo-opcao"><span className="demo-amostra" aria-hidden /> Músculo em ação</span>
