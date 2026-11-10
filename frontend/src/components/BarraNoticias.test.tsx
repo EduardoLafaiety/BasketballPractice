@@ -1,5 +1,4 @@
 import { fireEvent, screen, waitFor, within } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { definirToken, type Noticia } from '../api'
 import { NOTICIAS_MUDARAM, tempoAtras } from '../lib/noticias'
@@ -36,7 +35,7 @@ describe('Barra de notícias', () => {
     abrir([noticia({})])
     const barra = await screen.findByRole('region', { name: 'Notícias de basquete' })
 
-    expect(within(barra).getByText('Últimas notícias')).toBeInTheDocument()
+    expect(within(barra).getByText('Breaking news')).toBeInTheDocument()
     const link = within(barra).getByRole('link', { name: 'Curry faz 40 pontos' })
     expect(link).toHaveAttribute('href', 'https://veiculo.example/curry')
     expect(link).toHaveAttribute('target', '_blank')
@@ -49,18 +48,18 @@ describe('Barra de notícias', () => {
     const barra = await screen.findByRole('region', { name: 'Notícias de basquete' })
 
     // A trilha repete as manchetes para o laço: cada uma aparece duas vezes, e a cópia fica fora da árvore acessível.
-    expect(within(barra).getAllByText('Breaking news')).toHaveLength(2)
+    expect(barra.querySelectorAll('.noticias-selo')).toHaveLength(2)
     expect(within(barra).getAllByRole('link')).toHaveLength(1)
     expect(within(barra).getByRole('list').querySelector('.noticias-selo')!.nextElementSibling).toHaveTextContent('LeBron muda de time')
   })
 
-  it('como câmera de reportagem: REC, tempo gravando, "Últimas notícias" e o assunto de cada manchete', async () => {
+  it('como câmera de reportagem: REC, tempo gravando, "Breaking news" e o assunto de cada manchete', async () => {
     abrir([noticia({}), noticia({ id: 3, title: 'Brandon Miller acerta extensão com o Hornets' }), noticia({ id: 4, title: 'NBB 2026/27 é lançado no Rio' })])
     const barra = await screen.findByRole('region', { name: 'Notícias de basquete' })
 
     expect(barra.querySelector('.noticias-visor')).toHaveTextContent(/^Rec$/)
     expect(barra.querySelector('.noticias-tempo')!.textContent).toMatch(/^\d{2}:\d{2}:\d{2}$/)
-    expect(barra.querySelector('.noticias-rotulo')).toHaveTextContent(/^Últimas notícias$/)
+    expect(barra.querySelector('.noticias-rotulo')).toHaveTextContent(/^Breaking news$/)
     expect(within(barra).queryByText(/Atualizado/)).toBeNull()
     const lista = within(barra).getByRole('list')
     expect([...lista.querySelectorAll('.noticias-assunto')].map((e) => e.textContent)).toEqual(['Basquete', 'Mercado', 'NBB'])
@@ -114,15 +113,10 @@ describe('Barra de notícias', () => {
     expect(barra.querySelector('.noticias-flash')).not.toBe(primeiro)
   })
 
-  it('pausa e continua pelo botão', async () => {
-    const user = userEvent.setup()
+  it('não tem botão de pausa', async () => {
     abrir([noticia({})])
     const barra = await screen.findByRole('region', { name: 'Notícias de basquete' })
-
-    await user.click(within(barra).getByRole('button', { name: 'Pausar as notícias' }))
-    expect(barra).toHaveClass('pausada')
-    await user.click(within(barra).getByRole('button', { name: 'Continuar as notícias' }))
-    expect(barra).not.toHaveClass('pausada')
+    expect(within(barra).queryByRole('button')).toBeNull()
   })
 
   it.each([
