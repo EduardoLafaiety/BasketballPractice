@@ -1567,3 +1567,53 @@ select.input:hover:not(:disabled) { border-color: var(--laranja); }
 .conteudo .nba-noticia p { margin-top: 0; color: var(--muted); font-size: 0.85rem; line-height: 1.4; text-transform: none; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 .nba-noticia:hover h3 { color: var(--laranja-texto); }
 .nba-mais { margin-top: 1.25rem; }
+
+/* Artigos */
+/* Texto corrido do artigo: letra normal, sem as maiúsculas miúdas que o resto do conteúdo usa. */
+.artigo-texto, .artigo-texto li, .conteudo .artigo-texto p, .conteudo p.artigo-texto { text-transform: none; font-size: 1rem; font-weight: 400; letter-spacing: 0; }
+.conteudo .artigo-texto cite, .conteudo .artigo-texto .meta { text-transform: none; font-size: 0.82rem; font-weight: 400; letter-spacing: 0; }
+.artigo-categorias { grid-template-columns: repeat(5, minmax(0, 1fr)); margin-top: 2rem; }
+.artigo-categoria { display: grid; gap: 0.3rem; align-content: start; text-align: left; font: inherit; color: var(--texto); cursor: pointer; border-top: 5px solid var(--c); }
+.conteudo .artigo-categoria strong { font-family: var(--fonte-display); font-weight: var(--peso-display); font-size: 1.35rem; letter-spacing: 0.01em; text-transform: uppercase; line-height: 1; overflow-wrap: anywhere; }
+.artigo-categoria.ativo { background: var(--c); color: #111111; }
+.artigo-categoria.ativo .meta { color: #111111; }
+.artigo-contagem { margin-top: 0.4rem; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+.artigo-categoria.ativo .artigo-contagem { color: #111111; }
+.artigo-lista { margin-top: 1rem; }
+.artigo-cartao { display: flex; flex-direction: column; gap: 0.5rem; color: var(--texto); text-decoration: none; border-top: 5px solid var(--c); transition: transform 0.15s; }
+.artigo-cartao:hover { transform: translateY(-2px); }
+.artigo-cartao h3 { margin: 0.2rem 0 0; font-size: 1.2rem; }
+.artigo-cartao p { flex: 1; margin: 0; color: var(--muted); font-size: 0.9rem; line-height: 1.5; }
+.artigo-cartao-rodape { display: flex; align-items: center; gap: 0.6rem; white-space: nowrap; margin-top: 0.4rem; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.artigo-cartao-rodape .icone-svg { margin-left: auto; color: var(--laranja-texto); }
+.artigo-selo { color: var(--texto); }
+.artigo-selo::before { content: "· "; color: var(--muted); }
+.artigo-aviso { margin-top: 2rem; }
+
+.artigo { --largura: 68ch; }
+.artigo-topo, .artigo-corpo { max-width: var(--largura); }
+.artigo-topo { display: grid; gap: 0.6rem; justify-items: start; padding-bottom: 1.5rem; border-bottom: 5px solid var(--c); }
+.artigo-topo .tag { text-decoration: none; }
+.artigo-topo h1 { margin: 0.2rem 0 0; }
+.conteudo .artigo-linha-fina { margin: 0; font-size: 1.15rem; line-height: 1.5; }
+.artigo-corpo h2 { font-size: 1.5rem; margin-top: 2.25rem; }
+.artigo-corpo p { line-height: 1.7; overflow-wrap: anywhere; }
+.artigo-rotulo { display: block; margin-bottom: 0.75rem; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--c); }
+.artigo-ciencia { margin: 2.25rem 0 0; padding: 1.25rem 1.4rem; border-left: 4px solid var(--c); background: var(--superficie); border-radius: 0 var(--raio) var(--raio) 0; }
+.artigo-ciencia ul { display: grid; gap: 1rem; margin: 0; padding: 0; list-style: none; }
+.artigo-ciencia li { line-height: 1.6; }
+.artigo-ciencia cite { display: block; margin-top: 0.3rem; color: var(--muted); font-size: 0.82rem; font-style: normal; }
+.artigo-pratica { margin-top: 1.25rem; }
+.artigo-pratica ul { display: grid; gap: 0.6rem; margin: 0; padding: 0; list-style: none; }
+.artigo-pratica li { display: grid; grid-template-columns: auto 1fr; gap: 0.6rem; align-items: start; line-height: 1.55; }
+.artigo-pratica li .icone-svg { margin-top: 0.15rem; color: var(--c); }
+.artigo-no-app { display: inline-flex; align-items: center; gap: 0.4rem; margin-top: 1.1rem; }
+.artigo-fontes ol { display: grid; gap: 0.5rem; padding-left: 1.2rem; color: var(--muted); font-size: 0.85rem; line-height: 1.5; }
+
+@media (max-width: 1180px) { .artigo-categorias { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 640px) {
+  .artigo-categorias { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .conteudo .artigo-categoria strong { font-size: 1.05rem; }
+  .artigo-categoria { padding: 0.9rem 1rem; }
+  .artigo-categoria .meta { display: none; }
+}
