@@ -1462,44 +1462,74 @@ select.input:hover:not(:disabled) { border-color: var(--laranja); }
 .produto-vitrine { padding: 1.1rem 1rem 0.6rem; }
 .bola-nome { font-family: var(--fonte-display); font-weight: 800; letter-spacing: 0.04em; text-transform: none; }
 
-/* Início: data e hora como placar de ginásio (LED de sete segmentos). */
-.placar-relogio {
+/* Início: data e hora como o shot clock em cima da tabela (LED de sete segmentos). */
+.shot-relogio {
   --led-hora: #ffb21e;
-  --led-seg: #ff3b2f;
+  --led-posse: #ff3b2f;
+  position: relative;
   margin-left: auto;
   display: inline-flex;
   align-items: center;
-  gap: 0.7rem;
-  min-height: 44px;
-  padding: 0.3rem 0.75rem 0.3rem 0.9rem;
-  border-radius: 10px;
-  background: linear-gradient(#1b1b1b, #0c0c0c);
-  box-shadow: inset 0 0 0 1.5px #2c2c2c, inset 0 2px 6px rgba(0, 0, 0, 0.7), 0 4px 12px rgba(0, 0, 0, 0.18);
-  /* Grade fina de pontos, como a tela de um placar. */
-  background-image: radial-gradient(rgba(255, 255, 255, 0.035) 0.6px, transparent 0.7px), linear-gradient(#1b1b1b, #0c0c0c);
+  gap: 0.75rem;
+  min-height: 48px;
+  padding: 0.3rem 0.85rem 0.3rem 0.35rem;
+  border-radius: 12px;
+  overflow: hidden;
+  /* Caixa do aparelho: vidro escuro com grade fina de pontos e borda de metal. */
+  background-image: radial-gradient(rgba(255, 255, 255, 0.035) 0.6px, transparent 0.7px), linear-gradient(#1c1c1c, #0a0a0a);
   background-size: 3px 3px, auto;
+  box-shadow: inset 0 0 0 1.5px #2e2e2e, inset 0 0 0 3px #111, inset 0 2px 8px rgba(0, 0, 0, 0.8), 0 4px 14px rgba(0, 0, 0, 0.2);
 }
-.placar-relogio + .topo-acao { margin-left: 0; }
-.placar-legenda { display: grid; gap: 0.1rem; line-height: 1; text-transform: uppercase; letter-spacing: 0.12em; font-size: 0.6rem; font-weight: 800; color: rgba(255, 178, 30, 0.55); }
-.placar-legenda strong { color: var(--led-hora); font-size: 0.72rem; text-shadow: 0 0 6px rgba(255, 178, 30, 0.45); }
-.placar-hora, .placar-segundos { display: inline-flex; align-items: center; gap: 2px; }
-.led-digito { width: 15px; height: 24px; overflow: visible; }
+/* Buzina: a faixa vermelha no topo do aparelho, que acende quando a posse zera. */
+.shot-relogio::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  height: 3px;
+  background: var(--led-posse);
+  opacity: 0.12;
+  transition: opacity 0.2s;
+}
+.shot-relogio.buzina::before { opacity: 1; box-shadow: 0 0 12px 2px rgba(255, 59, 47, 0.85); }
+.shot-relogio + .topo-acao { margin-left: 0; }
+
+.shot-posse { position: relative; display: grid; place-items: center; width: 42px; height: 42px; flex: none; }
+.shot-anel { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.shot-anel-fundo { fill: none; stroke: rgba(255, 59, 47, 0.12); stroke-width: 3; }
+.shot-anel-tempo {
+  fill: none;
+  stroke: var(--led-posse);
+  stroke-width: 3;
+  stroke-linecap: round;
+  filter: drop-shadow(0 0 2.5px rgba(255, 59, 47, 0.8));
+  transition: stroke-dashoffset 1s linear;
+}
+/* No recomeço da posse o anel volta cheio de uma vez, sem girar para trás. */
+.shot-anel-tempo.reinicio { transition: none; }
+:root[data-movimento='reduzido'] .shot-anel-tempo { transition: none; }
+.shot-posse-num { display: inline-flex; gap: 1px; }
+.shot-posse-num .led-digito { width: 9px; height: 15px; }
+.shot-posse-num .led-digito polygon.aceso { fill: var(--led-posse); filter: drop-shadow(0 0 2px rgba(255, 59, 47, 0.8)); }
+
+.shot-legenda { display: grid; gap: 0.1rem; line-height: 1; text-transform: uppercase; letter-spacing: 0.12em; font-size: 0.6rem; font-weight: 800; color: rgba(255, 178, 30, 0.55); }
+.shot-legenda strong { color: var(--led-hora); font-size: 0.72rem; text-shadow: 0 0 6px rgba(255, 178, 30, 0.45); }
+.shot-hora { display: inline-flex; align-items: center; gap: 2px; }
+.led-digito { width: 16px; height: 26px; overflow: visible; }
 .led-digito polygon { fill: rgba(255, 255, 255, 0.06); }
-.placar-hora .led-digito polygon.aceso { fill: var(--led-hora); filter: drop-shadow(0 0 2.5px rgba(255, 178, 30, 0.75)); }
-.placar-segundos { padding-left: 0.6rem; border-left: 1px solid #2c2c2c; }
-.placar-segundos .led-digito { width: 10px; height: 16px; }
-.placar-segundos .led-digito polygon.aceso { fill: var(--led-seg); filter: drop-shadow(0 0 2px rgba(255, 59, 47, 0.8)); }
-.placar-dois-pontos { display: grid; gap: 6px; margin: 0 3px; }
-.placar-dois-pontos i { width: 3.5px; height: 3.5px; border-radius: 50%; background: var(--led-hora); box-shadow: 0 0 5px rgba(255, 178, 30, 0.8); transition: opacity 0.15s; }
-.placar-dois-pontos.apagado i { opacity: 0.12; box-shadow: none; }
-:root[data-movimento='reduzido'] .placar-dois-pontos.apagado i { opacity: 1; }
+.shot-hora .led-digito polygon.aceso { fill: var(--led-hora); filter: drop-shadow(0 0 2.5px rgba(255, 178, 30, 0.75)); }
+.shot-dois-pontos { display: grid; gap: 6px; margin: 0 3px; }
+.shot-dois-pontos i { width: 3.5px; height: 3.5px; border-radius: 50%; background: var(--led-hora); box-shadow: 0 0 5px rgba(255, 178, 30, 0.8); transition: opacity 0.15s; }
+.shot-dois-pontos.apagado i { opacity: 0.12; box-shadow: none; }
+:root[data-movimento='reduzido'] .shot-dois-pontos.apagado i { opacity: 1; }
 @media (max-width: 860px) {
-  .placar-relogio { min-height: 40px; gap: 0.5rem; padding: 0.25rem 0.6rem; }
-  .placar-legenda { display: none; }
+  .shot-relogio { min-height: 42px; gap: 0.55rem; padding: 0.25rem 0.65rem 0.25rem 0.3rem; }
+  .shot-legenda { display: none; }
+  .shot-posse { width: 36px; height: 36px; }
 }
 @media (max-width: 480px) {
-  .placar-segundos { display: none; }
   .led-digito { width: 11px; height: 18px; }
-  .placar-relogio { padding: 0.25rem 0.5rem; }
+  .shot-posse { width: 32px; height: 32px; }
+  .shot-posse-num .led-digito { width: 7px; height: 12px; }
+  .shot-relogio { padding: 0.2rem 0.5rem 0.2rem 0.25rem; }
   .topo-acao { white-space: nowrap; }
 }
