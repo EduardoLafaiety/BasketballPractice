@@ -92,6 +92,22 @@ body {
 }
 /* Botões e listas não herdam do body por padrão; o que a pessoa digita nos campos fica como foi escrito. */
 button, select, option, ::placeholder { text-transform: capitalize; }
+/*
+ * Padrão do sistema: todo texto do conteúdo em maiúsculas com fonte pequena. O Início fica de fora (tem
+ * composição própria). Com :where() a regra não pesa nada: o que já tem tamanho próprio (títulos de
+ * página, números grandes, botões) continua igual, e só o texto sem estilo cai no padrão.
+ */
+.conteudo { text-transform: uppercase; }
+.conteudo .pagina-inicio { text-transform: capitalize; }
+.conteudo :where(button, select, option):where(:not(.pagina-inicio *)), .conteudo :where(:not(.pagina-inicio *))::placeholder { text-transform: uppercase; }
+.conteudo :where(p, li, dd, dt, td, th, caption, label, legend, figcaption, blockquote, summary, small):where(:not(.pagina-inicio *)) {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  line-height: 1.55;
+}
+/* Títulos de cartão: maiúsculos, um pouco maiores que o texto. */
+.conteudo :where(h3, h4, h5, h6):where(:not(.pagina-inicio *)) { font-size: 0.85rem; font-weight: 800; letter-spacing: 0.06em; line-height: 1.3; }
 .texto-literal { text-transform: none; }
 
 :focus-visible { outline: 2px solid var(--laranja); outline-offset: 2px; }
@@ -551,7 +567,7 @@ p { margin: 0 0 1rem; }
 .form-solto { border-top: 1px solid var(--borda); padding-top: 1.25rem; margin-bottom: 1rem; }
 .form-inline { display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; color: var(--muted); margin: 0.75rem 0; flex-wrap: wrap; }
 .form-inline .input { width: auto; flex: 1; min-width: 200px; }
-.form label.check, .check { display: flex; flex-direction: row; align-items: center; gap: 0.5rem; cursor: pointer; color: var(--texto); font-size: 0.95rem; }
+.form label.check, .check { display: flex; flex-direction: row; align-items: center; gap: 0.5rem; cursor: pointer; color: var(--texto); font-size: 0.7rem; font-weight: 700; letter-spacing: 0.06em; }
 .check input { accent-color: var(--laranja); width: 18px; height: 18px; }
 .fieldset { border: 0; padding: 0; margin: 0; display: grid; gap: 0.4rem; }
 .fieldset legend { font-size: 0.875rem; color: var(--muted); margin-bottom: 0.4rem; }
@@ -812,7 +828,9 @@ section + section, .card + section { margin-top: 1.5rem; }
 /* Largura mínima: com poucas manchetes, a repetição não aparece colada na original */
 .noticias-lista { display: flex; align-items: center; min-width: 100vw; margin: 0; padding: 0; list-style: none; }
 .noticias-item { display: flex; align-items: center; gap: 0.5rem; padding: 0 1.5rem; white-space: nowrap; }
-.noticias-item a { color: inherit; text-decoration: none; font-weight: 600; }
+/* Manchetes no padrão do sistema: maiúsculas com fonte pequena. */
+.noticias-item { text-transform: uppercase; }
+.noticias-item a { color: inherit; text-decoration: none; font-weight: 700; font-size: 0.72rem; letter-spacing: 0.06em; }
 .noticias-item a:hover { color: var(--laranja); text-decoration: underline; }
 .noticias-fonte { color: var(--lateral-muted); font-size: 0.75rem; }
 .noticias-selo {
@@ -890,6 +908,7 @@ section + section, .card + section { margin-top: 1.5rem; }
 .movimento-dica { font-size: 0.9rem; color: var(--muted); border-left: 2px solid var(--c); padding-left: 0.75rem; }
 .movimento-exercicio { display: flex; flex-direction: column; gap: 0.2rem; min-width: 0; padding: 0.9rem 1rem; border-radius: 2px; background: var(--superficie-2); color: var(--texto); text-decoration: none; border: 1px solid transparent; }
 .movimento-exercicio:hover { border-color: var(--texto); }
+.movimento-exercicio strong { font-size: 0.85rem; font-weight: 800; letter-spacing: 0.06em; }
 
 .estilo-plano { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 320px); gap: 1.25rem; align-items: start; }
 .estilo-plano .plano { margin-top: 0; }

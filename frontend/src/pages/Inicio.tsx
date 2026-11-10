@@ -47,7 +47,7 @@ export default function Inicio() {
   const prontoHoje = rotina.carregado && drills.carregado
 
   return (
-    <div className="pagina-larga">
+    <div className="pagina-larga pagina-inicio">
       <AberturaBola
         titulo={
           <h1 className="abertura-titulo">
