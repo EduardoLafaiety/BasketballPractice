@@ -144,7 +144,7 @@ describe('Painel admin: barra de notícias', () => {
     await user.selectOptions(secao.getByLabelText('Fica no ar por'), '6 horas')
     await user.click(secao.getByRole('button', { name: 'Publicar manchete' }))
 
-    expect(await secao.findByText('Breaking news · ESPN · agora')).toBeInTheDocument()
+    expect(await secao.findByText('Urgente · ESPN · agora')).toBeInTheDocument()
     expect(ultima('POST', '/admin/news')?.corpo).toEqual({
       title: 'LeBron muda de time',
       sourceName: 'ESPN',

@@ -43,12 +43,12 @@ describe('Barra de notícias', () => {
     expect(within(barra).getAllByText('Veículo · há 13 h').length).toBeGreaterThan(0)
   })
 
-  it('só a manchete do admin leva o selo de breaking news, e sem link vira texto', async () => {
+  it('só a manchete do admin leva o selo de urgente, e sem link vira texto', async () => {
     abrir([noticia({ id: 2, origin: 'admin', title: 'LeBron muda de time', sourceName: null, url: null }), noticia({})])
     const barra = await screen.findByRole('region', { name: 'Notícias de basquete' })
 
     // A trilha repete as manchetes para o laço: cada uma aparece duas vezes, e a cópia fica fora da árvore acessível.
-    expect(barra.querySelectorAll('.noticias-selo')).toHaveLength(2)
+    expect([...barra.querySelectorAll('.noticias-selo')].map((e) => e.textContent)).toEqual(['Urgente', 'Urgente'])
     expect(within(barra).getAllByRole('link')).toHaveLength(1)
     expect(within(barra).getByRole('list').querySelector('.noticias-selo')!.nextElementSibling).toHaveTextContent('LeBron muda de time')
   })
