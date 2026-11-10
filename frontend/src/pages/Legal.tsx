@@ -1,9 +1,15 @@
-import type { ReactNode } from 'react'
-import { Link } from 'react-router-dom'
+import { useEffect, type ReactNode } from 'react'
+import { Link, useLocation } from 'react-router-dom'
 import Icone from '../components/Icone'
 import { LinksLegais } from '../components/TelaAuth'
 
 function PaginaLegal({ titulo, children }: { titulo: string; children: ReactNode }) {
+  // Links como /privacidade#cookies abrem já na seção (o roteador não rola sozinho até a âncora).
+  const { hash } = useLocation()
+  useEffect(() => {
+    if (hash) document.getElementById(decodeURIComponent(hash.slice(1)))?.scrollIntoView()
+  }, [hash])
+
   return (
     <div className="legal">
       <Link to="/" className="legal-marca">
@@ -39,14 +45,59 @@ export function PoliticaPrivacidade() {
         <li><strong>Pedidos de cadastro:</strong> o nome, o e-mail e o hash da senha ficam à espera da ativação por até 24 horas e são descartados quando um novo cadastro é feito depois desse prazo.</li>
       </ul>
 
-      <h2>O que fica só no seu navegador</h2>
-      <p>O site guarda a sessão de acesso, o tema e os lembretes no próprio navegador.</p>
+      <h2 id="cookies">Cookies e armazenamento no navegador</h2>
+      <p>Cookies e o armazenamento local são pequenos dados que um site guarda no seu navegador. O Basketball Practice usa dois tipos:</p>
+      <ul>
+        <li>
+          <strong>Necessários, sempre ligados:</strong> a sessão de acesso, o tema claro ou escuro, a escolha de animações, o
+          dia do último lembrete, a sua resposta ao aviso de cookies e uma cópia temporária das estatísticas da NBA, apagada
+          ao fechar a aba. Sem eles o site não funciona como deveria. Nenhum é usado para anúncios.
+        </li>
+        <li>
+          <strong>De anúncios personalizados, só com sua permissão:</strong> quando o site passar a exibir anúncios do Google
+          AdSense, o Google e seus parceiros poderão usar cookies para escolher anúncios com base nos seus interesses. Isso só
+          acontece se você tocar em Aceitar no aviso de cookies.
+        </li>
+      </ul>
+      <p>
+        Você pode mudar a escolha a qualquer momento pelo link Preferências de cookies, no rodapé de todas as páginas.
+        Apagar os dados do site no navegador também apaga a escolha, e o aviso aparece de novo.
+      </p>
+
+      <h2 id="anuncios">Anúncios</h2>
+      <p>
+        O site é gratuito e se mantém com anúncios e links de afiliado. [A definir: a data em que os anúncios começam.]
+        Os anúncios são fornecidos pelo Google, que, como fornecedor terceiro, usa cookies para exibi-los com base nas suas
+        visitas a este e a outros sites. Se você recusar, o site pedirá ao Google só anúncios não personalizados. Mesmo
+        esses podem usar cookies para limitar quantas vezes um anúncio aparece, contar visualizações e evitar fraudes.
+      </p>
+      <ul>
+        <li>
+          Como o Google usa os dados dos sites parceiros:{' '}
+          <a className="link" href="https://policies.google.com/technologies/partner-sites" target="_blank" rel="noreferrer">
+            policies.google.com/technologies/partner-sites
+          </a>
+          .
+        </li>
+        <li>
+          Para desativar anúncios personalizados do Google em qualquer site:{' '}
+          <a className="link" href="https://adssettings.google.com" target="_blank" rel="noreferrer">adssettings.google.com</a>.
+        </li>
+      </ul>
+
+      <h2 id="afiliados">Links da Amazon</h2>
+      <p>
+        Como Associado da Amazon, o Basketball Practice ganha com compras qualificadas. Os botões da aba Equipamentos levam
+        à Amazon com um código de afiliado no endereço. Ao abrir a Amazon, você passa a seguir a política de privacidade
+        dela, que pode usar cookies para registrar que a visita veio daqui. Não enviamos seus dados à Amazon e recebemos dela
+        só relatórios de cliques e vendas, sem saber quem comprou.
+      </p>
 
       <h2>Para que usamos</h2>
       <p>Para manter sua conta, mostrar seu histórico e sua evolução, proteger o acesso e enviar os e-mails de ativação e de recuperação de senha. Não há e-mail de propaganda.</p>
 
       <h2>Com quem compartilhamos</h2>
-      <p>[A definir: o provedor de e-mail e a empresa de hospedagem escolhidos, e o país onde os dados ficam.] O conteúdo da barra de notícias é buscado pelo servidor, sem enviar dados seus ao serviço de notícias. Os administradores do site veem nome, e-mail e um resumo de uso de cada conta.</p>
+      <p>[A definir: o provedor de e-mail e a empresa de hospedagem escolhidos, e o país onde os dados ficam.] O conteúdo da barra de notícias é buscado pelo servidor, sem enviar dados seus ao serviço de notícias. Os administradores do site veem nome, e-mail e um resumo de uso de cada conta. Os dados da sua conta e dos seus treinos não são enviados ao Google nem à Amazon.</p>
 
       <h2>Por quanto tempo</h2>
       <p>Os dados ficam enquanto a conta existir. [A definir: prazo de retenção em backups do servidor e o que fazer com contas sem uso.]</p>

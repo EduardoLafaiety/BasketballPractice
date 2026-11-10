@@ -19,6 +19,16 @@ export default defineConfig({
     timezoneId: 'America/Sao_Paulo',
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
+    // Cookies já respondidos: o aviso fixo no pé da tela não cobre os botões que os testes clicam.
+    storageState: {
+      cookies: [],
+      origins: [
+        {
+          origin: `http://localhost:${PORTA_SITE}`,
+          localStorage: [{ name: 'bp.cookies', value: JSON.stringify({ versao: 1, escolha: 'recusado' }) }],
+        },
+      ],
+    },
   },
   projects: [{ name: 'chrome', use: { ...devices['Desktop Chrome'], channel: 'chrome' } }],
   webServer: [
