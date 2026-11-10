@@ -98,6 +98,12 @@ describe('Estatísticas da NBA', () => {
     expect(cartoes[0]).toHaveTextContent('CBS Sports · há 30 min')
     expect(within(secao).queryByText(/promo code/i)).toBeNull()
     expect(within(secao).queryByRole('button')).toBeNull()
+    // Escudos dos times citados: "76ers" (no resumo) e Celtics; sem time citado, sem escudos.
+    const escudos = (c: HTMLElement) => [...c.querySelectorAll('.nba-noticia-times img.nba-escudo-claro')].map((i) => i.getAttribute('src')?.match(/\/(\w+)\.png/)?.[1])
+    expect(escudos(cartoes[1])).toEqual(['bos', 'phi'])
+    expect(cartoes[1].querySelector('.nba-noticia-times')).toHaveAttribute('title', 'Boston Celtics, Filadélfia 76ers')
+    expect(escudos(cartoes[2])).toEqual(['sa'])
+    expect(cartoes[0].querySelector('.nba-noticia-times')).toBeNull()
   })
 
   it('com muitas notícias do dia, mostra 12 e as outras entram conforme a página rola, até acabar', async () => {
