@@ -1,6 +1,7 @@
 // Líderes da temporada da NBA, por categoria, lidos da API pública da ESPN (aceita chamada direto do
-// navegador, então funciona também na demonstração sem servidor). Guardados por 15 minutos no
-// aparelho para não buscar de novo a cada página.
+// navegador, então funciona também na demonstração sem servidor). Guardados por 15 minutos.
+
+import { comValidade } from './cache'
 
 export const URL_LIDERES = 'https://site.api.espn.com/apis/site/v3/sports/basketball/nba/leaders'
 const VALIDADE_MS = 15 * 60_000
@@ -79,22 +80,8 @@ export function lerLideres(json: unknown): Lideres {
 /** "39,3": uma casa decimal, com vírgula. */
 export const numero = (v: number) => v.toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 })
 
-let emMemoria: { quando: number; dados: Lideres } | null = null
-
-function guardado(): { quando: number; dados: Lideres } | null {
-  if (emMemoria) return emMemoria
-  try {
-    const salvo = sessionStorage.getItem(CHAVE)
-    return salvo ? JSON.parse(salvo) : null
-  } catch {
-    return null
-  }
-}
-
 /** Líderes da temporada; usa o que já foi buscado nos últimos 15 minutos. */
-export async function buscarLideres(agora = Date.now()): Promise<Lideres> {
-  const antes = guardado()
-  if (antes && agora - antes.quando < VALIDADE_MS) return antes.dados
+export const buscarLideres = comValidade(CHAVE, VALIDADE_MS, async () => {
   const falhou = new Error('Não foi possível carregar as estatísticas da NBA agora.')
   const resposta = await fetch(URL_LIDERES).catch(() => {
     throw falhou
@@ -102,21 +89,8 @@ export async function buscarLideres(agora = Date.now()): Promise<Lideres> {
   if (!resposta.ok) throw falhou
   const dados = lerLideres(await resposta.json())
   if (!dados.categorias.length) throw new Error('As estatísticas da NBA vieram vazias. Tente de novo mais tarde.')
-  emMemoria = { quando: agora, dados }
-  try {
-    sessionStorage.setItem(CHAVE, JSON.stringify(emMemoria))
-  } catch {
-    // sem armazenamento: fica só na memória
-  }
   return dados
-}
+})
 
 /** Para os testes: esquece o que foi guardado. */
-export function esquecerLideres() {
-  emMemoria = null
-  try {
-    sessionStorage.removeItem(CHAVE)
-  } catch {
-    // nada guardado
-  }
-}
+export const esquecerLideres = () => buscarLideres.esquecer()
