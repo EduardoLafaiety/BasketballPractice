@@ -1,8 +1,9 @@
 // Peças animadas pela rolagem: a bola da abertura, o boneco comandado pela rolagem e os nomes que correm.
 import { forwardRef, useEffect, useMemo, useRef, useState, type ReactNode, type RefObject } from 'react'
 import { COREOGRAFIAS } from '../demonstracoes/coreografias'
-import { PARTES, pintar, posicionar } from '../demonstracoes/desenho'
-import { CHAO, instante, preparar, RAIO_BOLA } from '../demonstracoes/motor'
+import { Atleta, Bola, novaBola, novoAtleta } from '../demonstracoes/Atleta'
+import { pintar, posicionar } from '../demonstracoes/desenho'
+import { CHAO, instante, preparar } from '../demonstracoes/motor'
 
 const movimentoReduzido = () => !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
 const limite = (x: number) => Math.max(0, Math.min(1, x))
@@ -43,17 +44,17 @@ export interface FiguraApi {
 export function Figura({ nome, viewBox = '0 0 680 330', className, apiRef }: { nome: string; viewBox?: string; className?: string; apiRef?: React.MutableRefObject<FiguraApi | null> }) {
   const coreografia = COREOGRAFIAS[nome]
   const anim = useMemo(() => preparar(coreografia), [coreografia])
-  const partes = useRef<Record<string, SVGPathElement | null>>({})
-  const bola = useRef<SVGCircleElement>(null)
-  const bola2 = useRef<SVGCircleElement>(null)
+  const atleta = useRef(novoAtleta())
+  const bola = useRef(novaBola())
+  const bola2 = useRef(novaBola())
   const svg = useRef<SVGSVGElement>(null)
 
   useEffect(() => {
     const desenhar = (t: number) => {
       const agora = instante(anim, Math.max(0, Math.min(anim.total, t)))
-      pintar(anim, agora, partes.current)
-      posicionar(bola.current, agora.bola)
-      posicionar(bola2.current, agora.bola2)
+      pintar(anim, agora, atleta.current.partes)
+      posicionar(bola.current, agora.bola, agora.solo)
+      posicionar(bola2.current, agora.bola2, agora.solo)
       return agora.fase
     }
     desenhar(anim.total * 0.3)
@@ -98,13 +99,9 @@ export function Figura({ nome, viewBox = '0 0 680 330', className, apiRef }: { n
         </>
       )}
       {cena.cones?.map((c, i) => <path key={i} d={`M${c.x - 8} ${CHAO}L${c.x} ${CHAO - 20}L${c.x + 8} ${CHAO}Z`} className="demo-cone" />)}
-      <g className="demo-corpo">
-        {PARTES.map((p) => (
-          <path key={p.id} ref={(el) => { partes.current[p.id] = el }} className={`demo-${anim.frente ? 'perto' : p.lado}`} />
-        ))}
-      </g>
-      <circle ref={bola} r={RAIO_BOLA} className="demo-bola" />
-      <circle ref={bola2} r={RAIO_BOLA} className="demo-bola" />
+      <Atleta els={atleta} frente={anim.frente} />
+      <Bola els={bola} />
+      <Bola els={bola2} />
     </svg>
   )
 }
