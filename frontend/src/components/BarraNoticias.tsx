@@ -80,7 +80,6 @@ export default function BarraNoticias() {
   const { pathname } = useLocation()
   const [noticias, setNoticias] = useState<Noticia[]>([])
   const [lideres, setLideres] = useState<Lideres | null>(null)
-  const [pausada, setPausada] = useState(false)
   // Cada flash é um elemento novo (pela key), para a animação rodar de novo.
   const [flash, setFlash] = useState(0)
   const janela = useRef<HTMLDivElement>(null)
@@ -128,7 +127,7 @@ export default function BarraNoticias() {
   }
 
   return (
-    <section className={`noticias${pausada ? ' pausada' : ''}`} aria-label="Notícias de basquete">
+    <section className="noticias" aria-label="Notícias de basquete">
       {/* Como o visor de uma câmera de reportagem: cantos do enquadramento, REC e o tempo gravando. */}
       <div className="noticias-marca" aria-hidden>
         <span className="noticias-visor">
@@ -137,7 +136,7 @@ export default function BarraNoticias() {
           Rec
         </span>
         <Gravacao />
-        <span className="noticias-rotulo">Últimas notícias</span>
+        <span className="noticias-rotulo">Breaking news</span>
       </div>
       {/* O flash do fotógrafo: a cada volta da faixa e quando chega notícia nova. */}
       {flash > 0 && <span key={flash} className="noticias-flash" aria-hidden />}
@@ -151,14 +150,6 @@ export default function BarraNoticias() {
           <Itens noticias={noticias} destaques={destaques} copia />
         </div>
       </div>
-      <button
-        className="botao-icone noticias-pausa"
-        onClick={() => setPausada((p) => !p)}
-        aria-label={pausada ? 'Continuar as notícias' : 'Pausar as notícias'}
-        title={pausada ? 'Continuar' : 'Pausar'}
-      >
-        <Icone nome={pausada ? 'play' : 'pausa'} tamanho={16} />
-      </button>
     </section>
   )
 }

@@ -847,9 +847,8 @@ section + section, .card + section { margin-top: 1.5rem; }
 .noticias-item::before { content: ''; width: 6px; height: 6px; margin-right: 0.9rem; border-radius: 50%; background: var(--laranja); }
 .noticias-janela { flex: 1; min-width: 0; overflow: hidden; }
 .noticias-trilha { display: flex; width: max-content; animation: noticias-correr var(--duracao, 60s) linear infinite; }
-.noticias-janela:hover .noticias-trilha,
-.noticias-janela:focus-within .noticias-trilha,
-.noticias.pausada .noticias-trilha { animation-play-state: paused; }
+/* Só o foco do teclado segura a faixa, para o link não fugir de quem navega com Tab; o mouse não trava. */
+.noticias-janela:has(:focus-visible) .noticias-trilha { animation-play-state: paused; }
 @keyframes noticias-correr { to { transform: translateX(-50%); } }
 /* Largura mínima: com poucas manchetes, a repetição não aparece colada na original */
 .noticias-lista { display: flex; align-items: center; min-width: 100vw; margin: 0; padding: 0; list-style: none; }
@@ -869,7 +868,6 @@ section + section, .card + section { margin-top: 1.5rem; }
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
-.noticias-pausa { width: 36px; height: 36px; }
 @media (max-width: 860px) {
 }
 @media (max-width: 560px) {
@@ -881,7 +879,7 @@ section + section, .card + section { margin-top: 1.5rem; }
 /* Sem animação: a faixa fica parada e rola com o dedo ou o mouse */
 :root[data-movimento='reduzido'] .noticias-janela { overflow-x: auto; }
 :root[data-movimento='reduzido'] .noticias-trilha { animation: none; }
-:root[data-movimento='reduzido'] .noticias-lista[aria-hidden='true'], :root[data-movimento='reduzido'] .noticias-pausa { display: none; }
+:root[data-movimento='reduzido'] .noticias-lista[aria-hidden='true'] { display: none; }
 :root[data-movimento='reduzido'] .noticias-lista { min-width: 0; }
 
 /* Ícones em linha de texto */
