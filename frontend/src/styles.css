@@ -777,20 +777,46 @@ section + section, .card + section { margin-top: 1.5rem; }
   background: linear-gradient(90deg, #1f1f1f, #2a2a2a);
   clip-path: polygon(0 0, 100% 0, calc(100% - 14px) 100%, 0 100%);
 }
-.noticias-vivo {
+/* Visor da câmera: os quatro cantos do enquadramento desenhados com bordas em L. */
+.noticias-visor {
+  --canto: linear-gradient(#ffffff, #ffffff);
   display: inline-flex;
   align-items: center;
-  gap: 0.35rem;
-  padding: 0.2rem 0.5rem;
-  border-radius: 3px;
-  background: #c8102e;
+  gap: 0.4rem;
+  padding: 0.3rem 0.55rem;
+  background:
+    var(--canto) top left / 7px 1.5px, var(--canto) top left / 1.5px 7px,
+    var(--canto) top right / 7px 1.5px, var(--canto) top right / 1.5px 7px,
+    var(--canto) bottom left / 7px 1.5px, var(--canto) bottom left / 1.5px 7px,
+    var(--canto) bottom right / 7px 1.5px, var(--canto) bottom right / 1.5px 7px;
+  background-repeat: no-repeat;
+  color: #f25f5c;
   font-weight: 800;
   font-size: 0.66rem;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
 }
-.noticias-vivo i { width: 7px; height: 7px; border-radius: 50%; background: #ffffff; animation: noticias-pulsar 1.4s ease-in-out infinite; }
-@keyframes noticias-pulsar { 50% { opacity: 0.25; transform: scale(0.7); } }
+.noticias-visor .icone-svg { color: #ffffff; }
+.noticias-rec-ponto { width: 8px; height: 8px; border-radius: 50%; background: #f25f5c; animation: noticias-rec 1s steps(1) infinite; }
+@keyframes noticias-rec { 50% { opacity: 0.15; } }
+.noticias-tempo {
+  color: var(--lateral-muted);
+  font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace;
+  font-size: 0.72rem;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+}
+/* O flash do fotógrafo: um clarão branco rápido sobre a faixa inteira. */
+.noticias-flash {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: #ffffff;
+  opacity: 0;
+  pointer-events: none;
+  animation: noticias-flash 0.6s ease-out;
+}
+@keyframes noticias-flash { 8% { opacity: 0.75; } 100% { opacity: 0; } }
 .noticias-rotulo {
   color: var(--laranja);
   font-weight: 800;
@@ -847,10 +873,11 @@ section + section, .card + section { margin-top: 1.5rem; }
 @media (max-width: 860px) {
 }
 @media (max-width: 560px) {
-  .noticias-rotulo { display: none; }
+  .noticias-rotulo, .noticias-tempo { display: none; }
   .noticias-marca { padding-right: 1.1rem; }
 }
-:root[data-movimento='reduzido'] .noticias-vivo i { animation: none; }
+:root[data-movimento='reduzido'] .noticias-rec-ponto { animation: none; }
+:root[data-movimento='reduzido'] .noticias-flash { display: none; }
 /* Sem animação: a faixa fica parada e rola com o dedo ou o mouse */
 :root[data-movimento='reduzido'] .noticias-janela { overflow-x: auto; }
 :root[data-movimento='reduzido'] .noticias-trilha { animation: none; }
