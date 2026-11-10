@@ -11,6 +11,7 @@ import EstiloDetalhe from './pages/EstiloDetalhe'
 import Rotina from './pages/Rotina'
 import Alimentacao from './pages/Alimentacao'
 import Equipamentos from './pages/Equipamentos'
+import Artigos, { ArtigoDetalhe } from './pages/Artigos'
 import Desempenho from './pages/Desempenho'
 import Metas from './pages/Metas'
 import Ferramentas from './pages/Ferramentas'
@@ -52,6 +53,8 @@ export default function App() {
         <Route path="rotina" element={<Rotina />} />
         <Route path="alimentacao" element={<Alimentacao />} />
         <Route path="equipamentos" element={<Equipamentos />} />
+        <Route path="artigos" element={<Artigos />} />
+        <Route path="artigos/:id" element={<ArtigoDetalhe />} />
         <Route path="desempenho" element={<Desempenho />} />
         <Route path="metas" element={<Metas />} />
         <Route path="ferramentas" element={<Ferramentas />} />
