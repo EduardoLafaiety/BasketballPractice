@@ -16,6 +16,7 @@ const LINKS: { to: string; rotulo: string; fim?: boolean }[] = [
   { to: '/', rotulo: 'Início', fim: true },
   { to: '/treinos', rotulo: 'Treinos' },
   { to: '/jogue-como', rotulo: 'Jogue como' },
+  { to: '/nba', rotulo: 'Estatísticas da NBA' },
   { to: '/rotina', rotulo: 'Rotina' },
   { to: '/alimentacao', rotulo: 'Alimentação' },
   { to: '/equipamentos', rotulo: 'Equipamentos' },

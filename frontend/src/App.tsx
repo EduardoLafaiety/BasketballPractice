@@ -6,6 +6,7 @@ import Entrar from './pages/Entrar'
 import Treinos from './pages/Treinos'
 import TreinoDetalhe from './pages/TreinoDetalhe'
 import JogueComo from './pages/JogueComo'
+import EstatisticasNba from './nba/EstatisticasNba'
 import EstiloDetalhe from './pages/EstiloDetalhe'
 import Rotina from './pages/Rotina'
 import Alimentacao from './pages/Alimentacao'
@@ -47,6 +48,7 @@ export default function App() {
         <Route path="sessao" element={<SessaoGuiada />} />
         <Route path="jogue-como" element={<JogueComo />} />
         <Route path="jogue-como/:id" element={<EstiloDetalhe />} />
+        <Route path="nba" element={<EstatisticasNba />} />
         <Route path="rotina" element={<Rotina />} />
         <Route path="alimentacao" element={<Alimentacao />} />
         <Route path="equipamentos" element={<Equipamentos />} />

@@ -1,10 +1,16 @@
 import { screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { definirToken, type Noticia } from '../api'
 import { NOTICIAS_MUDARAM, tempoAtras } from '../lib/noticias'
 import { apiFalsa, configFalsa, Resposta, usuarioFalso } from '../test/api-falsa'
 import { abrirApp } from '../test/renderizar'
+import { respostaEspn } from '../nba/exemplo-espn'
+import { buscarLideres, lerLideres } from '../nba/lideres'
+
+// As estatísticas da NBA vêm da ESPN: aqui a busca é simulada (por padrão, falha e a barra fica só com as notícias).
+vi.mock('../nba/lideres', async (original) => ({ ...(await original<typeof import('../nba/lideres')>()), buscarLideres: vi.fn() }))
+beforeEach(() => vi.mocked(buscarLideres).mockRejectedValue(new Error('sem rede')))
 
 const noticia = (extra: Partial<Noticia>): Noticia => ({
   id: 1,
@@ -56,6 +62,25 @@ describe('Barra de notícias', () => {
     expect(within(barra).queryByText(/Atualizado/)).toBeNull()
     const lista = within(barra).getByRole('list')
     expect([...lista.querySelectorAll('.noticias-assunto')].map((e) => e.textContent)).toEqual(['Basquete', 'Mercado', 'NBB'])
+  })
+
+  it('o líder de cada estatística da NBA entra na faixa e leva à página de estatísticas', async () => {
+    vi.mocked(buscarLideres).mockResolvedValue(lerLideres(respostaEspn))
+    abrir([noticia({})])
+    const barra = await screen.findByRole('region', { name: 'Notícias de basquete' })
+
+    const pontos = await within(barra).findByRole('link', { name: 'Líder em pontos: Luka Doncic (LAL)' })
+    expect(pontos).toHaveAttribute('href', '/nba')
+    expect(pontos.previousElementSibling).toHaveTextContent('Stats')
+    expect(pontos.nextElementSibling).toHaveTextContent('39,3 por jogo')
+    expect(within(barra).getByRole('link', { name: 'Líder em rebotes: Domantas Sabonis (SAC)' })).toBeInTheDocument()
+  })
+
+  it('sem notícias, a faixa aparece só com as estatísticas', async () => {
+    vi.mocked(buscarLideres).mockResolvedValue(lerLideres(respostaEspn))
+    abrir([])
+    const barra = await screen.findByRole('region', { name: 'Notícias de basquete' })
+    expect(within(barra).getAllByRole('link').map((l) => l.textContent)).toEqual(['Líder em pontos: Luka Doncic (LAL)', 'Líder em rebotes: Domantas Sabonis (SAC)'])
   })
 
   it('a cópia da trilha não recebe foco do teclado', async () => {
