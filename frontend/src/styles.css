@@ -1617,3 +1617,22 @@ select.input:hover:not(:disabled) { border-color: var(--laranja); }
   .artigo-categoria { padding: 0.9rem 1rem; }
   .artigo-categoria .meta { display: none; }
 }
+
+/* Chamada dos artigos no Início, no mesmo molde da chamada da Alimentação */
+.artigos-chamada { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: 2rem clamp(2rem, 6vw, 6rem); align-items: center; padding: clamp(3rem, 8vh, 5rem) clamp(1.25rem, 5vw, 5rem); }
+.conteudo .artigos-chamada h2 { margin: 0.5rem 0 0.75rem; font-size: clamp(2rem, 4vw, 3.2rem); }
+.artigos-chamada-texto .muted { max-width: 30em; margin-bottom: 1.2rem; }
+.artigos-chamada-categorias { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 1.4rem; }
+.artigos-chamada-categoria { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.35rem 0.8rem; border: 1px solid var(--borda); border-radius: 999px; background: var(--superficie); color: var(--texto); font-size: 0.72rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; text-decoration: none; }
+.artigos-chamada-categoria::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--c); }
+.artigos-chamada-categoria:hover { border-color: var(--c); }
+.artigos-chamada-lista { display: grid; gap: 0.6rem; }
+.artigos-chamada-artigo { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 1rem; padding: 0.9rem 1.2rem; background: var(--superficie); border: 1px solid var(--borda); border-left: 4px solid var(--c); border-radius: var(--raio); color: var(--texto); text-decoration: none; }
+.artigos-chamada-artigo:hover { border-color: var(--c); }
+.artigos-chamada-artigo > .icone-svg { color: var(--muted); }
+.artigos-chamada-artigo:hover > .icone-svg { color: var(--c); }
+.artigos-chamada-nome { display: grid; gap: 0.25rem; }
+.artigos-chamada-nome strong { font-size: 1.05rem; }
+/* A bolinha da etiqueta usa a cor da categoria, que vem do cartão. */
+.artigo-cartao .tag, .artigo-topo .tag, .artigos-chamada-artigo .tag { --c: inherit; }
+@media (max-width: 800px) { .artigos-chamada { grid-template-columns: 1fr; } }

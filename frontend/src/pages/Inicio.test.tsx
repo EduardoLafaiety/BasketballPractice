@@ -124,6 +124,15 @@ describe('Início', () => {
     expect(screen.getByRole('heading', { name: 'Ter' }).closest('article')).toHaveTextContent('Descanso')
   })
 
+  it('chama para os artigos com as categorias e alguns em destaque', async () => {
+    abrirInicio()
+    const secao = (await screen.findByRole('heading', { name: 'Entenda o jogo' })).closest('section') as HTMLElement
+    expect(within(secao).getByRole('link', { name: 'Ver todos os artigos' })).toHaveAttribute('href', '/artigos')
+    expect(within(secao).getByRole('link', { name: 'Sono' })).toHaveAttribute('href', '/artigos?categoria=sono')
+    expect(within(secao).getByRole('link', { name: /Dormir mais acerta mais arremessos/ })).toHaveAttribute('href', '/artigos/sono-e-arremesso')
+    expect(within(secao).getAllByRole('link', { name: /min de leitura/ })).toHaveLength(4)
+  })
+
   it('sem resposta dos jogadores, o resto da página continua', async () => {
     abrirInicio({ 'GET /styles': new Resposta(500) })
     expect(await screen.findByRole('heading', { name: 'Treino de hoje' })).toBeInTheDocument()

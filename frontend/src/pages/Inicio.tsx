@@ -2,6 +2,7 @@ import { useEffect, useState, type CSSProperties } from 'react'
 import { Link } from 'react-router-dom'
 import { COR, POSICOES, REFEICOES } from '../alimentacao/dados'
 import IconeRefeicao from '../alimentacao/icones'
+import { ARTIGOS, CATEGORIAS, categoria, minutosDeLeitura } from '../artigos/dados'
 import { api } from '../api'
 import { AvisoDesatualizado, Carregando, ErroCarga } from '../components/Estado'
 import GradeJogadores from '../components/GradeJogadores'
@@ -17,6 +18,8 @@ const FIGURA_DO_NIVEL: Record<Nivel, string> = {
   avancado: 'Finger roll',
 }
 const ORDEM_SEMANA: DiaSemana[] = [1, 2, 3, 4, 5, 6, 0]
+// Um artigo de cada assunto que mais conversa com quem treina.
+const ARTIGOS_EM_DESTAQUE = ['sono-e-arremesso', 'treino-deliberado', 'salto-vertical', 'cesto-de-pessego'].map((id) => ARTIGOS.find((a) => a.id === id)!)
 const FERRAMENTAS: { to: string; titulo: string; texto: string }[] = [
   { to: '/gerador', titulo: 'Gerador de treino', texto: 'Diga o tempo, o nível e o foco: a sessão começa pelo aquecimento e vai do mais fácil ao mais difícil.' },
   { to: '/ferramentas', titulo: 'Ferramentas de quadra', texto: 'Cronômetro, metrônomo, contador ao vivo, calculadoras e testes físicos.' },
@@ -195,6 +198,37 @@ export default function Inicio() {
             rotulo="aproveitamento nos arremessos"
             destaque
           />
+        </div>
+      </section>
+
+      <section className="faixa-clara artigos-chamada" aria-labelledby="artigos-chamada-titulo">
+        <div className="artigos-chamada-texto">
+          <span className="rotulo-forte">Artigos</span>
+          <h2 id="artigos-chamada-titulo">Entenda o jogo</h2>
+          <p className="muted">Leituras curtas sobre história, mentalidade, condicionamento, sono e recuperação, com o estudo por trás de cada ideia.</p>
+          <div className="artigos-chamada-categorias">
+            {CATEGORIAS.map((c) => (
+              <Link key={c.id} to={`/artigos?categoria=${c.id}`} className="artigos-chamada-categoria" style={{ '--c': c.cor } as CSSProperties}>
+                {c.nome}
+              </Link>
+            ))}
+          </div>
+          <Link to="/artigos" className="link-forte">Ver todos os artigos</Link>
+        </div>
+        <div className="artigos-chamada-lista">
+          {ARTIGOS_EM_DESTAQUE.map((a) => {
+            const cat = categoria(a.categoria)
+            return (
+              <Link key={a.id} to={`/artigos/${a.id}`} className="artigos-chamada-artigo" style={{ '--c': cat.cor } as CSSProperties}>
+                <span className="artigos-chamada-nome">
+                  <span className="tag">{cat.nome}</span>
+                  <strong>{a.titulo}</strong>
+                  <span className="meta">{minutosDeLeitura(a)} min de leitura</span>
+                </span>
+                <Icone nome="seta" />
+              </Link>
+            )
+          })}
         </div>
       </section>
 
