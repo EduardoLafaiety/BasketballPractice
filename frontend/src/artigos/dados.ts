@@ -150,6 +150,71 @@ export const ARTIGOS: Artigo[] = [
       'Naismith Memorial Basketball Hall of Fame, perfis de Oscar Schmidt e Hortência Marcari.',
     ],
   },
+  {
+    id: 'dream-team',
+    categoria: 'historia',
+    titulo: 'O Dream Team e o basquete sem fronteiras',
+    resumo: 'Em 1992 os astros da NBA foram à Olimpíada pela primeira vez. Uma geração do mundo inteiro cresceu assistindo.',
+    secoes: [
+      {
+        titulo: 'Profissionais nos Jogos',
+        paragrafos: [
+          'Até 1989, jogadores da NBA não podiam disputar os Jogos Olímpicos. Naquele ano a FIBA liberou os profissionais, e em Barcelona, em 1992, os Estados Unidos levaram Michael Jordan, Magic Johnson, Larry Bird, Charles Barkley, Scottie Pippen e outros astros.',
+          'O time venceu os 8 jogos por uma média de mais de 40 pontos e virou um fenômeno mundial. Adversários pediam fotos com eles antes de a bola subir.',
+        ],
+      },
+      {
+        titulo: 'A geração que veio depois',
+        paragrafos: [
+          'Os garotos que viram aquele time pela TV viraram a geração de Dirk Nowitzki, Pau Gasol, Manu Ginóbili e Tony Parker. Em 2004, em Atenas, a Argentina de Ginóbili eliminou os Estados Unidos na semifinal e ficou com o ouro olímpico.',
+          'Hoje a NBA é global: de 2019 a 2025, todos os eleitos melhor jogador da temporada (MVP) nasceram fora dos Estados Unidos, como Giannis Antetokounmpo, Nikola Jokić, Joel Embiid e Shai Gilgeous-Alexander.',
+        ],
+      },
+    ],
+    pratica: [
+      'Assista a jogos de outras escolas: a Europa valoriza muito o passe e o jogo sem bola.',
+      'Jokić mostra que leitura de jogo e passe compensam falta de velocidade e de salto.',
+    ],
+    ciencia: [],
+    fontes: [
+      'FIBA, história da liberação dos jogadores profissionais (1989) e resultados olímpicos.',
+      'Naismith Memorial Basketball Hall of Fame, Dream Team de 1992 (homenageado em 2010).',
+      'NBA, lista de vencedores do prêmio de MVP.',
+    ],
+    noApp: { to: '/jogue-como', rotulo: 'Jogar como um astro' },
+  },
+  {
+    id: 'brasileiros-na-nba',
+    categoria: 'historia',
+    titulo: 'Os brasileiros na NBA',
+    resumo: 'De Oscar, que recusou a liga para defender a seleção, aos campeões Splitter e Leandrinho.',
+    secoes: [
+      {
+        titulo: 'O "não" de Oscar',
+        paragrafos: [
+          'Em 1984, Oscar Schmidt foi escolhido no draft pelo New Jersey Nets. Naquela época, quem jogava na NBA não podia defender a seleção, e Oscar preferiu continuar jogando pelo Brasil.',
+          'O primeiro brasileiro a entrar em quadra na liga foi o pivô Rolando Ferreira, pelo Portland Trail Blazers, na temporada 1988-89.',
+        ],
+      },
+      {
+        titulo: 'A geração dos anos 2000',
+        paragrafos: [
+          'Nenê foi a 7ª escolha do draft de 2002 e jogou mais de uma década na liga. Anderson Varejão virou ídolo no Cleveland Cavaliers, e Leandrinho foi eleito o melhor sexto homem da temporada 2006-07 pelo Phoenix Suns.',
+          'Em 2014, Tiago Splitter foi campeão com o San Antonio Spurs, o primeiro brasileiro campeão da NBA. No ano seguinte, Leandrinho ganhou o título com o Golden State Warriors.',
+        ],
+      },
+    ],
+    pratica: [
+      'Leandrinho fez carreira com o primeiro passo rápido: velocidade se treina com tiros curtos e mudança de ritmo.',
+      'Splitter e Varejão ganharam espaço fazendo o trabalho que pouca gente quer, como corta-luz, rebote e defesa.',
+    ],
+    ciencia: [],
+    fontes: [
+      'NBA, histórico do draft e dos prêmios de temporada.',
+      'Basketball-Reference, carreiras de Rolando Ferreira, Nenê, Anderson Varejão, Leandro Barbosa e Tiago Splitter.',
+      'Confederação Brasileira de Basketball (CBB), histórico de Oscar Schmidt na seleção.',
+    ],
+  },
 
   // Mentalidade
   {
@@ -270,6 +335,90 @@ export const ARTIGOS: Artigo[] = [
     ],
     noApp: { to: '/ferramentas', rotulo: 'Abrir o contador de arremessos' },
   },
+  {
+    id: 'metas-de-processo',
+    categoria: 'mentalidade',
+    titulo: 'Metas de processo, não só de resultado',
+    resumo: 'Ganhar o jogo não depende só de você. Dobrar os joelhos em todo arremesso, sim.',
+    secoes: [
+      {
+        titulo: 'Três tipos de meta',
+        paragrafos: [
+          'Meta de resultado é ganhar o campeonato. Meta de desempenho é acertar 75% dos lances livres. Meta de processo é o que você faz em cada jogada: cotovelo alinhado, pés firmes, olhar no aro.',
+          'O resultado depende do adversário, do juiz e da sorte. O processo depende só de você, e é ele que, repetido, leva ao desempenho e ao resultado.',
+        ],
+      },
+      {
+        titulo: 'Metas que funcionam',
+        paragrafos: [
+          'Décadas de pesquisa sobre metas mostram que objetivos específicos e desafiadores levam a mais desempenho do que um vago "dar o meu melhor". No esporte, um estudo com golfistas viu que quem usava metas de processo ganhou mais confiança e controlou melhor a ansiedade.',
+          'Na prática, use as três juntas: o resultado dá a direção, o desempenho mede o caminho e o processo é o que você controla hoje.',
+        ],
+      },
+    ],
+    pratica: [
+      'Para cada meta de resultado, escreva duas metas de processo que dependem só de você.',
+      'Durante o jogo, pense no processo da próxima jogada, não no placar.',
+      'No fim do treino, avalie o processo: "fiz o que combinei?", e não só o número de acertos.',
+    ],
+    ciencia: [
+      {
+        achado: 'Metas específicas e difíceis levaram a melhor desempenho do que metas vagas como "dar o melhor".',
+        fonte: 'Locke EA, Latham GP. American Psychologist, 2002.',
+      },
+      {
+        achado: 'Golfistas com metas de processo melhoraram a autoconfiança e o controle da ansiedade.',
+        fonte: 'Kingston KM, Hardy L. The Sport Psychologist, 1997.',
+      },
+    ],
+    fontes: [
+      'Locke EA, Latham GP. Building a practically useful theory of goal setting and task motivation: a 35-year odyssey. American Psychologist, 2002.',
+      'Kingston KM, Hardy L. Effects of different types of goal setting on processes that support performance. The Sport Psychologist, 1997.',
+    ],
+    noApp: { to: '/metas', rotulo: 'Criar uma meta' },
+  },
+  {
+    id: 'olhar-quieto',
+    categoria: 'mentalidade',
+    titulo: 'O olhar quieto do bom arremessador',
+    resumo: 'Os melhores fixam o olhar no aro por mais tempo antes de soltar a bola. E isso se treina.',
+    secoes: [
+      {
+        titulo: 'Onde o olho para',
+        paragrafos: [
+          'A pesquisadora Joan Vickers filmou o olhar de jogadores durante o lance livre. Os arremessadores mais precisos fixavam o olhar num ponto do aro por mais tempo, e de forma mais estável, antes e durante o início do movimento. Ela chamou isso de olhar quieto.',
+          'Os menos precisos mexiam mais os olhos e fixavam o alvo por menos tempo, muitas vezes já com o braço subindo.',
+        ],
+      },
+      {
+        titulo: 'Dá para treinar',
+        paragrafos: [
+          'Num estudo seguinte, um time universitário treinou o olhar quieto junto com a rotina de lance livre e melhorou o aproveitamento nos jogos em comparação com as temporadas anteriores.',
+          'O treino é simples: escolha um ponto do aro, como os ganchos da frente, chegue nele com os olhos antes de começar o movimento e não tire mais o olhar até a bola sair da mão.',
+        ],
+      },
+    ],
+    pratica: [
+      'Escolha sempre o mesmo ponto do aro para mirar.',
+      'Olhos no alvo antes de o braço começar a subir, e parados lá até a bola sair.',
+      'Coloque o olhar quieto dentro da sua rotina de lance livre.',
+    ],
+    ciencia: [
+      {
+        achado: 'No lance livre, os arremessadores de elite tiveram uma fixação final no alvo mais longa do que os de menor precisão.',
+        fonte: 'Vickers JN. Journal of Experimental Psychology: Human Perception and Performance, 1996.',
+      },
+      {
+        achado: 'O treino do olhar quieto melhorou o aproveitamento de lances livres de jogadores universitários.',
+        fonte: 'Harle SK, Vickers JN. The Sport Psychologist, 2001.',
+      },
+    ],
+    fontes: [
+      'Vickers JN. Visual control when aiming at a far target. Journal of Experimental Psychology: Human Perception and Performance, 1996.',
+      'Harle SK, Vickers JN. Training quiet eye improves accuracy in the basketball free throw. The Sport Psychologist, 2001.',
+    ],
+    noApp: { to: '/ferramentas', rotulo: 'Abrir o contador de arremessos' },
+  },
 
   // Condicionamento
   {
@@ -382,6 +531,83 @@ export const ARTIGOS: Artigo[] = [
       },
     ],
     fontes: ['McGuine TA, Keene JS. The effect of a balance training program on the risk of ankle sprains in high school athletes. American Journal of Sports Medicine, 2006.'],
+    noApp: { to: '/treinos', rotulo: 'Ver o aquecimento' },
+  },
+  {
+    id: 'forca-para-jovens',
+    categoria: 'condicionamento',
+    titulo: 'Musculação atrapalha o crescimento?',
+    resumo: 'Não. Com orientação e carga certa, o treino de força é seguro para jovens e ajuda a saltar mais e se machucar menos.',
+    secoes: [
+      {
+        titulo: 'Um mito antigo',
+        paragrafos: [
+          'Muita gente ainda acha que levantar peso na adolescência faz parar de crescer ou machuca a cartilagem de crescimento. A associação americana de força e condicionamento (NSCA) revisou os estudos e concluiu o contrário: com supervisão qualificada e progressão adequada, o treino de força é seguro e eficaz para crianças e adolescentes.',
+          'Os acidentes que aparecem nos estudos vêm quase sempre de treino sem supervisão, carga exagerada ou equipamento usado do jeito errado.',
+        ],
+      },
+      {
+        titulo: 'O que o basquete ganha',
+        paragrafos: [
+          'Força nas pernas e no quadril melhora o salto, o primeiro passo e a freada nas mudanças de direção. Força no tronco ajuda a aguentar o contato no garrafão e a terminar a bandeja com o corpo estável.',
+          'O começo é a técnica: agachamento, afundo, flexão e prancha com o peso do corpo, até o movimento sair limpo. Só depois a carga sobe, aos poucos.',
+        ],
+      },
+    ],
+    pratica: [
+      'Comece com o peso do corpo e só aumente a carga quando a técnica estiver perfeita.',
+      'Duas ou três sessões por semana, em dias que não sejam colados ao jogo.',
+      'Treine com um profissional de educação física, principalmente antes dos 18 anos.',
+    ],
+    ciencia: [
+      {
+        achado: 'Com supervisão qualificada e programa adequado, o treino de força é seguro e eficaz para jovens e pode reduzir lesões no esporte.',
+        fonte: 'Faigenbaum AD et al. Journal of Strength and Conditioning Research, 2009.',
+      },
+    ],
+    fontes: ['Faigenbaum AD, Kraemer WJ, Blimkie CJ et al. Youth resistance training: updated position statement paper from the National Strength and Conditioning Association. Journal of Strength and Conditioning Research, 2009.'],
+    noApp: { to: '/treinos', rotulo: 'Ver treinos de condicionamento' },
+  },
+  {
+    id: 'alongamento-antes-do-jogo',
+    categoria: 'condicionamento',
+    titulo: 'Alongar antes do jogo tira a explosão?',
+    resumo: 'Alongamento parado longo pode tirar um pouco de força. Curto, ele não atrapalha, e o aquecimento dinâmico é o melhor.',
+    secoes: [
+      {
+        titulo: 'Depende do tempo',
+        paragrafos: [
+          'Uma revisão reuniu os estudos sobre alongamento estático antes do exercício. Segurar a posição por menos de 30 segundos quase não mudou a força. A partir de 60 segundos por músculo, a força e a potência caíram de forma mais clara, ainda que pouco.',
+          'Para quem precisa saltar e arrancar, segurar o alongamento por muito tempo logo antes do jogo é o pior momento para isso.',
+        ],
+      },
+      {
+        titulo: 'O aquecimento que funciona',
+        paragrafos: [
+          'O aquecimento dinâmico, com polichinelo, corrida com elevação de joelho, afundo andando, balanço de perna e saltos progressivos, aquece o músculo e treina o movimento do jogo. Nos estudos, ele mantém ou melhora o desempenho.',
+          'O alongamento parado continua útil para ganhar flexibilidade, só que em outro momento: depois do treino ou num dia separado.',
+        ],
+      },
+    ],
+    pratica: [
+      'Antes do jogo, aquecimento dinâmico de 10 a 15 minutos.',
+      'Se quiser alongar parado no aquecimento, no máximo 30 segundos por músculo.',
+      'Alongamentos longos, para ganhar flexibilidade, ficam para depois do treino.',
+    ],
+    ciencia: [
+      {
+        achado: 'Alongamentos estáticos de menos de 30 segundos tiveram efeito pequeno ou nenhum; a partir de 60 segundos, a queda de força ficou mais clara.',
+        fonte: 'Kay AD, Blazevich AJ. Medicine & Science in Sports & Exercise, 2012.',
+      },
+      {
+        achado: 'O alongamento dinâmico antes do exercício não prejudicou e, em vários estudos, melhorou o desempenho.',
+        fonte: 'Behm DG, Chaouachi A. European Journal of Applied Physiology, 2011.',
+      },
+    ],
+    fontes: [
+      'Kay AD, Blazevich AJ. Effect of acute static stretch on maximal muscle performance: a systematic review. Medicine & Science in Sports & Exercise, 2012.',
+      'Behm DG, Chaouachi A. A review of the acute effects of static and dynamic stretching on performance. European Journal of Applied Physiology, 2011.',
+    ],
     noApp: { to: '/treinos', rotulo: 'Ver o aquecimento' },
   },
 
@@ -502,6 +728,76 @@ export const ARTIGOS: Artigo[] = [
     fontes: ['Drake C, Roehrs T, Shambroom J, Roth T. Caffeine effects on sleep taken 0, 3, or 6 hours before going to bed. Journal of Clinical Sleep Medicine, 2013.'],
     noApp: { to: '/configuracoes', rotulo: 'Ajustar os lembretes' },
   },
+  {
+    id: 'sono-e-aprendizado',
+    categoria: 'sono',
+    titulo: 'O gesto novo se firma dormindo',
+    resumo: 'Treinou um drible ou ajustou o arremesso? Parte do aprendizado acontece na noite seguinte.',
+    secoes: [
+      {
+        titulo: 'Melhorar sem treinar',
+        paragrafos: [
+          'Num estudo de Harvard, as pessoas aprenderam uma sequência de movimentos com os dedos. Quem dormiu uma noite depois do treino ficou cerca de 20% mais rápido no dia seguinte, sem praticar de novo. Quem passou o mesmo tempo acordado não melhorou.',
+          'O ganho acompanhou o sono leve das últimas horas da noite. Ou seja: quem acorda cedo demais corta justamente a parte que fixa o que foi treinado.',
+        ],
+      },
+      {
+        titulo: 'No basquete',
+        paragrafos: [
+          'Drible, passe e arremesso são sequências de movimento. O cérebro organiza essas sequências enquanto você dorme, e o gesto que saía travado no fim do treino costuma sair mais solto depois de uma boa noite.',
+          'Isso vale principalmente quando você está mudando a mecânica do arremesso ou aprendendo um movimento novo.',
+        ],
+      },
+    ],
+    pratica: [
+      'Deixe o movimento novo para o treino da tarde ou da noite e durma bem em seguida.',
+      'Não corte o fim da noite: acordar 1 hora mais cedo tira justamente o sono que fixa o gesto.',
+      'No dia seguinte, repita o movimento novo logo no começo do treino.',
+    ],
+    ciencia: [
+      {
+        achado: 'Depois de uma noite de sono, a velocidade numa tarefa motora melhorou cerca de 20% sem nova prática; o mesmo tempo acordado não trouxe ganho.',
+        fonte: 'Walker MP et al. Neuron, 2002.',
+      },
+    ],
+    fontes: ['Walker MP, Brakefield T, Morgan A, Hobson JA, Stickgold R. Practice with sleep makes perfect: sleep-dependent motor skill learning. Neuron, 2002.'],
+    noApp: { to: '/treinos', rotulo: 'Escolher um movimento novo' },
+  },
+  {
+    id: 'noite-mal-dormida',
+    categoria: 'sono',
+    titulo: 'O que uma noite mal dormida faz no jogo',
+    resumo: 'A força quase não muda. Atenção, tempo de reação, humor e fôlego para esforços longos, sim.',
+    secoes: [
+      {
+        titulo: 'Onde o cansaço aparece',
+        paragrafos: [
+          'Uma revisão sobre sono e desempenho esportivo concluiu que uma noite ruim mexe pouco com a força máxima e com um salto isolado. O que mais piora são os esforços longos, a atenção, o tempo de reação e o humor.',
+          'No basquete isso é decisivo: ler o jogo, reagir ao corte do adversário e manter a intensidade no quarto período dependem justamente do que o sono curto atrapalha.',
+        ],
+      },
+      {
+        titulo: 'Uma noite não é o fim do mundo',
+        paragrafos: [
+          'Dormir mal na véspera por ansiedade é comum e, sozinho, não decide o jogo. O que pesa é a dívida acumulada: várias noites curtas seguidas.',
+          'Se a noite foi ruim, um cochilo curto à tarde e um aquecimento caprichado ajudam. A semana inteira bem dormida antes do jogo vale mais do que a última noite.',
+        ],
+      },
+    ],
+    pratica: [
+      'Proteja o sono a semana toda, não só na véspera.',
+      'Dormiu mal? Cochilo de até 30 minutos e aquecimento mais longo.',
+      'Evite decidir carga de treino pesada depois de várias noites curtas.',
+    ],
+    ciencia: [
+      {
+        achado: 'A perda de sono afetou mais o exercício prolongado, a função cognitiva e o humor do que a força máxima.',
+        fonte: 'Fullagar HH et al. Sports Medicine, 2015.',
+      },
+    ],
+    fontes: ['Fullagar HH, Skorski S, Duffield R, Hammes D, Coutts AJ, Meyer T. Sleep and athletic performance: the effects of sleep loss on exercise performance, and physiological and cognitive responses to exercise. Sports Medicine, 2015.'],
+    noApp: { to: '/rotina', rotulo: 'Organizar minha rotina' },
+  },
 
   // Recuperação
   {
@@ -579,6 +875,122 @@ export const ARTIGOS: Artigo[] = [
     ],
     fontes: ['Foster C, Florhaug JA, Franklin J et al. A new approach to monitoring exercise training. Journal of Strength and Conditioning Research, 2001.'],
     noApp: { to: '/desempenho', rotulo: 'Ver meu desempenho' },
+  },
+  {
+    id: 'proteina',
+    categoria: 'recuperacao',
+    titulo: 'Proteína: quanto e quando',
+    resumo: 'O músculo se reconstrói com proteína. Dividir ao longo do dia funciona melhor do que concentrar numa refeição.',
+    secoes: [
+      {
+        titulo: 'Quanto por dia',
+        paragrafos: [
+          'Para quem treina força e salto, as diretrizes esportivas falam em 1,4 a 2,0 g de proteína por quilo de peso por dia. Uma meta-análise viu que o ganho de força e de massa muscular para de crescer por volta de 1,6 g por quilo: comer muito mais que isso não traz vantagem.',
+          'Para um atleta de 70 kg, 1,6 g por quilo dá cerca de 110 g de proteína por dia, o que se alcança com comida normal: carne, frango, peixe, ovos, leite, iogurte e feijão.',
+        ],
+      },
+      {
+        titulo: 'Quando',
+        paragrafos: [
+          'Distribuir de 20 a 40 g de proteína em cada refeição, a cada 3 ou 4 horas, aproveita melhor o estímulo do treino do que comer quase tudo no jantar.',
+          'Depois do treino, uma refeição com proteína e carboidrato repõe a energia e começa a recuperação. Não precisa ser shake: um sanduíche com frango e um copo de leite resolvem.',
+        ],
+      },
+    ],
+    pratica: [
+      'Coloque uma fonte de proteína em todas as refeições, inclusive no café da manhã.',
+      'Depois do treino, coma em até 1 ou 2 horas, com proteína e carboidrato.',
+      'Suplemento é opcional. Se for usar, converse com um nutricionista antes.',
+    ],
+    ciencia: [
+      {
+        achado: 'Somada ao treino de força, a proteína aumentou o ganho de força e de massa muscular, com o benefício estabilizando por volta de 1,6 g por quilo por dia.',
+        fonte: 'Morton RW et al. British Journal of Sports Medicine, 2018.',
+      },
+      {
+        achado: 'A Sociedade Internacional de Nutrição Esportiva recomenda de 1,4 a 2,0 g por quilo por dia, em doses de 20 a 40 g a cada 3 ou 4 horas.',
+        fonte: 'Jäger R et al. Journal of the International Society of Sports Nutrition, 2017.',
+      },
+    ],
+    fontes: [
+      'Morton RW, Murphy KT, McKellar SR et al. A systematic review, meta-analysis and meta-regression of the effect of protein supplementation on resistance training-induced gains in muscle mass and strength in healthy adults. British Journal of Sports Medicine, 2018.',
+      'Jäger R, Kerksick CM, Campbell BI et al. International Society of Sports Nutrition position stand: protein and exercise. Journal of the International Society of Sports Nutrition, 2017.',
+    ],
+    noApp: { to: '/alimentacao', rotulo: 'Ver os cardápios da Alimentação' },
+  },
+  {
+    id: 'banho-frio',
+    categoria: 'recuperacao',
+    titulo: 'Banho frio e gelo: quando vale a pena',
+    resumo: 'A água gelada alivia a dor muscular, mas usada sempre depois da musculação pode frear o ganho de força.',
+    secoes: [
+      {
+        titulo: 'O que o frio faz',
+        paragrafos: [
+          'Ficar de 10 a 15 minutos em água fria, entre 10 °C e 15 °C, diminui a dor muscular nos dias seguintes a um esforço forte. Uma meta-análise encontrou menos dor de 24 a 96 horas depois, em comparação com só descansar.',
+        ],
+      },
+      {
+        titulo: 'O lado ruim',
+        paragrafos: [
+          'A inflamação depois do treino também é um sinal para o músculo se adaptar. Num estudo de 12 semanas, quem entrava na água fria depois de cada treino de força ganhou menos massa muscular e menos força do que quem fazia uma recuperação ativa.',
+          'Por isso o frio funciona melhor como ferramenta de ocasião: torneio com jogos seguidos, jogo no dia seguinte, semana pesada. No dia a dia da musculação, deixe o músculo se recuperar sozinho.',
+        ],
+      },
+    ],
+    pratica: [
+      'Use água fria em torneios e jogos em dias seguidos, quando o que importa é estar inteiro amanhã.',
+      'Evite o banho gelado logo depois do treino de força, na fase em que o objetivo é ficar mais forte.',
+      'Gelo direto na pele, no máximo 15 a 20 minutos, sempre com um pano no meio.',
+    ],
+    ciencia: [
+      {
+        achado: 'A imersão em água fria reduziu a dor muscular de 24 a 96 horas depois do esforço, em comparação com a recuperação passiva.',
+        fonte: 'Leeder J et al. British Journal of Sports Medicine, 2012.',
+      },
+      {
+        achado: 'Usada depois de cada treino de força por 12 semanas, a água fria reduziu o ganho de massa muscular e de força.',
+        fonte: 'Roberts LA et al. Journal of Physiology, 2015.',
+      },
+    ],
+    fontes: [
+      'Leeder J, Gissane C, van Someren K, Gregson W, Howatson G. Cold water immersion and recovery from strenuous exercise: a meta-analysis. British Journal of Sports Medicine, 2012.',
+      'Roberts LA, Raastad T, Markworth JF et al. Post-exercise cold water immersion attenuates acute anabolic signalling and long-term adaptations in muscle to strength training. Journal of Physiology, 2015.',
+    ],
+  },
+  {
+    id: 'rolo-de-liberacao',
+    categoria: 'recuperacao',
+    titulo: 'Rolo de liberação: o que esperar',
+    resumo: 'O rolo de espuma ajuda um pouco na flexibilidade e na dor, sem milagre. Como usar sem perder tempo.',
+    secoes: [
+      {
+        titulo: 'Efeitos pequenos, mas reais',
+        paragrafos: [
+          'Uma meta-análise juntou os estudos sobre o rolo de liberação. Antes do treino, ele deu uma melhora pequena na flexibilidade e no sprint. Depois, diminuiu um pouco a dor muscular dos dias seguintes. Na força e no salto, praticamente não mudou nada.',
+          'Ou seja: é um complemento barato e sem risco, que não substitui sono, comida e descanso.',
+        ],
+      },
+      {
+        titulo: 'Como usar',
+        paragrafos: [
+          'Passe o rolo de 30 a 60 segundos em cada grupo muscular, devagar, parando um pouco nos pontos mais sensíveis. Panturrilha, coxa, glúteo e a lateral da coxa são os mais pedidos no basquete.',
+          'Antes do treino, use pouco tempo e emende no aquecimento dinâmico. Depois, pode ficar um pouco mais, com a respiração calma.',
+        ],
+      },
+    ],
+    pratica: [
+      'De 30 a 60 segundos por músculo bastam.',
+      'Dor forte não é sinal de que está funcionando: a pressão deve ser incômoda, não insuportável.',
+      'Não role direto sobre articulações nem sobre a coluna lombar.',
+    ],
+    ciencia: [
+      {
+        achado: 'O rolo antes do exercício melhorou um pouco o sprint e a flexibilidade; depois do exercício, reduziu um pouco a dor percebida.',
+        fonte: 'Wiewelhove T et al. Frontiers in Physiology, 2019.',
+      },
+    ],
+    fontes: ['Wiewelhove T, Döweling A, Schneider C et al. A meta-analysis of the effects of foam rolling on performance and recovery. Frontiers in Physiology, 2019.'],
   },
 ]
 
