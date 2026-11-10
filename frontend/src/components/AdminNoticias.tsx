@@ -13,7 +13,7 @@ const PRAZOS = [
 
 const avisarBarra = () => window.dispatchEvent(new Event(NOTICIAS_MUDARAM))
 
-/** Publica "Breaking news" e tira da barra as manchetes que não deviam estar lá. */
+/** Publica manchetes urgentes e tira da barra as manchetes que não deviam estar lá. */
 export default function AdminNoticias() {
   const [noticias, setNoticias] = useState<Noticia[] | null>(null)
   const [erro, setErro] = useState<Error | null>(null)
@@ -68,7 +68,7 @@ export default function AdminNoticias() {
           Manchete
           <input className="input" value={titulo} required minLength={3} maxLength={160} onChange={(e) => setTitulo(e.target.value)} />
         </label>
-        <p className="meta">Escreva com as suas palavras, sem copiar o texto da matéria. Ela aparece primeiro na barra, com o selo “Breaking news”.</p>
+        <p className="meta">Escreva com as suas palavras, sem copiar o texto da matéria. Ela aparece primeiro na barra, com o selo “Urgente”.</p>
         <div className="linha">
           <label>
             Fonte (opcional)
@@ -104,7 +104,7 @@ export default function AdminNoticias() {
               <div className="admin-info">
                 <strong>{n.title}</strong>
                 <span className="meta">
-                  {n.origin === 'admin' ? 'Breaking news' : 'Automática'}
+                  {n.origin === 'admin' ? 'Urgente' : 'Automática'}
                   {n.sourceName && ` · ${n.sourceName}`} · {tempoAtras(n.publishedAt)}
                 </span>
               </div>

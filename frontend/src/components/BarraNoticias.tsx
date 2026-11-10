@@ -36,7 +36,7 @@ function Itens({ noticias, destaques, copia }: { noticias: Noticia[]; destaques:
       {noticias.map((n) => (
         <li key={n.id} className="noticias-item">
           {n.origin === 'admin' ? (
-            <span className="noticias-selo">Breaking news</span>
+            <span className="noticias-selo">Urgente</span>
           ) : (
             <Assunto titulo={n.title} />
           )}
