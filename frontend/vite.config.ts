@@ -1,9 +1,22 @@
 /// <reference types="vitest" />
 import { fileURLToPath } from 'node:url'
-import { defineConfig, loadEnv } from 'vite'
+import { defineConfig, loadEnv, type Plugin } from 'vite'
 import react from '@vitejs/plugin-react'
+import { conteudoAdsTxt, idEditor } from './src/lib/adsense'
 
 const local = (caminho: string) => fileURLToPath(new URL(caminho, import.meta.url))
+
+/** Põe o ads.txt na raiz do build quando há VITE_ADSENSE_ID; sem ele, o arquivo não existe. */
+function adsTxt(valor: string | undefined): Plugin {
+  const id = idEditor(valor)
+  return {
+    name: 'ads-txt',
+    apply: 'build',
+    generateBundle() {
+      if (id) this.emitFile({ type: 'asset', fileName: 'ads.txt', source: conteudoAdsTxt(id) })
+    },
+  }
+}
 
 export default defineConfig(({ mode }) => {
   // API_PROXY muda o destino do proxy em dev (padrão: backend local na 3333).
@@ -12,7 +25,7 @@ export default defineConfig(({ mode }) => {
   return {
     // VITE_BASE publica o site numa subpasta (ex.: /BasketballPractice/ no GitHub Pages).
     base: env.VITE_BASE || '/',
-    plugins: [react()],
+    plugins: [react(), adsTxt(env.VITE_ADSENSE_ID)],
     // Constante de compilação: no site normal vira false e o bundler descarta todo o código da demonstração.
     define: { __DEMO__: JSON.stringify(demo) },
     resolve: {
