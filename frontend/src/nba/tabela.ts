@@ -2,7 +2,7 @@
 // navegador). As cores dos times vêm da aba Equipamentos, que já tem os 30 times.
 import { TIMES } from '../equipamentos/dados'
 import { comValidade } from './cache'
-import { escudos, type Escudos } from './escudos'
+import { escudos, SIGLA_ESPN, type Escudos } from './escudos'
 
 export const URL_TABELA = 'https://site.api.espn.com/apis/v2/sports/basketball/nba/standings'
 
@@ -26,8 +26,6 @@ export interface Tabela {
   oeste: LinhaTabela[]
 }
 
-// A ESPN abrevia alguns times de outro jeito.
-const SIGLA_ESPN: Record<string, string> = { GS: 'GSW', SA: 'SAS', NY: 'NYK', NO: 'NOP', UTAH: 'UTA', WSH: 'WAS' }
 const COR = new Map(TIMES.map((t) => [t.sigla, t.cor]))
 
 interface RespostaEspn {

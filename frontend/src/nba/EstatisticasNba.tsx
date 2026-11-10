@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState, type CSSProperties } from 're
 import { Carregando, ErroCarga } from '../components/Estado'
 import { tempoAtras } from '../lib/noticias'
 import { buscarLideres, numero, type Categoria, type Lider } from './lideres'
-import type { Escudos } from './escudos'
+import { timesCitados, type Escudos } from './escudos'
 import { buscarNoticiasNba, ultimas24h, type NoticiaNba } from './noticias'
 import { aproveitamento, buscarTabela, jogosAtras, type LinhaTabela } from './tabela'
 
@@ -153,11 +153,22 @@ function Lideres() {
 }
 
 function CartaoNoticia({ n }: { n: NoticiaNba }) {
+  // Os escudos dos times citados no título (e, se faltar, no resumo), até três.
+  const times = timesCitados(`${n.titulo} ${n.resumo}`)
   return (
     <a className="card nba-noticia" href={n.url} target="_blank" rel="noopener noreferrer">
-      {n.imagem && <img src={n.imagem} alt="" loading="lazy" referrerPolicy="no-referrer" />}
+      {n.imagem && <img className="nba-noticia-foto" src={n.imagem} alt="" loading="lazy" referrerPolicy="no-referrer" />}
       <span className="nba-noticia-meta">
-        <strong>{n.fonte}</strong> · {tempoAtras(n.publicada)}
+        <span>
+          <strong>{n.fonte}</strong> · {tempoAtras(n.publicada)}
+        </span>
+        {times.length > 0 && (
+          <span className="nba-noticia-times" title={times.map((t) => t.nome).join(', ')}>
+            {times.map((t) => (
+              <Escudo key={t.sigla} time={t} />
+            ))}
+          </span>
+        )}
       </span>
       <h3>{n.titulo}</h3>
       {n.resumo && <p>{n.resumo}</p>}
