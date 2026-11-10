@@ -479,7 +479,7 @@ export const ARTIGOS: Artigo[] = [
     ],
     fontes: [
       'Locke EA, Latham GP. Building a practically useful theory of goal setting and task motivation: a 35-year odyssey. American Psychologist, 2002.',
-      'Kingston KM, Hardy L. Effects of different types of goal setting on processes that support performance. The Sport Psychologist, 1997.',
+      'Kingston KM, Hardy L. Effects of different types of goals on processes that support performance. The Sport Psychologist, 1997.',
     ],
     noApp: { to: '/metas', rotulo: 'Criar uma meta' },
   },
