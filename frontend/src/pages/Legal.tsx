@@ -5,7 +5,8 @@ import { LinksLegais } from '../components/TelaAuth'
 
 // Quem responde pelo serviço e pelos dados. O e-mail de contato aparece nas duas páginas.
 const RESPONSAVEL = 'Eduardo Lopes'
-const CONTATO = '[e-mail de contato a definir]'
+const EMAIL_CONTATO = 'deveducontato@gmail.com'
+const CONTATO = <a className="link" href={`mailto:${EMAIL_CONTATO}`}>{EMAIL_CONTATO}</a>
 const ATUALIZADO_EM = '10 de novembro de 2026'
 
 function PaginaLegal({ titulo, children }: { titulo: string; children: ReactNode }) {

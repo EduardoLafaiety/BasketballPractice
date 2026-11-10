@@ -312,6 +312,10 @@ describe('Documentos', () => {
     expect(aviso).toHaveTextContent('Rascunho')
     expect(aviso).toHaveTextContent('revisado por um advogado')
     expect(screen.getByText(/mantido por Eduardo Lopes|oferecido por Eduardo Lopes/)).toBeInTheDocument()
+    for (const link of screen.getAllByRole('link', { name: 'deveducontato@gmail.com' })) {
+      expect(link).toHaveAttribute('href', 'mailto:deveducontato@gmail.com')
+    }
+    expect(document.body).not.toHaveTextContent('contato a definir')
     expect(screen.getByText(/18 anos ou mais|maiores de 18 anos/)).toBeInTheDocument()
   })
 
