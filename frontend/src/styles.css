@@ -853,11 +853,11 @@ section + section, .card + section { margin-top: 1.5rem; }
 /* Largura mínima: com poucas manchetes, a repetição não aparece colada na original */
 .noticias-lista { display: flex; align-items: center; min-width: 100vw; margin: 0; padding: 0; list-style: none; }
 .noticias-item { display: flex; align-items: center; gap: 0.5rem; padding: 0 1.5rem; white-space: nowrap; }
-/* Manchetes no padrão do sistema: maiúsculas com fonte pequena. */
-.noticias-item { text-transform: uppercase; }
-.noticias-item a { color: inherit; text-decoration: none; font-weight: 700; font-size: 0.72rem; letter-spacing: 0.06em; }
+/* Manchete e fonte no padrão do sistema: maiúsculas com fonte pequena (os selos de assunto têm tamanho próprio). */
+.noticias-item { text-transform: uppercase; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.06em; }
+.noticias-item a { color: inherit; text-decoration: none; }
 .noticias-item a:hover { color: var(--laranja); text-decoration: underline; }
-.noticias-fonte { color: var(--lateral-muted); font-size: 0.75rem; }
+.noticias-fonte { color: var(--lateral-muted); }
 .noticias-selo {
   padding: 0.1rem 0.4rem;
   border-radius: 2px;
