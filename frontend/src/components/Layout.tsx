@@ -10,7 +10,6 @@ import { diasAtras, useConfig } from '../store'
 import type { Config } from '../types'
 import BarraNoticias from './BarraNoticias'
 import Icone from './Icone'
-import Relogio from './Relogio'
 import { LinksLegais } from './TelaAuth'
 
 const LINKS: { to: string; rotulo: string; fim?: boolean }[] = [
@@ -123,7 +122,6 @@ export default function Layout() {
           <Icone nome="bola" tamanho={34} />
         </Link>
         {secao && <span className="topo-secao">{secao}</span>}
-        {pathname === '/' && <Relogio />}
         <Link to="/gerador" className="topo-acao">Gerar treino</Link>
         <button
           ref={botaoMenu}
