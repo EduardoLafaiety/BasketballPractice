@@ -1,20 +1,25 @@
 import { useEffect, useRef, useState, type CSSProperties } from 'react'
 import { useLocation } from 'react-router-dom'
 import { api, type Noticia } from '../api'
-import { NOTICIAS_MUDARAM, tempoAtras } from '../lib/noticias'
+import { assuntoDa, NOTICIAS_MUDARAM, ROTULO_ASSUNTO, tempoAtras } from '../lib/noticias'
 import Icone from './Icone'
 
 const ATUALIZAR_MS = 5 * 60_000
 // Velocidade de leitura confortável: o tempo da volta cresce com a quantidade de texto.
 const SEGUNDOS_POR_LETRA = 0.2
 const VOLTA_MINIMA_S = 30
+const HORA = new Intl.DateTimeFormat('pt-BR', { hour: '2-digit', minute: '2-digit' })
 
 function Itens({ noticias, copia }: { noticias: Noticia[]; copia?: boolean }) {
   return (
     <ul className="noticias-lista" aria-hidden={copia || undefined}>
       {noticias.map((n) => (
         <li key={n.id} className="noticias-item">
-          {n.origin === 'admin' && <span className="noticias-selo">Breaking news</span>}
+          {n.origin === 'admin' ? (
+            <span className="noticias-selo">Breaking news</span>
+          ) : (
+            <Assunto titulo={n.title} />
+          )}
           {n.url ? (
             <a href={n.url} target="_blank" rel="noopener noreferrer" tabIndex={copia ? -1 : undefined}>{n.title}</a>
           ) : (
@@ -27,16 +32,29 @@ function Itens({ noticias, copia }: { noticias: Noticia[]; copia?: boolean }) {
   )
 }
 
+function Assunto({ titulo }: { titulo: string }) {
+  const assunto = assuntoDa(titulo)
+  return <span className={`noticias-assunto assunto-${assunto}`}>{ROTULO_ASSUNTO[assunto]}</span>
+}
+
 /** Faixa no rodapé com as manchetes correndo. Falha ao buscar não atrapalha o app: mantém o que já tinha. */
 export default function BarraNoticias() {
   const { pathname } = useLocation()
   const [noticias, setNoticias] = useState<Noticia[]>([])
   const [pausada, setPausada] = useState(false)
+  const [atualizada, setAtualizada] = useState<Date | null>(null)
   const janela = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const carregar = () => {
-      if (!document.hidden) api.noticias().then(setNoticias).catch(() => {})
+      if (document.hidden) return
+      api
+        .noticias()
+        .then((lista) => {
+          setNoticias(lista)
+          setAtualizada(new Date())
+        })
+        .catch(() => {})
     }
     carregar()
     const timer = window.setInterval(carregar, ATUALIZAR_MS)
@@ -63,7 +81,17 @@ export default function BarraNoticias() {
 
   return (
     <section className={`noticias${pausada ? ' pausada' : ''}`} aria-label="Notícias de basquete">
-      <span className="noticias-rotulo">Últimas notícias</span>
+      {/* Como a faixa de um canal de esporte: selo "ao vivo", o nome da faixa e a hora da última atualização. */}
+      <div className="noticias-marca">
+        <span className="noticias-vivo" aria-hidden>
+          <i />
+          Ao vivo
+        </span>
+        <span className="noticias-rotulo">
+          Últimas notícias
+          {atualizada && <small className="noticias-hora">Atualizado às {HORA.format(atualizada)}</small>}
+        </span>
+      </div>
       <div className="noticias-janela" ref={janela} onBlur={aoSairDoFoco}>
         <div className="noticias-trilha" style={{ '--duracao': `${duracao}s` } as CSSProperties}>
           <Itens noticias={noticias} />
