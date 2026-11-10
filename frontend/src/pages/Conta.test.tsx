@@ -303,7 +303,7 @@ describe('Documentos', () => {
   it.each([
     ['/privacidade', 'Política de Privacidade'],
     ['/termos', 'Termos de Uso'],
-  ])('%s abre sem login, marcado como rascunho e com a idade mínima e os menores a decidir', (rota, titulo) => {
+  ])('%s abre sem login, marcado como rascunho, com o responsável e a idade mínima de 18 anos', (rota, titulo) => {
     apiFalsa({})
     abrirApp(rota)
 
@@ -311,8 +311,8 @@ describe('Documentos', () => {
     const aviso = screen.getByRole('note')
     expect(aviso).toHaveTextContent('Rascunho')
     expect(aviso).toHaveTextContent('revisado por um advogado')
-    expect(screen.getByText('Idade mínima:').closest('li')).toHaveTextContent('a definir')
-    expect(screen.getByText('Menores de idade:').closest('li')).toHaveTextContent('a definir')
+    expect(screen.getByText(/mantido por Eduardo Lopes|oferecido por Eduardo Lopes/)).toBeInTheDocument()
+    expect(screen.getByText(/18 anos ou mais|maiores de 18 anos/)).toBeInTheDocument()
   })
 
   it.each(['/privacidade', '/termos'])('%s não afirma estar em conformidade com a lei', (rota) => {

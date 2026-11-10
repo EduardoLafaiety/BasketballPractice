@@ -11,6 +11,14 @@ const SEGUNDOS_POR_LETRA = 0.2
 const VOLTA_MINIMA_S = 30
 // Quantas categorias de estatística entram na faixa (pontos, rebotes, assistências e tocos).
 const CATEGORIAS_NA_BARRA = 4
+// O tempo de gravação conta desde que o site abriu, não desde que a faixa apareceu.
+const INICIO_GRAVACAO = Date.now()
+
+const doisDigitos = (n: number) => String(n).padStart(2, '0')
+/** Segundos no formato do visor de uma câmera: 01:02:03. */
+export function tempoDeGravacao(segundos: number) {
+  return [Math.floor(segundos / 3600), Math.floor(segundos / 60) % 60, segundos % 60].map(doisDigitos).join(':')
+}
 
 /** O líder de cada categoria vira uma linha da faixa, com link para a página de estatísticas. */
 function destaquesDe(lideres: Lideres | null) {
@@ -28,7 +36,7 @@ function Itens({ noticias, destaques, copia }: { noticias: Noticia[]; destaques:
       {noticias.map((n) => (
         <li key={n.id} className="noticias-item">
           {n.origin === 'admin' ? (
-            <span className="noticias-selo">Breaking news</span>
+            <span className="noticias-selo">Urgente</span>
           ) : (
             <Assunto titulo={n.title} />
           )}
@@ -56,18 +64,39 @@ function Assunto({ titulo }: { titulo: string }) {
   return <span className={`noticias-assunto assunto-${assunto}`}>{ROTULO_ASSUNTO[assunto]}</span>
 }
 
+/** Separado da faixa para que só o relógio redesenhe a cada segundo. */
+function Gravacao() {
+  const segundos = () => Math.floor((Date.now() - INICIO_GRAVACAO) / 1000)
+  const [s, setS] = useState(segundos)
+  useEffect(() => {
+    const timer = window.setInterval(() => setS(segundos()), 1000)
+    return () => window.clearInterval(timer)
+  }, [])
+  return <span className="noticias-tempo">{tempoDeGravacao(s)}</span>
+}
+
 /** Faixa no rodapé com as manchetes correndo. Falha ao buscar não atrapalha o app: mantém o que já tinha. */
 export default function BarraNoticias() {
   const { pathname } = useLocation()
   const [noticias, setNoticias] = useState<Noticia[]>([])
   const [lideres, setLideres] = useState<Lideres | null>(null)
-  const [pausada, setPausada] = useState(false)
+  // Cada flash é um elemento novo (pela key), para a animação rodar de novo.
+  const [flash, setFlash] = useState(0)
   const janela = useRef<HTMLDivElement>(null)
+  const vistas = useRef<Set<number> | null>(null)
 
   useEffect(() => {
     const carregar = () => {
       if (document.hidden) return
-      api.noticias().then(setNoticias).catch(() => {})
+      api
+        .noticias()
+        .then((lista) => {
+          // Notícia que não estava na faixa dispara o flash (a primeira carga, não).
+          if (vistas.current && lista.some((n) => !vistas.current!.has(n.id))) setFlash((f) => f + 1)
+          vistas.current = new Set(lista.map((n) => n.id))
+          setNoticias(lista)
+        })
+        .catch(() => {})
       // As estatísticas da NBA entram na faixa quando chegam; se a ESPN falhar, ficam só as notícias.
       buscarLideres().then(setLideres).catch(() => {})
     }
@@ -98,29 +127,29 @@ export default function BarraNoticias() {
   }
 
   return (
-    <section className={`noticias${pausada ? ' pausada' : ''}`} aria-label="Notícias de basquete">
-      {/* Como a faixa de um canal de esporte: selo "ao vivo" e o nome da faixa. */}
-      <div className="noticias-marca">
-        <span className="noticias-vivo" aria-hidden>
-          <i />
-          Ao vivo
+    <section className="noticias" aria-label="Notícias de basquete">
+      {/* Como o visor de uma câmera de reportagem: cantos do enquadramento, REC e o tempo gravando. */}
+      <div className="noticias-marca" aria-hidden>
+        <span className="noticias-visor">
+          <Icone nome="video" tamanho={16} />
+          <i className="noticias-rec-ponto" />
+          Rec
         </span>
-        <span className="noticias-rotulo">Últimas notícias</span>
+        <Gravacao />
+        <span className="noticias-rotulo">Breaking news</span>
       </div>
+      {/* O flash do fotógrafo: a cada volta da faixa e quando chega notícia nova. */}
+      {flash > 0 && <span key={flash} className="noticias-flash" aria-hidden />}
       <div className="noticias-janela" ref={janela} onBlur={aoSairDoFoco}>
-        <div className="noticias-trilha" style={{ '--duracao': `${duracao}s` } as CSSProperties}>
+        <div
+          className="noticias-trilha"
+          style={{ '--duracao': `${duracao}s` } as CSSProperties}
+          onAnimationIteration={() => setFlash((f) => f + 1)}
+        >
           <Itens noticias={noticias} destaques={destaques} />
           <Itens noticias={noticias} destaques={destaques} copia />
         </div>
       </div>
-      <button
-        className="botao-icone noticias-pausa"
-        onClick={() => setPausada((p) => !p)}
-        aria-label={pausada ? 'Continuar as notícias' : 'Pausar as notícias'}
-        title={pausada ? 'Continuar' : 'Pausar'}
-      >
-        <Icone nome={pausada ? 'play' : 'pausa'} tamanho={16} />
-      </button>
     </section>
   )
 }

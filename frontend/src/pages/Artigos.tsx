@@ -1,6 +1,6 @@
 import { useState, type CSSProperties } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router-dom'
-import { ARTIGOS, CATEGORIAS, categoria, minutosDeLeitura, type Artigo, type Categoria } from '../artigos/dados'
+import { ARTIGOS, CATEGORIAS, POR_FILEIRA, categoria, minutosDeLeitura, type Artigo, type Categoria } from '../artigos/dados'
 import { linkDaFonte } from '../artigos/links'
 import ImagemArtigo from '../artigos/ImagemArtigo'
 import Icone from '../components/Icone'
@@ -102,7 +102,10 @@ export function ArtigoDetalhe() {
   if (!artigo) return <NaoEncontrada />
 
   const cat = categoria(artigo.categoria)
-  const mais = ARTIGOS.filter((a) => a.categoria === artigo.categoria && a.id !== artigo.id)
+  // Uma fileira cheia de 4: os próximos da mesma categoria, voltando ao começo da lista.
+  const mesmos = ARTIGOS.filter((a) => a.categoria === artigo.categoria)
+  const i = mesmos.indexOf(artigo)
+  const mais = [...mesmos.slice(i + 1), ...mesmos.slice(0, i)].slice(0, POR_FILEIRA)
 
   return (
     <article className="artigo" style={{ '--c': cat.cor } as CSSProperties}>

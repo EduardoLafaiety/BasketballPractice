@@ -38,6 +38,22 @@ const ESTUDOS: Record<string, string> = {
   'Leeder 2012': doi('10.1136/bjsports-2011-090061'),
   'Roberts 2015': doi('10.1113/JP270570'),
   'Wiewelhove 2019': doi('10.3389/fphys.2019.00376'),
+  'Shea 1979': doi('10.1037/0278-7393.5.2.179'),
+  'Zachry 2005': doi('10.1016/j.brainresbull.2005.06.035'),
+  'Wulf 2013': doi('10.1080/1750984X.2012.723728'),
+  'Van Cutsem 2017': doi('10.1007/s40279-016-0672-0'),
+  'Hewett 1999': doi('10.1177/03635465990270060301'),
+  'van Dyk 2019': doi('10.1136/bjsports-2018-100045'),
+  'Lian 2005': doi('10.1177/0363546504270454'),
+  'Kongsgaard 2009': doi('10.1111/j.1600-0838.2009.00949.x'),
+  // Chang saiu online no fim de 2014; a edição impressa citada é de 2015.
+  'Chang 2015': doi('10.1073/pnas.1418490112'),
+  'Carskadon 1998': doi('10.1093/sleep/21.8.871'),
+  'Waterhouse 2007': doi('10.1080/02640410701244983'),
+  'Burke 2011': doi('10.1080/02640414.2011.585473'),
+  // Guest saiu na edição de 2021; a versão online da editora é de 2022.
+  'Guest 2021': doi('10.1186/s12970-020-00383-4'),
+  'Dupuy 2018': doi('10.3389/fphys.2018.00403'),
 }
 
 /** Instituições, pelo nome com que a referência começa. */
@@ -48,6 +64,10 @@ const INSTITUICOES: [string, string][] = [
   ['NCAA', 'https://www.ncaa.org/'],
   ['Confederação Brasileira de Basketball', 'https://www.cbb.com.br/'],
   ['Basketball-Reference', 'https://www.basketball-reference.com/'],
+  ['WNBA', 'https://www.wnba.com/'],
+  ['Comitê Olímpico Internacional', 'https://www.olympics.com/'],
+  ['IWBF', 'https://iwbf.org/'],
+  ['Comitê Paralímpico Internacional', 'https://www.paralympic.org/'],
 ]
 
 /**
@@ -57,7 +77,8 @@ const INSTITUICOES: [string, string][] = [
 export function linkDaFonte(texto: string): string | null {
   const instituicao = INSTITUICOES.find(([nome]) => texto.startsWith(nome))
   if (instituicao) return instituicao[1]
-  const autor = texto.match(/^[^\s,]+/)?.[0]
+  // O sobrenome pode vir com partícula: "van Dyk N", "Van Cutsem J".
+  const autor = texto.match(/^(?:[Vv]an )?[^\s,]+/)?.[0]
   const ano = texto.match(/(\d{4})\.?\s*$/)?.[1]
   return (autor && ano && ESTUDOS[`${autor} ${ano}`]) || null
 }

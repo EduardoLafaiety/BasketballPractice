@@ -1,6 +1,7 @@
 import { useRef, useState, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import Icone from './Icone'
+import { abrirPreferenciasCookies } from '../lib/cookies'
 import { BolaCouro, BolaVazada, Figura, LinhasQuadra, ListraBola, useFuroBola } from './rolagem'
 
 /** A moldura das telas de conta: a quadra de um lado, o formulário do outro. */
@@ -43,6 +44,7 @@ export function LinksLegais() {
     <nav className="links-legais" aria-label="Documentos">
       <Link to="/privacidade">Política de Privacidade</Link>
       <Link to="/termos">Termos de Uso</Link>
+      <button type="button" onClick={abrirPreferenciasCookies}>Preferências de cookies</button>
     </nav>
   )
 }
