@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef } from 'react'
+import { menosMovimento } from '../lib/movimento'
 import { Atleta, Bola, novaBola, novoAtleta } from './Atleta'
 import { pintar, posicionar } from './desenho'
 import { instante, preparar, type Coreografia } from './motor'
@@ -16,7 +17,7 @@ export default function Manequim({ coreografia, viewBox, velocidade = 0.7 }: { c
       posicionar(bola.current, agora.bola, agora.solo)
     }
     // Sem animação (ou para quem prefere menos movimento), fica parado numa pose de arremesso.
-    const parado = typeof requestAnimationFrame !== 'function' || window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+    const parado = typeof requestAnimationFrame !== 'function' || menosMovimento()
     if (parado) {
       desenhar(anim.inicioFase.at(-1) ?? 0)
       return

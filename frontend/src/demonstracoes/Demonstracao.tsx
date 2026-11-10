@@ -1,5 +1,6 @@
 import { useEffect, useId, useMemo, useRef, useState } from 'react'
 import { Atleta, Bola, novaBola, novoAtleta, SombraBola } from './Atleta'
+import { menosMovimento } from '../lib/movimento'
 import { janela, mirar, QUADRO, seguir, type Mira } from './camera'
 import { caminhos, PARTES, pintar, posicionar } from './desenho'
 import {
@@ -20,15 +21,11 @@ import {
 const VELOCIDADES = [0.25, 0.5, 1]
 const Y_PEGADAS = 364
 
-function prefereMenosMovimento() {
-  return typeof window !== 'undefined' && !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
-}
-
 /** Animação de um exercício: manequim, cena, rastro das poses e pegadas vistas de cima. */
 export default function Demonstracao({ coreografia, nome }: { coreografia: Coreografia; nome: string }) {
   const anim = useMemo(() => preparar(coreografia), [coreografia])
   const marcas = useMemo(() => pegadas(anim), [anim])
-  const [tocando, setTocando] = useState(() => !prefereMenosMovimento())
+  const [tocando, setTocando] = useState(() => !menosMovimento())
   const [fase, setFase] = useState(0)
   const [rastro, setRastro] = useState(true)
   const [camera, setCamera] = useState(true)

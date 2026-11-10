@@ -4,6 +4,7 @@ import { BrowserRouter } from 'react-router-dom'
 import App from './App'
 import { AuthProvider } from './auth'
 import { iniciarPwa } from './lib/pwa'
+import { aplicarMovimento } from './lib/movimento'
 import { aplicarTema, temaSalvo } from './lib/tema'
 // Fontes servidas pelo próprio site: sem depender do Google Fonts e funcionando offline no PWA.
 import '@fontsource-variable/big-shoulders-display'
@@ -15,6 +16,7 @@ const BASE = import.meta.env.BASE_URL.replace(/\/$/, '') || '/'
 
 // Tema da última visita, antes do primeiro render; o salvo na conta chega depois do login.
 aplicarTema(temaSalvo())
+aplicarMovimento()
 iniciarPwa()
 
 createRoot(document.getElementById('root')!).render(

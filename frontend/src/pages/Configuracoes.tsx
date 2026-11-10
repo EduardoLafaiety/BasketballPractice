@@ -3,6 +3,7 @@ import { api, ApiError, dataLocal, definirToken, type ResultadoImportacao } from
 import { useAuth } from '../auth'
 import { Carregando, ErroCarga } from '../components/Estado'
 import { baixarArquivo, sessoesParaCsv } from '../lib/arquivo'
+import { definirAnimacoes, useAnimacoes, type Animacoes } from '../lib/movimento'
 import { notificar, pedirPermissao, proximoLembrete, suportaNotificacoes } from '../lib/lembretes'
 import { instalar, rodandoComoApp, usePodeInstalar } from '../lib/pwa'
 import { DIAS, recarregarTudo, useConfig } from '../store'
@@ -14,10 +15,16 @@ const TEMAS: { id: Tema; rotulo: string }[] = [
   { id: 'claro', rotulo: 'Claro' },
   { id: 'escuro', rotulo: 'Escuro' },
 ]
+const ANIMACOES: { id: Animacoes; rotulo: string }[] = [
+  { id: 'ligadas', rotulo: 'Ligadas' },
+  { id: 'sistema', rotulo: 'Seguir o sistema' },
+  { id: 'desligadas', rotulo: 'Desligadas' },
+]
 
 export default function Configuracoes() {
   const { config, carregado, erro, recarregar, salvar } = useConfig()
   const [erroSalvar, setErroSalvar] = useState<string | null>(null)
+  const animacoes = useAnimacoes().escolha
 
   const atualizar = (nova: Config) => {
     setErroSalvar(null)
@@ -44,6 +51,21 @@ export default function Configuracoes() {
                   onClick={() => atualizar({ ...config, tema: t.id })}
                 >
                   {t.rotulo}
+                </button>
+              ))}
+            </div>
+            <h3 className="sem-margem">Animações e efeitos</h3>
+            <p className="muted sem-margem">Rolagem, mouse e demonstrações em movimento. Desligue se o movimento na tela incomodar.</p>
+            <div className="chips" role="radiogroup" aria-label="Animações e efeitos">
+              {ANIMACOES.map((a) => (
+                <button
+                  key={a.id}
+                  role="radio"
+                  aria-checked={animacoes === a.id}
+                  className={`chip ${animacoes === a.id ? 'ativo' : ''}`}
+                  onClick={() => definirAnimacoes(a.id)}
+                >
+                  {a.rotulo}
                 </button>
               ))}
             </div>

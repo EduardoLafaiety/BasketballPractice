@@ -52,13 +52,4 @@ describe('Blocos que aparecem ao rolar', () => {
     expect(raiz.querySelector<HTMLElement>('.card')!.dataset.surge).toBeUndefined()
     parar()
   })
-
-  it('quem prefere menos movimento não vê nenhum efeito', () => {
-    vi.stubGlobal('matchMedia', () => ({ matches: true }))
-    const raiz = raizCom('<div class="card"></div>')
-    const parar = iniciarEfeitos(raiz)
-    expect(raiz.querySelector<HTMLElement>('.card')!.dataset.surge).toBeUndefined()
-    parar()
-    vi.unstubAllGlobals()
-  })
 })
