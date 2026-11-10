@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState, type CSSProperties } from 're
 import { Carregando, ErroCarga } from '../components/Estado'
 import { tempoAtras } from '../lib/noticias'
 import { buscarLideres, numero, type Categoria, type Lider } from './lideres'
+import type { Escudos } from './escudos'
 import { buscarNoticiasNba, ultimas24h, type NoticiaNba } from './noticias'
 import { aproveitamento, buscarTabela, jogosAtras, type LinhaTabela } from './tabela'
 
@@ -26,14 +27,18 @@ function Estado({ erro, carregar, texto }: { erro: Error | null; carregar: () =>
   return erro ? <ErroCarga erro={erro} tentarDeNovo={carregar} /> : <Carregando texto={texto} />
 }
 
-/** Escudo nas versões para fundo claro e escuro (o CSS mostra a do tema); se não carregar, fica a bolinha na cor do time. */
-function Escudo({ linha }: { linha: LinhaTabela }) {
+/**
+ * Escudo nas versões para fundo claro e escuro (o CSS mostra a do tema); se não carregar, fica a bolinha
+ * na cor do time. `soEscuro` é para fundos sempre escuros, como o cartão do líder: sem escudo, não mostra nada.
+ */
+function Escudo({ time, soEscuro = false, className = '' }: { time: Escudos; soEscuro?: boolean; className?: string }) {
   const [falhou, setFalhou] = useState(false)
-  if (falhou) return <span className="nba-time-cor" aria-hidden />
+  // Dados guardados no cache antes de existirem os escudos vêm sem eles.
+  if (falhou || !time.escudo || !time.escudoEscuro) return soEscuro ? null : <span className="nba-time-cor" aria-hidden />
+  const img = (src: string, classe?: string) => <img className={classe} src={src} alt="" width={28} height={28} loading="lazy" onError={() => setFalhou(true)} />
   return (
-    <span className="nba-escudo" aria-hidden>
-      <img className="nba-escudo-claro" src={linha.escudo} alt="" width={28} height={28} loading="lazy" onError={() => setFalhou(true)} />
-      <img className="nba-escudo-escuro" src={linha.escudoEscuro} alt="" width={28} height={28} loading="lazy" onError={() => setFalhou(true)} />
+    <span className={`nba-escudo ${className}`.trim()} aria-hidden>
+      {soEscuro ? img(time.escudoEscuro) : <>{img(time.escudo, 'nba-escudo-claro')}{img(time.escudoEscuro, 'nba-escudo-escuro')}</>}
     </span>
   )
 }
@@ -58,7 +63,7 @@ function TabelaConferencia({ titulo, linhas }: { titulo: string; linhas: LinhaTa
           <tr key={l.sigla} className={l.posicao <= 6 ? 'nba-direto' : l.posicao <= 10 ? 'nba-playin' : undefined} style={{ '--time': l.cor } as CSSProperties}>
             <td>{l.posicao}</td>
             <th scope="row">
-              <Escudo linha={l} />
+              <Escudo time={l} />
               <span className="nba-time-nome">{l.nome}</span>
               <abbr className="nba-time-sigla" title={l.nome}>{l.sigla}</abbr>
             </th>
@@ -107,6 +112,7 @@ function CartaoCategoria({ categoria, lideres }: { categoria: Categoria; lideres
       <h3 id={id}>{categoria.rotulo}</h3>
       <div className="nba-lider" style={{ '--time': primeiro.cor } as CSSProperties}>
         <span className="nba-coroa">1º</span>
+        <Escudo time={primeiro} soEscuro className="nba-escudo-lider" />
         <span className="nba-valor">{numero(primeiro.valor)}</span>
         <span className="nba-unidade">{categoria.unidade}</span>
         <strong className="nba-nome-lider">{primeiro.nome}</strong>
@@ -116,6 +122,7 @@ function CartaoCategoria({ categoria, lideres }: { categoria: Categoria; lideres
         {resto.map((l) => (
           <li key={l.posicao} style={{ '--time': l.cor, '--pct': l.valor / maior } as CSSProperties}>
             <span className="nba-pos" aria-hidden>{l.posicao}</span>
+            <Escudo time={l} className="nba-escudo-ranking" />
             <span className="nba-nome">{l.nome}</span>
             <abbr className="nba-sigla" title={l.time}>{l.sigla}</abbr>
             <span className="nba-barra" aria-hidden><i /></span>

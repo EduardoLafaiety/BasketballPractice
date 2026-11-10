@@ -2,17 +2,15 @@
 // navegador). As cores dos times vêm da aba Equipamentos, que já tem os 30 times.
 import { TIMES } from '../equipamentos/dados'
 import { comValidade } from './cache'
+import { escudos, type Escudos } from './escudos'
 
 export const URL_TABELA = 'https://site.api.espn.com/apis/v2/sports/basketball/nba/standings'
 
-export interface LinhaTabela {
+export interface LinhaTabela extends Escudos {
   posicao: number
   sigla: string
   nome: string
   cor: string
-  /** Escudo do time para fundo claro e para fundo escuro (CDN da ESPN). */
-  escudo: string
-  escudoEscuro: string
   vitorias: number
   derrotas: number
   /** Aproveitamento de 0 a 1. */
@@ -31,9 +29,6 @@ export interface Tabela {
 // A ESPN abrevia alguns times de outro jeito.
 const SIGLA_ESPN: Record<string, string> = { GS: 'GSW', SA: 'SAS', NY: 'NYK', NO: 'NOP', UTAH: 'UTA', WSH: 'WAS' }
 const COR = new Map(TIMES.map((t) => [t.sigla, t.cor]))
-// O CDN da ESPN usa a sigla dela em minúsculas; o "combiner" já entrega o escudo pequeno (56 px, nítido em tela retina).
-const escudo = (siglaEspn: string, variante: '500' | '500-dark') =>
-  `https://a.espncdn.com/combiner/i?img=/i/teamlogos/nba/${variante}/${siglaEspn.toLowerCase()}.png&h=56&w=56`
 
 interface RespostaEspn {
   children?: {
@@ -61,8 +56,7 @@ function linhas(entradas: NonNullable<NonNullable<RespostaEspn['children']>[numb
         sigla,
         nome: e.team?.displayName ?? sigla,
         cor: COR.get(sigla) ?? '#6b6b6b',
-        escudo: escudo(siglaEspn, '500'),
-        escudoEscuro: escudo(siglaEspn, '500-dark'),
+        ...escudos(siglaEspn),
         vitorias: num('wins'),
         derrotas: num('losses'),
         aproveitamento: num('winPercent'),
