@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState, type CSSProperties } from 'react'
+import { useCallback, useEffect, useRef, useState, type CSSProperties } from 'react'
 import { Carregando, ErroCarga } from '../components/Estado'
 import { tempoAtras } from '../lib/noticias'
 import { buscarLideres, numero, type Categoria, type Lider } from './lideres'
@@ -7,7 +7,8 @@ import { aproveitamento, buscarTabela, jogosAtras, type LinhaTabela } from './ta
 
 // As notícias se atualizam sozinhas com a página aberta; as que passam de 24 horas saem da lista.
 const ATUALIZAR_NOTICIAS_MS = 10 * 60_000
-const NOTICIAS_VISIVEIS = 3
+// Entram de 12 em 12 conforme a página rola (12 fecha fileiras de 1, 2, 3 ou 4 cartões).
+const NOTICIAS_POR_VEZ = 12
 
 /** Busca ao abrir, com carregando, erro e "tentar de novo". */
 function useCarga<T>(buscar: () => Promise<T>) {
@@ -148,7 +149,8 @@ function CartaoNoticia({ n }: { n: NoticiaNba }) {
 function Noticias() {
   const { dados, erro, carregar } = useCarga(buscarNoticiasNba)
   const [agora, setAgora] = useState(() => Date.now())
-  const [todas, setTodas] = useState(false)
+  const [quantas, setQuantas] = useState(NOTICIAS_POR_VEZ)
+  const fim = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const timer = window.setInterval(() => {
@@ -160,7 +162,23 @@ function Noticias() {
   }, [carregar])
 
   const lista = dados ? ultimas24h(dados, agora) : []
-  const visiveis = todas ? lista : lista.slice(0, NOTICIAS_VISIVEIS)
+  // Sem IntersectionObserver (navegador antigo), mostra tudo de uma vez.
+  const rolagem = typeof IntersectionObserver !== 'undefined'
+  const visiveis = rolagem ? lista.slice(0, quantas) : lista
+  const falta = visiveis.length < lista.length
+
+  // Quando o fim da lista chega perto da tela, entram mais; se ainda couber, o observador avisa de novo.
+  useEffect(() => {
+    if (!falta || !fim.current) return
+    const olho = new IntersectionObserver(
+      ([item]) => {
+        if (item.isIntersecting) setQuantas((q) => q + NOTICIAS_POR_VEZ)
+      },
+      { rootMargin: '0px 0px 600px 0px' },
+    )
+    olho.observe(fim.current)
+    return () => olho.disconnect()
+  }, [falta, quantas])
 
   return (
     <section className="nba-secao" aria-labelledby="nba-noticias">
@@ -175,11 +193,7 @@ function Noticias() {
               <CartaoNoticia key={n.id} n={n} />
             ))}
           </div>
-          {lista.length > NOTICIAS_VISIVEIS && (
-            <button className="btn nba-mais" onClick={() => setTodas((t) => !t)} aria-expanded={todas}>
-              {todas ? 'Mostrar menos' : `Mais notícias (${lista.length - NOTICIAS_VISIVEIS})`}
-            </button>
-          )}
+          {falta && <div ref={fim} className="nba-noticias-fim" aria-hidden />}
         </>
       )}
     </section>
