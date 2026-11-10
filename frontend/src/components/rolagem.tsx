@@ -1,11 +1,11 @@
 // Peças animadas pela rolagem: a bola da abertura, o boneco comandado pela rolagem e os nomes que correm.
 import { forwardRef, useEffect, useMemo, useRef, useState, type ReactNode, type RefObject } from 'react'
 import { COREOGRAFIAS } from '../demonstracoes/coreografias'
+import { menosMovimento } from '../lib/movimento'
 import { Atleta, Bola, novaBola, novoAtleta } from '../demonstracoes/Atleta'
 import { pintar, posicionar } from '../demonstracoes/desenho'
 import { CHAO, instante, preparar } from '../demonstracoes/motor'
 
-const movimentoReduzido = () => !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
 const limite = (x: number) => Math.max(0, Math.min(1, x))
 
 /** Chama `aoRolar` no máximo uma vez por quadro, ao rolar ou redimensionar. */
@@ -62,7 +62,7 @@ export function Figura({ nome, viewBox = '0 0 680 330', className, apiRef }: { n
       apiRef.current = { total: anim.total, desenhar }
       return () => { apiRef.current = null }
     }
-    if (movimentoReduzido() || typeof IntersectionObserver === 'undefined' || !svg.current) return
+    if (menosMovimento() || typeof IntersectionObserver === 'undefined' || !svg.current) return
 
     let quadro = 0
     let t = anim.total * 0.3
@@ -136,7 +136,7 @@ export const BolaCouro = forwardRef<SVGSVGElement>(function BolaCouro(_, ref) {
 /** Faz o furo da camada seguir o mouse; sem mouse (celular, ou antes do primeiro movimento), ele passeia pela bola. */
 export function useFuroBola(camada: RefObject<HTMLElement>) {
   useEffect(() => {
-    if (movimentoReduzido() || !camada.current) return
+    if (menosMovimento() || !camada.current) return
     const el = camada.current
     const mouse = { x: 0, y: 0, usou: false }
     const inicio = el.getBoundingClientRect()
@@ -186,7 +186,7 @@ export function AberturaBola({ titulo, children }: { titulo: ReactNode; children
   const dentro = useRef<HTMLDivElement>(null)
 
   useRolagem(() => {
-    if (!secao.current || movimentoReduzido()) return
+    if (!secao.current || menosMovimento()) return
     const p = progressoDoPino(secao.current)
     bolas.current.forEach((b) => { if (b) b.style.transform = `rotate(${p * 260}deg) scale(${1 + p * 1.7})` })
     if (dentro.current) dentro.current.style.transform = `scale(${1 + p * 1.2})`
@@ -240,10 +240,10 @@ export function ListraBola() {
 /** Frase que acende palavra por palavra conforme a rolagem. */
 export function FraseRolagem({ texto }: { texto: string }) {
   const caixa = useRef<HTMLElement>(null)
-  const [acesas, setAcesas] = useState(() => (movimentoReduzido() ? Number.MAX_SAFE_INTEGER : 0))
+  const [acesas, setAcesas] = useState(() => (menosMovimento() ? Number.MAX_SAFE_INTEGER : 0))
   const palavras = texto.split(' ')
   useRolagem(() => {
-    if (!caixa.current || movimentoReduzido()) return
+    if (!caixa.current || menosMovimento()) return
     const r = caixa.current.getBoundingClientRect()
     setAcesas(Math.round(limite((window.innerHeight * 0.85 - r.top) / (r.height * 0.72)) * palavras.length))
   })
@@ -294,7 +294,7 @@ export function NomesRolagem({ nomes, titulo, texto }: { nomes: string[]; titulo
   const b = useRef<HTMLDivElement>(null)
   const metade = Math.ceil(nomes.length / 2)
   useRolagem(() => {
-    if (!pino.current || !a.current || !b.current || movimentoReduzido()) return
+    if (!pino.current || !a.current || !b.current || menosMovimento()) return
     const caixa = pino.current.getBoundingClientRect()
     if (caixa.bottom < 0 || caixa.top > window.innerHeight) return
     const p = progressoDoPino(pino.current)

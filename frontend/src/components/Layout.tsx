@@ -3,6 +3,7 @@ import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
 import { api, dataLocal } from '../api'
 import { useAuth } from '../auth'
 import { iniciarEfeitos } from '../lib/efeitos'
+import { useAnimacoes } from '../lib/movimento'
 import { marcarLembrado, notificar, proximoLembrete } from '../lib/lembretes'
 import { aplicarTema } from '../lib/tema'
 import { diasAtras, useConfig } from '../store'
@@ -69,7 +70,9 @@ export default function Layout() {
   }, [carregado, config.tema])
   useLembretes(config.lembretes)
 
-  useEffect(() => (conteudo.current ? iniciarEfeitos(conteudo.current) : undefined), [])
+  // Efeitos de entrada e de mouse; religam sozinhos quando o atleta muda a opção de animações.
+  const { reduzido } = useAnimacoes()
+  useEffect(() => (conteudo.current && !reduzido ? iniciarEfeitos(conteudo.current) : undefined), [reduzido])
 
   // Cada tela começa do topo, e o menu fecha ao navegar.
   useEffect(() => {

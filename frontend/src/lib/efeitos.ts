@@ -14,8 +14,6 @@ interface Revelando {
 }
 
 export function iniciarEfeitos(raiz: HTMLElement) {
-  if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return () => {}
-
   const esperando = new Set<HTMLElement>()
   const registrar = () => {
     raiz.querySelectorAll<HTMLElement>(SURGE).forEach((el) => {
