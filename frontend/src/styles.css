@@ -1621,7 +1621,7 @@ body:has(.noticias) .aviso-cookies { bottom: calc(44px + 1rem); }
 .nba-noticia h3 { margin-top: 0; margin-bottom: 0; }
 .conteudo .nba-noticia p { margin-top: 0; color: var(--muted); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 .nba-noticia:hover h3 { color: var(--laranja-texto); }
-.nba-mais { margin-top: 1.25rem; }
+.nba-noticias-fim { height: 1px; }
 
 /* Artigos */
 /* Texto do artigo no padrão do site: fonte pequena, maiúscula e espaçada, também nas listas, nas citações e nas fontes. */
@@ -1705,7 +1705,7 @@ body:has(.noticias) .aviso-cookies { bottom: calc(44px + 1rem); }
 /* Artigos e Estatísticas da NBA no padrão do site: todo texto em maiúsculas com fonte pequena.
    Títulos de página e de seção e os números grandes (o valor do líder, o ranking) ficam como estão. */
 .conteudo .artigo p, .conteudo .artigo li, .conteudo .artigo cite, .conteudo .artigo .meta, .conteudo .artigo-cartao p, .conteudo .artigo-cartao-rodape,
-.conteudo .nba-noticia p, .conteudo .nba-noticia-meta, .conteudo .nba-tabela caption, .conteudo .nba-tabela th, .conteudo .nba-tabela td,
+.conteudo .nba-noticia h3, .conteudo .nba-noticia p, .conteudo .nba-noticia-meta, .conteudo .nba-tabela caption, .conteudo .nba-tabela th, .conteudo .nba-tabela td,
 .conteudo .nba-nome, .conteudo .nba-time, .conteudo .nba-unidade, .conteudo .nba-legenda, .conteudo .nba-fonte {
   font-size: 0.7rem;
   font-weight: 700;
@@ -1714,7 +1714,7 @@ body:has(.noticias) .aviso-cookies { bottom: calc(44px + 1rem); }
   text-transform: uppercase;
 }
 /* Títulos de cartão: também em maiúsculas, um pouco maiores que o texto para continuar dando para ler a hierarquia. */
-.conteudo .artigo-cartao h3, .conteudo .nba-noticia h3, .conteudo .nba-cartao h3, .conteudo .nba-nome-lider {
+.conteudo .artigo-cartao h3, .conteudo .nba-cartao h3, .conteudo .nba-nome-lider {
   font-size: 0.85rem;
   font-weight: 800;
   letter-spacing: 0.06em;

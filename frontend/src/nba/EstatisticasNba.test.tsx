@@ -71,11 +71,22 @@ describe('Estatísticas da NBA', () => {
     expect(cartoes[0]).toHaveAttribute('target', '_blank')
     expect(cartoes[0]).toHaveTextContent('CBS Sports · há 30 min')
     expect(within(secao).queryByText(/promo code/i)).toBeNull()
-    expect(within(secao).queryByRole('button', { name: /Mais notícias/ })).toBeNull()
+    expect(within(secao).queryByRole('button')).toBeNull()
   })
 
-  it('com muitas notícias do dia, mostra três e as outras ficam no "Mais notícias"', async () => {
-    const user = userEvent.setup()
+  it('com muitas notícias do dia, mostra 12 e as outras entram conforme a página rola, até acabar', async () => {
+    // O jsdom não tem IntersectionObserver: este finge o fim da lista chegando perto da tela.
+    let avisar: (visivel: boolean) => void = () => {}
+    vi.stubGlobal(
+      'IntersectionObserver',
+      class {
+        constructor(chamar: (itens: { isIntersecting: boolean }[]) => void) {
+          avisar = (visivel) => chamar([{ isIntersecting: visivel }])
+        }
+        observe() {}
+        disconnect() {}
+      },
+    )
     const agora = Date.now()
     const materia = (id: number) => ({
       id,
@@ -84,15 +95,22 @@ describe('Estatísticas da NBA', () => {
       published: new Date(agora - id * 60_000).toISOString(),
       links: { web: { href: `https://www.espn.com/nba/story/_/id/${id}` } },
     })
-    fontes({ noticiasEspn: { articles: [1, 2, 3, 4, 5].map(materia) } })
-    render(<EstatisticasNba />)
+    fontes({ noticiasEspn: { articles: Array.from({ length: 30 }, (_, i) => materia(i + 1)) } })
+    const { container } = render(<EstatisticasNba />)
 
     const secao = await screen.findByRole('region', { name: 'Notícias' })
-    const mais = await within(secao).findByRole('button', { name: 'Mais notícias (3)' })
-    expect(within(secao).getAllByRole('link')).toHaveLength(3)
-    await user.click(mais)
-    expect(within(secao).getAllByRole('link')).toHaveLength(6)
-    expect(within(secao).getByRole('button', { name: 'Mostrar menos' })).toHaveAttribute('aria-expanded', 'true')
+    await within(secao).findAllByRole('link')
+    expect(within(secao).getAllByRole('link')).toHaveLength(12)
+    expect(within(secao).queryByRole('button')).toBeNull()
+
+    act(() => avisar(false))
+    expect(within(secao).getAllByRole('link')).toHaveLength(12)
+    act(() => avisar(true))
+    expect(within(secao).getAllByRole('link')).toHaveLength(24)
+    act(() => avisar(true))
+    // 30 da ESPN e a da CBS: todas na tela, e o marcador do fim some.
+    expect(within(secao).getAllByRole('link')).toHaveLength(31)
+    expect(container.querySelector('.nba-noticias-fim')).toBeNull()
   })
 
   it('com a página aberta, as notícias se atualizam sozinhas a cada 10 minutos', async () => {
