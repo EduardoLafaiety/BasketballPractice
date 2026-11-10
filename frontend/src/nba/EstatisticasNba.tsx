@@ -26,6 +26,18 @@ function Estado({ erro, carregar, texto }: { erro: Error | null; carregar: () =>
   return erro ? <ErroCarga erro={erro} tentarDeNovo={carregar} /> : <Carregando texto={texto} />
 }
 
+/** Escudo nas versões para fundo claro e escuro (o CSS mostra a do tema); se não carregar, fica a bolinha na cor do time. */
+function Escudo({ linha }: { linha: LinhaTabela }) {
+  const [falhou, setFalhou] = useState(false)
+  if (falhou) return <span className="nba-time-cor" aria-hidden />
+  return (
+    <span className="nba-escudo" aria-hidden>
+      <img className="nba-escudo-claro" src={linha.escudo} alt="" width={28} height={28} loading="lazy" onError={() => setFalhou(true)} />
+      <img className="nba-escudo-escuro" src={linha.escudoEscuro} alt="" width={28} height={28} loading="lazy" onError={() => setFalhou(true)} />
+    </span>
+  )
+}
+
 function TabelaConferencia({ titulo, linhas }: { titulo: string; linhas: LinhaTabela[] }) {
   return (
     <table className="nba-tabela">
@@ -46,7 +58,7 @@ function TabelaConferencia({ titulo, linhas }: { titulo: string; linhas: LinhaTa
           <tr key={l.sigla} className={l.posicao <= 6 ? 'nba-direto' : l.posicao <= 10 ? 'nba-playin' : undefined} style={{ '--time': l.cor } as CSSProperties}>
             <td>{l.posicao}</td>
             <th scope="row">
-              <span className="nba-time-cor" aria-hidden />
+              <Escudo linha={l} />
               <span className="nba-time-nome">{l.nome}</span>
               <abbr className="nba-time-sigla" title={l.nome}>{l.sigla}</abbr>
             </th>

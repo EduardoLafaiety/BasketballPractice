@@ -1589,26 +1589,43 @@ body:has(.noticias) .aviso-cookies { bottom: calc(44px + 1rem); }
 .nba-legenda-playin::before { background: var(--laranja); }
 
 .nba-conferencias { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: 1.25rem; }
-.nba-tabela { width: 100%; border-collapse: collapse; background: var(--superficie); border-radius: var(--raio); box-shadow: var(--sombra); font-variant-numeric: tabular-nums; }
+.nba-tabela { width: 100%; border-collapse: separate; border-spacing: 0; overflow: hidden; background: var(--superficie); border: 1px solid var(--borda); border-radius: var(--raio); box-shadow: var(--sombra); font-variant-numeric: tabular-nums; }
 .nba-tabela caption { padding: 0 0 0.6rem; text-align: left; font-weight: 800; font-size: 0.85rem; letter-spacing: 0.1em; text-transform: uppercase; }
-.nba-tabela th, .nba-tabela td { padding: 0.5rem 0.55rem; border-bottom: 1px solid var(--borda); text-align: center; font-size: 0.85rem; }
-.nba-tabela thead th { color: var(--muted); font-size: 0.7rem; font-weight: 700; letter-spacing: 0.06em; }
+.nba-tabela th, .nba-tabela td { padding: 0.45rem 0.55rem; border-bottom: 1px solid var(--borda); text-align: center; vertical-align: middle; font-size: 0.85rem; }
+.nba-tabela thead th { padding-block: 0.6rem; background: var(--superficie-2); color: var(--muted); font-size: 0.68rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
 .nba-tabela thead th:nth-child(2) { text-align: left; }
 .nba-tabela abbr { text-decoration: none; }
-.nba-tabela tbody th { text-align: left; font-weight: 600; white-space: nowrap; }
+.nba-tabela tbody th { width: 100%; text-align: left; font-weight: 700; white-space: nowrap; }
 .nba-tabela tbody tr:last-child > * { border-bottom: 0; }
+/* Linha tracejada separando quem vai direto, o play-in e quem está fora. */
+.nba-tabela tr.nba-direto:has(+ tr.nba-playin) > *, .nba-tabela tr.nba-playin:has(+ tr:not(.nba-playin)) > * { border-bottom: 1px dashed var(--muted); }
 /* Faixa à esquerda: verde para quem vai direto aos playoffs, laranja para o play-in. */
-.nba-tabela tbody td:first-child { border-left: 4px solid transparent; color: var(--muted); font-weight: 700; }
+.nba-tabela tbody td:first-child { width: 2.2rem; border-left: 4px solid transparent; color: var(--muted); font-weight: 700; }
 .nba-tabela tr.nba-direto td:first-child { border-left-color: var(--verde); }
 .nba-tabela tr.nba-playin td:first-child { border-left-color: var(--laranja); }
-.nba-time-cor { display: inline-block; width: 10px; height: 10px; margin-right: 0.5rem; border-radius: 50%; background: var(--time); box-shadow: 0 0 0 1px rgba(127, 127, 127, 0.35); vertical-align: -1px; }
+/* Derrotas e jogos atrás mais apagados, para as vitórias e o aproveitamento saltarem aos olhos. */
+.nba-tabela tbody td:nth-child(4), .nba-tabela tbody td:nth-child(6) { color: var(--muted); }
+
+/* Escudo do time: a versão para fundo escuro no tema escuro, a para fundo claro no tema claro. */
+.nba-escudo { display: inline-flex; width: 28px; height: 28px; margin-right: 0.65rem; vertical-align: middle; }
+.nba-escudo img { width: 100%; height: 100%; object-fit: contain; }
+.nba-escudo-claro { display: none; }
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme='dark']) .nba-escudo-claro { display: block; }
+  :root:not([data-theme='dark']) .nba-escudo-escuro { display: none; }
+}
+:root[data-theme='light'] .nba-escudo-claro { display: block; }
+:root[data-theme='light'] .nba-escudo-escuro { display: none; }
+.nba-time-cor { display: inline-block; width: 10px; height: 10px; margin: 0 1.1rem 0 0.5rem; border-radius: 50%; background: var(--time); box-shadow: 0 0 0 1px rgba(127, 127, 127, 0.35); vertical-align: middle; }
+.nba-time-nome, .nba-time-sigla { vertical-align: middle; }
 .nba-time-sigla { display: none; }
 .nba-seq-v { color: var(--verde); font-weight: 700; }
 .nba-seq-d { color: var(--vermelho); font-weight: 700; }
 @media (max-width: 560px) {
   .nba-time-nome { display: none; }
   .nba-time-sigla { display: inline; }
-  .nba-tabela th, .nba-tabela td { padding: 0.45rem 0.35rem; }
+  .nba-tabela th, .nba-tabela td { padding: 0.4rem 0.35rem; }
+  .nba-escudo { width: 24px; height: 24px; margin-right: 0.45rem; }
 }
 
 .nba-noticias { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr)); gap: 1.25rem; }

@@ -10,6 +10,9 @@ export interface LinhaTabela {
   sigla: string
   nome: string
   cor: string
+  /** Escudo do time para fundo claro e para fundo escuro (CDN da ESPN). */
+  escudo: string
+  escudoEscuro: string
   vitorias: number
   derrotas: number
   /** Aproveitamento de 0 a 1. */
@@ -28,6 +31,9 @@ export interface Tabela {
 // A ESPN abrevia alguns times de outro jeito.
 const SIGLA_ESPN: Record<string, string> = { GS: 'GSW', SA: 'SAS', NY: 'NYK', NO: 'NOP', UTAH: 'UTA', WSH: 'WAS' }
 const COR = new Map(TIMES.map((t) => [t.sigla, t.cor]))
+// O CDN da ESPN usa a sigla dela em minúsculas; o "combiner" já entrega o escudo pequeno (56 px, nítido em tela retina).
+const escudo = (siglaEspn: string, variante: '500' | '500-dark') =>
+  `https://a.espncdn.com/combiner/i?img=/i/teamlogos/nba/${variante}/${siglaEspn.toLowerCase()}.png&h=56&w=56`
 
 interface RespostaEspn {
   children?: {
@@ -47,13 +53,16 @@ function linhas(entradas: NonNullable<NonNullable<RespostaEspn['children']>[numb
     .map((e) => {
       const stat = (nome: string) => e.stats?.find((s) => s.name === nome)
       const num = (nome: string) => Number(stat(nome)?.value ?? 0) || 0
-      const sigla = SIGLA_ESPN[e.team?.abbreviation ?? ''] ?? e.team?.abbreviation ?? ''
+      const siglaEspn = e.team?.abbreviation ?? ''
+      const sigla = SIGLA_ESPN[siglaEspn] ?? siglaEspn
       const seq = stat('streak')?.displayValue ?? ''
       return {
         posicao: num('playoffSeed'),
         sigla,
         nome: e.team?.displayName ?? sigla,
         cor: COR.get(sigla) ?? '#6b6b6b',
+        escudo: escudo(siglaEspn, '500'),
+        escudoEscuro: escudo(siglaEspn, '500-dark'),
         vitorias: num('wins'),
         derrotas: num('losses'),
         aproveitamento: num('winPercent'),
