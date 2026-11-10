@@ -1,4 +1,4 @@
-import { screen, waitFor, within } from '@testing-library/react'
+import { fireEvent, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { definirToken, type Noticia } from '../api'
@@ -7,6 +7,7 @@ import { apiFalsa, configFalsa, Resposta, usuarioFalso } from '../test/api-falsa
 import { abrirApp } from '../test/renderizar'
 import { respostaEspn } from '../nba/exemplo-espn'
 import { buscarLideres, lerLideres } from '../nba/lideres'
+import { tempoDeGravacao } from './BarraNoticias'
 
 // As estatísticas da NBA vêm da ESPN: aqui a busca é simulada (por padrão, falha e a barra fica só com as notícias).
 vi.mock('../nba/lideres', async (original) => ({ ...(await original<typeof import('../nba/lideres')>()), buscarLideres: vi.fn() }))
@@ -53,11 +54,12 @@ describe('Barra de notícias', () => {
     expect(within(barra).getByRole('list').querySelector('.noticias-selo')!.nextElementSibling).toHaveTextContent('LeBron muda de time')
   })
 
-  it('como faixa de TV: selo ao vivo, "Últimas notícias" e o assunto de cada manchete', async () => {
+  it('como câmera de reportagem: REC, tempo gravando, "Últimas notícias" e o assunto de cada manchete', async () => {
     abrir([noticia({}), noticia({ id: 3, title: 'Brandon Miller acerta extensão com o Hornets' }), noticia({ id: 4, title: 'NBB 2026/27 é lançado no Rio' })])
     const barra = await screen.findByRole('region', { name: 'Notícias de basquete' })
 
-    expect(barra.querySelector('.noticias-vivo')).toHaveTextContent('Ao vivo')
+    expect(barra.querySelector('.noticias-visor')).toHaveTextContent(/^Rec$/)
+    expect(barra.querySelector('.noticias-tempo')!.textContent).toMatch(/^\d{2}:\d{2}:\d{2}$/)
     expect(barra.querySelector('.noticias-rotulo')).toHaveTextContent(/^Últimas notícias$/)
     expect(within(barra).queryByText(/Atualizado/)).toBeNull()
     const lista = within(barra).getByRole('list')
@@ -88,6 +90,28 @@ describe('Barra de notícias', () => {
     const barra = await screen.findByRole('region', { name: 'Notícias de basquete' })
     const copia = barra.querySelector('.noticias-lista[aria-hidden="true"]')!
     expect(copia.querySelector('a')).toHaveAttribute('tabindex', '-1')
+  })
+
+  it('o flash dispara quando chega notícia nova e a cada volta da faixa, mas não na primeira carga', async () => {
+    let lista = [noticia({})]
+    abrir(() => lista)
+    const barra = await screen.findByRole('region', { name: 'Notícias de basquete' })
+    expect(barra.querySelector('.noticias-flash')).toBeNull()
+
+    // Atualizar com as mesmas manchetes não pisca.
+    window.dispatchEvent(new Event(NOTICIAS_MUDARAM))
+    await new Promise((r) => setTimeout(r, 20))
+    expect(barra.querySelector('.noticias-flash')).toBeNull()
+
+    lista = [noticia({ id: 9, origin: 'admin', title: 'Troca bombástica', url: null }), noticia({})]
+    window.dispatchEvent(new Event(NOTICIAS_MUDARAM))
+    await within(barra).findAllByText('Troca bombástica')
+    const primeiro = barra.querySelector('.noticias-flash')
+    expect(primeiro).not.toBeNull()
+
+    // Cada volta troca o elemento, para a animação rodar de novo.
+    fireEvent.animationIteration(barra.querySelector('.noticias-trilha')!)
+    expect(barra.querySelector('.noticias-flash')).not.toBe(primeiro)
   })
 
   it('pausa e continua pelo botão', async () => {
@@ -128,6 +152,17 @@ describe('Barra de notícias', () => {
     await waitFor(() => expect(ultima('GET', '/news')).toBeDefined())
     await new Promise((r) => setTimeout(r, 20))
     expect(screen.queryByRole('region', { name: 'Notícias de basquete' })).toBeNull()
+  })
+})
+
+describe('tempoDeGravacao', () => {
+  it.each([
+    [0, '00:00:00'],
+    [59, '00:00:59'],
+    [61, '00:01:01'],
+    [3_725, '01:02:05'],
+  ])('%i s → %s', (segundos, esperado) => {
+    expect(tempoDeGravacao(segundos)).toBe(esperado)
   })
 })
 
