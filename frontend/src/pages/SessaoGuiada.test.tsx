@@ -1,4 +1,4 @@
-import { act, screen, within } from '@testing-library/react'
+import { act, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import { definirToken } from '../api'
@@ -101,7 +101,8 @@ describe('Sessão guiada', () => {
     await user.type(screen.getByLabelText('Notas'), '  Joelho tranquilo  ')
     await clicar(user, 'Salvar sessão')
 
-    expect(await screen.findByTestId('caminho')).toHaveTextContent('/desempenho')
+    // Salvar navega depois da resposta da API: espera a troca de página em vez de olhar uma vez só.
+    await waitFor(() => expect(screen.getByTestId('caminho')).toHaveTextContent('/desempenho'))
     expect(ultima('POST', '/sessions')?.corpo).toMatchObject({
       workoutId: 7,
       durationMinutes: 1,
