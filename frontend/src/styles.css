@@ -1569,6 +1569,9 @@ select.input:hover:not(:disabled) { border-color: var(--laranja); }
 .nba-mais { margin-top: 1.25rem; }
 
 /* Artigos */
+/* Texto do artigo no padrão do site: fonte pequena, maiúscula e espaçada, também nas listas, nas citações e nas fontes. */
+.conteudo .artigo-texto li, .conteudo .artigo-texto cite { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.06em; line-height: 1.55; text-transform: uppercase; }
+.conteudo .artigo-texto p { line-height: 1.75; }
 .artigo-categorias { grid-template-columns: repeat(5, minmax(0, 1fr)); margin-top: 2rem; }
 .artigo-categoria { display: grid; gap: 0.3rem; align-content: start; text-align: left; font: inherit; color: var(--texto); cursor: pointer; border-top: 5px solid var(--c); }
 .conteudo .artigo-categoria strong { font-family: var(--fonte-display); font-weight: var(--peso-display); font-size: 1.35rem; letter-spacing: 0.01em; text-transform: uppercase; line-height: 1; overflow-wrap: anywhere; }
@@ -1592,20 +1595,20 @@ select.input:hover:not(:disabled) { border-color: var(--laranja); }
 .artigo-topo { display: grid; gap: 0.6rem; justify-items: start; padding-bottom: 1.5rem; border-bottom: 5px solid var(--c); }
 .artigo-topo .tag { text-decoration: none; }
 .artigo-topo h1 { margin: 0.2rem 0 0; }
-.conteudo .artigo-linha-fina { margin: 0; font-size: 1.15rem; line-height: 1.5; }
+.conteudo .artigo-linha-fina { margin: 0; font-size: 0.85rem; line-height: 1.6; }
 .artigo-corpo h2 { font-size: 1.5rem; margin-top: 2.25rem; }
 .artigo-corpo p { line-height: 1.7; overflow-wrap: anywhere; }
 .artigo-rotulo { display: block; margin-bottom: 0.75rem; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--c); }
 .artigo-ciencia { margin: 2.25rem 0 0; padding: 1.25rem 1.4rem; border-left: 4px solid var(--c); background: var(--superficie); border-radius: 0 var(--raio) var(--raio) 0; }
 .artigo-ciencia ul { display: grid; gap: 1rem; margin: 0; padding: 0; list-style: none; }
 .artigo-ciencia li { line-height: 1.6; }
-.artigo-ciencia cite { display: block; margin-top: 0.3rem; color: var(--muted); font-size: 0.82rem; font-style: normal; }
+.artigo-ciencia cite { display: block; margin-top: 0.3rem; color: var(--muted); font-style: normal; }
 .artigo-pratica { margin-top: 1.25rem; }
 .artigo-pratica ul { display: grid; gap: 0.6rem; margin: 0; padding: 0; list-style: none; }
 .artigo-pratica li { display: grid; grid-template-columns: auto 1fr; gap: 0.6rem; align-items: start; line-height: 1.55; }
 .artigo-pratica li .icone-svg { margin-top: 0.15rem; color: var(--c); }
 .artigo-no-app { display: inline-flex; align-items: center; gap: 0.4rem; margin-top: 1.1rem; }
-.artigo-fontes ol { display: grid; gap: 0.5rem; padding-left: 1.2rem; color: var(--muted); font-size: 0.85rem; line-height: 1.5; }
+.artigo-fontes ol { display: grid; gap: 0.5rem; padding-left: 1.2rem; color: var(--muted); }
 
 @media (max-width: 1180px) { .artigo-categorias { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 @media (max-width: 640px) {
@@ -1653,6 +1656,5 @@ select.input:hover:not(:disabled) { border-color: var(--laranja); }
   line-height: 1.3;
   text-transform: uppercase;
 }
-.conteudo .artigo-corpo p { line-height: 1.8; }
 .artigo-fonte-link { color: inherit; text-decoration: underline; text-decoration-color: var(--c); text-underline-offset: 3px; }
 .artigo-fonte-link:hover { color: var(--laranja-texto); }

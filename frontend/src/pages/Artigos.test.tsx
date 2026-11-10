@@ -79,7 +79,7 @@ describe('dados dos artigos', () => {
       expect(a.fontes.length).toBeGreaterThan(0)
       expect(minutosDeLeitura(a)).toBeGreaterThanOrEqual(1)
     }
-    // Toda categoria tem pelo menos dois artigos.
-    for (const c of CATEGORIAS) expect(ARTIGOS.filter((a) => a.categoria === c.id).length).toBeGreaterThanOrEqual(2)
+    // Toda categoria tem cinco artigos.
+    for (const c of CATEGORIAS) expect(ARTIGOS.filter((a) => a.categoria === c.id)).toHaveLength(5)
   })
 })
