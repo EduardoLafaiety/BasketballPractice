@@ -2,6 +2,7 @@ import { useState, type CSSProperties } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router-dom'
 import { ARTIGOS, CATEGORIAS, categoria, minutosDeLeitura, type Artigo, type Categoria } from '../artigos/dados'
 import { linkDaFonte } from '../artigos/links'
+import ImagemArtigo from '../artigos/ImagemArtigo'
 import Icone from '../components/Icone'
 import NaoEncontrada from './NaoEncontrada'
 
@@ -11,6 +12,7 @@ function CartaoArtigo({ artigo }: { artigo: Artigo }) {
   const cat = categoria(artigo.categoria)
   return (
     <Link to={`/artigos/${artigo.id}`} className="card artigo-cartao" style={{ '--c': cat.cor } as CSSProperties}>
+      <ImagemArtigo id={artigo.id} />
       <span className="tag">{cat.nome}</span>
       <h3>{artigo.titulo}</h3>
       <p>{artigo.resumo}</p>
@@ -111,6 +113,7 @@ export function ArtigoDetalhe() {
         <p className="artigo-texto artigo-linha-fina">{artigo.resumo}</p>
         <span className="meta">{minutosDeLeitura(artigo)} min de leitura</span>
       </header>
+      <ImagemArtigo id={artigo.id} capa />
 
       <div className="artigo-corpo artigo-texto">
         {artigo.secoes.map((s) => (

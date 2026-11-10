@@ -1658,3 +1658,9 @@ select.input:hover:not(:disabled) { border-color: var(--laranja); }
 }
 .artigo-fonte-link { color: inherit; text-decoration: underline; text-decoration-color: var(--c); text-underline-offset: 3px; }
 .artigo-fonte-link:hover { color: var(--laranja-texto); }
+/* Imagens dos artigos: foto na História, ilustração própria nas outras categorias, sempre em 3:2 */
+.artigo-imagem { aspect-ratio: 3 / 2; overflow: hidden; border-radius: 18px; background: var(--superficie-2); }
+.artigo-imagem img, .artigo-imagem svg { display: block; width: 100%; height: 100%; object-fit: cover; }
+.artigo-cartao .artigo-imagem { margin-bottom: 0.5rem; }
+.artigo-capa { max-width: var(--largura); margin: 1.75rem 0 0; }
+.conteudo .artigo-capa .credito-foto { margin-top: 0.6rem; font-size: 0.66rem; font-weight: 700; letter-spacing: 0.06em; line-height: 1.55; text-transform: uppercase; }
