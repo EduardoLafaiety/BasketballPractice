@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import EstatisticasNba from './EstatisticasNba'
 import { respostaEspn, respostaNoticiasEspn, respostaTabela, rssCbs } from './exemplo-espn'
-import { esquecerLideres, URL_LIDERES } from './lideres'
+import { esquecerLideres, lerLideres, URL_LIDERES } from './lideres'
 import { buscarNoticiasNba, URL_NOTICIAS_CBS, URL_NOTICIAS_ESPN } from './noticias'
 import { buscarTabela, URL_TABELA } from './tabela'
 
@@ -60,6 +60,26 @@ describe('Estatísticas da NBA', () => {
     const ranking = within(pontos).getByRole('list')
     expect(ranking).toHaveAttribute('start', '2')
     expect(within(ranking).getByRole('listitem')).toHaveTextContent('Stephen Curry')
+
+    // Escudos: o do líder só na versão escura (o cartão tem o fundo na cor do time); os do ranking nos dois temas.
+    const lider = pontos.querySelectorAll('.nba-escudo-lider img')
+    expect([...lider].map((i) => i.getAttribute('src'))).toEqual([expect.stringContaining('/500-dark/lal.png')])
+    expect(within(ranking).getByRole('listitem').querySelector('img.nba-escudo-claro')).toHaveAttribute('src', expect.stringContaining('/500/gs.png'))
+    // Sem o escudo, o líder fica sem nada no lugar; no ranking volta a bolinha na cor do time.
+    act(() => lider[0].dispatchEvent(new Event('error')))
+    expect(pontos.querySelector('.nba-escudo-lider')).toBeNull()
+  })
+
+  it('dados guardados antes dos escudos (sem os endereços) mostram a bolinha, não uma imagem vazia', async () => {
+    fontes()
+    const { categorias } = lerLideres(respostaEspn)
+    const semEscudos = categorias.map((c) => ({ ...c, lideres: c.lideres.map(({ escudo: _e, escudoEscuro: _ee, ...l }) => l) }))
+    sessionStorage.setItem('bp.nba.lideres', JSON.stringify({ quando: Date.now(), dados: { temporada: '2026-27', categorias: semEscudos } }))
+    render(<EstatisticasNba />)
+
+    const pontos = await screen.findByRole('region', { name: 'Pontos' })
+    expect(pontos.querySelector('img')).toBeNull()
+    expect(within(pontos).getByRole('listitem').querySelector('.nba-time-cor')).not.toBeNull()
   })
 
   it('mostra as notícias em cartões, que abrem a matéria no site de origem', async () => {

@@ -2,6 +2,7 @@
 // navegador, então funciona também na demonstração sem servidor). Guardados por 15 minutos.
 
 import { comValidade } from './cache'
+import { escudos, type Escudos } from './escudos'
 
 export const URL_LIDERES = 'https://site.api.espn.com/apis/site/v3/sports/basketball/nba/leaders'
 const VALIDADE_MS = 15 * 60_000
@@ -26,7 +27,7 @@ export const CATEGORIAS: Categoria[] = [
   { id: '3PointsMadePerGame', rotulo: 'Bolas de 3', unidade: 'cestas de 3 por jogo', curto: 'bolas de 3' },
 ]
 
-export interface Lider {
+export interface Lider extends Escudos {
   posicao: number
   nome: string
   time: string
@@ -71,6 +72,7 @@ export function lerLideres(json: unknown): Lideres {
         sigla: l.team?.abbreviation ?? '',
         cor: /^[0-9a-f]{6}$/i.test(l.team?.color ?? '') ? `#${l.team!.color}` : '#6b6b6b',
         valor: l.value,
+        ...escudos(l.team?.abbreviation ?? ''),
       }))
     return lideres.length ? [{ categoria, lideres }] : []
   })

@@ -7,7 +7,16 @@ describe('Líderes da NBA', () => {
     const { temporada, categorias } = lerLideres(respostaEspn)
     expect(temporada).toBe('2026-27')
     expect(categorias.map((c) => c.categoria.id)).toEqual(['pointsPerGame', 'reboundsPerGame'])
-    expect(categorias[0].lideres[0]).toEqual({ posicao: 1, nome: 'Luka Doncic', time: 'Los Angeles Lakers', sigla: 'LAL', cor: '#552583', valor: 39.29999923706055 })
+    expect(categorias[0].lideres[0]).toEqual({
+      posicao: 1,
+      nome: 'Luka Doncic',
+      time: 'Los Angeles Lakers',
+      sigla: 'LAL',
+      cor: '#552583',
+      valor: 39.29999923706055,
+      escudo: 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/nba/500/lal.png&h=56&w=56',
+      escudoEscuro: 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/nba/500-dark/lal.png&h=56&w=56',
+    })
   })
 
   it('ignora quem vem sem nome e usa cinza quando a cor do time não é válida', () => {
