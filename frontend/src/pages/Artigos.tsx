@@ -1,6 +1,7 @@
 import { useState, type CSSProperties } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router-dom'
 import { ARTIGOS, CATEGORIAS, categoria, minutosDeLeitura, type Artigo, type Categoria } from '../artigos/dados'
+import { linkDaFonte } from '../artigos/links'
 import Icone from '../components/Icone'
 import NaoEncontrada from './NaoEncontrada'
 
@@ -81,6 +82,18 @@ export default function Artigos() {
   )
 }
 
+/** A referência como link para a fonte original, que abre em outra aba. */
+function Fonte({ texto }: { texto: string }) {
+  const url = linkDaFonte(texto)
+  if (!url) return <>{texto}</>
+  return (
+    <a href={url} target="_blank" rel="noopener noreferrer" className="artigo-fonte-link" title="Abre a fonte em outra aba">
+      {texto}
+      <span aria-hidden> ↗</span>
+    </a>
+  )
+}
+
 export function ArtigoDetalhe() {
   const { id } = useParams()
   const artigo = ARTIGOS.find((a) => a.id === id)
@@ -114,7 +127,7 @@ export function ArtigoDetalhe() {
               {artigo.ciencia.map((c) => (
                 <li key={c.fonte}>
                   {c.achado}
-                  <cite>{c.fonte}</cite>
+                  <cite><Fonte texto={c.fonte} /></cite>
                 </li>
               ))}
             </ul>
@@ -138,7 +151,7 @@ export function ArtigoDetalhe() {
         <section className="artigo-fontes">
           <h2>Fontes</h2>
           <ol>
-            {artigo.fontes.map((f) => <li key={f}>{f}</li>)}
+            {artigo.fontes.map((f) => <li key={f}><Fonte texto={f} /></li>)}
           </ol>
           <p className="meta">{AVISO}</p>
         </section>

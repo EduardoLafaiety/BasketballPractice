@@ -1563,15 +1563,12 @@ select.input:hover:not(:disabled) { border-color: var(--laranja); }
 .nba-noticia > .nba-noticia-meta:first-child { margin-top: 1.1rem; }
 .nba-noticia-meta { color: var(--muted); font-size: 0.72rem; }
 .nba-noticia-meta strong { color: var(--laranja-texto); }
-.nba-noticia h3 { font-size: 1.05rem; line-height: 1.25; text-transform: none; }
-.conteudo .nba-noticia p { margin-top: 0; color: var(--muted); font-size: 0.85rem; line-height: 1.4; text-transform: none; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.nba-noticia h3 { margin-top: 0; margin-bottom: 0; }
+.conteudo .nba-noticia p { margin-top: 0; color: var(--muted); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 .nba-noticia:hover h3 { color: var(--laranja-texto); }
 .nba-mais { margin-top: 1.25rem; }
 
 /* Artigos */
-/* Texto corrido do artigo: letra normal, sem as maiúsculas miúdas que o resto do conteúdo usa. */
-.artigo-texto, .artigo-texto li, .conteudo .artigo-texto p, .conteudo p.artigo-texto { text-transform: none; font-size: 1rem; font-weight: 400; letter-spacing: 0; }
-.conteudo .artigo-texto cite, .conteudo .artigo-texto .meta { text-transform: none; font-size: 0.82rem; font-weight: 400; letter-spacing: 0; }
 .artigo-categorias { grid-template-columns: repeat(5, minmax(0, 1fr)); margin-top: 2rem; }
 .artigo-categoria { display: grid; gap: 0.3rem; align-content: start; text-align: left; font: inherit; color: var(--texto); cursor: pointer; border-top: 5px solid var(--c); }
 .conteudo .artigo-categoria strong { font-family: var(--fonte-display); font-weight: var(--peso-display); font-size: 1.35rem; letter-spacing: 0.01em; text-transform: uppercase; line-height: 1; overflow-wrap: anywhere; }
@@ -1636,3 +1633,26 @@ select.input:hover:not(:disabled) { border-color: var(--laranja); }
 /* A bolinha da etiqueta usa a cor da categoria, que vem do cartão. */
 .artigo-cartao .tag, .artigo-topo .tag, .artigos-chamada-artigo .tag { --c: inherit; }
 @media (max-width: 800px) { .artigos-chamada { grid-template-columns: 1fr; } }
+
+/* Artigos e Estatísticas da NBA no padrão do site: todo texto em maiúsculas com fonte pequena.
+   Títulos de página e de seção e os números grandes (o valor do líder, o ranking) ficam como estão. */
+.conteudo .artigo p, .conteudo .artigo li, .conteudo .artigo cite, .conteudo .artigo .meta, .conteudo .artigo-cartao p, .conteudo .artigo-cartao-rodape,
+.conteudo .nba-noticia p, .conteudo .nba-noticia-meta, .conteudo .nba-tabela caption, .conteudo .nba-tabela th, .conteudo .nba-tabela td,
+.conteudo .nba-nome, .conteudo .nba-time, .conteudo .nba-unidade, .conteudo .nba-legenda, .conteudo .nba-fonte {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  line-height: 1.55;
+  text-transform: uppercase;
+}
+/* Títulos de cartão: também em maiúsculas, um pouco maiores que o texto para continuar dando para ler a hierarquia. */
+.conteudo .artigo-cartao h3, .conteudo .nba-noticia h3, .conteudo .nba-cartao h3, .conteudo .nba-nome-lider {
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  line-height: 1.3;
+  text-transform: uppercase;
+}
+.conteudo .artigo-corpo p { line-height: 1.8; }
+.artigo-fonte-link { color: inherit; text-decoration: underline; text-decoration-color: var(--c); text-underline-offset: 3px; }
+.artigo-fonte-link:hover { color: var(--laranja-texto); }

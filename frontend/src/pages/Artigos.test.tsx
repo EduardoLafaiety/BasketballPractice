@@ -48,10 +48,17 @@ describe('Artigos', () => {
 
     expect(screen.getByRole('heading', { name: 'Dormir mais acerta mais arremessos', level: 1 })).toBeInTheDocument()
     const ciencia = screen.getByRole('complementary', { name: 'O que a ciência diz' })
-    expect(within(ciencia).getByText(/Mah CD, Mah KE, Kezirian EJ, Dement WC\. Sleep, 2011/)).toBeInTheDocument()
+    const estudo = within(ciencia).getByRole('link', { name: /Mah CD, Mah KE, Kezirian EJ, Dement WC\. Sleep, 2011/ })
+    expect(estudo).toHaveAttribute('href', 'https://doi.org/10.5665/sleep.1132')
+    expect(estudo).toHaveAttribute('target', '_blank')
+    expect(estudo).toHaveAttribute('rel', 'noopener noreferrer')
     const pratica = screen.getByRole('complementary', { name: 'Na prática' })
     expect(within(pratica).getByRole('link', { name: /Organizar minha rotina/ })).toHaveAttribute('href', '/rotina')
-    expect(screen.getByRole('heading', { name: 'Fontes' })).toBeInTheDocument()
+    // Cada fonte da lista é um link para o original.
+    const fontes = screen.getByRole('heading', { name: 'Fontes' }).closest('section')!
+    const itens = within(fontes).getAllByRole('listitem')
+    expect(itens.length).toBeGreaterThan(0)
+    for (const item of itens) expect(within(item).getByRole('link')).toHaveAttribute('href', expect.stringMatching(/^https:\/\//))
     expect(screen.getByRole('heading', { name: 'Leia também' })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: /Higiene do sono/ })).toHaveAttribute('href', '/artigos/higiene-do-sono')
   })
