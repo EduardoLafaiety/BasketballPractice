@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { Atleta, Bola, novaBola, novoAtleta, SombraBola } from './Atleta'
 import { caminhos, PARTES, pintar, posicionar } from './desenho'
 import {
   alturaQuadril,
@@ -11,7 +12,6 @@ import {
   pegadas,
   POSE_NEUTRA,
   preparar,
-  RAIO_BOLA,
   type Animacao,
   type Coreografia,
 } from './motor'
@@ -36,9 +36,9 @@ export default function Demonstracao({ coreografia, nome }: { coreografia: Coreo
   const pararEm = useRef<number | null>(null)
   const tocandoRef = useRef(tocando)
   const velocidadeRef = useRef(velocidade)
-  const partes = useRef<Record<string, SVGPathElement | null>>({})
-  const bola = useRef<SVGCircleElement>(null)
-  const bola2 = useRef<SVGCircleElement>(null)
+  const atleta = useRef(novoAtleta())
+  const bola = useRef(novaBola())
+  const bola2 = useRef(novaBola())
   const parceiro = useRef<SVGGElement>(null)
   const marcasRef = useRef<(SVGGElement | null)[]>([])
   const desenhar = useRef<(t: number) => void>(() => {})
@@ -48,9 +48,9 @@ export default function Demonstracao({ coreografia, nome }: { coreografia: Coreo
 
   desenhar.current = (t: number) => {
     const agora = instante(anim, t)
-    pintar(anim, agora, partes.current)
-    posicionar(bola.current, agora.bola)
-    posicionar(bola2.current, agora.bola2)
+    pintar(anim, agora, atleta.current.partes, atleta.current.sombra)
+    posicionar(bola.current, agora.bola, agora.solo)
+    posicionar(bola2.current, agora.bola2, agora.solo)
     if (parceiro.current && agora.px !== undefined) parceiro.current.setAttribute('transform', `translate(${agora.px.toFixed(1)} 0)`)
     marcas.forEach((m, i) => marcasRef.current[i]?.setAttribute('opacity', t >= m.tempo - 1 ? '1' : '0'))
     setFase(agora.fase)
@@ -136,13 +136,11 @@ export default function Demonstracao({ coreografia, nome }: { coreografia: Coreo
             {PARTES.map((p) => <path key={p.id} d={corpoParceiro[p.id]} />)}
           </g>
         )}
-        <g className="demo-corpo">
-          {PARTES.map((p) => (
-            <path key={p.id} ref={(el) => { partes.current[p.id] = el }} className={`demo-${anim.frente ? 'perto' : p.lado}`} />
-          ))}
-        </g>
-        <circle ref={bola} r={RAIO_BOLA} className="demo-bola" />
-        <circle ref={bola2} r={RAIO_BOLA} className="demo-bola" />
+        <SombraBola els={bola} />
+        <SombraBola els={bola2} />
+        <Atleta els={atleta} frente={anim.frente} />
+        <Bola els={bola} />
+        <Bola els={bola2} />
 
         <rect x="20" y="324" width="640" height="70" rx="8" className="demo-mapa" />
         <text x="32" y="341" className="demo-legenda">Pegadas, vista de cima</text>

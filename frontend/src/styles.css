@@ -896,6 +896,24 @@ section + section, .card + section { margin-top: 1.5rem; }
 .demo-longe { fill: #a9a7a0; }
 .demo-corpo path.demo-musculo { fill: var(--laranja); }
 .demo-corpo path.demo-longe.demo-musculo { fill: #c95a12; }
+/* Atleta: pele, uniforme azul com friso branco, meias e tênis brancos; o lado longe fica na sombra. */
+.demo-atleta path { stroke: #1d1b17; stroke-width: 1.1; }
+.demo-atleta .demo-pele { fill: #c68a5e; }
+.demo-atleta .demo-pele.demo-longe { fill: #9a6443; }
+.demo-atleta .demo-camisa, .demo-atleta .demo-short { fill: #2f5fd0; }
+.demo-atleta .demo-short.demo-longe { fill: #2349a6; }
+.demo-atleta .demo-friso { fill: #ffffff; stroke: none; }
+.demo-atleta .demo-meia { fill: #f2f2f2; }
+.demo-atleta .demo-tenis { fill: #fafafa; }
+.demo-atleta .demo-meia.demo-longe, .demo-atleta .demo-tenis.demo-longe { fill: #cfcfcf; }
+.demo-atleta .demo-sola { fill: #2b2b2b; stroke: none; }
+.demo-atleta .demo-cabelo { fill: #1d1914; }
+.demo-atleta .demo-rosto { fill: #1d1914; stroke: none; }
+.demo-atleta path.demo-musculo { fill: var(--laranja); }
+.demo-atleta path.demo-longe.demo-musculo { fill: #c95a12; }
+.demo-atleta path.demo-short.demo-musculo { fill: #2f5fd0; stroke: var(--laranja); stroke-width: 2.2; }
+.demo-sombra { fill: #000; opacity: 0.25; }
+.demo-bola-gomo { fill: none; stroke: #5a2405; stroke-width: 0.9; }
 .demo-fantasma { transition: opacity 0.25s; }
 .demo-fantasma path { fill: none; stroke: var(--muted); stroke-width: 1; opacity: 0.55; }
 .demo-parceiro path { fill: var(--borda); stroke: none; }

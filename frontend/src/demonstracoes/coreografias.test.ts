@@ -89,3 +89,67 @@ describe('Motor da animação', () => {
     expect(recuo.x).toBeLessThan(plantado.x - 40)
   })
 })
+
+describe('Movimento contínuo, como num vídeo', () => {
+  it('na corrida o quadril atravessa cada passada sem frear', () => {
+    const anim = preparar(COREOGRAFIAS['Suicídio'])
+    const quadril = (t: number) => instante(anim, t).e.quadril.x
+    const passadas = anim.chaves.filter((k, i) => i > 1 && k.fase === 0 && i < anim.chaves.length - 1 && anim.chaves[i + 1].fase === 0)
+    expect(passadas.length).toBeGreaterThan(3)
+    for (const k of passadas) expect(quadril(k.tempo + 8) - quadril(k.tempo - 8), `em ${k.tempo}ms`).toBeGreaterThan(1)
+  })
+
+  it('entre duas passadas há uma pose de passagem, que não deixa pegada nem mexe na bola', () => {
+    const anim = preparar(COREOGRAFIAS['Bandeja com a mão fraca'])
+    const passagens = anim.chaves.filter((k) => k.entre)
+    expect(passagens.length).toBe(5)
+    const tempos = new Set(passagens.map((k) => k.tempo))
+    expect(pegadas(anim).some((m) => tempos.has(m.tempo))).toBe(false)
+  })
+
+  it('o pé de apoio não escorrega enquanto o corpo se mexe em cima dele', () => {
+    const anim = preparar(COREOGRAFIAS['Saltos na caixa'])
+    const [a, b] = anim.chaves
+    const pe = (t: number) => instante(anim, t).e.tornozeloF.x
+    const quadril = (t: number) => instante(anim, t).e.quadril.x
+    expect(Math.abs(quadril(b.tempo) - quadril(a.tempo))).toBeGreaterThan(5)
+    // Agachando, o pé vai direto de uma posição à outra (quase parado), sem ir e voltar.
+    const xs = Array.from({ length: 21 }, (_, i) => pe(a.tempo + ((b.tempo - a.tempo) * i) / 20))
+    expect(Math.max(...xs) - Math.min(...xs)).toBeCloseTo(Math.abs(xs[20] - xs[0]), 5)
+    expect(Math.abs(xs[20] - xs[0])).toBeLessThan(Math.abs(quadril(b.tempo) - quadril(a.tempo)))
+  })
+
+  it('a bola faz a parábola num ritmo só, passa pelo aro e quica até parar', () => {
+    const anim = preparar(COREOGRAFIAS['Lance livre'])
+    const xs: number[] = []
+    for (let t = 2500; t <= 3100; t += 50) xs.push(instante(anim, t).bola!.x)
+    const passos = xs.slice(1).map((x, i) => x - xs[i])
+    for (const p of passos) expect(p).toBeCloseTo(passos[0], 0)
+    const alturas: number[] = []
+    for (let t = 3300; t <= anim.total; t += 10) alturas.push(instante(anim, t).bola!.y)
+    const chao = CHAO - 7
+    const toques = alturas.filter((y, i) => y > chao - 1 && (alturas[i - 1] ?? 0) <= chao - 1).length
+    expect(toques).toBeGreaterThan(1)
+    expect(alturas.at(-1)).toBeCloseTo(chao, 0)
+  })
+
+  it('no quique, a bola acelera ao descer e chega achatada no chão', () => {
+    const anim = preparar(COREOGRAFIAS['Drible estacionário'])
+    const [ini, fim] = [anim.chaves[0].tempo, anim.chaves[1].tempo]
+    const y = (f: number) => instante(anim, ini + (fim - ini) * f).bola!.y
+    expect(y(1) - y(0.75)).toBeGreaterThan(y(0.25) - y(0))
+    expect(instante(anim, fim).bola!.amasso).toBeLessThan(1)
+    expect(instante(anim, ini).bola!.amasso).toBe(1)
+  })
+
+  it('ao virar, o corpo afina no meio do giro em vez de espelhar de repente', () => {
+    const anim = preparar(COREOGRAFIAS['Suicídio'])
+    const i = anim.chaves.findIndex((k, j) => j > 0 && k.dir !== anim.chaves[j - 1].dir)
+    const meio = (anim.chaves[i - 1].tempo + anim.chaves[i].tempo) / 2
+    const largura = (t: number) => {
+      const { e } = instante(anim, t)
+      return Math.abs(e.cabeca.x - e.quadril.x) + Math.abs(e.maoP.x - e.quadril.x)
+    }
+    expect(largura(meio)).toBeLessThan(largura(anim.chaves[i].tempo) * 0.7)
+  })
+})
