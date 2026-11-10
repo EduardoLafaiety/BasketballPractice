@@ -1486,9 +1486,9 @@ select.input:hover:not(:disabled) { border-color: var(--laranja); }
 .bola-nome { font-family: var(--fonte-display); font-weight: 800; letter-spacing: 0.04em; text-transform: none; }
 
 /* Estatísticas da NBA: um cartão por categoria, com o líder na cor do time e o ranking em barras. */
-.nba-grade { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 1.25rem; margin-top: 1.5rem; }
+.nba-grade { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 1.25rem; }
 .nba-cartao { display: grid; align-content: start; gap: 0.9rem; padding: 1.25rem; }
-.nba-cartao h2 { margin: 0; font-size: 1rem; letter-spacing: 0.1em; text-transform: uppercase; }
+.nba-cartao h3 { margin: 0; font-size: 1rem; letter-spacing: 0.1em; text-transform: uppercase; }
 .nba-lider {
   position: relative;
   display: grid;
@@ -1522,6 +1522,51 @@ select.input:hover:not(:disabled) { border-color: var(--laranja); }
 .nba-barra i { display: block; width: calc(var(--pct) * 100%); height: 100%; border-radius: 2px; background: var(--time); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12); }
 .nba-num { grid-area: num; font-family: var(--fonte-display); font-weight: var(--peso-display); font-size: 1.15rem; text-align: right; font-variant-numeric: tabular-nums; }
 .nba-fonte { margin-top: 1.5rem; color: var(--muted); font-size: 0.8rem; }
+
+/* Estatísticas da NBA: seções, classificação das conferências e notícias em cartões. */
+.nba-secao { margin-top: 2.75rem; }
+.nba-secao > h2 { margin: 0 0 1rem; }
+.nba-legenda { display: flex; flex-wrap: wrap; gap: 0.4rem 1.25rem; margin: 0.75rem 0 0; color: var(--muted); font-size: 0.8rem; }
+.nba-secao > h2 + .nba-legenda { margin: -0.5rem 0 1rem; }
+.nba-legenda-direto, .nba-legenda-playin { display: inline-flex; align-items: center; gap: 0.4rem; }
+.nba-legenda-direto::before, .nba-legenda-playin::before { content: ''; width: 4px; height: 1em; border-radius: 2px; }
+.nba-legenda-direto::before { background: var(--verde); }
+.nba-legenda-playin::before { background: var(--laranja); }
+
+.nba-conferencias { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: 1.25rem; }
+.nba-tabela { width: 100%; border-collapse: collapse; background: var(--superficie); border-radius: var(--raio); box-shadow: var(--sombra); font-variant-numeric: tabular-nums; }
+.nba-tabela caption { padding: 0 0 0.6rem; text-align: left; font-weight: 800; font-size: 0.85rem; letter-spacing: 0.1em; text-transform: uppercase; }
+.nba-tabela th, .nba-tabela td { padding: 0.5rem 0.55rem; border-bottom: 1px solid var(--borda); text-align: center; font-size: 0.85rem; }
+.nba-tabela thead th { color: var(--muted); font-size: 0.7rem; font-weight: 700; letter-spacing: 0.06em; }
+.nba-tabela thead th:nth-child(2) { text-align: left; }
+.nba-tabela abbr { text-decoration: none; }
+.nba-tabela tbody th { text-align: left; font-weight: 600; white-space: nowrap; }
+.nba-tabela tbody tr:last-child > * { border-bottom: 0; }
+/* Faixa à esquerda: verde para quem vai direto aos playoffs, laranja para o play-in. */
+.nba-tabela tbody td:first-child { border-left: 4px solid transparent; color: var(--muted); font-weight: 700; }
+.nba-tabela tr.nba-direto td:first-child { border-left-color: var(--verde); }
+.nba-tabela tr.nba-playin td:first-child { border-left-color: var(--laranja); }
+.nba-time-cor { display: inline-block; width: 10px; height: 10px; margin-right: 0.5rem; border-radius: 50%; background: var(--time); box-shadow: 0 0 0 1px rgba(127, 127, 127, 0.35); vertical-align: -1px; }
+.nba-time-sigla { display: none; }
+.nba-seq-v { color: var(--verde); font-weight: 700; }
+.nba-seq-d { color: var(--vermelho); font-weight: 700; }
+@media (max-width: 560px) {
+  .nba-time-nome { display: none; }
+  .nba-time-sigla { display: inline; }
+  .nba-tabela th, .nba-tabela td { padding: 0.45rem 0.35rem; }
+}
+
+.nba-noticias { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr)); gap: 1.25rem; }
+.nba-noticia { display: flex; flex-direction: column; gap: 0.5rem; padding: 0 0 1.1rem; overflow: hidden; color: inherit; text-decoration: none; }
+.nba-noticia img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; background: var(--superficie-2); }
+.nba-noticia > :not(img) { margin: 0 1.1rem; }
+.nba-noticia > .nba-noticia-meta:first-child { margin-top: 1.1rem; }
+.nba-noticia-meta { color: var(--muted); font-size: 0.72rem; }
+.nba-noticia-meta strong { color: var(--laranja-texto); }
+.nba-noticia h3 { font-size: 1.05rem; line-height: 1.25; text-transform: none; }
+.conteudo .nba-noticia p { margin-top: 0; color: var(--muted); font-size: 0.85rem; line-height: 1.4; text-transform: none; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.nba-noticia:hover h3 { color: var(--laranja-texto); }
+.nba-mais { margin-top: 1.25rem; }
 
 /* Artigos */
 /* Texto corrido do artigo: letra normal, sem as maiúsculas miúdas que o resto do conteúdo usa. */
