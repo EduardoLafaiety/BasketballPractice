@@ -17,6 +17,13 @@ describe('Classificação das conferências', () => {
     expect(leste.find((l) => l.sigla === 'MIL')?.sequencia).toBe('D6')
   })
 
+  it('monta os escudos com a sigla da ESPN, nas versões para fundo claro e escuro', () => {
+    const { leste } = lerTabela(respostaTabela)
+    const knicks = leste.find((l) => l.sigla === 'NYK')
+    expect(knicks?.escudo).toBe('https://a.espncdn.com/combiner/i?img=/i/teamlogos/nba/500/ny.png&h=56&w=56')
+    expect(knicks?.escudoEscuro).toBe('https://a.espncdn.com/combiner/i?img=/i/teamlogos/nba/500-dark/ny.png&h=56&w=56')
+  })
+
   it('resposta vazia não quebra', () => {
     expect(lerTabela(null)).toEqual({ leste: [], oeste: [] })
   })

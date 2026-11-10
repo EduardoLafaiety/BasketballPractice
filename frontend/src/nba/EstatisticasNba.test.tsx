@@ -40,6 +40,12 @@ describe('Estatísticas da NBA', () => {
     expect(linhas[0]).toHaveTextContent(/^1Philadelphia 76ersPHI92\.818—V1$/)
     expect(linhas[0]).toHaveClass('nba-direto')
     expect(linhas[2]).not.toHaveClass('nba-direto')
+    // Escudo do time, decorativo; se não carregar, volta a bolinha na cor do time.
+    const escudo = linhas[0].querySelector('img.nba-escudo-escuro')
+    expect(escudo).toHaveAttribute('src', expect.stringContaining('/500-dark/phi.png'))
+    act(() => escudo!.dispatchEvent(new Event('error')))
+    expect(linhas[0].querySelector('img')).toBeNull()
+    expect(linhas[0].querySelector('.nba-time-cor')).not.toBeNull()
     expect(screen.getByRole('table', { name: 'Conferência Oeste' })).toHaveTextContent('Los Angeles Lakers')
     expect(screen.getByText('7º ao 10º: play-in')).toBeInTheDocument()
   })
