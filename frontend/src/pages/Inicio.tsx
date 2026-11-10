@@ -2,19 +2,15 @@ import { useEffect, useState, type CSSProperties } from 'react'
 import { Link } from 'react-router-dom'
 import { COR, POSICOES, REFEICOES } from '../alimentacao/dados'
 import IconeRefeicao from '../alimentacao/icones'
+import { ARTIGOS, CATEGORIAS, categoria, minutosDeLeitura } from '../artigos/dados'
 import { api } from '../api'
 import { AvisoDesatualizado, Carregando, ErroCarga } from '../components/Estado'
 import GradeJogadores from '../components/GradeJogadores'
 import Icone from '../components/Icone'
 import { AberturaBola, EscadaRolagem, Figura, FraseRolagem, ListraBola, NomesRolagem } from '../components/rolagem'
 import { NIVEIS } from '../lib/niveis'
-import { DIAS, ROTULO_METRICA, aproveitamento, diasAtras, useDrills, useMetas, useProgresso, useResumo, useRotina } from '../store'
+import { DIAS, ROTULO_METRICA, aproveitamento, diasAtras, useDrills, useResumo, useRotina } from '../store'
 import type { DiaSemana, Drill, EstiloResumo, Nivel } from '../types'
-
-/** "a, b e c" */
-function juntar(itens: string[]) {
-  return itens.length < 2 ? itens.join('') : `${itens.slice(0, -1).join(', ')} e ${itens[itens.length - 1]}`
-}
 
 const FIGURA_DO_NIVEL: Record<Nivel, string> = {
   iniciante: 'Drible sentado',
@@ -22,6 +18,8 @@ const FIGURA_DO_NIVEL: Record<Nivel, string> = {
   avancado: 'Finger roll',
 }
 const ORDEM_SEMANA: DiaSemana[] = [1, 2, 3, 4, 5, 6, 0]
+// Um artigo de cada assunto que mais conversa com quem treina.
+const ARTIGOS_EM_DESTAQUE = ['sono-e-arremesso', 'treino-deliberado', 'salto-vertical', 'cesto-de-pessego'].map((id) => ARTIGOS.find((a) => a.id === id)!)
 const FERRAMENTAS: { to: string; titulo: string; texto: string }[] = [
   { to: '/gerador', titulo: 'Gerador de treino', texto: 'Diga o tempo, o nível e o foco: a sessão começa pelo aquecimento e vai do mais fácil ao mais difícil.' },
   { to: '/ferramentas', titulo: 'Ferramentas de quadra', texto: 'Cronômetro, metrônomo, contador ao vivo, calculadoras e testes físicos.' },
@@ -33,17 +31,13 @@ export default function Inicio() {
   const { resumo, erro: erroResumo } = useResumo(diasAtras(6))
   const rotina = useRotina()
   const drills = useDrills()
-  const { progresso } = useProgresso()
-  const { metas } = useMetas()
   const [estilos, setEstilos] = useState<EstiloResumo[]>([])
   useEffect(() => {
     api.estilos().then(setEstilos, () => setEstilos([]))
   }, [])
 
-  const proximaMeta = metas.find((m) => !m.concluida)
   const hoje = new Date().getDay() as DiaSemana
   const treinosHoje = rotina.rotina[hoje].map(drills.drillPorId).filter((d): d is Drill => !!d)
-  const focoHoje = juntar([...new Set(treinosHoje.map((d) => d.categoria.toLowerCase()))])
   const contagem = (id: Nivel) => drills.drills.filter((d) => d.nivel === id && !d.aquecimento).length
 
   const pct = resumo ? aproveitamento(resumo.acertos, resumo.tentativas) : null
@@ -53,7 +47,7 @@ export default function Inicio() {
   const prontoHoje = rotina.carregado && drills.carregado
 
   return (
-    <div className="pagina-larga">
+    <div className="pagina-larga pagina-inicio">
       <AberturaBola
         titulo={
           <h1 className="abertura-titulo">
@@ -61,52 +55,21 @@ export default function Inicio() {
             <span className="abertura-b">quadra<span className="ponto">.</span></span>
           </h1>
         }
-      >
-        <div className="abertura-painel">
-          <div className="hero-kicker">
-            <p className="eyebrow">{DIAS[hoje]}</p>
-            {progresso && progresso.sequenciaAtual > 0 ? (
-              <Link to="/metas" className="sequencia-mini">
-                <Icone nome="fogo" tamanho={16} />
-                {progresso.sequenciaAtual} {progresso.sequenciaAtual === 1 ? 'dia seguido' : 'dias seguidos'}
-                {proximaMeta && ` · meta: ${proximaMeta.titulo} (${proximaMeta.atual}/${proximaMeta.alvo})`}
-              </Link>
-            ) : (
-              proximaMeta && (
-                <Link to="/metas" className="sequencia-mini">
-                  <Icone nome="metas" tamanho={16} />
-                  Meta: {proximaMeta.titulo} ({proximaMeta.atual}/{proximaMeta.alvo})
-                </Link>
-              )
-            )}
-          </div>
-          <p className="hero-texto">
-            {treinosHoje.length > 0
-              ? `Hoje: ${focoHoje}. ${treinosHoje.length} ${treinosHoje.length === 1 ? 'exercício' : 'exercícios'}, um registro no fim.`
-              : 'Sem treino hoje. Que tal 15 minutos?'}
-          </p>
-          <div className="acoes hero-acoes">
-            {treinosHoje.length > 0 ? (
-              <Link to="/sessao?hoje" className="btn btn-primario btn-grande">
-                Começar treino de hoje <Icone nome="seta" />
-              </Link>
-            ) : (
-              <Link to="/gerador?minutos=15" className="btn btn-primario btn-grande">
-                Gerar treino rápido <Icone nome="raio" />
-              </Link>
-            )}
-            <Link to="/treinos" className="link-forte">Ver treinos</Link>
-            <Link to="/rotina" className="link-forte">Montar rotina</Link>
-          </div>
-        </div>
-      </AberturaBola>
+      />
 
       <FraseRolagem texto="Ninguém começa arremessando de três. Primeiro vem a bola na mão, depois o arremesso colado à cesta, e só então a distância." />
 
       <section className="faixa-clara banda">
         <div className="secao-topo secao-forte">
           <h2>Treino de hoje</h2>
-          <Link to="/rotina" className="link-forte">Editar rotina</Link>
+          <div className="acoes">
+            {prontoHoje && treinosHoje.length > 0 && (
+              <Link to="/sessao?hoje" className="btn btn-primario">
+                Começar treino de hoje <Icone nome="seta" />
+              </Link>
+            )}
+            <Link to="/rotina" className="link-forte">Editar rotina</Link>
+          </div>
         </div>
         {prontoHoje && (
           <AvisoDesatualizado erro={erroHoje} tentarDeNovo={() => { rotina.recarregar(); drills.recarregar() }} />
@@ -235,6 +198,37 @@ export default function Inicio() {
             rotulo="aproveitamento nos arremessos"
             destaque
           />
+        </div>
+      </section>
+
+      <section className="faixa-clara artigos-chamada" aria-labelledby="artigos-chamada-titulo">
+        <div className="artigos-chamada-texto">
+          <span className="rotulo-forte">Artigos</span>
+          <h2 id="artigos-chamada-titulo">Entenda o jogo</h2>
+          <p className="muted">Leituras curtas sobre história, mentalidade, condicionamento, sono e recuperação, com o estudo por trás de cada ideia.</p>
+          <div className="artigos-chamada-categorias">
+            {CATEGORIAS.map((c) => (
+              <Link key={c.id} to={`/artigos?categoria=${c.id}`} className="artigos-chamada-categoria" style={{ '--c': c.cor } as CSSProperties}>
+                {c.nome}
+              </Link>
+            ))}
+          </div>
+          <Link to="/artigos" className="link-forte">Ver todos os artigos</Link>
+        </div>
+        <div className="artigos-chamada-lista">
+          {ARTIGOS_EM_DESTAQUE.map((a) => {
+            const cat = categoria(a.categoria)
+            return (
+              <Link key={a.id} to={`/artigos/${a.id}`} className="artigos-chamada-artigo" style={{ '--c': cat.cor } as CSSProperties}>
+                <span className="artigos-chamada-nome">
+                  <span className="tag">{cat.nome}</span>
+                  <strong>{a.titulo}</strong>
+                  <span className="meta">{minutosDeLeitura(a)} min de leitura</span>
+                </span>
+                <Icone nome="seta" />
+              </Link>
+            )
+          })}
         </div>
       </section>
 

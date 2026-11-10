@@ -6,9 +6,12 @@ import Entrar from './pages/Entrar'
 import Treinos from './pages/Treinos'
 import TreinoDetalhe from './pages/TreinoDetalhe'
 import JogueComo from './pages/JogueComo'
+import EstatisticasNba from './nba/EstatisticasNba'
 import EstiloDetalhe from './pages/EstiloDetalhe'
 import Rotina from './pages/Rotina'
 import Alimentacao from './pages/Alimentacao'
+import Equipamentos from './pages/Equipamentos'
+import Artigos, { ArtigoDetalhe } from './pages/Artigos'
 import Desempenho from './pages/Desempenho'
 import Metas from './pages/Metas'
 import Ferramentas from './pages/Ferramentas'
@@ -20,8 +23,18 @@ import RecuperarSenha from './pages/RecuperarSenha'
 import { ConfirmarConta, RedefinirSenha } from './pages/LinkDeConta'
 import { PoliticaPrivacidade, TermosDeUso } from './pages/Legal'
 import Admin from './pages/Admin'
+import AvisoCookies from './components/AvisoCookies'
 
 export default function App() {
+  return (
+    <>
+      <Rotas />
+      <AvisoCookies />
+    </>
+  )
+}
+
+function Rotas() {
   return (
     <Routes>
       <Route path="entrar" element={<Entrar modo="entrar" />} />
@@ -46,8 +59,12 @@ export default function App() {
         <Route path="sessao" element={<SessaoGuiada />} />
         <Route path="jogue-como" element={<JogueComo />} />
         <Route path="jogue-como/:id" element={<EstiloDetalhe />} />
+        <Route path="nba" element={<EstatisticasNba />} />
         <Route path="rotina" element={<Rotina />} />
         <Route path="alimentacao" element={<Alimentacao />} />
+        <Route path="equipamentos" element={<Equipamentos />} />
+        <Route path="artigos" element={<Artigos />} />
+        <Route path="artigos/:id" element={<ArtigoDetalhe />} />
         <Route path="desempenho" element={<Desempenho />} />
         <Route path="metas" element={<Metas />} />
         <Route path="ferramentas" element={<Ferramentas />} />

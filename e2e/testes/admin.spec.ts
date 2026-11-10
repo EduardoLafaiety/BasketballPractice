@@ -56,10 +56,8 @@ test('a manchete do admin entra na barra de notícias de outro atleta e sai quan
   await entrarCom(celular, atleta.token)
   await celular.goto('/')
   const barraCelular = celular.getByRole('region', { name: 'Notícias de basquete' })
-  await expect(barraCelular.getByText('Breaking news').first()).toBeVisible()
+  await expect(barraCelular.locator('.noticias-selo').first()).toBeVisible()
   expect(await celular.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
-  await barraCelular.getByRole('button', { name: 'Pausar as notícias' }).click()
-  await expect(barraCelular).toHaveClass(/pausada/)
   await contexto.close()
 
   page.on('dialog', (d) => d.accept())

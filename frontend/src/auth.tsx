@@ -103,12 +103,12 @@ export function useAuth() {
   return valor
 }
 
-/** Protege rotas: sem login, manda para /entrar e volta depois. */
+/** Protege rotas: sem login, manda para /entrar e volta depois para o mesmo endereço (com ?query e #hash). */
 export function RequerLogin({ children }: { children: ReactNode }) {
   const { usuario, verificando, temToken } = useAuth()
   const local = useLocation()
   if (verificando) return <Carregando texto={__DEMO__ ? 'Preparando o app…' : 'Conferindo sua sessão…'} />
-  if (!usuario && !temToken) return <Navigate to="/entrar" replace state={{ de: local.pathname }} />
+  if (!usuario && !temToken) return <Navigate to="/entrar" replace state={{ de: local.pathname + local.search + local.hash }} />
   return <>{children}</>
 }
 

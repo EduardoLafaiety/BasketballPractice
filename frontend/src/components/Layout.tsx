@@ -3,6 +3,7 @@ import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
 import { api, dataLocal } from '../api'
 import { useAuth } from '../auth'
 import { iniciarEfeitos } from '../lib/efeitos'
+import { useAnimacoes } from '../lib/movimento'
 import { marcarLembrado, notificar, proximoLembrete } from '../lib/lembretes'
 import { aplicarTema } from '../lib/tema'
 import { diasAtras, useConfig } from '../store'
@@ -15,8 +16,11 @@ const LINKS: { to: string; rotulo: string; fim?: boolean }[] = [
   { to: '/', rotulo: 'Início', fim: true },
   { to: '/treinos', rotulo: 'Treinos' },
   { to: '/jogue-como', rotulo: 'Jogue como' },
+  { to: '/nba', rotulo: 'Estatísticas da NBA' },
   { to: '/rotina', rotulo: 'Rotina' },
   { to: '/alimentacao', rotulo: 'Alimentação' },
+  { to: '/equipamentos', rotulo: 'Equipamentos' },
+  { to: '/artigos', rotulo: 'Artigos' },
   { to: '/desempenho', rotulo: 'Desempenho' },
   { to: '/metas', rotulo: 'Metas' },
   { to: '/ferramentas', rotulo: 'Ferramentas' },
@@ -67,7 +71,9 @@ export default function Layout() {
   }, [carregado, config.tema])
   useLembretes(config.lembretes)
 
-  useEffect(() => (conteudo.current ? iniciarEfeitos(conteudo.current) : undefined), [])
+  // Efeitos de entrada e de mouse; religam sozinhos quando o atleta muda a opção de animações.
+  const { reduzido } = useAnimacoes()
+  useEffect(() => (conteudo.current && !reduzido ? iniciarEfeitos(conteudo.current) : undefined), [reduzido])
 
   // Cada tela começa do topo, e o menu fecha ao navegar.
   useEffect(() => {

@@ -32,6 +32,11 @@ export const SOLTOS: P = { bP: 5, aP: 20, bL: -5, aL: 10 }
 export const CORRIDA_A: P = { bP: -35, aP: 10, bL: 40, aL: 110 }
 export const CORRIDA_B: P = { bP: 40, aP: 110, bL: -35, aL: 10 }
 export const MAO_LIVRE: P = { bL: 25, aL: 45 }
+// Meio da passada: o pé de apoio embaixo do quadril e a outra perna passando dobrada à frente.
+const PASSA_A: P = { cF: 2, kF: -6, cT: 16, kT: -95 }
+const PASSA_B: P = { cT: 2, kT: -6, cF: 16, kF: -95 }
+const PASSA_ANDA_A: P = { cF: 1, kF: -2, cT: 4, kT: -38 }
+const PASSA_ANDA_B: P = { cT: 1, kT: -2, cF: 4, kF: -38 }
 // Vista de frente
 export const F_PE: P = { t: 0, cF: 6, kF: 0, cT: -6, kT: 0, eF: 1, eT: 1 }
 export const F_BASE: P = { t: 0, cF: 22, kF: -6, cT: -22, kT: 6, eF: 0.85, eT: 0.85 }
@@ -49,9 +54,30 @@ export const mao = (d: number, lado: Lado = 'P'): Bola => ({ m: 'mao', d, lado }
 export const em = (x: number, y: number): Bola => ({ m: 'em', x, y })
 export const PERNAS: Musculo[] = ['pF', 'pT']
 
+/**
+ * Entre uma passada e a seguinte, uma pose de passagem (só do corpo): sem ela, as pernas iriam de um
+ * extremo ao outro dobrando juntas, e a corrida pareceria um deslize.
+ */
+function comPassagens<T extends Q>(passos: T[], andar: boolean): T[] {
+  return passos.flatMap((q, i) => {
+    const antes = passos[i - 1]
+    if (!antes || antes.x === undefined || q.x === undefined) return [q]
+    const d = q.d ?? 300
+    const metade = Math.round(d / 2)
+    const meio: Q = {}
+    for (const c of ['t', 'bP', 'aP', 'bL', 'aL'] as const) {
+      const a = antes[c]
+      const b = q[c]
+      if (a !== undefined && b !== undefined) meio[c] = (a + b) / 2
+    }
+    const pernas = i % 2 === 1 ? (andar ? PASSA_ANDA_A : PASSA_A) : andar ? PASSA_ANDA_B : PASSA_B
+    return [{ ...meio, ...pernas, d: metade, fase: q.fase, x: (antes.x + q.x) / 2, entre: true } as T, { ...q, d: d - metade }]
+  })
+}
+
 /** Passadas de corrida alternando as pernas; com bola, ela quica a cada passada. */
 export function correr(xs: number[], fase: number, bola: 'drible' | 'drible-L' | 'sem' = 'drible', extra: (i: number) => Partial<Quadro> = () => ({})): Quadro[] {
-  return xs.map((x, i) => {
+  const passos = xs.map((x, i): Quadro => {
     const a = i % 2 === 0
     const pernas = a ? CORRE_A : CORRE_B
     const bracos: P =
@@ -61,6 +87,7 @@ export function correr(xs: number[], fase: number, bola: 'drible' | 'drible-L' |
     const quique = bola === 'sem' ? undefined : mao(a ? 1 : 0, bola === 'drible-L' ? 'L' : 'P')
     return { d: 200, fase, x, ...pernas, ...bracos, bola: quique, ...extra(i) }
   })
+  return comPassagens(passos, false)
 }
 
 /** Final de arremesso: sobe, solta, a bola cai na cesta e o atleta aterrissa. */
@@ -116,7 +143,7 @@ export const ciclo = (poses: Q[], vezes: number, d = 320): Q[] =>
 
 /** Passadas com ou sem bola; caminhando, os passos são mais curtos e lentos. */
 export function passadas(xs: number[], { bola = 'P', andar = false, d }: { bola?: Lado | null; andar?: boolean; d?: number } = {}): Q[] {
-  return xs.map((x, i) => {
+  const passos = xs.map((x, i): Q => {
     const a = i % 2 === 0
     const pernas = andar ? (a ? ANDA_A : ANDA_B) : a ? CORRE_A : CORRE_B
     const bracos: P =
@@ -125,6 +152,7 @@ export function passadas(xs: number[], { bola = 'P', andar = false, d }: { bola?
       : { bP: 30, aP: 75, bL: a ? 40 : -30, aL: a ? 110 : 20 }
     return { d: d ?? (andar ? 300 : 200), x, ...pernas, ...bracos, ...(bola ? { bola: mao(a ? 1 : 0, bola) } : {}) }
   })
+  return comPassagens(passos, andar)
 }
 
 /** De xi a xf em n passadas igualmente espaçadas. */

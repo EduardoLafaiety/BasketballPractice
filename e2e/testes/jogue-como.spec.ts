@@ -51,7 +51,8 @@ test('escolhe um jogador pelo menu, vê o perfil e abre o exercício de um movim
   await expect(page.locator('.cartao-jogador')).toHaveCount(28)
 
   // Perfil do Luka: ficha, divisão do treino, movimentos e crédito da foto.
-  await page.getByRole('link', { name: /Luka Dončić/ }).click()
+  // Na lista do Jogue como: a barra de notícias também pode ter link com o nome de um jogador (líderes da NBA).
+  await page.locator('.grade-jogadores').getByRole('link', { name: /Luka Dončić/ }).click()
   await expect(page).toHaveURL(/\/jogue-como\/luka-doncic$/)
   await expect(page.getByRole('heading', { name: 'Luka Dončić', level: 1 })).toBeVisible()
   await expect(page.locator('.estilo-ficha')).toContainText('1,98 m')
@@ -160,7 +161,7 @@ test.describe('no celular', () => {
     await expect(page.locator('.cartao-jogador')).toHaveCount(28)
     expect(await semRolagemLateral()).toBe(true)
 
-    await page.getByRole('link', { name: /Victor Wembanyama/ }).click()
+    await page.locator('.grade-jogadores').getByRole('link', { name: /Victor Wembanyama/ }).click()
     await expect(page.getByRole('heading', { name: 'Victor Wembanyama', level: 1 })).toBeVisible()
     await expect(page.locator('.movimento').first()).toBeVisible()
     expect(await semRolagemLateral()).toBe(true)

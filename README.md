@@ -4,86 +4,86 @@
 
 # Basketball Practice
 
-**Do primeiro quique à jogada de decisão: treinos em três níveis, figuras animadas para cada movimento e sua evolução em números.**
+**Do Primeiro Quique À Jogada De Decisão: Treinos Em Três Níveis, Figuras Animadas Para Cada Movimento E Sua Evolução Em Números.**
 
 ![React](https://img.shields.io/badge/React_18-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
 ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
-![Node.js](https://img.shields.io/badge/Node.js_24-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)
+![Node.Js](https://img.shields.io/badge/Node.js_24-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL_17-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)
 ![PWA](https://img.shields.io/badge/PWA-5A0FC8?style=for-the-badge&logo=pwa&logoColor=white)
 
-**[▶ Experimente a demonstração](https://eduardolafaiety.github.io/BasketballPractice/)**: entre com qualquer e-mail e senha ou sem conta, direto no navegador.
+**[▶ Experimente A Demonstração](https://eduardolafaiety.github.io/BasketballPractice/)**: Entre Com Qualquer E-Mail E Senha Ou Sem Conta, Direto No Navegador.
 
 <br />
 
-<img src="docs/screenshots/inicio.png" alt="Abertura com a bola de basquete transparente sob o mouse, revelando o atleta dentro dela" width="900" />
+<img src="docs/screenshots/inicio.png" alt="Abertura Com A Bola De Basquete Transparente Sob O Mouse, Revelando O Atleta Dentro Dela" width="900" />
 
 </div>
 
 ---
 
-## ✨ O que tem
+## ✨ O Que Tem.
 
-- 📶 **Três níveis**: iniciante, intermediário e avançado, com 50 exercícios em cada um e aquecimento próprio.
-- 🎬 **Como fazer**: os 181 exercícios do catálogo têm uma animação de um manequim mostrando o movimento.
-- ⚡ **Gerador de treino**: diga quanto tempo tem, o nível e o foco, e a sessão sai pronta.
-- 🌟 **Jogue como**: escolha um entre 28 jogadores da NBA e treine os movimentos que definem o estilo dele.
-- ▶️ **Sessão guiada**: animação ao lado do cronômetro, contador de acertos e registro automático no fim.
-- 🗓️ **Rotina semanal**: monte o que treinar em cada dia ou comece de um modelo pronto.
-- 📈 **Desempenho**: comparativos, gráficos e mapa de arremessos por zona da quadra.
-- 🏆 **Metas e conquistas**: barras de progresso, sequência de dias seguidos e medalhas.
-- 🧰 **Ferramentas**: timer de intervalos, contador de arremessos, metrônomo de drible e calculadoras; o vídeo em câmera lenta chega em breve.
-- 📰 **Barra de notícias**: as últimas manchetes do basquete correndo no rodapé do site.
-- 🏀 **Visual de quadra**: a bola da abertura amplia sem perder nitidez ao rolar a página, e uma listra com as costuras dela abre as seções de números e ferramentas.
-- 📱 **PWA**: instalável no celular, com tema claro/escuro e lembretes de treino.
+- 📶 **Três Níveis**: Iniciante, Intermediário E Avançado, Com 50 Exercícios Em Cada Um E Aquecimento Próprio.
+- 🎬 **Como Fazer**: Os 181 Exercícios Do Catálogo Têm Uma Animação De Um Manequim Mostrando O Movimento.
+- ⚡ **Gerador De Treino**: Diga Quanto Tempo Tem, O Nível E O Foco, E A Sessão Sai Pronta.
+- 🌟 **Jogue Como**: Escolha Um Entre 28 Jogadores Da NBA E Treine Os Movimentos Que Definem O Estilo Dele.
+- ▶️ **Sessão Guiada**: Animação Ao Lado Do Cronômetro, Contador De Acertos E Registro Automático No Fim.
+- 🗓️ **Rotina Semanal**: Monte O Que Treinar Em Cada Dia Ou Comece De Um Modelo Pronto.
+- 📈 **Desempenho**: Comparativos, Gráficos E Mapa De Arremessos Por Zona Da Quadra.
+- 🏆 **Metas E Conquistas**: Barras De Progresso, Sequência De Dias Seguidos E Medalhas.
+- 🧰 **Ferramentas**: Timer De Intervalos, Contador De Arremessos, Metrônomo De Drible E Calculadoras; O Vídeo Em Câmera Lenta Chega Em Breve.
+- 📰 **Barra De Notícias**: As Últimas Manchetes Do Basquete Correndo No Rodapé Do Site.
+- 🏀 **Visual De Quadra**: A Bola Da Abertura Amplia Sem Perder Nitidez Ao Rolar A Página, E Uma Listra Com As Costuras Dela Abre As Seções De Números E Ferramentas.
+- 📱 **PWA**: Instalável No Celular, Com Tema Claro/Escuro E Lembretes De Treino.
 
 ## 📸 Telas
 
 <table>
   <tr>
-    <td width="50%"><img src="docs/screenshots/desempenho.png" alt="Página de desempenho com comparativos, gráficos e mapa de arremessos" /></td>
-    <td width="50%"><img src="docs/screenshots/metas.png" alt="Metas com barras de progresso e conquistas" /></td>
+    <td width="50%"><img src="docs/screenshots/desempenho.png" alt="Página De Desempenho Com Comparativos, Gráficos E Mapa De Arremessos" /></td>
+    <td width="50%"><img src="docs/screenshots/metas.png" alt="Metas Com Barras De Progresso E Conquistas" /></td>
   </tr>
   <tr>
-    <td align="center"><b>Desempenho</b> · comparativos, gráficos e mapa de arremessos</td>
-    <td align="center"><b>Metas e conquistas</b> · sequência, metas e medalhas</td>
+    <td align="center"><b>Desempenho</b> · Comparativos, Gráficos E Mapa De Arremessos</td>
+    <td align="center"><b>Metas E Conquistas</b> · Sequência, Metas E Medalhas</td>
   </tr>
   <tr>
-    <td><img src="docs/screenshots/rotina.png" alt="Rotina semanal com os treinos de cada dia" /></td>
-    <td><img src="docs/screenshots/gerador.png" alt="Gerador de treino montando uma sessão de 45 minutos" /></td>
+    <td><img src="docs/screenshots/rotina.png" alt="Rotina Semanal Com Os Treinos De Cada Dia" /></td>
+    <td><img src="docs/screenshots/gerador.png" alt="Gerador De Treino Montando Uma Sessão De 45 Minutos" /></td>
   </tr>
   <tr>
-    <td align="center"><b>Rotina semanal</b> · o dia de hoje em destaque</td>
-    <td align="center"><b>Gerador</b> · um treino completo em um clique</td>
+    <td align="center"><b>Rotina Semanal</b> · O Dia De Hoje Em Destaque</td>
+    <td align="center"><b>Gerador</b> · Um Treino Completo Em Um Clique</td>
   </tr>
   <tr>
-    <td><img src="docs/screenshots/treinos.png" alt="Treinos divididos em iniciante, intermediário e avançado, com o aquecimento em ordem" /></td>
-    <td><img src="docs/screenshots/ferramentas.png" alt="Ferramentas: timer de intervalos, contador, metrônomo, vídeo e calculadoras" /></td>
+    <td><img src="docs/screenshots/treinos.png" alt="Treinos Divididos Em Iniciante, Intermediário E Avançado, Com O Aquecimento Em Ordem" /></td>
+    <td><img src="docs/screenshots/ferramentas.png" alt="Ferramentas: Timer De Intervalos, Contador, Metrônomo, Vídeo E Calculadoras" /></td>
   </tr>
   <tr>
-    <td align="center"><b>Treinos</b> · três níveis, com o aquecimento primeiro</td>
-    <td align="center"><b>Ferramentas</b> · timer, contador, metrônomo e mais</td>
+    <td align="center"><b>Treinos</b> · Três Níveis, Com O Aquecimento Primeiro</td>
+    <td align="center"><b>Ferramentas</b> · Timer, Contador, Metrônomo E Mais</td>
   </tr>
   <tr>
-    <td><img src="docs/screenshots/jogue-como.png" alt="Grade da aba Jogue como, com as fotos em preto e branco e o mouse revelando a cor de uma delas" /></td>
-    <td><img src="docs/screenshots/jogue-como-perfil.png" alt="Perfil do Luka Dončić com a divisão do treino e os movimentos-assinatura" /></td>
+    <td><img src="docs/screenshots/jogue-como.png" alt="Grade Da Aba Jogue Como, Com As Fotos Em Preto E Branco E O Mouse Revelando A Cor De Uma Delas" /></td>
+    <td><img src="docs/screenshots/jogue-como-perfil.png" alt="Perfil Do Luka Dončić Com A Divisão Do Treino E Os Movimentos-Assinatura" /></td>
   </tr>
   <tr>
-    <td align="center"><b>Jogue como</b> · 28 jogadores; o mouse revela a cor da foto</td>
-    <td align="center"><b>Perfil do jogador</b> · estilo, movimentos e treino pronto</td>
+    <td align="center"><b>Jogue Como</b> · 28 Jogadores; O Mouse Revela A Cor Da Foto</td>
+    <td align="center"><b>Perfil Do Jogador</b> · Estilo, Movimentos E Treino Pronto</td>
   </tr>
 </table>
 
 <div align="center">
-  <img src="docs/screenshots/mobile.png" alt="App no celular" width="300" />
+  <img src="docs/screenshots/mobile.png" alt="App No Celular" width="300" />
   <br />
-  <sub>Feito para usar na quadra, direto do celular.</sub>
+  <sub>Feito Para Usar Na Quadra, Direto Do Celular.</sub>
 </div>
 
 ---
 
 <div align="center">
-  <sub>Projeto pessoal, não é open source: todos os direitos reservados.</sub>
+  <sub>Projeto Pessoal, Não É Open Source: Todos Os Direitos Reservados.</sub>
   <br />
-  <sub>Feito com 🧡 e muitos arremessos por <a href="https://github.com/EduardoLafaiety">Eduardo Lopes</a>.</sub>
+  <sub>Feito Com 🧡 E Muitos Arremessos Por <a href="https://github.com/EduardoLafaiety">Eduardo Lopes</a>.</sub>
 </div>

@@ -125,7 +125,7 @@ export interface UsuarioAdmin extends Usuario {
   lastSessionAt: string | null
 }
 
-/** Manchete da barra de notícias: automática (GNews) ou escrita por um admin ("Breaking news"). */
+/** Manchete da barra de notícias: automática (GNews) ou escrita por um admin (selo "Urgente"). */
 export interface Noticia {
   id: number
   origin: 'admin' | 'gnews' | 'curated'

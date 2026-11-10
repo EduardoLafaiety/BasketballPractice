@@ -78,7 +78,6 @@ describe('Início', () => {
     expect(numero('aproveitamento nos arremessos')).toHaveTextContent('75%')
     // Quinta, 22/10, 00h em São Paulo = 03h UTC.
     expect(ultima('GET', '/stats/summary')?.url.searchParams.get('from')).toBe('2026-10-22T03:00:00.000Z')
-    expect(screen.getByText('Quarta')).toBeInTheDocument()
   })
 
   it('mostra “—” no aproveitamento quando não houve arremesso', async () => {
@@ -87,39 +86,14 @@ describe('Início', () => {
     expect(numero('aproveitamento nos arremessos')).toHaveTextContent('—')
   })
 
-  it('mostra a sequência de dias e a próxima meta não concluída', async () => {
-    abrirInicio({
-      'GET /goals': [
-        meta({ id: 1, title: 'Já foi', current: 3, achieved: true }),
-        meta({ id: 2, title: '100 cestas', kind: 'cestas_total', target: 100, current: 42 }),
-      ],
-    })
-    const sequencia = await screen.findByRole('link', { name: /dias seguidos/ })
-    expect(sequencia).toHaveTextContent('3 dias seguidos · meta: 100 cestas (42/100)')
-    expect(sequencia).toHaveAttribute('href', '/metas')
-  })
-
-  it('usa o singular com 1 dia seguido', async () => {
-    abrirInicio({ 'GET /stats/progress': { streak: { current: 1, best: 5 }, achievements: [] } })
-    expect(await screen.findByRole('link', { name: /dia seguido/ })).toHaveTextContent(/^1 dia seguido$/)
-  })
-
-  it('sem sequência, não mostra “0 dias seguidos” e mantém só a próxima meta', async () => {
-    abrirInicio({
-      'GET /stats/progress': { streak: { current: 0, best: 5 }, achievements: [] },
-      'GET /goals': [meta({ id: 2, title: '100 cestas', kind: 'cestas_total', target: 100, current: 42 })],
-    })
-    const link = await screen.findByRole('link', { name: /Meta: 100 cestas/ })
-    expect(link).toHaveTextContent(/^Meta: 100 cestas \(42\/100\)$/)
-    expect(link).toHaveAttribute('href', '/metas')
-    expect(screen.queryByText(/dias? seguidos?/)).toBeNull()
-  })
-
-  it('sem sequência e sem meta pendente, não mostra nada', async () => {
-    abrirInicio({ 'GET /stats/progress': { streak: { current: 0, best: 5 }, achievements: [] } })
+  it('a abertura fica só com o título: sem o cartão de convite, sequência ou meta', async () => {
+    abrirInicio({ 'GET /goals': [meta({ id: 2, title: '100 cestas', kind: 'cestas_total', target: 100, current: 42 })] })
     expect(await screen.findByText('95')).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Bora pra quadra.')
     expect(screen.queryByText(/dias? seguidos?/)).toBeNull()
     expect(screen.queryByRole('link', { name: /Meta:/ })).toBeNull()
+    expect(screen.queryByText(/Que tal 15 minutos/)).toBeNull()
+    expect(screen.queryByRole('link', { name: 'Gerar treino rápido' })).toBeNull()
   })
 
   it('a página mostra os níveis com a contagem real, a rotina da semana e todos os jogadores', async () => {
@@ -150,6 +124,15 @@ describe('Início', () => {
     expect(screen.getByRole('heading', { name: 'Ter' }).closest('article')).toHaveTextContent('Descanso')
   })
 
+  it('chama para os artigos com as categorias e alguns em destaque', async () => {
+    abrirInicio()
+    const secao = (await screen.findByRole('heading', { name: 'Entenda o jogo' })).closest('section') as HTMLElement
+    expect(within(secao).getByRole('link', { name: 'Ver todos os artigos' })).toHaveAttribute('href', '/artigos')
+    expect(within(secao).getByRole('link', { name: 'Sono' })).toHaveAttribute('href', '/artigos?categoria=sono')
+    expect(within(secao).getByRole('link', { name: /Dormir mais acerta mais arremessos/ })).toHaveAttribute('href', '/artigos/sono-e-arremesso')
+    expect(within(secao).getAllByRole('link', { name: /min de leitura/ })).toHaveLength(4)
+  })
+
   it('sem resposta dos jogadores, o resto da página continua', async () => {
     abrirInicio({ 'GET /styles': new Resposta(500) })
     expect(await screen.findByRole('heading', { name: 'Treino de hoje' })).toBeInTheDocument()
@@ -163,22 +146,14 @@ describe('Início', () => {
     const cartoes = await within(hoje).findAllByRole('link', { name: /Crossover|Lance livre|Suicídio/ })
     expect(cartoes.map((c) => c.querySelector('h3')?.textContent)).toEqual(['Crossover', 'Lance livre'])
     expect(cartoes[1]).toHaveAttribute('href', '/treinos/1')
-    expect(screen.getByRole('link', { name: 'Começar treino de hoje' })).toHaveAttribute('href', '/sessao?hoje')
-    expect(screen.queryByRole('link', { name: 'Gerar treino rápido' })).toBeNull()
+    expect(within(hoje).getByRole('link', { name: 'Começar treino de hoje' })).toHaveAttribute('href', '/sessao?hoje')
   })
 
-  it('com um só exercício hoje, já oferece começar o treino', async () => {
-    abrirInicio(rotinaDe({ 3: [2] }))
-    expect(await screen.findByRole('link', { name: 'Começar treino de hoje' })).toBeInTheDocument()
-    expect(screen.queryByRole('link', { name: 'Gerar treino rápido' })).toBeNull()
-  })
-
-  it('sem treino planejado para hoje, sugere a rotina e o gerador', async () => {
+  it('sem treino planejado para hoje, sugere a rotina', async () => {
     abrirInicio(rotinaDe({ 4: [2] }))
 
     expect(await screen.findByText(/Nenhum treino planejado para quarta\./)).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Adicione à rotina' })).toHaveAttribute('href', '/rotina')
-    expect(screen.getByRole('link', { name: 'Gerar treino rápido' })).toHaveAttribute('href', '/gerador?minutos=15')
     expect(screen.queryByRole('link', { name: /Começar treino de hoje/ })).toBeNull()
   })
 
