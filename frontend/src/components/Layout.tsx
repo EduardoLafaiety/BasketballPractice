@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type CSSProperties } from 'react'
+import { useEffect, useRef, useState, type CSSProperties, type MouseEvent } from 'react'
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
 import { api, dataLocal } from '../api'
 import { useAuth } from '../auth'
@@ -6,6 +6,7 @@ import { iniciarEfeitos } from '../lib/efeitos'
 import { useAnimacoes } from '../lib/movimento'
 import { marcarLembrado, notificar, proximoLembrete } from '../lib/lembretes'
 import { aplicarTema } from '../lib/tema'
+import { vibrar } from '../lib/audio'
 import { diasAtras, useConfig } from '../store'
 import type { Config } from '../types'
 import BarraNoticias from './BarraNoticias'
@@ -32,6 +33,23 @@ const LINKS: { to: string; rotulo: string; fim?: boolean }[] = [
   { to: '/time', rotulo: 'Time' },
   { to: '/ferramentas', rotulo: 'Ferramentas' },
 ]
+
+// Barra de baixo do celular: os atalhos ao alcance do polegar, com a bola de gerar treino no meio.
+type AtalhoDoca = { to: string; rotulo: string; icone: 'inicio' | 'treinos' | 'fogo'; fim?: boolean }
+const DOCA_ESQUERDA: AtalhoDoca[] = [
+  { to: '/', rotulo: 'Início', icone: 'inicio', fim: true },
+  { to: '/treinos', rotulo: 'Treinos', icone: 'treinos' },
+]
+const DOCA_DIREITA: AtalhoDoca[] = [{ to: '/desafio', rotulo: 'Desafio', icone: 'fogo' }]
+
+function ItemDoca({ to, rotulo, icone, fim }: AtalhoDoca) {
+  return (
+    <NavLink to={to} end={fim} className="doca-item">
+      <Icone nome={icone} tamanho={22} />
+      {rotulo}
+    </NavLink>
+  )
+}
 
 // Maior espera do setTimeout é ~24,8 dias; reagendar a cada 6 h também corrige a hora depois de o PC dormir.
 const REAGENDAR_MS = 6 * 60 * 60 * 1000
@@ -70,7 +88,8 @@ export default function Layout() {
   const { pathname } = useLocation()
   const [menuAberto, setMenuAberto] = useState(false)
   const conteudo = useRef<HTMLElement>(null)
-  const botaoMenu = useRef<HTMLButtonElement>(null)
+  // Quem abriu o menu (o botão do topo ou o da barra de baixo) recebe o foco de volta no Esc.
+  const botaoMenu = useRef<HTMLButtonElement | null>(null)
   const barra = useRef<HTMLElement>(null)
 
   useEffect(() => {
@@ -121,6 +140,11 @@ export default function Layout() {
     }
   }, [pathname])
 
+  const alternarMenu = (e: MouseEvent<HTMLButtonElement>) => {
+    botaoMenu.current = e.currentTarget
+    setMenuAberto((a) => !a)
+  }
+
   const secao = LINKS.find((l) => (l.fim ? pathname === l.to : pathname.startsWith(l.to)))?.rotulo
 
   return (
@@ -132,13 +156,7 @@ export default function Layout() {
         </Link>
         {secao && <span className="topo-secao">{secao}</span>}
         <Link to="/gerador" className="topo-acao">Gerar treino</Link>
-        <button
-          ref={botaoMenu}
-          className="topo-menu"
-          aria-expanded={menuAberto}
-          aria-controls="menu-tela"
-          onClick={() => setMenuAberto((a) => !a)}
-        >
+        <button className="topo-menu" aria-expanded={menuAberto} aria-controls="menu-tela" onClick={alternarMenu}>
           <span className="topo-tracos" aria-hidden />
           {menuAberto ? 'Fechar' : 'Menu'}
         </button>
@@ -147,13 +165,13 @@ export default function Layout() {
       <div id="menu-tela" className={`menu-tela ${menuAberto ? 'aberto' : ''}`}>
         <nav className="nav" aria-label="Principal" style={{ '--linhas': Math.ceil((LINKS.length + (usuario?.isAdmin ? 1 : 0)) / 2) } as CSSProperties}>
           {LINKS.map((l, i) => (
-            <NavLink key={l.to} to={l.to} end={l.fim} className="nav-link" onClick={() => setMenuAberto(false)}>
+            <NavLink key={l.to} to={l.to} end={l.fim} className="nav-link" style={{ '--i': i } as CSSProperties} onClick={() => setMenuAberto(false)}>
               <span aria-hidden>{String(i + 1).padStart(2, '0')}</span>
               {l.rotulo}
             </NavLink>
           ))}
           {usuario?.isAdmin && (
-            <NavLink to="/admin" className="nav-link" onClick={() => setMenuAberto(false)}>
+            <NavLink to="/admin" className="nav-link" style={{ '--i': LINKS.length } as CSSProperties} onClick={() => setMenuAberto(false)}>
               <span aria-hidden>{String(LINKS.length + 1).padStart(2, '0')}</span>
               Admin
             </NavLink>
@@ -180,6 +198,19 @@ export default function Layout() {
       </main>
       <footer className="rodape"><LinksLegais /></footer>
       <BarraNoticias />
+
+      <nav className="doca" aria-label="Atalhos" onClick={() => vibrar(8)}>
+        {DOCA_ESQUERDA.map((l) => <ItemDoca key={l.to} {...l} />)}
+        <NavLink to="/gerador" className="doca-item doca-gerar" aria-label="Gerar treino">
+          <span className="doca-bola"><Icone nome="bola" tamanho={28} /></span>
+          Gerar
+        </NavLink>
+        {DOCA_DIREITA.map((l) => <ItemDoca key={l.to} {...l} />)}
+        <button className="doca-item" aria-label="Mais seções" aria-expanded={menuAberto} aria-controls="menu-tela" onClick={alternarMenu}>
+          <span className="topo-tracos" aria-hidden />
+          {menuAberto ? 'Fechar' : 'Mais'}
+        </button>
+      </nav>
     </div>
   )
 }

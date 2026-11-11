@@ -2034,3 +2034,133 @@ body:has(.noticias) .aviso-cookies { bottom: calc(44px + 1rem); }
 .nova-tarefa { border-top: 0; max-width: 720px; }
 .tarefa-blocos { margin: 0; padding-left: 1.2rem; display: grid; gap: 0.3rem; }
 .tarefa-blocos li { font-size: 0.75rem; font-weight: 700; }
+
+/* ==== Celular: atalhos embaixo, ao alcance do polegar, toque com resposta e alvos do tamanho do dedo ==== */
+html { -webkit-tap-highlight-color: transparent; }
+.doca { display: none; }
+/* A bola da marca dá uma girada no toque. */
+.marca .icone-svg { transition: transform 0.5s cubic-bezier(0.3, 1.5, 0.5, 1); }
+.marca:active .icone-svg { transform: rotate(-120deg) scale(0.9); }
+/* Ao abrir, as seções do menu entram uma atrás da outra. */
+.menu-tela.aberto .nav-link { animation: menu-entra 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) backwards; animation-delay: calc(0.15s + var(--i, 0) * 0.03s); }
+@keyframes menu-entra { from { opacity: 0; transform: translateY(26px); } }
+:root[data-movimento='reduzido'] .menu-tela.aberto .nav-link { animation: none; }
+
+@media (max-width: 860px) {
+  :root:has(.doca) { --doca: calc(64px + env(safe-area-inset-bottom, 0px)); }
+  /* Gerar treino e o menu descem para a barra; no alto fica só a marca. */
+  .topo { padding-top: calc(0.8rem + env(safe-area-inset-top, 0px)); }
+  .topo-acao, .topo-menu { display: none; }
+  .doca {
+    position: fixed;
+    inset: auto 0 0;
+    z-index: 43;
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    height: var(--doca);
+    padding: 0 0.25rem env(safe-area-inset-bottom, 0px);
+    background: #101010;
+    color: #a3a3a3;
+    border-top: 1px solid #262626;
+  }
+  .doca-item {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
+    height: 64px;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: inherit;
+    font: inherit;
+    font-size: 0.6rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    text-decoration: none;
+    cursor: pointer;
+    touch-action: manipulation;
+    transition: color 0.2s, transform 0.3s cubic-bezier(0.3, 1.6, 0.5, 1);
+  }
+  .doca-item:active { transform: scale(0.88); transition-duration: 0.08s; }
+  .doca-item.active, .doca-item[aria-expanded='true'] { color: #f4f2ea; }
+  .doca-item.active .icone-svg { color: var(--laranja); }
+  .doca-item .topo-tracos { width: 22px; height: 10px; margin-block: 6px; }
+  .doca-item[aria-expanded='true'] .topo-tracos { height: 2px; margin-block: 10px; border-bottom: 0; }
+  /* A bolinha laranja cai e quica em cima da aba atual. */
+  .doca-item.active:not(.doca-gerar)::before { content: ''; position: absolute; top: 5px; width: 6px; height: 6px; border-radius: 50%; background: var(--laranja); animation: doca-quique 0.7s cubic-bezier(0.3, 0.7, 0.4, 1) both; }
+  @keyframes doca-quique {
+    0% { opacity: 0; transform: translateY(-16px); }
+    40% { opacity: 1; transform: translateY(0) scale(1.5, 0.6); }
+    65% { transform: translateY(-6px) scale(0.9, 1.1); }
+    85% { transform: translateY(0) scale(1.15, 0.85); }
+    100% { transform: none; }
+  }
+  /* Gerar treino: a bola laranja no meio, saltada para fora da barra. */
+  .doca-gerar { justify-content: flex-end; padding-bottom: 0.4rem; color: #f4f2ea; }
+  .doca-bola {
+    position: absolute;
+    top: -14px;
+    left: 50%;
+    display: grid;
+    place-items: center;
+    width: 50px;
+    height: 50px;
+    margin-left: -25px;
+    border-radius: 50%;
+    background: var(--laranja);
+    box-shadow: 0 0 0 4px #101010, 0 6px 18px rgba(255, 106, 19, 0.45);
+    transition: transform 0.5s cubic-bezier(0.3, 1.6, 0.5, 1);
+  }
+  .doca-gerar .icone-svg, .doca-gerar.active .icone-svg { color: #111111; }
+  .doca-gerar:active { transform: none; }
+  .doca-gerar:active .doca-bola { transform: rotate(-90deg) scale(0.88); transition-duration: 0.12s; }
+  .doca-gerar.active .doca-bola { animation: doca-arremesso 0.8s cubic-bezier(0.3, 1.3, 0.5, 1); }
+  @keyframes doca-arremesso { 0% { transform: translateY(-14px) rotate(-200deg) scale(0.85); } }
+
+  /* A barra de notícias sobe para cima dos atalhos, um pouco mais baixa. */
+  .noticias { bottom: var(--doca, 0px); min-height: 38px; padding-bottom: 0; }
+  .conteudo, .app:has(.noticias) .conteudo { padding-bottom: calc(6rem + var(--doca, 0px)); }
+  .rodape, .app:has(.noticias) .rodape { padding-bottom: calc(38px + 1.25rem + var(--doca, 0px)); }
+  .aviso-cookies { bottom: calc(1rem + var(--doca, 0px)); }
+  body:has(.noticias) .aviso-cookies { bottom: calc(38px + 1rem + var(--doca, 0px)); }
+  .menu-tela { padding-bottom: calc(1.5rem + var(--doca, 0px)); overscroll-behavior: contain; }
+  .nav-link:active { color: var(--laranja); }
+}
+:root[data-movimento='reduzido'] .doca-item::before, :root[data-movimento='reduzido'] .doca-bola { animation: none; }
+
+/* Telas de toque: o hover "grudado" sai, e cada toque responde com um aperto que volta quicando. */
+@media (hover: none) {
+  .drill-card:hover, .cartao-jogador:hover, .nivel-cartao:hover, .treino-linha:hover { transform: none; box-shadow: var(--sombra); }
+  .nav-link:hover { transform: none; }
+  .ferramenta-linha:hover { padding-left: 0; }
+  .btn, .chip, .gerador-foco, .nivel-opcao, .ferramenta-linha, .time-cartao, .artigo-cartao {
+    transition: transform 0.35s cubic-bezier(0.3, 1.6, 0.5, 1), color 0.3s, background-color 0.15s, border-color 0.3s, box-shadow 0.25s;
+  }
+  .drill-card, .cartao-jogador, .nivel-cartao, .treino-linha { transition: transform 0.35s cubic-bezier(0.3, 1.6, 0.5, 1), box-shadow 0.25s; }
+  .btn:active:not(:disabled), .chip:active:not(:disabled), .gerador-foco:active, .nivel-opcao:active { transform: scale(0.93); transition-duration: 0.08s; }
+  .drill-card:active, .cartao-jogador:active, .nivel-cartao:active, .treino-linha:active, .ferramenta-linha:active, .time-cartao:active, .artigo-cartao:active { transform: scale(0.97); transition-duration: 0.08s; }
+}
+:root[data-movimento='reduzido'] :is(.btn, .chip, .gerador-foco, .nivel-opcao, .drill-card, .cartao-jogador, .nivel-cartao, .treino-linha, .ferramenta-linha, .time-cartao, .artigo-cartao):active { transform: none; }
+
+/* Dedo, não mouse: chips, campos e o x de remover ganham altura de toque. */
+@media (pointer: coarse) {
+  .chip { min-height: 40px; padding-inline: 1rem; }
+  .input, select.input { min-height: 44px; }
+  .remover { min-width: 40px; min-height: 40px; }
+  .links-legais a, .links-legais button { padding-block: 0.45rem; }
+}
+@media (max-width: 560px) {
+  .niveis .nivel-opcao { padding-inline: 0.4rem; }
+  .niveis .nivel-opcao strong { letter-spacing: 0.02em; }
+  .gerador-foco { gap: 0.4rem; padding-inline: 0.7rem; letter-spacing: 0.02em; }
+}
+/* Menu no celular: as seções cabem quase todas na tela, sem rolar tanto. */
+@media (max-width: 560px) {
+  .menu-tela { padding-top: calc(76px + env(safe-area-inset-top, 0px)); }
+  .nav-link { gap: 0.9rem; padding-block: 0.12rem; font-size: clamp(1.75rem, 8.6vw, 2.4rem); line-height: 1.05; }
+  .nav-link span { min-width: 1.4rem; font-size: 0.7rem; }
+}

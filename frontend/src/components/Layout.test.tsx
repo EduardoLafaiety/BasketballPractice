@@ -64,3 +64,34 @@ describe('Menu em tela cheia', () => {
     expect(screen.getByText('Ferramentas', { selector: '.topo-secao' })).toBeInTheDocument()
   })
 })
+
+describe('Barra de atalhos do celular', () => {
+  const doca = () => within(screen.getByRole('navigation', { name: 'Atalhos' }))
+
+  it('leva às seções principais e marca a atual', async () => {
+    const user = userEvent.setup()
+    abrir()
+    await botaoMenu()
+    expect(doca().getByRole('link', { name: 'Treinos' })).toHaveClass('active')
+
+    await user.click(doca().getByRole('link', { name: 'Gerar treino' }))
+    await waitFor(() => expect(screen.getByTestId('caminho')).toHaveTextContent('/gerador'))
+    expect(doca().getByRole('link', { name: 'Gerar treino' })).toHaveClass('active')
+    expect(doca().getByRole('link', { name: 'Treinos' })).not.toHaveClass('active')
+  })
+
+  it('o botão Mais abre o menu, e o Esc devolve o foco a ele', async () => {
+    const user = userEvent.setup()
+    abrir()
+    await botaoMenu()
+    const mais = doca().getByRole('button', { name: 'Mais seções' })
+    await user.click(mais)
+    expect(tela()).toHaveClass('aberto')
+    expect(mais).toHaveAttribute('aria-expanded', 'true')
+    expect(mais).toHaveTextContent('Fechar')
+
+    await user.keyboard('{Escape}')
+    expect(tela()).not.toHaveClass('aberto')
+    expect(mais).toHaveFocus()
+  })
+})
