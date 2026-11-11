@@ -48,7 +48,7 @@ test('ranking com amigos: perfil, convite por link, desafio aceito e placar da s
 
   // Ana desafia Bia em lances livres; Bia aceita e o placar aparece.
   await page.reload()
-  await page.getByLabel('Desafio').selectOption({ label: 'Quem acerta mais lances livres' })
+  await page.getByLabel('Desafio', { exact: true }).selectOption({ label: 'Quem acerta mais lances livres' })
   await page.getByRole('button', { name: /Desafiar/ }).click()
   await expect(page.getByText(`você desafiou ${apelidoBia}`)).toBeVisible()
 
