@@ -67,7 +67,7 @@ export function reiniciarTrilha() {
 const linkDa = (f: Faixa) => `https://open.spotify.com/track/${f.id}`
 
 /**
- * Player da playlist de rap no canto de baixo, à direita, colado na faixa de notícias.
+ * Player da playlist de rap no topo, na linha do Gerar treino e do Menu.
  * O player do Spotify fica escondido e só carrega no primeiro play (ele grava cookies);
  * os botões e a capa à mostra são do site.
  */
@@ -157,7 +157,7 @@ export default function TrilhaQuadra() {
   return (
     <aside className={`trilha${tocando ? ' tocando' : ''}`} aria-label="Trilha da quadra">
       <a className="trilha-capa" href={linkDa(faixa)} target="_blank" rel="noopener noreferrer" title="Ouvir no Spotify" aria-label={`Ouvir ${faixa.titulo} no Spotify`}>
-        {capa ? <img src={capa} alt="" width={48} height={48} /> : <Icone nome="bola" tamanho={26} />}
+        {capa ? <img src={capa} alt="" width={41} height={41} /> : <Icone nome="bola" tamanho={26} />}
       </a>
       <div className="trilha-info">
         <span className="trilha-rotulo">
