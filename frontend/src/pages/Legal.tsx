@@ -53,6 +53,7 @@ export function PoliticaPrivacidade() {
         <li><strong>Testes físicos:</strong> os resultados que você registra, como impulsão e sprint, que também formam o cartão do atleta.</li>
         <li><strong>Desafio do dia, quiz e programas:</strong> o placar de cada desafio e de cada quiz, os programas que você começou e os dias concluídos.</li>
         <li><strong>Prancheta:</strong> as jogadas que você desenha e salva.</li>
+        <li><strong>Diário de jogos:</strong> data, adversário, placar e os seus números em cada partida que você anota.</li>
         <li><strong>Segurança:</strong> o endereço IP é usado para limitar tentativas de acesso. A contagem fica na memória do servidor e não é gravada no banco.</li>
         <li><strong>Pedidos de cadastro:</strong> o nome, o e-mail e o hash da senha ficam à espera da ativação por até 24 horas e são descartados quando um novo cadastro é feito depois desse prazo.</li>
       </ul>

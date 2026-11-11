@@ -26,6 +26,7 @@ const LINKS: { to: string; rotulo: string; fim?: boolean }[] = [
   { to: '/quiz', rotulo: 'Quiz do dia' },
   { to: '/desempenho', rotulo: 'Desempenho' },
   { to: '/cartao', rotulo: 'Cartão do atleta' },
+  { to: '/jogos', rotulo: 'Diário de jogos' },
   { to: '/metas', rotulo: 'Metas' },
   { to: '/ferramentas', rotulo: 'Ferramentas' },
 ]

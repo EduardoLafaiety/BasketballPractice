@@ -1934,3 +1934,20 @@ body:has(.noticias) .aviso-cookies { bottom: calc(44px + 1rem); }
 .leaflet-container { font: inherit; }
 .leaflet-control-attribution { font-size: 0.65rem; }
 @media (max-width: 900px) { .quadras-corpo { grid-template-columns: 1fr; } .quadras-lista { max-height: none; } }
+
+/* Diário de jogos */
+.jogo-form { margin: 1rem 0; border-top: 0; }
+.jogo-grade { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 170px), 1fr)); gap: 0.75rem; }
+.jogo-pontos { align-self: end; margin: 0; }
+.jogo-pontos strong { font-family: var(--fonte-display); font-weight: var(--peso-display); font-size: 2rem; color: var(--laranja-texto); }
+.jogos-lista { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.6rem; }
+.jogo-linha { display: grid; gap: 0.5rem; padding: 1rem 1.2rem; border-radius: 18px; background: var(--superficie); }
+.jogo-linha p { margin: 0; }
+.jogo-topo { display: flex; justify-content: space-between; gap: 0.75rem; flex-wrap: wrap; }
+.jogo-resultado { font-size: 0.7rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.jogo-resultado.vitória { color: var(--verde); }
+.jogo-resultado.derrota { color: var(--vermelho); }
+.jogo-numeros { display: flex; gap: 1.25rem; flex-wrap: wrap; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.jogo-numeros strong { font-family: var(--fonte-display); font-weight: var(--peso-display); font-size: 2.2rem; color: var(--texto); margin-right: 0.2rem; letter-spacing: 0; }
+.jogos-comparacao { display: grid; gap: 0.75rem; margin-bottom: 1rem; }
+.jogos-comparacao p { margin: 0; }
