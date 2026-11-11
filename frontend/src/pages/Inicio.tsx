@@ -8,8 +8,8 @@ import { AvisoDesatualizado, Carregando, ErroCarga } from '../components/Estado'
 import GradeJogadores from '../components/GradeJogadores'
 import Icone from '../components/Icone'
 import { DesafioNoInicio, ResumoSemana } from '../components/InicioDestaques'
-import { AberturaBola, EscadaRolagem, Figura, FraseRolagem, ListraBola } from '../components/rolagem'
-import { NomesTambor } from '../components/NomesTambor'
+import { AberturaBola, EscadaRolagem, Figura, FraseRolagem, ListraBola, NomesRolagem } from '../components/rolagem'
+import { corDoJogador } from '../lib/cor-do-time'
 import { NIVEIS } from '../lib/niveis'
 import { DIAS, ROTULO_METRICA, aproveitamento, diasAtras, useDrills, useResumo, useRotina } from '../store'
 import type { DiaSemana, Drill, EstiloResumo, Nivel } from '../types'
@@ -134,8 +134,8 @@ export default function Inicio() {
 
       {estilos.length > 0 && (
         <section className="faixa-escura">
-          <NomesTambor
-            estilos={estilos}
+          <NomesRolagem
+            nomes={estilos.map((e) => ({ nome: e.nome, cor: corDoJogador(e.id) }))}
             titulo={<h2 className="titulo-gigante">Jogue como</h2>}
             texto={<p className="frase-destaque banda-texto">{estilos.length} jogadores. Escolha um e treine os movimentos que definem o jogo dele.</p>}
           />

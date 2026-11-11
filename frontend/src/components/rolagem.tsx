@@ -286,3 +286,38 @@ export function EscadaRolagem({ nome, titulo, rotulo }: { nome: string; titulo: 
     </section>
   )
 }
+
+export interface NomeRolagem {
+  nome: string
+  /** Cor do time do jogador; sem ela, o nome fica na cor do texto. */
+  cor?: string
+}
+
+/** Título parado e nomes correndo em sentidos opostos até passar por todos. Os links ficam na grade logo abaixo. */
+export function NomesRolagem({ nomes, titulo, texto }: { nomes: NomeRolagem[]; titulo: ReactNode; texto?: ReactNode }) {
+  const pino = useRef<HTMLDivElement>(null)
+  const a = useRef<HTMLDivElement>(null)
+  const b = useRef<HTMLDivElement>(null)
+  const metade = Math.ceil(nomes.length / 2)
+  useRolagem(() => {
+    if (!pino.current || !a.current || !b.current || menosMovimento()) return
+    const caixa = pino.current.getBoundingClientRect()
+    if (caixa.bottom < 0 || caixa.top > window.innerHeight) return
+    const p = progressoDoPino(pino.current)
+    const largura = window.innerWidth
+    a.current.style.transform = `translateX(${-p * Math.max(0, a.current.offsetWidth - largura)}px)`
+    b.current.style.transform = `translateX(${-(1 - p) * Math.max(0, b.current.offsetWidth - largura)}px)`
+  })
+  const linha = (lista: NomeRolagem[]) =>
+    lista.map((n) => <span key={n.nome} style={n.cor ? ({ '--c': n.cor } as React.CSSProperties) : undefined}>{n.nome}<i>/</i></span>)
+  return (
+    <div className="nomes-pino" ref={pino}>
+      <div className="nomes-fixo">
+        {titulo}
+        <div className="nomes-linha" ref={a} aria-hidden>{linha(nomes.slice(0, metade))}</div>
+        <div className="nomes-linha nomes-contorno" ref={b} aria-hidden>{linha(nomes.slice(metade))}</div>
+        {texto}
+      </div>
+    </div>
+  )
+}

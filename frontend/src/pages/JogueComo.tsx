@@ -2,7 +2,8 @@ import { useCallback, useEffect, useState } from 'react'
 import { api } from '../api'
 import { Carregando, ErroCarga } from '../components/Estado'
 import GradeJogadores, { BarraDivisao } from '../components/GradeJogadores'
-import { NomesTambor } from '../components/NomesTambor'
+import { NomesRolagem } from '../components/rolagem'
+import { corDoJogador } from '../lib/cor-do-time'
 import type { EstiloResumo, Posicao } from '../types'
 
 export { BarraDivisao }
@@ -25,8 +26,8 @@ export default function JogueComo() {
 
   return (
     <div className="pagina-larga faixa-escura">
-      <NomesTambor
-        estilos={estilos ?? []}
+      <NomesRolagem
+        nomes={estilos?.map((e) => ({ nome: e.nome, cor: corDoJogador(e.id) })) ?? []}
         titulo={<h1>Jogue como</h1>}
         texto={<p className="muted">Escolha um jogador e treine os movimentos que definem o jeito dele de jogar.</p>}
       />
