@@ -1230,13 +1230,21 @@ section + section, .card + section { margin-top: 1.5rem; }
 .nomes-secao { display: flex; flex-direction: column; gap: 2vh; padding: 14vh 0 2vh; overflow: hidden; }
 .nomes-secao h1, .nomes-secao h2 { width: fit-content; margin: 0 0 2vh clamp(1.25rem, 5vw, 5rem); font-size: clamp(3.4rem, 11vw, 11rem); }
 .nomes-secao > p { max-width: 34em; margin: 2vh 0 0; padding: 0 clamp(1.25rem, 5vw, 5rem); }
-.nomes-mosaico { display: flex; flex-wrap: wrap; gap: 0.12em 0.45em; padding: 0 clamp(1.25rem, 5vw, 5rem); font-family: var(--fonte-display); font-size: clamp(1.7rem, 4.4vw, 4.4rem); font-weight: var(--peso-display); line-height: 1; text-transform: uppercase; }
-.nomes-mosaico span { display: inline-block; }
-.nomes-contorno { color: transparent; -webkit-text-stroke: 1.5px var(--texto); }
-.nomes-mosaico span:nth-child(5n + 3) { color: var(--laranja); -webkit-text-stroke: 0; }
-/* Antes de aparecer, os nomes esperam no alto; ao entrar na tela, caem um atrás do outro (cerca de 1 s no total). */
-.nomes-mosaico.esperando span { opacity: 0; transform: translateY(-60vh) rotate(-4deg); }
-.nomes-mosaico.caiu span { transition: transform 0.5s cubic-bezier(0.2, 1.35, 0.4, 1), opacity 0.2s; transition-delay: calc(var(--i) * 25ms); }
+.nomes-tambor { position: relative; height: clamp(13rem, 27vw, 20rem); perspective: 1600px; overflow: hidden; cursor: grab; user-select: none; touch-action: pan-y; }
+.nomes-tambor.arrastando { cursor: grabbing; }
+.tb-roda { position: absolute; left: 0; right: 0; top: 50%; height: 1.1em; margin-top: -0.55em; font-family: var(--fonte-display); font-size: clamp(2.6rem, 7.2vw, 7rem); font-weight: var(--peso-display); line-height: 1; text-transform: uppercase; transform-style: preserve-3d; transition: transform 0.55s cubic-bezier(0.2, 0.8, 0.2, 1); }
+.tb-roda.livre { transition: none; }
+.tb-item { position: absolute; inset: 0; display: grid; align-items: center; justify-items: start; padding-left: clamp(1.25rem, 5vw, 5rem); backface-visibility: hidden; cursor: pointer; transform: rotateX(calc(var(--i) * var(--passo) * -1)) translateZ(var(--r, 0px)); }
+.tb-item > span { grid-area: 1 / 1; }
+/* As letras são recortes da foto do jogador: em preto e branco, e a cor desliza para dentro no nome da frente. */
+.tb-nome { white-space: nowrap; color: transparent; background-image: var(--foto); background-size: cover; background-position: center 25%; -webkit-background-clip: text; background-clip: text; -webkit-text-stroke: 1.5px var(--texto); }
+.tb-cinza { filter: grayscale(1) contrast(1.1); }
+.tb-cor { clip-path: inset(0 100% 0 0); transition: clip-path 0.55s cubic-bezier(0.7, 0, 0.2, 1); }
+.tb-item.ativo .tb-cor { clip-path: inset(0); }
+.tb-item.sem-foto .tb-nome { color: var(--texto); -webkit-text-stroke: 0; }
+.tb-item.sem-foto .tb-cor { display: none; }
+.tb-info { position: absolute; left: clamp(1.25rem, 5vw, 5rem); bottom: 0.75rem; margin: 0; font-size: 0.8rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--laranja); }
+.nomes-tambor-lista { display: flex; flex-wrap: wrap; gap: 0.12em 0.45em; padding: 0 clamp(1.25rem, 5vw, 5rem); font-family: var(--fonte-display); font-size: clamp(1.7rem, 4.4vw, 4.4rem); font-weight: var(--peso-display); line-height: 1; text-transform: uppercase; }
 .jogue-corpo { padding: 6vh clamp(1.25rem, 5vw, 5rem) 12vh; }
 .grade-jogadores { grid-template-columns: repeat(4, minmax(0, 1fr)); margin-top: 1.5rem; }
 .pagina-larga.faixa-escura { min-height: 100vh; }
