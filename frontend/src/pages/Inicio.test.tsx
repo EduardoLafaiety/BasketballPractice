@@ -111,10 +111,10 @@ describe('Início', () => {
     await within(iniciante).findByText('2 exercícios')
     expect(within(screen.getByRole('heading', { name: 'Avançado' }).closest('a') as HTMLElement).getByText('1 exercícios')).toBeInTheDocument()
 
-    // Os dois jogadores têm link; os nomes que correm são decoração e não repetem o link.
+    // Os dois jogadores têm link; os nomes do mosaico são decoração e não repetem o link.
     expect(await screen.findByRole('link', { name: /Luka Dončić/ })).toHaveAttribute('href', '/jogue-como/luka-doncic')
     expect(screen.getAllByRole('link', { name: /Dončić|Curry/ })).toHaveLength(2)
-    const nomes = document.querySelector('.nomes-linha') as HTMLElement
+    const nomes = document.querySelector('.nomes-mosaico') as HTMLElement
     expect(nomes).toHaveTextContent('Luka Dončić')
     expect(nomes).toHaveAttribute('aria-hidden', 'true')
     expect(nomes.querySelector('a')).toBeNull()

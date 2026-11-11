@@ -287,30 +287,31 @@ export function EscadaRolagem({ nome, titulo, rotulo }: { nome: string; titulo: 
   )
 }
 
-/** Título parado e nomes correndo em sentidos opostos até passar por todos. Os links ficam na grade logo abaixo. */
-export function NomesRolagem({ nomes, titulo, texto }: { nomes: string[]; titulo: ReactNode; texto?: ReactNode }) {
-  const pino = useRef<HTMLDivElement>(null)
-  const a = useRef<HTMLDivElement>(null)
-  const b = useRef<HTMLDivElement>(null)
-  const metade = Math.ceil(nomes.length / 2)
-  useRolagem(() => {
-    if (!pino.current || !a.current || !b.current || menosMovimento()) return
-    const caixa = pino.current.getBoundingClientRect()
-    if (caixa.bottom < 0 || caixa.top > window.innerHeight) return
-    const p = progressoDoPino(pino.current)
-    const largura = window.innerWidth
-    a.current.style.transform = `translateX(${-p * Math.max(0, a.current.offsetWidth - largura)}px)`
-    b.current.style.transform = `translateX(${-(1 - p) * Math.max(0, b.current.offsetWidth - largura)}px)`
-  })
-  const linha = (lista: string[]) => lista.map((n) => <span key={n}>{n}<i>/</i></span>)
+/** Título e nomes que caem e se encaixam num mosaico quando a seção aparece, uma vez só. Os links ficam na grade logo abaixo. */
+export function NomesMosaico({ nomes, titulo, texto }: { nomes: string[]; titulo: ReactNode; texto?: ReactNode }) {
+  const caixa = useRef<HTMLDivElement>(null)
+  const [estado, setEstado] = useState<'' | 'esperando' | 'caiu'>('')
+  const temNomes = nomes.length > 0
+  useEffect(() => {
+    if (!temNomes || !caixa.current || menosMovimento() || typeof IntersectionObserver === 'undefined') return
+    setEstado('esperando')
+    const olho = new IntersectionObserver(([item]) => {
+      if (!item.isIntersecting) return
+      setEstado('caiu')
+      olho.disconnect()
+    }, { threshold: 0.2 })
+    olho.observe(caixa.current)
+    return () => olho.disconnect()
+  }, [temNomes])
   return (
-    <div className="nomes-pino" ref={pino}>
-      <div className="nomes-fixo">
-        {titulo}
-        <div className="nomes-linha" ref={a} aria-hidden>{linha(nomes.slice(0, metade))}</div>
-        <div className="nomes-linha nomes-contorno" ref={b} aria-hidden>{linha(nomes.slice(metade))}</div>
-        {texto}
+    <div className="nomes-secao">
+      {titulo}
+      <div ref={caixa} className={`nomes-mosaico ${estado}`} aria-hidden>
+        {nomes.map((n, i) => (
+          <span key={n} className={i % 2 ? 'nomes-contorno' : undefined} style={{ '--i': i } as React.CSSProperties}>{n}</span>
+        ))}
       </div>
+      {texto}
     </div>
   )
 }
