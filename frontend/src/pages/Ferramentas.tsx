@@ -1,17 +1,19 @@
 import { useSearchParams } from 'react-router-dom'
 import Calculadoras from '../ferramentas/Calculadoras'
 import Prancheta from '../ferramentas/Prancheta'
+import Quadras from '../ferramentas/Quadras'
 import LancesLivres from '../ferramentas/LancesLivres'
 import Metronomo from '../ferramentas/Metronomo'
 import TimerIntervalos from '../ferramentas/TimerIntervalos'
 import Icone, { type NomeIcone } from '../components/Icone'
 import { useConfig } from '../store'
 
-const ABAS: { id: 'timer' | 'arremessos' | 'metronomo' | 'prancheta' | 'video' | 'calculadoras'; rotulo: string; resumo: string; icone: NomeIcone; descricao: string }[] = [
+const ABAS: { id: 'timer' | 'arremessos' | 'metronomo' | 'prancheta' | 'quadras' | 'video' | 'calculadoras'; rotulo: string; resumo: string; icone: NomeIcone; descricao: string }[] = [
   { id: 'timer', rotulo: 'Timer de intervalos', resumo: 'Trabalho e descanso', icone: 'relogio', descricao: 'Blocos de trabalho e descanso com aviso sonoro, para condicionamento e circuitos.' },
   { id: 'arremessos', rotulo: 'Contador de arremessos', resumo: 'Acertos e sequência', icone: 'metas', descricao: 'Acerto ou erro com um toque, com sequência e recorde da sessão.' },
   { id: 'metronomo', rotulo: 'Metrônomo de drible', resumo: 'Ritmo constante', icone: 'ritmo', descricao: 'Ritmo constante para treinar velocidade e controle de bola.' },
   { id: 'prancheta', rotulo: 'Prancheta tática', resumo: 'Desenhe jogadas', icone: 'prancheta', descricao: 'Jogadores, bola, cortes, passes, dribles e bloqueios em meia quadra ou quadra inteira. Salve e abra as jogadas quando quiser.' },
+  { id: 'quadras', rotulo: 'Quadras perto de você', resumo: 'Onde jogar', icone: 'mapa', descricao: 'Quadras públicas de basquete mapeadas no OpenStreetMap, com distância, piso e o caminho até lá.' },
   { id: 'video', rotulo: 'Vídeo do arremesso', resumo: 'Em breve', icone: 'video', descricao: 'Em breve: grave, assista em câmera lenta e compare a mecânica lado a lado.' },
   { id: 'calculadoras', rotulo: 'Calculadoras', resumo: 'Aproveitamento e metas', icone: 'calculadora', descricao: 'FG%, eFG%, TS%, quanto falta para a meta e distâncias.' },
 ]
@@ -66,6 +68,7 @@ export default function Ferramentas() {
           />
         )}
         {aba === 'prancheta' && <Prancheta />}
+        {aba === 'quadras' && <Quadras />}
         {aba === 'video' && <VideoIndisponivel />}
         {aba === 'calculadoras' && <Calculadoras />}
       </section>
