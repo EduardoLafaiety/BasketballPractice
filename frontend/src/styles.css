@@ -2091,7 +2091,7 @@ html { -webkit-tap-highlight-color: transparent; }
   .doca-item .topo-tracos { width: 22px; height: 10px; margin-block: 6px; }
   .doca-item[aria-expanded='true'] .topo-tracos { height: 2px; margin-block: 10px; border-bottom: 0; }
   /* A bolinha laranja cai e quica em cima da aba atual. */
-  .doca-item.active:not(.doca-gerar)::before { content: ''; position: absolute; top: 5px; width: 6px; height: 6px; border-radius: 50%; background: var(--laranja); animation: doca-quique 0.7s cubic-bezier(0.3, 0.7, 0.4, 1) both; }
+  .doca-item.active::before { content: ''; position: absolute; top: 5px; width: 6px; height: 6px; border-radius: 50%; background: var(--laranja); animation: doca-quique 0.7s cubic-bezier(0.3, 0.7, 0.4, 1) both; }
   @keyframes doca-quique {
     0% { opacity: 0; transform: translateY(-16px); }
     40% { opacity: 1; transform: translateY(0) scale(1.5, 0.6); }
@@ -2099,27 +2099,12 @@ html { -webkit-tap-highlight-color: transparent; }
     85% { transform: translateY(0) scale(1.15, 0.85); }
     100% { transform: none; }
   }
-  /* Gerar treino: a bola laranja no meio, saltada para fora da barra. */
-  .doca-gerar { justify-content: flex-end; padding-bottom: 0.4rem; color: #f4f2ea; }
-  .doca-bola {
-    position: absolute;
-    top: -14px;
-    left: 50%;
-    display: grid;
-    place-items: center;
-    width: 50px;
-    height: 50px;
-    margin-left: -25px;
-    border-radius: 50%;
-    background: var(--laranja);
-    box-shadow: 0 0 0 4px #101010, 0 6px 18px rgba(255, 106, 19, 0.45);
-    transition: transform 0.5s cubic-bezier(0.3, 1.6, 0.5, 1);
-  }
-  .doca-gerar .icone-svg, .doca-gerar.active .icone-svg { color: #111111; }
-  .doca-gerar:active { transform: none; }
-  .doca-gerar:active .doca-bola { transform: rotate(-90deg) scale(0.88); transition-duration: 0.12s; }
-  .doca-gerar.active .doca-bola { animation: doca-arremesso 0.8s cubic-bezier(0.3, 1.3, 0.5, 1); }
-  @keyframes doca-arremesso { 0% { transform: translateY(-14px) rotate(-200deg) scale(0.85); } }
+  /* Gerar treino: do tamanho das outras abas, com a bola sempre laranja, que gira no toque. */
+  .doca-gerar { color: #f4f2ea; }
+  .doca-gerar .icone-svg { color: var(--laranja); transition: transform 0.5s cubic-bezier(0.3, 1.6, 0.5, 1); }
+  .doca-gerar:active .icone-svg { transform: rotate(-90deg); transition-duration: 0.12s; }
+  .doca-gerar.active .icone-svg { animation: doca-gira 0.8s cubic-bezier(0.3, 1.3, 0.5, 1); }
+  @keyframes doca-gira { from { transform: rotate(-200deg); } }
 
   /* A barra de notícias sobe para cima dos atalhos, um pouco mais baixa. */
   .noticias { bottom: var(--doca, 0px); min-height: 38px; padding-bottom: 0; }
@@ -2130,7 +2115,7 @@ html { -webkit-tap-highlight-color: transparent; }
   .menu-tela { padding-bottom: calc(1.5rem + var(--doca, 0px)); overscroll-behavior: contain; }
   .nav-link:active { color: var(--laranja); }
 }
-:root[data-movimento='reduzido'] .doca-item::before, :root[data-movimento='reduzido'] .doca-bola { animation: none; }
+:root[data-movimento='reduzido'] .doca-item::before, :root[data-movimento='reduzido'] .doca-gerar .icone-svg { animation: none; }
 
 /* Telas de toque: o hover "grudado" sai, e cada toque responde com um aperto que volta quicando. */
 @media (hover: none) {
