@@ -66,6 +66,15 @@ export function reiniciarTrilha() {
 
 const linkDa = (f: Faixa) => `https://open.spotify.com/track/${f.id}`
 
+/** Barras de equalizador: pulam enquanto a música toca. */
+function Equalizador() {
+  return (
+    <span className="trilha-eq" aria-hidden>
+      <i /><i /><i /><i />
+    </span>
+  )
+}
+
 /**
  * Player da playlist de rap no canto de baixo, à direita, colado na faixa de notícias.
  * O player do Spotify fica escondido e só carrega no primeiro play (ele grava cookies);
@@ -157,10 +166,11 @@ export default function TrilhaQuadra() {
   return (
     <aside className={`trilha${tocando ? ' tocando' : ''}`} aria-label="Trilha da quadra">
       <a className="trilha-capa" href={linkDa(faixa)} target="_blank" rel="noopener noreferrer" title="Ouvir no Spotify" aria-label={`Ouvir ${faixa.titulo} no Spotify`}>
-        {capa ? <img src={capa} alt="" width={48} height={48} /> : <Icone nome="bola" tamanho={26} />}
+        {capa ? <img src={capa} alt="" width={64} height={64} /> : <Icone nome="bola" tamanho={34} />}
       </a>
       <div className="trilha-info">
         <span className="trilha-rotulo">
+          <Equalizador />
           {tocando ? 'No ar' : 'Trilha da quadra'}
         </span>
         <span className="trilha-titulo" aria-live="polite">{faixa.titulo}</span>
@@ -168,13 +178,13 @@ export default function TrilhaQuadra() {
       </div>
       <div className="trilha-controles">
         <button type="button" onClick={() => ir(-1)} aria-label="Música anterior" title="Anterior">
-          <Icone nome="anterior" tamanho={14} />
+          <Icone nome="anterior" tamanho={18} />
         </button>
         <button type="button" className="trilha-play" onClick={alternar} aria-label={tocando ? 'Pausar' : 'Tocar'} title={tocando ? 'Pausar' : 'Tocar'}>
-          <Icone nome={tocando ? 'pausa' : 'play'} tamanho={14} />
+          <Icone nome={tocando ? 'pausa' : 'play'} tamanho={18} />
         </button>
         <button type="button" onClick={() => ir(1)} aria-label="Próxima música" title="Próxima">
-          <Icone nome="proxima" tamanho={14} />
+          <Icone nome="proxima" tamanho={18} />
         </button>
       </div>
       {ligada && <div className="trilha-spotify" ref={lugar} aria-hidden />}
