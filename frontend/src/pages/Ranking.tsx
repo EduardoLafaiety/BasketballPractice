@@ -218,18 +218,19 @@ function Desafios() {
       {amigos && amigos.length > 0 ? (
         <form className="card form desafio-novo" onSubmit={(e) => { e.preventDefault(); void acao(() => apiSocial.desafiar(Number(amigo), metrica)) }}>
           <div className="linha">
-            <label>
-              Amigo
-              <select className="input select" value={amigo} onChange={(e) => setAmigo(e.target.value)}>
+            {/* Rótulo com htmlFor: envolvendo o select, o nome acessível levaria junto o texto das opções. */}
+            <div className="campo">
+              <label htmlFor="desafio-amigo">Amigo</label>
+              <select id="desafio-amigo" className="input select" value={amigo} onChange={(e) => setAmigo(e.target.value)}>
                 {amigos.map((a) => <option key={a.id} value={a.id}>{a.apelido}</option>)}
               </select>
-            </label>
-            <label>
-              Desafio
-              <select className="input select" value={metrica} onChange={(e) => setMetrica(e.target.value as MetricaDesafio)}>
+            </div>
+            <div className="campo">
+              <label htmlFor="desafio-metrica">Desafio</label>
+              <select id="desafio-metrica" className="input select" value={metrica} onChange={(e) => setMetrica(e.target.value as MetricaDesafio)}>
                 {METRICAS_DESAFIO.map((m) => <option key={m.id} value={m.id}>{m.rotulo}</option>)}
               </select>
-            </label>
+            </div>
           </div>
           <button className="btn btn-primario" type="submit" disabled={ocupado || !amigo}>Desafiar <Icone nome="raio" /></button>
         </form>

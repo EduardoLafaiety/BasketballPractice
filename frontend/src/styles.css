@@ -2004,3 +2004,4 @@ body:has(.noticias) .aviso-cookies { bottom: calc(44px + 1rem); }
 .convite { display: grid; gap: 0.75rem; justify-items: start; margin-bottom: 1rem; }
 .convite h2 { font-size: clamp(2.4rem, 6vw, 4rem); }
 @media (max-width: 640px) { .podio { grid-template-columns: 1fr; } .podio-lugar.lugar-1, .podio-lugar.lugar-2, .podio-lugar.lugar-3 { order: 0; } }
+.campo { display: grid; gap: 0.35rem; flex: 1; }
