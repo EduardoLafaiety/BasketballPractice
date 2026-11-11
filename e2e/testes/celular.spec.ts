@@ -27,4 +27,13 @@ test('no celular, o menu abre em tela cheia, navega entre as telas e nada vaza p
     await expect(page.getByRole('heading', { name: titulo, level: 1 })).toBeVisible()
     expect(await semRolagemLateral()).toBe(true)
   }
+
+  // A barra de atalhos de baixo leva direto ao gerador e marca a seção atual.
+  const atalhos = page.getByRole('navigation', { name: 'Atalhos' })
+  await expect(atalhos).toBeVisible()
+  await expect(page.locator('.topo').getByRole('link', { name: 'Gerar treino' })).toBeHidden()
+  await atalhos.getByRole('link', { name: 'Gerar treino' }).click()
+  await expect(page.getByRole('heading', { name: 'Gerador de treino', level: 1 })).toBeVisible()
+  await expect(atalhos.getByRole('link', { name: 'Gerar treino' })).toHaveClass(/active/)
+  expect(await semRolagemLateral()).toBe(true)
 })
