@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import { z } from 'zod'
 import { many, one, type Database, type Queryable } from '../db/index.js'
+import { hash } from '../lib/daily.js'
 import { HttpError } from '../lib/http-error.js'
 import { parse } from '../lib/validate.js'
 import { currentUser } from '../middleware/auth.js'
@@ -37,16 +38,6 @@ export const DAILY_CHALLENGES: DailyChallenge[] = [
   { id: 'dois-metros-50', title: '50 a dois metros', description: 'Cinquenta arremessos a dois metros do aro, prestando atenção na mecânica.', exercise: 'Arremesso a dois metros', mode: 'tentativas', attempts: 50, goal: 35 },
   { id: 'bandeja-1min', title: 'Um minuto de bandeja', description: 'Bandejas com a mão forte, um lado e depois o outro, por um minuto.', exercise: 'Bandeja com a mão forte', mode: 'tempo', seconds: 60, goal: 12 },
 ]
-
-/** FNV-1a: o mesmo dia sempre dá o mesmo número, em qualquer servidor ou navegador. */
-function hash(text: string) {
-  let h = 0x811c9dc5
-  for (let i = 0; i < text.length; i++) {
-    h ^= text.charCodeAt(i)
-    h = Math.imul(h, 0x01000193)
-  }
-  return h >>> 0
-}
 
 export const challengeFor = (day: string) => DAILY_CHALLENGES[hash(`desafio:${day}`) % DAILY_CHALLENGES.length]
 

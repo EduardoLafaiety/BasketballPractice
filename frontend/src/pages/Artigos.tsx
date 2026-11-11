@@ -42,6 +42,7 @@ export default function Artigos() {
       <p className="muted">
         Leituras curtas sobre a história do jogo, a cabeça do atleta, o corpo e o descanso. Cada ideia vem com o estudo por trás dela.
       </p>
+      <Link to="/quiz" className="link-forte">Quiz do dia: 5 perguntas sobre o que está aqui</Link>
 
       <div className="grade artigo-categorias" role="group" aria-label="Categorias">
         {CATEGORIAS.map((c) => {

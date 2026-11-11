@@ -221,7 +221,10 @@ export default function Inicio() {
               </Link>
             ))}
           </div>
-          <Link to="/artigos" className="link-forte">Ver todos os artigos</Link>
+          <div className="acoes">
+            <Link to="/artigos" className="link-forte">Ver todos os artigos</Link>
+            <Link to="/quiz" className="link-forte">Quiz do dia</Link>
+          </div>
         </div>
         <div className="artigos-chamada-lista">
           {ARTIGOS_EM_DESTAQUE.map((a) => {
