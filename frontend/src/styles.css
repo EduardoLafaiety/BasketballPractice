@@ -2100,7 +2100,6 @@ html { -webkit-tap-highlight-color: transparent; }
     100% { transform: none; }
   }
   /* Gerar treino: do tamanho das outras abas, com a bola sempre laranja, que gira no toque. */
-  .doca-gerar { color: #f4f2ea; }
   .doca-gerar .icone-svg { color: var(--laranja); transition: transform 0.5s cubic-bezier(0.3, 1.6, 0.5, 1); }
   .doca-gerar:active .icone-svg { transform: rotate(-90deg); transition-duration: 0.12s; }
   .doca-gerar.active .icone-svg { animation: doca-gira 0.8s cubic-bezier(0.3, 1.3, 0.5, 1); }
