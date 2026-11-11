@@ -5,15 +5,15 @@ export type DadosZonas = Partial<Record<Zona, { acertos: number; tentativas: num
 
 // Meia-quadra em escala 1 unidade = 3 cm (500 × 470 ≈ 15 m × 14 m), tabela no topo.
 // Lado "_e"/"_d" é a esquerda/direita de quem está de frente para a cesta.
-const CESTA = { x: 250, y: 52 }
-const RAIO_TRES = 237.5
-const CANTO_TRES = 30 // distância da linha de três do canto até a lateral
-const Y_FIM_CANTO = CESTA.y + Math.sqrt(RAIO_TRES ** 2 - (CESTA.x - CANTO_TRES) ** 2)
+export const CESTA = { x: 250, y: 52 }
+export const RAIO_TRES = 237.5
+export const CANTO_TRES = 30 // distância da linha de três do canto até a lateral
+export const Y_FIM_CANTO = CESTA.y + Math.sqrt(RAIO_TRES ** 2 - (CESTA.x - CANTO_TRES) ** 2)
 
 const DENTRO_DOS_TRES = `M${CANTO_TRES},0 L${CANTO_TRES},${Y_FIM_CANTO} A${RAIO_TRES},${RAIO_TRES} 0 0 0 ${500 - CANTO_TRES},${Y_FIM_CANTO} L${500 - CANTO_TRES},0 Z`
 
 // Setores angulares a partir da cesta (0° = lateral direita, 90° = meio da quadra).
-const SETORES: { sufixo: 'canto_d' | 'ala_d' | 'topo' | 'ala_e' | 'canto_e'; de: number; ate: number }[] = [
+export const SETORES: { sufixo: 'canto_d' | 'ala_d' | 'topo' | 'ala_e' | 'canto_e'; de: number; ate: number }[] = [
   { sufixo: 'canto_d', de: -60, ate: 20 },
   { sufixo: 'ala_d', de: 20, ate: 68 },
   { sufixo: 'topo', de: 68, ate: 112 },
@@ -45,7 +45,7 @@ export const NOME_ZONA: Record<Zona, string> = {
   tres_canto_d: 'Três — canto direito',
 }
 
-const ROTULO: Record<Zona, [number, number]> = {
+export const ROTULO: Record<Zona, [number, number]> = {
   garrafao: [250, 115],
   lance_livre: [250, 196],
   media_canto_e: [100, 62],
