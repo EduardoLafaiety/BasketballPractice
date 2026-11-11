@@ -130,6 +130,35 @@ async function exportData(db: Queryable, userId: number) {
     }),
     goals,
     physicalTests,
+    // Só para a pessoa ter tudo o que é dela; a importação ignora esta parte.
+    extras: await exportExtras(db, userId),
+  }
+}
+
+/** Dados dos recursos mais novos: desafios, quiz, programas, jogos, jogadas, perfil do ranking e times. */
+async function exportExtras(db: Queryable, userId: number) {
+  const q = (sql: string) => many(db, sql, [userId])
+  return {
+    dailyChallenges: await q(`SELECT to_char(day, 'YYYY-MM-DD') AS day, challenge_id AS "challengeId", makes, attempts FROM daily_challenge_results WHERE user_id = $1 ORDER BY day`),
+    quiz: await q(`SELECT to_char(day, 'YYYY-MM-DD') AS day, correct, answers FROM quiz_results WHERE user_id = $1 ORDER BY day`),
+    programs: await q(
+      `SELECT p.program_id AS "programId", to_char(p.started_on, 'YYYY-MM-DD') AS "startedOn",
+              COALESCE(array_agg(d.day ORDER BY d.day) FILTER (WHERE d.day IS NOT NULL), '{}') AS "daysDone"
+       FROM user_programs p LEFT JOIN program_days_done d ON d.user_id = p.user_id AND d.program_id = p.program_id
+       WHERE p.user_id = $1 GROUP BY 1, 2 ORDER BY 2`,
+    ),
+    games: await q(
+      `SELECT to_char(played_on, 'YYYY-MM-DD') AS "playedOn", opponent, team_score AS "teamScore", opp_score AS "oppScore", minutes, points,
+              rebounds, assists, steals, blocks, turnovers, fg_made AS "fgMade", fg_att AS "fgAtt", three_made AS "threeMade",
+              three_att AS "threeAtt", ft_made AS "ftMade", ft_att AS "ftAtt", notes FROM games WHERE user_id = $1 ORDER BY played_on, id`,
+    ),
+    plays: await q(`SELECT name, court, data FROM plays WHERE user_id = $1 ORDER BY id`),
+    rankingProfile: (await q(`SELECT nickname, public FROM profiles WHERE user_id = $1`))[0] ?? null,
+    friends: await q(`SELECT p.nickname FROM friendships f JOIN profiles p ON p.user_id = f.friend_id WHERE f.user_id = $1 ORDER BY 1`),
+    teams: await q(
+      `SELECT t.name, 'tecnico' AS role FROM teams t WHERE t.coach_id = $1
+       UNION ALL SELECT t.name, 'atleta' FROM team_members m JOIN teams t ON t.id = m.team_id WHERE m.user_id = $1`,
+    ),
   }
 }
 
