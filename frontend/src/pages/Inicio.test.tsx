@@ -130,7 +130,8 @@ describe('Início', () => {
     expect(within(secao).getByRole('link', { name: 'Ver todos os artigos' })).toHaveAttribute('href', '/artigos')
     expect(within(secao).getByRole('link', { name: 'Sono' })).toHaveAttribute('href', '/artigos?categoria=sono')
     expect(within(secao).getByRole('link', { name: /Dormir mais acerta mais arremessos/ })).toHaveAttribute('href', '/artigos/sono-e-arremesso')
-    expect(within(secao).getAllByRole('link', { name: /min de leitura/ })).toHaveLength(4)
+    expect(within(secao).getByRole('link', { name: /Massagem, compressão, gelo/ })).toHaveAttribute('href', '/artigos/qual-recuperacao-funciona')
+    expect(within(secao).getAllByRole('link', { name: /min de leitura/ })).toHaveLength(5)
   })
 
   it('sem resposta dos jogadores, o resto da página continua', async () => {
