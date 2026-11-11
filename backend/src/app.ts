@@ -27,6 +27,7 @@ import { sessionsRouter } from './routes/sessions.js'
 import { settingsRouter } from './routes/settings.js'
 import { socialRouter } from './routes/social.js'
 import { statsRouter } from './routes/stats.js'
+import { teamsRouter } from './routes/teams.js'
 import { stylesRouter } from './routes/styles.js'
 import { testsRouter } from './routes/tests.js'
 import { workoutsRouter } from './routes/workouts.js'
@@ -134,6 +135,7 @@ export function createApp(
   app.use('/api/social', auth, socialRouter(db, { notificar }))
   app.use('/api/push/run', pushCronRouter(db, { secret: push.cronSecret ?? '', send: push.send }))
   app.use('/api/push', auth, pushRouter(db, push))
+  app.use('/api/teams', auth, teamsRouter(db))
   app.use('/api/styles', auth, stylesRouter(db))
   app.use('/api/settings', auth, settingsRouter(db))
   app.use('/api/data', auth, dataRouter(db, { maxImports }))
