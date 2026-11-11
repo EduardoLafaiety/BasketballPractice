@@ -75,6 +75,12 @@ const CAMINHOS = {
     </>
   ),
   fogo: <path d="M12 3c1 3.5 5 5.5 5 10a5 5 0 0 1-10 0c0-2 1-3.5 2-4.5 0 2 1 3 2 3 0-3.5-1-6 1-8.5z" />,
+  prancheta: (
+    <>
+      <rect x="4" y="4" width="16" height="18" rx="2" />
+      <path d="M9 2h6v4H9zM8 12l3 3M11 12l-3 3M14 17l3-6M15.5 10.5 17 11l-.3 1.6" />
+    </>
+  ),
 }
 
 export type NomeIcone = keyof typeof CAMINHOS
