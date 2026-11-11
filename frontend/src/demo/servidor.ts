@@ -3,6 +3,7 @@
 import { PGlite, type Transaction } from '@electric-sql/pglite'
 import { one, prepareDatabase, type Database, type Queryable } from '../../../backend/src/db/index'
 import { errorHandler, notFoundHandler } from '../../../backend/src/middleware/errors'
+import { challengesRouter } from '../../../backend/src/routes/challenges'
 import { dataRouter } from '../../../backend/src/routes/data'
 import { exercisesRouter } from '../../../backend/src/routes/exercises'
 import { goalsRouter } from '../../../backend/src/routes/goals'
@@ -79,6 +80,7 @@ export async function criarServidor({ dados }: { dados?: string } = {}) {
     ['/sessions', montar(sessionsRouter(db))],
     ['/stats', montar(statsRouter(db))],
     ['/goals', montar(goalsRouter(db))],
+    ['/challenges', montar(challengesRouter(db))],
     ['/tests', montar(testsRouter(db))],
     ['/plans', montar(plansRouter(db))],
     ['/styles', montar(stylesRouter(db))],

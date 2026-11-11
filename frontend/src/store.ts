@@ -15,7 +15,7 @@ const DERIVADOS = ['resumo', 'zonas', 'progresso', 'metas']
 const recarregadores = new Map<string, Set<() => void>>()
 
 /** Descarta os dados das chaves com esses prefixos; o que está na tela é buscado de novo. */
-const invalidar = (...prefixos: string[]) => {
+export const invalidar = (...prefixos: string[]) => {
   const casa = (chave: string) => prefixos.some((p) => chave.startsWith(p))
   for (const chave of [...cache.keys()]) if (casa(chave)) cache.delete(chave)
   for (const [chave, lista] of recarregadores) if (casa(chave)) lista.forEach((recarregar) => recarregar())
@@ -30,7 +30,8 @@ function publicar(chave: string, valor: unknown) {
   ouvintes.get(chave)?.forEach((ouvir) => ouvir(valor))
 }
 
-function useRecurso<T>(chave: string, carregar: () => Promise<T>) {
+/** Dado da API com cache por chave (ver acima); os módulos de cada recurso montam seus hooks com ele. */
+export function useRecurso<T>(chave: string, carregar: () => Promise<T>) {
   const [dados, setDadosInterno] = useState<T | undefined>(() => cache.get(chave) as T | undefined)
   const [erro, setErro] = useState<Error | null>(null)
   const [carregando, setCarregando] = useState(true)
@@ -330,3 +331,6 @@ export function diasAtras(dias: number) {
   d.setDate(d.getDate() - dias)
   return d
 }
+
+/** Uma sessão foi registrada por fora do useSessoes (ex.: desafio do dia): números, metas e sequência mudam. */
+export const sessaoRegistrada = () => invalidar('sessoes', ...DERIVADOS)

@@ -207,7 +207,25 @@ const migrations: string[] = [
   );
   CREATE INDEX idx_pending_registrations_email ON pending_registrations(email);
   `,
+  `
+  -- Desafio do dia: um resultado por atleta e por dia (vale o primeiro), o mesmo desafio para todos na mesma data.
+  CREATE TABLE daily_challenge_results (
+    user_id      integer NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    day          date NOT NULL,
+    challenge_id text NOT NULL,
+    makes        integer NOT NULL CHECK (makes >= 0),
+    attempts     integer NOT NULL CHECK (attempts >= 0),
+    session_id   integer REFERENCES practice_sessions(id) ON DELETE SET NULL,
+    created_at   timestamptz NOT NULL DEFAULT now(),
+    PRIMARY KEY (user_id, day),
+    CHECK (makes <= attempts)
+  );
+  CREATE INDEX idx_daily_challenge_results_day ON daily_challenge_results(day);
+  `,
 ]
+
+/** Versão do schema depois de todas as migrações. */
+export const SCHEMA_VERSION = migrations.length
 
 export async function migrate(db: Database) {
   await db.transaction(async (tx) => {

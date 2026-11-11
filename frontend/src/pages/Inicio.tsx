@@ -7,6 +7,7 @@ import { api } from '../api'
 import { AvisoDesatualizado, Carregando, ErroCarga } from '../components/Estado'
 import GradeJogadores from '../components/GradeJogadores'
 import Icone from '../components/Icone'
+import { DesafioNoInicio, ResumoSemana } from '../components/InicioDestaques'
 import { AberturaBola, EscadaRolagem, Figura, FraseRolagem, ListraBola, NomesRolagem } from '../components/rolagem'
 import { NIVEIS } from '../lib/niveis'
 import { DIAS, ROTULO_METRICA, aproveitamento, diasAtras, useDrills, useResumo, useRotina } from '../store'
@@ -44,6 +45,8 @@ export default function Inicio() {
   const valor = (n: number | string | undefined) => (n === undefined ? (erroResumo ? '!' : '…') : n)
 
   const erroHoje = rotina.erro ?? drills.erro
+  // Na segunda-feira, o balanço da semana que passou vem logo no alto.
+  const segunda = new Date().getDay() === 1
   const prontoHoje = rotina.carregado && drills.carregado
 
   return (
@@ -58,6 +61,9 @@ export default function Inicio() {
       />
 
       <FraseRolagem texto="Ninguém começa arremessando de três. Primeiro vem a bola na mão, depois o arremesso colado à cesta, e só então a distância." />
+
+      {segunda && <ResumoSemana />}
+      <DesafioNoInicio />
 
       <section className="faixa-clara banda">
         <div className="secao-topo secao-forte">
@@ -185,6 +191,8 @@ export default function Inicio() {
           })}
         </div>
       </section>
+
+      {!segunda && <ResumoSemana />}
 
       <section className="faixa-laranja banda com-listra" aria-busy={!resumo}>
         <ListraBola />

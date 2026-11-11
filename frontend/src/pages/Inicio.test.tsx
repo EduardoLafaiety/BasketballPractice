@@ -160,8 +160,70 @@ describe('Início', () => {
   it('avisa quando os números não carregam, sem mostrar zeros falsos', async () => {
     abrirInicio({ 'GET /stats/summary': new Resposta(500, { error: 'Banco fora do ar' }) })
 
-    expect(await screen.findByRole('alert')).toHaveTextContent('Não foi possível carregar seus números: Banco fora do ar')
+    expect(await screen.findByText('Não foi possível carregar seus números: Banco fora do ar')).toHaveAttribute('role', 'alert')
+    expect(screen.getByText('Não foi possível carregar o resumo: Banco fora do ar')).toHaveAttribute('role', 'alert')
     for (const rotulo of ['sessões nos últimos 7 dias', 'minutos treinados', 'aproveitamento nos arremessos'])
       expect(numero(rotulo)).toHaveTextContent('!')
+  })
+})
+
+const semana = (weekStart: string, sessions: number, minutes: number, makes: number, attempts: number) => ({ weekStart, sessions, minutes, makes, attempts })
+const desafioHoje = (result: object | null = null) => ({
+  day: '2026-10-28',
+  challenge: { id: 'tres-25', title: '25 bolas de três', description: 'Cinco de cada posição.', exercise: 'Arremesso de três', mode: 'tentativas', attempts: 25, goal: 10, maxAttempts: 25 },
+  result,
+})
+
+describe('Início: desafio do dia e resumo da semana', () => {
+  it('chama para o desafio do dia e mostra quando ele já foi feito', async () => {
+    abrirInicio({ 'GET /challenges/today': desafioHoje() })
+    const secao = (await screen.findByRole('heading', { name: '25 bolas de três' })).closest('section')!
+    expect(within(secao).getByText('cestas em 25 arremessos')).toBeInTheDocument()
+    expect(within(secao).getByRole('link', { name: /Aceitar desafio/ })).toHaveAttribute('href', '/desafio')
+  })
+
+  it('o desafio já feito mostra o placar do dia', async () => {
+    abrirInicio({ 'GET /challenges/today': desafioHoje({ day: '2026-10-28', challengeId: 'tres-25', title: '25 bolas de três', makes: 12, attempts: 25, goal: 10, completed: true }) })
+    const secao = (await screen.findByRole('heading', { name: '25 bolas de três' })).closest('section')!
+    expect(within(secao).getByText('12/25')).toBeInTheDocument()
+    expect(within(secao).getByText('Cumprido hoje')).toBeInTheDocument()
+  })
+
+  it('no meio da semana, compara a semana até agora com a anterior', async () => {
+    const { chamadas } = abrirInicio({
+      'GET /stats/summary': { ...resumo(4, 95, 30, 40), byWeek: [semana('2026-10-19', 2, 60, 10, 20), semana('2026-10-26', 3, 90, 15, 20)] },
+    })
+    const secao = (await screen.findByRole('heading', { name: 'Resumo da semana' })).closest('section')!
+    expect(secao).not.toHaveClass('destaque')
+    expect(await within(secao).findByText('+1 em relação à semana anterior')).toBeInTheDocument()
+    expect(within(secao).getByText('+30 min em relação à semana anterior')).toBeInTheDocument()
+    expect(within(secao).getByText('75%')).toBeInTheDocument()
+    expect(within(secao).getByText('+25 pontos em relação à semana anterior')).toHaveClass('sobe')
+    // Desde a segunda da semana anterior (19/10, 00h em São Paulo).
+    expect(chamadas.some((c) => c.caminho === '/stats/summary' && c.url.searchParams.get('from') === '2026-10-19T03:00:00.000Z')).toBe(true)
+  })
+
+  it('na segunda-feira, o balanço da semana passada vem em destaque no alto', async () => {
+    vi.useFakeTimers({ toFake: ['Date'] })
+    vi.setSystemTime(new Date('2026-10-26T09:00:00-03:00'))
+    definirToken('tk')
+    apiFalsa({
+      'GET /auth/me': usuarioFalso(),
+      'GET /settings': configFalsa,
+      'GET /exercises': catalogo,
+      'GET /stats/summary': { ...resumo(1, 30, 0, 0), byWeek: [semana('2026-10-12', 4, 120, 30, 40), semana('2026-10-19', 2, 60, 10, 20)] },
+      'GET /challenges/today': desafioHoje(),
+      ...rotinaDe({}),
+    })
+    abrirApp('/')
+
+    const secao = (await screen.findByRole('heading', { name: 'Resumo da semana passada' })).closest('section')!
+    expect(secao).toHaveClass('destaque')
+    expect(within(secao).getByText('Segunda é dia de balanço')).toBeInTheDocument()
+    expect(await within(secao).findByText('−2 em relação à semana anterior')).toHaveClass('desce')
+    expect(within(secao).getByText('−25 pontos em relação à semana anterior')).toBeInTheDocument()
+    // Vem antes do desafio do dia.
+    const desafio = screen.getByRole('heading', { name: '25 bolas de três' })
+    expect(secao.compareDocumentPosition(desafio) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
   })
 })

@@ -3,6 +3,7 @@ import type { AddressInfo } from 'node:net'
 import { after, before, describe, it } from 'node:test'
 import { createApp } from '../src/app.js'
 import { isPgError, prepareDatabase, UNIQUE_VIOLATION } from '../src/db/index.js'
+import { SCHEMA_VERSION } from '../src/db/migrations.js'
 import { caixaDeEmails, criarConta } from './caixa.js'
 import { openTestDatabase } from './pglite.js'
 
@@ -202,7 +203,7 @@ describe('Banco de dados', () => {
     await prepareDatabase(db)
     const afterRun = await db.query('SELECT COUNT(*)::int AS n FROM exercises WHERE user_id IS NULL')
     assert.deepEqual(afterRun.rows, before.rows)
-    assert.deepEqual((await db.query('SELECT MAX(version) AS v FROM schema_migrations')).rows, [{ v: 7 }])
+    assert.deepEqual((await db.query('SELECT MAX(version) AS v FROM schema_migrations')).rows, [{ v: SCHEMA_VERSION }])
   })
 
   it('garante e-mail único sem diferenciar maiúsculas', async () => {
