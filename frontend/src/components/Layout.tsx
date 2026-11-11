@@ -202,7 +202,7 @@ export default function Layout() {
       <nav className="doca" aria-label="Atalhos" onClick={() => vibrar(8)}>
         {DOCA_ESQUERDA.map((l) => <ItemDoca key={l.to} {...l} />)}
         <NavLink to="/gerador" className="doca-item doca-gerar" aria-label="Gerar treino">
-          <span className="doca-bola"><Icone nome="bola" tamanho={28} /></span>
+          <Icone nome="bola" tamanho={22} />
           Gerar
         </NavLink>
         {DOCA_DIREITA.map((l) => <ItemDoca key={l.to} {...l} />)}
