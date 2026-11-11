@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type CSSProperties } from 'react'
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
 import { api, dataLocal } from '../api'
 import { useAuth } from '../auth'
@@ -144,7 +144,7 @@ export default function Layout() {
       </header>
 
       <div id="menu-tela" className={`menu-tela ${menuAberto ? 'aberto' : ''}`}>
-        <nav className="nav" aria-label="Principal">
+        <nav className="nav" aria-label="Principal" style={{ '--linhas': Math.ceil((LINKS.length + (usuario?.isAdmin ? 1 : 0)) / 2) } as CSSProperties}>
           {LINKS.map((l, i) => (
             <NavLink key={l.to} to={l.to} end={l.fim} className="nav-link" onClick={() => setMenuAberto(false)}>
               <span aria-hidden>{String(i + 1).padStart(2, '0')}</span>
