@@ -55,6 +55,11 @@ export function PoliticaPrivacidade() {
         <li><strong>Prancheta:</strong> as jogadas que você desenha e salva.</li>
         <li><strong>Diário de jogos:</strong> data, adversário, placar e os seus números em cada partida que você anota.</li>
         <li><strong>Notificações, se você ligar:</strong> o endereço de entrega que o navegador cria para o aparelho, as chaves dele e o fuso horário, para o lembrete chegar na hora certa. Desligar a opção apaga esses dados.</li>
+        <li>
+          <strong>Times, se você entrar em um:</strong> o time, o técnico e as tarefas que ele passou. O técnico do time vê o seu nome, quantos
+          treinos e minutos você registrou nos últimos 7 dias, a data do último treino, a sequência de dias, a nota do cartão e as
+          tarefas que você cumpriu. Ele não vê o seu e-mail, as notas das sessões nem o resto do histórico. Ao sair do time, ele deixa de ver.
+        </li>
         <li><strong>Ranking, se você entrar nele:</strong> o apelido, se ele aparece no ranking aberto, o código do seu link de convite, a lista de amigos e os desafios entre amigos.</li>
         <li><strong>Segurança:</strong> o endereço IP é usado para limitar tentativas de acesso. A contagem fica na memória do servidor e não é gravada no banco.</li>
         <li><strong>Pedidos de cadastro:</strong> o nome, o e-mail e o hash da senha ficam à espera da ativação por até 24 horas e são descartados quando um novo cadastro é feito depois desse prazo.</li>

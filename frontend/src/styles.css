@@ -2006,3 +2006,31 @@ body:has(.noticias) .aviso-cookies { bottom: calc(44px + 1rem); }
 @media (max-width: 640px) { .podio { grid-template-columns: 1fr; } .podio-lugar.lugar-1, .podio-lugar.lugar-2, .podio-lugar.lugar-3 { order: 0; } }
 .campo { display: grid; gap: 0.35rem; flex: 1; }
 .push-celular { display: grid; gap: 0.5rem; padding-top: 0.75rem; border-top: 1px solid var(--borda); }
+
+/* Modo técnico */
+.times-grade { grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr)); margin-bottom: 1.5rem; }
+.time-cartao { display: grid; gap: 0.5rem; align-content: start; color: inherit; text-decoration: none; }
+.time-cartao h2 { font-size: clamp(1.8rem, 3vw, 2.4rem); }
+.time-cartao .link-forte { justify-self: start; display: inline-flex; align-items: center; gap: 0.4rem; transition: color 0.15s; }
+.time-cartao:hover .link-forte { color: var(--laranja-texto); }
+.times-acoes { grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr)); }
+.times-acoes .form { border-top: 0; align-content: start; }
+.time-convite { display: grid; gap: 0.75rem; }
+.time-convite p { margin: 0; }
+.time-codigo { display: flex; align-items: baseline; gap: 0.75rem; }
+.time-codigo strong { font-family: var(--fonte-display); font-weight: var(--peso-display); font-size: 2.6rem; letter-spacing: 0.04em; color: var(--laranja-texto); }
+.atletas-lista { gap: 0.5rem; }
+.atleta-linha { display: grid; gap: 0.5rem; padding: 1rem 1.2rem; border-radius: 18px; background: var(--superficie); }
+.atleta-topo { display: flex; justify-content: space-between; align-items: center; }
+.atleta-topo h3 { margin: 0; }
+.atleta-numeros { display: flex; flex-wrap: wrap; gap: 0.4rem 1.25rem; align-items: baseline; font-size: 0.7rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.atleta-numeros strong { font-family: var(--fonte-display); font-weight: var(--peso-display); font-size: 1.8rem; color: var(--texto); margin-right: 0.2rem; letter-spacing: 0; }
+.atleta-numeros .meta { flex-basis: 100%; }
+.tarefas { gap: 0.6rem; margin-top: 1rem; }
+.tarefa { display: grid; gap: 0.4rem; padding: 1rem 1.2rem; border-radius: 18px; background: var(--superficie); }
+.tarefa h3, .tarefa p { margin: 0; }
+.tarefa.cumprida { box-shadow: inset 0 0 0 2px var(--laranja); }
+.tarefa-feita { display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--laranja-texto); }
+.nova-tarefa { border-top: 0; max-width: 720px; }
+.tarefa-blocos { margin: 0; padding-left: 1.2rem; display: grid; gap: 0.3rem; }
+.tarefa-blocos li { font-size: 0.75rem; font-weight: 700; }
