@@ -154,7 +154,7 @@ export default function Inicio() {
           <h2 id="dieta-chamada-titulo">Coma como quem joga</h2>
           <p className="muted">Café da manhã, almoço, café da tarde e janta para cada posição, com as quantidades em gramas.</p>
           <div className="dieta-chamada-icones" aria-hidden>
-            {REFEICOES.map((r) => <IconeRefeicao key={r.id} refeicao={r.id} tamanho={34} />)}
+            {REFEICOES.map((r) => <IconeRefeicao key={r.id} refeicao={r.id} tamanho={46} />)}
           </div>
           <Link to="/alimentacao" className="link-forte">Ver alimentação</Link>
         </div>

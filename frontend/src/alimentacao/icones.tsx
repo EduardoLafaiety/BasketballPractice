@@ -1,66 +1,71 @@
 import type { Refeicao } from './dados'
 
-// Ícones das refeições, desenhados à mão (48×48), com cores próprias que funcionam no tema claro e no escuro.
-const DESENHOS: Record<Refeicao, JSX.Element> = {
-  // Café da manhã: xícara de café com vapor.
+// Pratinhos das refeições, desenhados à mão (48×48): o prato visto de lado, com a comida em cima. As cores são
+// próprias e funcionam no tema claro e no escuro (o prato branco tem contorno, e a sombra é só um véu escuro).
+const PRATO = (
+  <>
+    <ellipse cx="24" cy="38" rx="21" ry="5.5" fill="#000" opacity="0.18" />
+    <ellipse cx="24" cy="35" rx="21.5" ry="6.5" fill="#fbfaf5" stroke="#d6d0bf" />
+    <ellipse cx="24" cy="34" rx="15" ry="3.6" fill="none" stroke="#e7e2d4" />
+  </>
+)
+
+const COMIDA: Record<Refeicao, JSX.Element> = {
+  // Café da manhã: pão francês e ovo frito.
   cafe: (
     <>
-      <path d="M17 4c-2 3 2 5 0 8M24 2c-2 3 2 5 0 8M31 4c-2 3 2 5 0 8" stroke="currentColor" strokeOpacity="0.45" strokeWidth="2" strokeLinecap="round" fill="none" />
-      <ellipse cx="24" cy="41" rx="18" ry="3.5" fill="#cfc8b6" />
-      <path d="M36 21h2.5a5.5 5.5 0 0 1 0 11H35" stroke="#d9530a" strokeWidth="3.2" fill="none" />
-      <path d="M11 17h26v15a8 8 0 0 1-8 8H19a8 8 0 0 1-8-8z" fill="#ff6a13" />
-      <ellipse cx="24" cy="17" rx="13" ry="3.2" fill="#5a3420" />
-      <path d="M15 24v7" stroke="#ffa66b" strokeWidth="2" strokeLinecap="round" />
+      <path d="M8 33c0-6 6-9.5 13-9.5S34 27 34 33z" fill="#cf8b3e" />
+      <path d="M10.5 31c1.5-4 5.5-6 10.5-6s9 2 10.5 6" stroke="#e5ab62" strokeWidth="2" fill="none" />
+      <path d="M13 27.5c3-3.5 13-3.5 16 0" stroke="#a9692a" strokeWidth="1.3" fill="none" />
+      <path d="M27 32c-.5-3 2-5 6-5s8 1 8 4-3 3-7 3-6.6-.4-7-2z" fill="#fff" stroke="#e1dccd" strokeWidth="0.7" />
+      <ellipse cx="34" cy="29.6" rx="2.6" ry="1.9" fill="#f5b82e" />
     </>
   ),
-  // Almoço: tigela de arroz.
+  // Almoço: arroz, feijão, salada com tomate e frango grelhado.
   almoco: (
     <>
-      <path d="M8 26c0-8.5 7-14 16-14s16 5.5 16 14z" fill="#fbf7ec" stroke="#d6ccb3" strokeWidth="1.5" />
-      <path d="M15 21l2 1M21 17l2 .5M28 17.5l2-1M33 22l2 1M19 24l2-.5M26 23l2 1" stroke="#cbbf9f" strokeWidth="1.6" strokeLinecap="round" />
-      <path d="M5 26h38c-1 9-8 15-19 15S6 35 5 26z" fill="#4da3ff" />
-      <path d="M7.5 31h33" stroke="#2f7fd6" strokeWidth="2" />
-      <rect x="17" y="39.5" width="14" height="3.5" rx="1.75" fill="#2f7fd6" />
+      <path d="M7 34c0-5 3.5-8 8-8s8 3 8 8z" fill="#fbf7ec" stroke="#d9cfb8" strokeWidth="0.8" />
+      <path d="M11 30.5l1 .4M15 28.5l1 .2M18 31l1 .4" stroke="#c9bd9e" strokeLinecap="round" />
+      <path d="M18 34c0-3.6 3-6 6.5-6s6.5 2.4 6.5 6z" fill="#4a2414" />
+      <circle cx="22" cy="31" r="0.9" fill="#7a4128" />
+      <circle cx="26" cy="30.4" r="0.9" fill="#7a4128" />
+      <path d="M27 34c-1-4 2-7.5 7-8 4.5-.4 7.5 3 7 8z" fill="#e3a352" stroke="#b9772f" strokeWidth="0.8" />
+      <path d="M31 28l3 5M35 27.5l2.6 4.6" stroke="#a35c22" strokeWidth="1.2" strokeLinecap="round" />
+      <path d="M9 27c-1-4 2-7 5-6.5M12.5 26c1-3.5 4.5-5 6.5-3.5" stroke="#2fa36b" strokeWidth="3" strokeLinecap="round" fill="none" />
+      <circle cx="16.5" cy="24.5" r="2" fill="#f25f5c" />
     </>
   ),
-  // Café da tarde: sanduíche.
+  // Café da tarde: banana e um potinho de doce de leite com a colher.
   lanche: (
     <>
-      <rect x="6" y="31" width="36" height="8" rx="4" fill="#d9954a" />
-      <rect x="8" y="28" width="32" height="4.5" rx="2.25" fill="#f25f5c" />
-      <path d="M7 25h34l-3 5.5-4-3-5 4-4-4-5 4-4-3-5 3z" fill="#f5c542" />
-      <path d="M5 24c3-3 5 1 8-1s5 2 8 0 5 2 8 0 5 2 8 0 3 1 6 1v3H5z" fill="#43c59e" />
-      <path d="M6 23c0-8 8-13 18-13s18 5 18 13z" fill="#e8b56b" />
-      <ellipse cx="17" cy="16" rx="1.6" ry="1" fill="#fff3d6" />
-      <ellipse cx="25" cy="13.5" rx="1.6" ry="1" fill="#fff3d6" />
-      <ellipse cx="31" cy="17" rx="1.6" ry="1" fill="#fff3d6" />
+      <path d="M8 31c4 5 20 6 30-3-1 4-7 9-16 9S9 35 8 31z" fill="#f5d24a" stroke="#c9a227" strokeWidth="0.8" />
+      <path d="M7.4 29.6l1 1.6M38.6 27.4l-1.2 1" stroke="#5b4320" strokeWidth="1.8" strokeLinecap="round" />
+      <path d="M27 34v-5.5h12V34" fill="#fbf7ec" stroke="#cfc6b1" strokeWidth="0.8" />
+      <ellipse cx="33" cy="28.5" rx="6" ry="1.8" fill="#b8692a" />
+      <path d="M35 28c2-6 4-9 5-11" stroke="#9a9384" strokeWidth="1.4" strokeLinecap="round" />
     </>
   ),
-  // Janta: bisteca de porco grelhada, com a borda de gordura e o osso.
+  // Janta: bife grelhado, batata-doce e brócolis.
   janta: (
     <>
-      <path d="M8 14c0-5 4-8 9-8h12c8 0 14 7 14 16 0 10-7 18-17 18h-6c-6 0-9-4-9-8 0-3 2-5 2-8s-5-5-5-10z" fill="#f6d9c9" stroke="#e2b9a3" strokeWidth="1.2" />
-      <path d="M12 15c0-3 2-5 5-5h11c6 0 11 5 11 12 0 8-6 14-13 14h-5c-4 0-6-2-6-5 0-2 2-4 2-7s-5-5-5-9z" fill="#c96a55" />
-      <path d="M14.5 11c-1 5 3.5 7 3.5 11s-3.5 6-2.5 10" stroke="#f3ead8" strokeWidth="3.5" strokeLinecap="round" fill="none" />
-      <path d="M23 15l11 11M27 12.5l9.5 9.5M21 21.5l10 10" stroke="#8f3f30" strokeWidth="2.2" strokeLinecap="round" />
+      <path d="M6 34c0-5 4-8.5 10-8.5s10 3.5 10 8.5z" fill="#8f3f30" stroke="#f1d3c1" strokeWidth="1.2" />
+      <path d="M10 31l3-3.5M14 32l3.4-4M18 32.4l2.6-3" stroke="#5a2216" strokeWidth="1.2" strokeLinecap="round" />
+      <path d="M24 34l2.6-6.4 6 2.4-1.6 4z" fill="#f08a3c" stroke="#b5502a" strokeWidth="0.8" />
+      <path d="M37 34v-5" stroke="#8fc46a" strokeWidth="2.4" strokeLinecap="round" />
+      <circle cx="34.6" cy="27.6" r="2.8" fill="#2f9e5e" />
+      <circle cx="39.4" cy="27.6" r="2.8" fill="#2f9e5e" />
+      <circle cx="37" cy="25" r="3" fill="#38b06a" />
     </>
   ),
 }
 
-// Os desenhos têm formas diferentes (a bisteca é um bloco cheio, a xícara tem vapor e pires finos). Cada um ganha
-// uma escala e um centro próprios para que os quatro pareçam do mesmo tamanho e fiquem na mesma altura.
-const AJUSTE: Record<Refeicao, { escala: number; centro: [number, number] }> = {
-  cafe: { escala: 1.05, centro: [25, 23.25] },
-  almoco: { escala: 1, centro: [24, 27.5] },
-  lanche: { escala: 0.97, centro: [24, 24.5] },
-  janta: { escala: 0.88, centro: [25.5, 23] },
-}
-
-export default function IconeRefeicao({ refeicao, tamanho = 40 }: { refeicao: Refeicao; tamanho?: number }) {
+// O prato fica na metade de baixo do desenho; sobe um pouco para o pratinho ficar no meio do ícone.
+export default function IconeRefeicao({ refeicao, tamanho = 52 }: { refeicao: Refeicao; tamanho?: number }) {
   return (
     <svg className="icone-refeicao" width={tamanho} height={tamanho} viewBox="0 0 48 48" aria-hidden focusable="false">
-      <g transform={`translate(24 24.5) scale(${AJUSTE[refeicao].escala}) translate(${-AJUSTE[refeicao].centro[0]} ${-AJUSTE[refeicao].centro[1]})`}>
-        {DESENHOS[refeicao]}
+      <g transform="translate(0 -6)">
+        {PRATO}
+        {COMIDA[refeicao]}
       </g>
     </svg>
   )
