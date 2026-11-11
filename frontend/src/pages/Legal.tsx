@@ -54,10 +54,23 @@ export function PoliticaPrivacidade() {
         <li><strong>Desafio do dia, quiz e programas:</strong> o placar de cada desafio e de cada quiz, os programas que você começou e os dias concluídos.</li>
         <li><strong>Prancheta:</strong> as jogadas que você desenha e salva.</li>
         <li><strong>Diário de jogos:</strong> data, adversário, placar e os seus números em cada partida que você anota.</li>
+        <li><strong>Ranking, se você entrar nele:</strong> o apelido, se ele aparece no ranking aberto, o código do seu link de convite, a lista de amigos e os desafios entre amigos.</li>
         <li><strong>Segurança:</strong> o endereço IP é usado para limitar tentativas de acesso. A contagem fica na memória do servidor e não é gravada no banco.</li>
         <li><strong>Pedidos de cadastro:</strong> o nome, o e-mail e o hash da senha ficam à espera da ativação por até 24 horas e são descartados quando um novo cadastro é feito depois desse prazo.</li>
       </ul>
       <p>A aba Alimentação só mostra sugestões: ela não pede nem guarda nada sobre o que você come, seu peso ou sua saúde.</p>
+
+      <h2 id="ranking">O que fica visível no ranking</h2>
+      <p>
+        O ranking é opcional: sem criar um perfil, nada seu aparece para outras pessoas. Ao criar o perfil, os outros atletas passam a
+        ver o seu <strong>apelido</strong> e os seus <strong>números em cada lista</strong> (lances livres, desafio do dia, quiz,
+        dias de treino e nota do cartão), além da sua posição. Nome, e-mail, notas e o restante dos treinos nunca aparecem.
+      </p>
+      <ul>
+        <li>Com a opção de ranking aberto desmarcada, só os seus amigos veem o seu apelido e os seus números.</li>
+        <li>Amigos são as pessoas que aceitaram o seu link de convite ou cujo convite você aceitou. Nos desafios entre amigos, os dois veem o placar da semana.</li>
+        <li>Você pode trocar o apelido, sair do ranking aberto ou sair do ranking de vez a qualquer momento. Sair apaga o perfil, as amizades e os desafios; os treinos continuam.</li>
+      </ul>
 
       <h2 id="cookies">Cookies e armazenamento no navegador</h2>
       <p>Cookies e o armazenamento local são pequenos dados que um site guarda no seu navegador. O Basketball Practice usa dois tipos:</p>
@@ -203,6 +216,14 @@ export function TermosDeUso() {
       <p>
         Não tente acessar dados de outras pessoas, atrapalhar o serviço ou automatizar o cadastro e o login. Contas que fizerem isso
         podem ser suspensas ou apagadas.
+      </p>
+
+      <h2>Ranking e desafios entre amigos</h2>
+      <p>
+        Participar do ranking é opcional. O apelido não pode ofender, enganar se passando por outra pessoa nem trazer dados pessoais
+        de ninguém. Registre só treinos, testes e jogos que você fez de verdade: os números têm limites e conferências no servidor,
+        e perfis com apelido impróprio ou números forjados podem ser tirados do ranking ou apagados, sem aviso. O que fica visível
+        está descrito na <Link className="link" to="/privacidade#ranking">Política de Privacidade</Link>.
       </p>
 
       <h2>Jogadores e notícias</h2>

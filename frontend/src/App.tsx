@@ -18,6 +18,8 @@ import Quiz from './pages/Quiz'
 import CartaoDoAtleta from './pages/Cartao'
 import Programas, { ProgramaDetalhe } from './pages/Programas'
 import Jogos from './pages/Jogos'
+import RankingPagina from './pages/Ranking'
+import Convite from './pages/Convite'
 import Metas from './pages/Metas'
 import Ferramentas from './pages/Ferramentas'
 import Gerador from './pages/Gerador'
@@ -67,6 +69,8 @@ function Rotas() {
         <Route path="programas" element={<Programas />} />
         <Route path="programas/:id" element={<ProgramaDetalhe />} />
         <Route path="jogos" element={<Jogos />} />
+        <Route path="ranking" element={<RankingPagina />} />
+        <Route path="convite/:codigo" element={<Convite />} />
         <Route path="sessao" element={<SessaoGuiada />} />
         <Route path="jogue-como" element={<JogueComo />} />
         <Route path="jogue-como/:id" element={<EstiloDetalhe />} />

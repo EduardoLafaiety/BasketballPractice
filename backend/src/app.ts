@@ -23,6 +23,7 @@ import { playsRouter } from './routes/plays.js'
 import { programsRouter } from './routes/programs.js'
 import { sessionsRouter } from './routes/sessions.js'
 import { settingsRouter } from './routes/settings.js'
+import { socialRouter } from './routes/social.js'
 import { statsRouter } from './routes/stats.js'
 import { stylesRouter } from './routes/styles.js'
 import { testsRouter } from './routes/tests.js'
@@ -118,6 +119,7 @@ export function createApp(
   app.use('/api/programs', auth, programsRouter(db))
   app.use('/api/plays', auth, playsRouter(db))
   app.use('/api/games', auth, gamesRouter(db))
+  app.use('/api/social', auth, socialRouter(db))
   app.use('/api/styles', auth, stylesRouter(db))
   app.use('/api/settings', auth, settingsRouter(db))
   app.use('/api/data', auth, dataRouter(db, { maxImports }))
