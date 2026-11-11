@@ -286,32 +286,3 @@ export function EscadaRolagem({ nome, titulo, rotulo }: { nome: string; titulo: 
     </section>
   )
 }
-
-/** Título e nomes que caem e se encaixam num mosaico quando a seção aparece, uma vez só. Os links ficam na grade logo abaixo. */
-export function NomesMosaico({ nomes, titulo, texto }: { nomes: string[]; titulo: ReactNode; texto?: ReactNode }) {
-  const caixa = useRef<HTMLDivElement>(null)
-  const [estado, setEstado] = useState<'' | 'esperando' | 'caiu'>('')
-  const temNomes = nomes.length > 0
-  useEffect(() => {
-    if (!temNomes || !caixa.current || menosMovimento() || typeof IntersectionObserver === 'undefined') return
-    setEstado('esperando')
-    const olho = new IntersectionObserver(([item]) => {
-      if (!item.isIntersecting) return
-      setEstado('caiu')
-      olho.disconnect()
-    }, { threshold: 0.2 })
-    olho.observe(caixa.current)
-    return () => olho.disconnect()
-  }, [temNomes])
-  return (
-    <div className="nomes-secao">
-      {titulo}
-      <div ref={caixa} className={`nomes-mosaico ${estado}`} aria-hidden>
-        {nomes.map((n, i) => (
-          <span key={n} className={i % 2 ? 'nomes-contorno' : undefined} style={{ '--i': i } as React.CSSProperties}>{n}</span>
-        ))}
-      </div>
-      {texto}
-    </div>
-  )
-}
