@@ -5,6 +5,7 @@ import helmet from 'helmet'
 import { config } from './config.js'
 import type { Database } from './db/index.js'
 import { createEmailSender, type EmailSender } from './lib/email.js'
+import { createPushSender, sendToUser, type PushSender } from './lib/push.js'
 import { requireAdmin, requireAuth } from './middleware/auth.js'
 import { errorHandler, notFoundHandler } from './middleware/errors.js'
 import { emailDoLogin, limitarTentativas, type LimiteTentativas } from './middleware/rate-limit.js'
@@ -21,6 +22,7 @@ import { newsRouter } from './routes/news.js'
 import { plansRouter } from './routes/plans.js'
 import { playsRouter } from './routes/plays.js'
 import { programsRouter } from './routes/programs.js'
+import { pushCronRouter, pushRouter } from './routes/push.js'
 import { sessionsRouter } from './routes/sessions.js'
 import { settingsRouter } from './routes/settings.js'
 import { socialRouter } from './routes/social.js'
@@ -39,6 +41,8 @@ export interface AppOptions {
   emails?: EmailSender
   /** Recebe cada envio em segundo plano; os testes usam para esperar o e-mail sair. */
   segundoPlano?: (tarefa: Promise<void>) => void
+  /** Web Push: chave pública VAPID, quem envia (null = desligado) e o segredo do agendador externo. */
+  push?: { publicKey: string; send: PushSender | null; cronSecret?: string }
 }
 
 export function createApp(
@@ -52,6 +56,7 @@ export function createApp(
     maxImports = config.maxImports,
     emails = createEmailSender(config.email),
     segundoPlano,
+    push = { publicKey: config.push.publicKey, send: createPushSender(config.push), cronSecret: config.push.cronSecret },
   }: AppOptions = {},
 ) {
   const app = express()
@@ -119,7 +124,16 @@ export function createApp(
   app.use('/api/programs', auth, programsRouter(db))
   app.use('/api/plays', auth, playsRouter(db))
   app.use('/api/games', auth, gamesRouter(db))
-  app.use('/api/social', auth, socialRouter(db))
+  // Avisos no celular (desafio recebido, aceito…) saem em segundo plano: uma falha no push não derruba o pedido.
+  const notificar = push.send
+    ? (userId: number, message: Parameters<PushSender>[1]) => {
+        const tarefa = sendToUser(db, push.send!, userId, message).then(() => undefined, () => undefined)
+        segundoPlano?.(tarefa)
+      }
+    : undefined
+  app.use('/api/social', auth, socialRouter(db, { notificar }))
+  app.use('/api/push/run', pushCronRouter(db, { secret: push.cronSecret ?? '', send: push.send }))
+  app.use('/api/push', auth, pushRouter(db, push))
   app.use('/api/styles', auth, stylesRouter(db))
   app.use('/api/settings', auth, settingsRouter(db))
   app.use('/api/data', auth, dataRouter(db, { maxImports }))

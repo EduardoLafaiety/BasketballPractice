@@ -62,4 +62,13 @@ export const config = {
   gnewsApiKey: process.env.GNEWS_API_KEY ?? '',
   /** A cada 20 minutos são 72 das 100 consultas diárias do plano grátis; o resto fica para a demonstração. */
   newsIntervalMinutes: Number(process.env.NEWS_INTERVAL_MINUTES ?? 20),
+  /** Chaves VAPID do Web Push (gere com `npx web-push generate-vapid-keys`). Sem elas, os lembretes por push ficam desligados. */
+  push: {
+    publicKey: process.env.VAPID_PUBLIC_KEY ?? '',
+    privateKey: process.env.VAPID_PRIVATE_KEY ?? '',
+    /** Contato do responsável pelo site, exigido pelos serviços de push: mailto:… ou https://… */
+    subject: process.env.VAPID_SUBJECT ?? '',
+    /** Segredo para um agendador externo chamar POST /api/push/run (o plano grátis do Render dorme). Vazio: rota desligada. */
+    cronSecret: process.env.PUSH_CRON_SECRET ?? '',
+  },
 }

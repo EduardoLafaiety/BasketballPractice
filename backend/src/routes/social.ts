@@ -208,7 +208,9 @@ type ChallengeRow = {
   status: 'pendente' | 'aceito' | 'recusado' | 'cancelado'
 }
 
-export function socialRouter(db: Database) {
+type Notify = (userId: number, message: { title: string; body: string; url?: string; tag?: string }) => void
+
+export function socialRouter(db: Database, { notificar }: { notificar?: Notify } = {}) {
   const router = Router()
 
   router.get('/profile', async (req, res) => {
@@ -416,6 +418,12 @@ export function socialRouter(db: Database) {
       `SELECT ${challengeColumns} FROM friend_challenges c JOIN profiles pc ON pc.user_id = c.challenger_id JOIN profiles po ON po.user_id = c.opponent_id WHERE c.id = $1`,
       [created.id],
     )
+    notificar?.(opponentId, {
+      title: `${row!.challengerNickname} te desafiou`,
+      body: 'Um desafio para esta semana está esperando a sua resposta.',
+      url: '/ranking',
+      tag: `desafio-${row!.id}`,
+    })
     res.status(201).json((await withScore([row!], userId, tzOffset))[0])
   })
 
@@ -438,6 +446,9 @@ export function socialRouter(db: Database) {
       if (localToday(tzOffset) >= weekPeriod(challenge.weekStart, tzOffset).toDay) throw new HttpError(409, 'A semana desse desafio já acabou')
       const status = action === 'accept' ? 'aceito' : action === 'decline' ? 'recusado' : 'cancelado'
       await db.query(`UPDATE friend_challenges SET status = $1, responded_at = now() WHERE id = $2`, [status, id])
+      if (action === 'accept') {
+        notificar?.(challenge.challengerId, { title: `${challenge.opponentNickname} aceitou o desafio`, body: 'O placar da semana já está valendo.', url: '/ranking', tag: `desafio-${id}` })
+      }
       res.json((await withScore([{ ...challenge, status }], userId, tzOffset))[0])
     })
   respond('accept')
