@@ -50,7 +50,9 @@ export function PoliticaPrivacidade() {
       <ul>
         <li><strong>Conta:</strong> nome, e-mail e a senha em forma de hash, nunca o texto dela.</li>
         <li><strong>Treino:</strong> exercícios, treinos, sessões, arremessos por zona, notas, metas e preferências que você registra.</li>
-        <li><strong>Testes físicos:</strong> os resultados que você registra, como impulsão e sprint.</li>
+        <li><strong>Testes físicos:</strong> os resultados que você registra, como impulsão e sprint, que também formam o cartão do atleta.</li>
+        <li><strong>Desafio do dia, quiz e programas:</strong> o placar de cada desafio e de cada quiz, os programas que você começou e os dias concluídos.</li>
+        <li><strong>Prancheta:</strong> as jogadas que você desenha e salva.</li>
         <li><strong>Segurança:</strong> o endereço IP é usado para limitar tentativas de acesso. A contagem fica na memória do servidor e não é gravada no banco.</li>
         <li><strong>Pedidos de cadastro:</strong> o nome, o e-mail e o hash da senha ficam à espera da ativação por até 24 horas e são descartados quando um novo cadastro é feito depois desse prazo.</li>
       </ul>
@@ -123,6 +125,12 @@ export function PoliticaPrivacidade() {
         <li><strong>Cloudflare:</strong> entrega as páginas do site.</li>
         <li><strong>Resend:</strong> envia os e-mails de ativação e de recuperação de senha.</li>
         <li><strong>Google AdSense:</strong> mostra os anúncios, com os cookies descritos em <a className="link" href="#anuncios">Anúncios</a>.</li>
+        <li>
+          <strong>OpenStreetMap:</strong> na busca de quadras, o seu navegador pede direto aos servidores do OpenStreetMap os blocos
+          do mapa, as quadras perto do ponto escolhido e, se você digitar um lugar, o endereço. Eles recebem a localização ou o
+          texto da busca e o seu IP; o Basketball Practice não recebe nem guarda nada disso. A localização só é usada se você tocar
+          em Usar minha localização e permitir no navegador.
+        </li>
       </ul>
       <p>
         O servidor e o banco de dados ficam nos Estados Unidos, então seus dados são transferidos para fora do Brasil. O conteúdo
