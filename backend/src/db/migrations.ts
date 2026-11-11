@@ -241,6 +241,26 @@ const migrations: string[] = [
     'impulsao', 'sprint', 'agilidade', 'suicidio', 'lances_1min', 'arremesso_5_pontos', 'drible_cones'
   ));
   `,
+  `
+  -- Programas de várias semanas: o atleta começa um programa e conclui um dia de cada vez.
+  CREATE TABLE user_programs (
+    user_id    integer NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    program_id text NOT NULL,
+    started_on date NOT NULL,
+    created_at timestamptz NOT NULL DEFAULT now(),
+    PRIMARY KEY (user_id, program_id)
+  );
+  CREATE TABLE program_days_done (
+    user_id    integer NOT NULL,
+    program_id text NOT NULL,
+    day        integer NOT NULL CHECK (day >= 1),
+    done_on    date NOT NULL,
+    session_id integer REFERENCES practice_sessions(id) ON DELETE SET NULL,
+    PRIMARY KEY (user_id, program_id, day),
+    FOREIGN KEY (user_id, program_id) REFERENCES user_programs(user_id, program_id) ON DELETE CASCADE
+  );
+  CREATE INDEX idx_program_days_done_session ON program_days_done(session_id);
+  `,
 ]
 
 /** Versão do schema depois de todas as migrações. */
