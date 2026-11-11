@@ -32,10 +32,20 @@
 - 🗓️ **Rotina Semanal**: Monte O Que Treinar Em Cada Dia Ou Comece De Um Modelo Pronto.
 - 📈 **Desempenho**: Comparativos, Gráficos E Mapa De Arremessos Por Zona Da Quadra.
 - 🏆 **Metas E Conquistas**: Barras De Progresso, Sequência De Dias Seguidos E Medalhas.
+- 🎯 **Desafio Do Dia E Quiz Diário**: O Mesmo Desafio De Quadra E As Mesmas 5 Perguntas Para Todo Mundo, Trocados À Meia-Noite, Com Placar Em Quadradinhos Para Compartilhar.
+- 🪪 **Cartão Do Atleta**: Bateria Mensal De Quatro Testes, Nota De 0 A 99, Radar E Evolução Mês A Mês.
+- 📅 **Programas De 30 Dias**: Um Treino Liberado Por Dia, Com Barra De Progresso.
+- 🥇 **Ranking E Desafios Entre Amigos**: Listas Da Semana E Gerais, Convite Por Link E Duelos Semanais.
+- 📋 **Modo Técnico**: Times, Tarefas E O Acompanhamento De Cada Atleta.
+- 📓 **Diário De Jogos**: As Partidas De Verdade, Comparadas Com O Treino.
+- 🗺️ **Quadras Perto De Você E Prancheta Tática**: Mapa Com Quadras Do OpenStreetMap E Jogadas Desenhadas Em Meia Ou Quadra Inteira.
+- 🖼️ **Imagem Da Semana**: PNG No Tamanho Dos Stories Com O Mapa De Arremessos E A Sequência.
 - 🧰 **Ferramentas**: Timer De Intervalos, Contador De Arremessos, Metrônomo De Drible E Calculadoras; O Vídeo Em Câmera Lenta Chega Em Breve.
 - 📰 **Barra De Notícias**: As Últimas Manchetes Do Basquete Correndo No Rodapé Do Site.
 - 🏀 **Visual De Quadra**: A Bola Da Abertura Amplia Sem Perder Nitidez Ao Rolar A Página, E Uma Listra Com As Costuras Dela Abre As Seções De Números E Ferramentas.
-- 📱 **PWA**: Instalável No Celular, Com Tema Claro/Escuro E Lembretes De Treino.
+- 📱 **PWA**: Instalável No Celular, Com Tema Claro/Escuro E Lembretes De Treino, Inclusive Com O App Fechado (Web Push).
+
+Detalhes De Cada Recurso, Da API E Da Hospedagem Em [`docs/DOCUMENTACAO.md`](docs/DOCUMENTACAO.md).
 
 ## 📸 Telas
 
