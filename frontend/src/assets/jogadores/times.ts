@@ -1,0 +1,33 @@
+// Time de cada jogador da aba Jogue como, pela sigla da tabela de `equipamentos/dados.ts`.
+// Conferido nos elencos do ESPN em 11/11/2026. Troca de time muda isso: ao conferir de novo, atualize aqui.
+// É o time de agora, não o da foto (a legenda de `fotos.ts` guarda o time de quando ela foi tirada).
+export const TIME_DO_JOGADOR: Record<string, string> = {
+  'luka-doncic': 'LAL',
+  'kyrie-irving': 'DAL',
+  'lebron-james': 'PHI',
+  'stephen-curry': 'GSW',
+  'shai-gilgeous-alexander': 'OKC',
+  'nikola-jokic': 'DEN',
+  'giannis-antetokounmpo': 'MIA',
+  'kevin-durant': 'HOU',
+  'jayson-tatum': 'BOS',
+  'anthony-edwards': 'MIN',
+  'victor-wembanyama': 'SAS',
+  'jalen-brunson': 'NYK',
+  'james-harden': 'CLE',
+  'damian-lillard': 'POR',
+  'ja-morant': 'POR',
+  'tyrese-haliburton': 'IND',
+  'devin-booker': 'PHX',
+  'joel-embiid': 'PHI',
+  'kawhi-leonard': 'TOR',
+  'trae-young': 'WAS',
+  'jimmy-butler': 'GSW',
+  'paul-george': 'BOS',
+  'pascal-siakam': 'IND',
+  'zion-williamson': 'NOP',
+  'scottie-barnes': 'TOR',
+  'anthony-davis': 'WAS',
+  'karl-anthony-towns': 'NYK',
+  'bam-adebayo': 'MIA',
+}
