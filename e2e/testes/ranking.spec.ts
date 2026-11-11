@@ -38,8 +38,13 @@ test('ranking com amigos: perfil, convite por link, desafio aceito e placar da s
   // No ranking de amigos as duas aparecem, mesmo com Ana fora do ranking aberto.
   await expect(paginaBia.getByRole('list', { name: 'Pódio' })).toContainText(apelidoAna)
   await expect(paginaBia.getByRole('list', { name: 'Pódio' }).locator('.lugar-1')).toContainText(apelidoBia)
-  const aberto = await request.get('/api/social/ranking?scope=todos', { headers: autorizacao(bia.token) })
+  // Quem não é amigo não vê a Ana no ranking aberto; a Bia, que é, vê.
+  const cris = await novaConta(request, 'Cris E2E')
+  await request.put('/api/social/profile', { headers: autorizacao(cris.token), data: { nickname: apelido('cris') } })
+  const aberto = await request.get('/api/social/ranking?scope=todos', { headers: autorizacao(cris.token) })
   expect(JSON.stringify(await aberto.json())).not.toContain(apelidoAna)
+  const daBia = await request.get('/api/social/ranking?scope=todos', { headers: autorizacao(bia.token) })
+  expect(JSON.stringify(await daBia.json())).toContain(apelidoAna)
 
   // Ana desafia Bia em lances livres; Bia aceita e o placar aparece.
   await page.reload()
