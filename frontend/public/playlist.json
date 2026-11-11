@@ -1,0 +1,606 @@
+{
+  "id": "0rshzJAoeKoS8nYiBCAEJG",
+  "nome": "Basktball Pratice",
+  "faixas": [
+    {
+      "id": "2JvzF1RMd7lE3KmFlsyZD8",
+      "titulo": "MIDDLE CHILD",
+      "artista": "J. Cole",
+      "duracao": 213593
+    },
+    {
+      "id": "0TlLq3lA83rQOYtrqBqSct",
+      "titulo": "Nonstop",
+      "artista": "Drake",
+      "duracao": 238614
+    },
+    {
+      "id": "0nbXyq5TXYPCO7pr3N8S4I",
+      "titulo": "The Box",
+      "artista": "Roddy Ricch",
+      "duracao": 196652
+    },
+    {
+      "id": "1sbEeUY8KsdvgiQi26JBFz",
+      "titulo": "POPSTAR (feat. Drake)",
+      "artista": "DJ Khaled, Drake",
+      "duracao": 200221
+    },
+    {
+      "id": "2IRZnDFmlqMuOrYOLnZZyc",
+      "titulo": "Going Bad (feat. Drake)",
+      "artista": "Meek Mill, Drake",
+      "duracao": 180522
+    },
+    {
+      "id": "2SAqBLGA283SUiwJ3xOUVI",
+      "titulo": "Laugh Now Cry Later (feat. Lil Durk)",
+      "artista": "Drake, Lil Durk",
+      "duracao": 261492
+    },
+    {
+      "id": "4OOlOfvVLO7dxXvgxOqnwp",
+      "titulo": "Take Money",
+      "artista": "Ryan Witherspoon, Jadakiss",
+      "duracao": 263046
+    },
+    {
+      "id": "6gBFPUFcJLzWGx4lenP6h2",
+      "titulo": "goosebumps",
+      "artista": "Travis Scott",
+      "duracao": 243836
+    },
+    {
+      "id": "5ry2OE6R2zPQFDO85XkgRb",
+      "titulo": "Money In The Grave (Drake ft. Rick Ross)",
+      "artista": "Drake, Rick Ross",
+      "duracao": 205426
+    },
+    {
+      "id": "0EnHCs1fsyt4nnTxt2eL7A",
+      "titulo": "Straight Shot Hennessy",
+      "artista": "Yaw Tog",
+      "duracao": 154698
+    },
+    {
+      "id": "7KXjTSCq5nL1LoYtL7XAwS",
+      "titulo": "HUMBLE.",
+      "artista": "Kendrick Lamar",
+      "duracao": 177000
+    },
+    {
+      "id": "2xLMifQCjDGFmkHkpNLD9h",
+      "titulo": "SICKO MODE",
+      "artista": "Travis Scott",
+      "duracao": 312820
+    },
+    {
+      "id": "0GdbQMdQKb9nDXRBSpkjpl",
+      "titulo": "Lifestyle",
+      "artista": "Reese Moneyyy",
+      "duracao": 143020
+    },
+    {
+      "id": "1pMWg15piNTDSJB14e2ino",
+      "titulo": "EL VEE",
+      "artista": "Corey St.Rose",
+      "duracao": 114960
+    },
+    {
+      "id": "1xzBco0xcoJEDXktl7Jxrr",
+      "titulo": "Mo Bamba",
+      "artista": "Sheck Wes",
+      "duracao": 183906
+    },
+    {
+      "id": "2eKXDSa7Ze952gulXGCy0O",
+      "titulo": "Wockiana",
+      "artista": "Lil Rocky",
+      "duracao": 169462
+    },
+    {
+      "id": "6k6syoJrtdhMxPPz8z0lR9",
+      "titulo": "War Games",
+      "artista": "TrubAssassin, Easy Lantana, Trey G",
+      "duracao": 193374
+    },
+    {
+      "id": "7yotKA30dwTKNEGomV9ZsI",
+      "titulo": "KOD",
+      "artista": "J. Cole",
+      "duracao": 191436
+    },
+    {
+      "id": "6vN77lE9LK6HP2DewaN6HZ",
+      "titulo": "Yes Indeed",
+      "artista": "Lil Baby, Drake",
+      "duracao": 142273
+    },
+    {
+      "id": "3s4mrPrEFFPF0LmAfutW0n",
+      "titulo": "The London (feat. J. Cole & Travis Scott)",
+      "artista": "Young Thug, J. Cole, Travis Scott",
+      "duracao": 200186
+    },
+    {
+      "id": "09Ny6OwJsSvYkITXj2OMek",
+      "titulo": "flyyarmani interlude",
+      "artista": "zandros, Flyy Armani",
+      "duracao": 90397
+    },
+    {
+      "id": "2gwkD6igEhQbDQegRCcdoB",
+      "titulo": "Suge",
+      "artista": "DaBaby",
+      "duracao": 163320
+    },
+    {
+      "id": "78QR3Wp35dqAhFEc2qAGjE",
+      "titulo": "Drip Too Hard (Lil Baby & Gunna)",
+      "artista": "Lil Baby, Gunna",
+      "duracao": 145542
+    },
+    {
+      "id": "6n4U3TlzUGhdSFbUUhTvLP",
+      "titulo": "Walk It Talk It",
+      "artista": "Migos, Drake",
+      "duracao": 276147
+    },
+    {
+      "id": "32Y2jHM49VMEHiNkBOR5Hl",
+      "titulo": "polaroid",
+      "artista": "Dyl",
+      "duracao": 138348
+    },
+    {
+      "id": "5eqK0tbzUPo2SoeZsov04s",
+      "titulo": "Bank Account",
+      "artista": "21 Savage",
+      "duracao": 220306
+    },
+    {
+      "id": "1wJRveJZLSb1rjhnUHQiv6",
+      "titulo": "Swervin (feat. 6ix9ine)",
+      "artista": "A Boogie Wit da Hoodie, 6ix9ine",
+      "duracao": 189486
+    },
+    {
+      "id": "5LKkpgINNqUh4KKec80J65",
+      "titulo": "Talk My Stuff",
+      "artista": "Iam.youngc",
+      "duracao": 136852
+    },
+    {
+      "id": "7xQAfvXzm3AkraOtGPWIZg",
+      "titulo": "Wow.",
+      "artista": "Post Malone",
+      "duracao": 149546
+    },
+    {
+      "id": "4S8d14HvHb70ImctNgVzQQ",
+      "titulo": "I Love It (& Lil Pump)",
+      "artista": "Kanye West, Lil Pump",
+      "duracao": 127946
+    },
+    {
+      "id": "2O8gSQ9z52tZSLJnuzjkcG",
+      "titulo": "West Coast",
+      "artista": "G-Eazy, Blueface",
+      "duracao": 139610
+    },
+    {
+      "id": "2B9wgj9XzbJZLty03PRbVo",
+      "titulo": "Bezerk (feat. A$AP Ferg)",
+      "artista": "Big Sean, Hit-Boy, A$AP Ferg",
+      "duracao": 151066
+    },
+    {
+      "id": "3qX1dqmDdmMvvfMVfsx4Bh",
+      "titulo": "m.A.A.d city",
+      "artista": "Kendrick Lamar, MC Eiht",
+      "duracao": 350120
+    },
+    {
+      "id": "6HZILIRieu8S0iqY8kIKhj",
+      "titulo": "DNA.",
+      "artista": "Kendrick Lamar",
+      "duracao": 185946
+    },
+    {
+      "id": "7wdzLe2Gsx1RGqbvYZHASz",
+      "titulo": "i",
+      "artista": "Kendrick Lamar",
+      "duracao": 231933
+    },
+    {
+      "id": "2FeBslNBMdR9V58uv6hd2t",
+      "titulo": "N95",
+      "artista": "Kendrick Lamar",
+      "duracao": 195950
+    },
+    {
+      "id": "0YeUVm23SAkUruwEx9LWnt",
+      "titulo": "Savior",
+      "artista": "Kendrick Lamar, Baby Keem, Sam Dew",
+      "duracao": 224466
+    },
+    {
+      "id": "6AI3ezQ4o3HUoP6Dhudph3",
+      "titulo": "Not Like Us",
+      "artista": "Kendrick Lamar",
+      "duracao": 274192
+    },
+    {
+      "id": "0nj9Bq5sHDiTxSHunhgkFb",
+      "titulo": "squabble up",
+      "artista": "Kendrick Lamar",
+      "duracao": 157992
+    },
+    {
+      "id": "5W8jRrZ6tWrTrqnKRtIQBf",
+      "titulo": "p r i d e . i s . t h e . d e v i l (with Lil Baby)",
+      "artista": "J. Cole, Lil Baby",
+      "duracao": 218210
+    },
+    {
+      "id": "5qHirGR7M9tdm6C17DlzSY",
+      "titulo": "REEL IT IN",
+      "artista": "Aminé",
+      "duracao": 121346
+    },
+    {
+      "id": "2cnKST6T9qUo2i907lm8zX",
+      "titulo": "a m a r i",
+      "artista": "J. Cole",
+      "duracao": 148421
+    },
+    {
+      "id": "62vpWI1CHwFy7tMIcSStl8",
+      "titulo": "No Role Modelz",
+      "artista": "J. Cole",
+      "duracao": 292986
+    },
+    {
+      "id": "6MF4tRr5lU8qok8IKaFOBE",
+      "titulo": "Under The Sun (with J. Cole & Lute feat. DaBaby)",
+      "artista": "Dreamville, J. Cole, Lute, DaBaby",
+      "duracao": 202040
+    },
+    {
+      "id": "3F5CgOj3wFlRv51JsHbxhe",
+      "titulo": "Jimmy Cooks (feat. 21 Savage)",
+      "artista": "Drake, 21 Savage",
+      "duracao": 218364
+    },
+    {
+      "id": "12VWzyPDBCc8fqeWCAfNwR",
+      "titulo": "One Dance",
+      "artista": "Drake, Wizkid, Kyla",
+      "duracao": 173986
+    },
+    {
+      "id": "6V2D8Lls36APk0THDjBDfE",
+      "titulo": "Started From the Bottom",
+      "artista": "Drake",
+      "duracao": 174133
+    },
+    {
+      "id": "33gwZOGJWEZ7dRWPqPxBEZ",
+      "titulo": "Wolves (feat. Post Malone)",
+      "artista": "Big Sean, Post Malone",
+      "duracao": 199758
+    },
+    {
+      "id": "7FYH5AW3bVfZHJIQpq3UOA",
+      "titulo": "I Don't Fuck With You",
+      "artista": "Big Sean, E-40",
+      "duracao": 284386
+    },
+    {
+      "id": "0SGkqnVQo9KPytSri1H6cF",
+      "titulo": "Bounce Back",
+      "artista": "Big Sean",
+      "duracao": 222360
+    },
+    {
+      "id": "4qikXelSRKvoCqFcHLB2H2",
+      "titulo": "Mercy",
+      "artista": "Kanye West, Big Sean, Pusha T, 2 Chainz",
+      "duracao": 329320
+    },
+    {
+      "id": "4Li2WHPkuyCdtmokzW2007",
+      "titulo": "Ni**as In Paris",
+      "artista": "JAŸ-Z, Kanye West",
+      "duracao": 219333
+    },
+    {
+      "id": "4KW1lqgSr8TKrvBII0Brf8",
+      "titulo": "Father Stretch My Hands Pt. 1",
+      "artista": "Kanye West",
+      "duracao": 135920
+    },
+    {
+      "id": "0j2T0R9dR9qdJYsB7ciXhf",
+      "titulo": "Stronger",
+      "artista": "Kanye West",
+      "duracao": 311866
+    },
+    {
+      "id": "5ad5uryyzVWs95bK3myGkw",
+      "titulo": "Ok Ok pt 2",
+      "artista": "Kanye West",
+      "duracao": 204629
+    },
+    {
+      "id": "3eekarcy7kvN4yt5ZFzltW",
+      "titulo": "HIGHEST IN THE ROOM",
+      "artista": "Travis Scott",
+      "duracao": 175720
+    },
+    {
+      "id": "6gi6y1xwmVszDWkUqab1qw",
+      "titulo": "OUT WEST (feat. Young Thug)",
+      "artista": "JACKBOYS, Travis Scott, Young Thug",
+      "duracao": 157712
+    },
+    {
+      "id": "4jVBIpuOiMj1crqd8LoCrJ",
+      "titulo": "FRANCHISE (feat. Young Thug & M.I.A.)",
+      "artista": "Travis Scott, Young Thug, M.I.A.",
+      "duracao": 202794
+    },
+    {
+      "id": "7lQ8MOhq6IN2w8EYcFNSUk",
+      "titulo": "Without Me",
+      "artista": "Eminem",
+      "duracao": 290320
+    },
+    {
+      "id": "2GoOioZVtOF1iMYfnzkreg",
+      "titulo": "My Life",
+      "artista": "50 Cent, Eminem, Adam Levine",
+      "duracao": 239906
+    },
+    {
+      "id": "7ycWLEP1GsNjVvcjawXz3z",
+      "titulo": "Praise The Lord (Da Shine) (feat. Skepta)",
+      "artista": "A$AP Rocky, Skepta",
+      "duracao": 205813
+    },
+    {
+      "id": "3yfqSUWxFvZELEM4PmlwIR",
+      "titulo": "The Real Slim Shady",
+      "artista": "Eminem",
+      "duracao": 284200
+    },
+    {
+      "id": "77Ft1RJngppZlq59B6uP0z",
+      "titulo": "Lose Yourself",
+      "artista": "Eminem",
+      "duracao": 320626
+    },
+    {
+      "id": "4xkOaSrkexMciUUogZKVTS",
+      "titulo": "Till I Collapse",
+      "artista": "Eminem, Nate Dogg",
+      "duracao": 297786
+    },
+    {
+      "id": "4WgvTITBJbEfCJHguiE7QS",
+      "titulo": "The Monster",
+      "artista": "Eminem, Rihanna",
+      "duracao": 250188
+    },
+    {
+      "id": "60SdxE8apGAxMiRrpbmLY0",
+      "titulo": "Lucky You (feat. Joyner Lucas)",
+      "artista": "Eminem, Joyner Lucas",
+      "duracao": 244679
+    },
+    {
+      "id": "7iL6o9tox1zgHpKUfh9vuC",
+      "titulo": "In Da Club",
+      "artista": "50 Cent",
+      "duracao": 193466
+    },
+    {
+      "id": "5D2mYZuzcgjpchVY1pmTPh",
+      "titulo": "Candy Shop",
+      "artista": "50 Cent, Olivia",
+      "duracao": 209106
+    },
+    {
+      "id": "3G0yz3DZn3lfraledmBCT0",
+      "titulo": "P.I.M.P.",
+      "artista": "50 Cent",
+      "duracao": 249480
+    },
+    {
+      "id": "6mcu7D7QuABVwUGDwovOEh",
+      "titulo": "If I Can't",
+      "artista": "50 Cent",
+      "duracao": 196626
+    },
+    {
+      "id": "5STdMlrBf6pqWiNE7WqxSi",
+      "titulo": "Many Men (Wish Death)",
+      "artista": "50 Cent",
+      "duracao": 256240
+    },
+    {
+      "id": "6Ozh9Ok6h4Oi1wUSLtBseN",
+      "titulo": "BOP",
+      "artista": "DaBaby",
+      "duracao": 159714
+    },
+    {
+      "id": "2WsuSYJNXGKXVYkHPnq2yp",
+      "titulo": "Ransom (with Juice WRLD) - Remix",
+      "artista": "Lil Tecca, Juice WRLD",
+      "duracao": 171253
+    },
+    {
+      "id": "7ytR5pFWmSjzHJIeQkgog4",
+      "titulo": "ROCKSTAR (feat. Roddy Ricch)",
+      "artista": "DaBaby, Roddy Ricch",
+      "duracao": 181733
+    },
+    {
+      "id": "2FvD20Z8aoWIePi7PoN8sG",
+      "titulo": "TOES (feat. Lil Baby & Moneybagg Yo)",
+      "artista": "DaBaby, Lil Baby, Moneybagg Yo",
+      "duracao": 136366
+    },
+    {
+      "id": "2lUDBd7JrgAMltcp6dcd7D",
+      "titulo": "25 million",
+      "artista": "Roddy Ricch",
+      "duracao": 204626
+    },
+    {
+      "id": "1ttPzkTSpQUFcEGx8bjerL",
+      "titulo": "Every Season",
+      "artista": "Roddy Ricch",
+      "duracao": 214375
+    },
+    {
+      "id": "4SWWe2OYC4mqf40Gc2RSdl",
+      "titulo": "Down Below",
+      "artista": "Roddy Ricch",
+      "duracao": 224002
+    },
+    {
+      "id": "3QzAOrNlsabgbMwlZt7TAY",
+      "titulo": "Ballin' (with Roddy Ricch)",
+      "artista": "Mustard, Roddy Ricch",
+      "duracao": 180434
+    },
+    {
+      "id": "1fewSx2d5KIZ04wsooEBOz",
+      "titulo": "Space Cadet (feat. Gunna)",
+      "artista": "Metro Boomin, Gunna",
+      "duracao": 203266
+    },
+    {
+      "id": "0wHFktze2PHC5jDt3B17DC",
+      "titulo": "First Class",
+      "artista": "Jack Harlow",
+      "duracao": 173947
+    },
+    {
+      "id": "1jaTQ3nqY3oAAYyCTbIvnM",
+      "titulo": "WHATS POPPIN",
+      "artista": "Jack Harlow",
+      "duracao": 139741
+    },
+    {
+      "id": "6bTdZ7xfKp3NqqADJ8HLyj",
+      "titulo": "Vampiro",
+      "artista": "Matuê, WIU, Teto",
+      "duracao": 250434
+    },
+    {
+      "id": "7aZusA4cWXz3Wv9e9uhavz",
+      "titulo": "Quer Voar",
+      "artista": "Matuê",
+      "duracao": 187636
+    },
+    {
+      "id": "6Vgn3IEUkWs3d6og029Gtm",
+      "titulo": "Mustang Preto",
+      "artista": "Teto",
+      "duracao": 183000
+    },
+    {
+      "id": "3sGcETRMuAgcPgjDpIkgMn",
+      "titulo": "777-666",
+      "artista": "Matuê",
+      "duracao": 164000
+    },
+    {
+      "id": "2c80HnIOPMmQQVQllQEWb5",
+      "titulo": "É Sal",
+      "artista": "Matuê",
+      "duracao": 157687
+    },
+    {
+      "id": "0COdap7lWmcab47ftniiIG",
+      "titulo": "Yakuza",
+      "artista": "Jovem Dex",
+      "duracao": 140581
+    },
+    {
+      "id": "3ow7zYRhbIO7f4yyHI4ZaD",
+      "titulo": "Manha",
+      "artista": "Teto",
+      "duracao": 177442
+    },
+    {
+      "id": "3HdEOUNuFuoWj06rXpQQ4o",
+      "titulo": "Jovens do Reggae",
+      "artista": "Kawe, WIU, Original Quality",
+      "duracao": 183652
+    },
+    {
+      "id": "1RgJ4lexKGNBlKnyxB5SRt",
+      "titulo": "Balazul",
+      "artista": "Teto, Mateca",
+      "duracao": 202909
+    },
+    {
+      "id": "5DhiTYpD599fu3q7fCepgL",
+      "titulo": "Dior",
+      "artista": "BIN, Major RD, Mainstreet, Ajaxx",
+      "duracao": 229894
+    },
+    {
+      "id": "17rF54WvGGqPVxDheq8PP8",
+      "titulo": "Mantém",
+      "artista": "WIU, Matuê",
+      "duracao": 195692
+    },
+    {
+      "id": "2evcFxT2aW4FZznh6DyEwK",
+      "titulo": "Vlife",
+      "artista": "Yunk Vino, WIU, Labbel Rec",
+      "duracao": 160014
+    },
+    {
+      "id": "381RU1bmJgizSmZyyiOIno",
+      "titulo": "Blackout",
+      "artista": "Yunk Vino, Axant, Akilla, Ursão",
+      "duracao": 191933
+    },
+    {
+      "id": "5TMhVPQ0zVxDvg2jRFPvPv",
+      "titulo": "WTF - Tô Nem Aí",
+      "artista": "Dudu, Vk Mac",
+      "duracao": 166153
+    },
+    {
+      "id": "3DETeSP0LRVbp0Hldq32SC",
+      "titulo": "Maldade das Ruas (feat. Did Brock, Murillo Zenki, Phantom Mob & Caju Clã)",
+      "artista": "JayA Luuck, Danzo, B.I.G Carter, Ras Akin, Murillo Zenki, Phantom Mob, Caju Clã",
+      "duracao": 282767
+    },
+    {
+      "id": "7aX8eaNCw5mBaRXAJ8aUqY",
+      "titulo": "Lebron James",
+      "artista": "Big Bllakk, Pedro Apoema",
+      "duracao": 149787
+    },
+    {
+      "id": "4ToiWhiO0NHjhaBjFz4JDf",
+      "titulo": "Nascido Pra Ser Rei",
+      "artista": "Dudu, LEALL, nvhuel",
+      "duracao": 183478
+    },
+    {
+      "id": "65pLuhvAvq0tPijFTpqKBP",
+      "titulo": "Sirenes",
+      "artista": "Big Bllakk, SD9, Pedro Apoema",
+      "duracao": 230000
+    }
+  ]
+}

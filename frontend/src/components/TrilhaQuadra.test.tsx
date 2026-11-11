@@ -1,114 +1,169 @@
-import { act, screen, waitFor, within } from '@testing-library/react'
+import { act, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { definirToken } from '../api'
 import { apiFalsa, configFalsa, usuarioFalso } from '../test/api-falsa'
 import { abrirApp } from '../test/renderizar'
-import { LINK_PLAYLIST, reiniciarTrilha, SCRIPT_SPOTIFY, type ApiSpotify } from './TrilhaQuadra'
+import { LISTA_FAIXAS, reiniciarTrilha, SCRIPT_SPOTIFY, type ApiSpotify, type Controle, type Estado, type Faixa } from './TrilhaQuadra'
 
-function abrir(rota = '/treinos') {
+const FAIXAS: Faixa[] = [
+  { id: 'a1', titulo: 'Middle Child', artista: 'J. Cole', duracao: 213_000 },
+  { id: 'b2', titulo: 'Nonstop', artista: 'Drake', duracao: 238_000 },
+  { id: 'c3', titulo: 'The Box', artista: 'Roddy Ricch', duracao: 196_000 },
+]
+
+/** Responde a lista de faixas e as capas; as outras rotas ficam com a API falsa. */
+function abrir({ capas = true } = {}) {
   definirToken('tk')
   apiFalsa({ 'GET /auth/me': usuarioFalso(), 'GET /settings': configFalsa, 'GET /exercises': [] })
-  abrirApp(rota)
+  const original = globalThis.fetch
+  vi.spyOn(globalThis, 'fetch').mockImplementation((entrada, init) => {
+    const url = String(entrada)
+    if (url === LISTA_FAIXAS) return Promise.resolve(Response.json({ faixas: FAIXAS }))
+    if (url.startsWith('https://open.spotify.com/oembed'))
+      return Promise.resolve(capas ? Response.json({ thumbnail_url: `https://capa.example/${url.split('/track/')[1]}` }) : new Response('', { status: 500 }))
+    return original(entrada, init)
+  })
+  abrirApp('/treinos')
 }
-const botao = () => screen.findByRole('button', { name: /Trilha da quadra/ })
+const trilha = () => screen.findByRole('complementary', { name: 'Trilha da quadra' })
 const scripts = () => [...document.querySelectorAll<HTMLScriptElement>(`script[src="${SCRIPT_SPOTIFY}"]`)]
 
-/** Faz de conta que o script do Spotify chegou: devolve quem avisa o site de play e pause. */
+/** Faz de conta que o script do Spotify chegou: devolve o controle falso e quem avisa o site do estado. */
 async function spotifyCarregou() {
-  let avisar: (pausado: boolean) => void = () => {}
-  const api: ApiSpotify = {
-    createController: vi.fn((el, _opcoes, pronto) => {
-      el.replaceWith(Object.assign(document.createElement('iframe'), { title: 'Spotify' }))
-      pronto({ addListener: (_evento: string, ouvir: (e: { data: { isPaused: boolean } }) => void) => { avisar = (isPaused) => ouvir({ data: { isPaused } }) } })
-    }),
+  let ouvinte: (e: { data: Estado }) => void = () => {}
+  const controle: Controle = {
+    loadUri: vi.fn(),
+    play: vi.fn(),
+    togglePlay: vi.fn(),
+    addListener: (_evento, ouvir) => { ouvinte = ouvir },
   }
+  const api: ApiSpotify = { createController: vi.fn((_el, _opcoes, pronto) => pronto(controle)) }
   act(() => window.onSpotifyIframeApiReady!(api))
   await waitFor(() => expect(api.createController).toHaveBeenCalledOnce())
-  return { api, avisar: (pausado: boolean) => act(() => avisar(pausado)) }
+  const avisar = (estado: Partial<Estado>) => act(() => ouvinte({ data: { isPaused: false, position: 0, duration: 213_000, ...estado } }))
+  return { api, controle, avisar }
 }
 
 afterEach(() => {
   scripts().forEach((s) => s.remove())
   reiniciarTrilha()
+  vi.restoreAllMocks()
 })
 
 describe('Trilha da quadra', () => {
-  it('fica fechada e não baixa nada do Spotify até o clique', async () => {
+  it('fica à mostra com a primeira faixa e a capa, sem baixar o player do Spotify', async () => {
     abrir()
-    expect(await botao()).toHaveAttribute('aria-expanded', 'false')
+    const barra = await trilha()
+    expect(barra).toHaveTextContent('Middle Child')
+    expect(barra).toHaveTextContent('J. Cole')
+    await waitFor(() => expect(barra.querySelector('img')).toHaveAttribute('src', 'https://capa.example/a1'))
+    expect(screen.getByRole('link', { name: 'Ouvir Middle Child no Spotify' })).toHaveAttribute('href', 'https://open.spotify.com/track/a1')
     expect(scripts()).toHaveLength(0)
-    expect(document.getElementById('trilha-painel')).toBeNull()
   })
 
-  it('no clique, abre o painel com a playlist e o link para o Spotify', async () => {
+  it('sem a capa, mostra a bola no lugar', async () => {
+    abrir({ capas: false })
+    await trilha()
+    const capa = screen.getByRole('link', { name: 'Ouvir Middle Child no Spotify' })
+    await waitFor(() => expect(capa.querySelector('.icone-svg')).not.toBeNull())
+    expect(capa.querySelector('img')).toBeNull()
+  })
+
+  it('o play liga o Spotify escondido na faixa da vez e mostra "No ar"', async () => {
     const user = userEvent.setup()
     abrir()
-    await user.click(await botao())
-    expect(await botao()).toHaveAttribute('aria-expanded', 'true')
+    const barra = await trilha()
+    await user.click(screen.getByRole('button', { name: 'Tocar' }))
     expect(scripts()).toHaveLength(1)
 
-    const { api } = await spotifyCarregou()
-    expect(vi.mocked(api.createController).mock.calls[0][1]).toMatchObject({ uri: 'spotify:playlist:0rshzJAoeKoS8nYiBCAEJG' })
-    expect(screen.getByRole('link', { name: 'Abrir no Spotify' })).toHaveAttribute('href', LINK_PLAYLIST)
+    const { api, controle, avisar } = await spotifyCarregou()
+    expect(vi.mocked(api.createController).mock.calls[0][1]).toMatchObject({ uri: 'spotify:track:a1' })
+    expect(controle.play).toHaveBeenCalled()
+    expect(barra.querySelector('.trilha-spotify')).toHaveAttribute('aria-hidden', 'true')
+
+    avisar({ isPaused: false })
+    expect(barra).toHaveClass('tocando')
+    expect(barra).toHaveTextContent('No ar')
+
+    await user.click(screen.getByRole('button', { name: 'Pausar' }))
+    expect(controle.togglePlay).toHaveBeenCalledOnce()
+    avisar({ isPaused: true, position: 40_000 })
+    expect(barra).not.toHaveClass('tocando')
+    expect(screen.getByRole('button', { name: 'Tocar' })).toBeInTheDocument()
   })
 
-  it('mostra quando está tocando: "No ar", equalizador e "Tocando agora"', async () => {
+  it('próxima e anterior trocam a faixa, a capa e o que o Spotify toca, dando a volta na lista', async () => {
     const user = userEvent.setup()
     abrir()
-    await user.click(await botao())
-    const { avisar } = await spotifyCarregou()
-    const trilha = screen.getByRole('complementary', { name: 'Trilha da quadra' })
-    await waitFor(() => expect(trilha).toHaveTextContent('Pausado'))
+    const barra = await trilha()
 
-    avisar(false)
-    expect(trilha).toHaveClass('tocando')
-    expect(trilha).toHaveTextContent('No ar')
-    expect(trilha).toHaveTextContent('Tocando agora')
+    // Antes do play, só troca o que aparece.
+    await user.click(screen.getByRole('button', { name: 'Música anterior' }))
+    expect(barra).toHaveTextContent('The Box')
+    expect(scripts()).toHaveLength(0)
 
-    avisar(true)
-    expect(trilha).not.toHaveClass('tocando')
+    await user.click(screen.getByRole('button', { name: 'Próxima música' }))
+    await user.click(screen.getByRole('button', { name: 'Tocar' }))
+    const { controle } = await spotifyCarregou()
+    await user.click(screen.getByRole('button', { name: 'Próxima música' }))
+    expect(barra).toHaveTextContent('Nonstop')
+    expect(controle.loadUri).toHaveBeenLastCalledWith('spotify:track:b2')
+    expect(controle.play).toHaveBeenCalledTimes(2)
+    await waitFor(() => expect(barra.querySelector('img')).toHaveAttribute('src', 'https://capa.example/b2'))
   })
 
-  it('minimizar esconde o painel sem tirar o player, e a música segue ao trocar de página', async () => {
+  it('quando a faixa acaba, passa sozinho para a próxima', async () => {
     const user = userEvent.setup()
     abrir()
-    await user.click(await botao())
+    const barra = await trilha()
+    await user.click(screen.getByRole('button', { name: 'Tocar' }))
+    const { controle, avisar } = await spotifyCarregou()
+
+    avisar({ isPaused: false, position: 212_500 })
+    avisar({ isPaused: true, position: 213_000 })
+    expect(barra).toHaveTextContent('Nonstop')
+    expect(controle.loadUri).toHaveBeenLastCalledWith('spotify:track:b2')
+
+    // Pausar no meio da música não pula.
+    avisar({ isPaused: false, position: 10_000 })
+    avisar({ isPaused: true, position: 10_200 })
+    expect(barra).toHaveTextContent('Nonstop')
+  })
+
+  it('sem login no Spotify, avisa que é a prévia de 30 s', async () => {
+    const user = userEvent.setup()
+    abrir()
+    const barra = await trilha()
+    await user.click(screen.getByRole('button', { name: 'Tocar' }))
     const { avisar } = await spotifyCarregou()
-    avisar(false)
+    avisar({ duration: 30_000 })
+    expect(barra).toHaveTextContent('J. Cole · prévia de 30 s')
+  })
 
-    await user.click(screen.getByRole('button', { name: 'Minimizar o player' }))
-    const painel = document.getElementById('trilha-painel')!
-    expect(painel).not.toHaveClass('aberta')
-    expect(painel).toHaveAttribute('aria-hidden', 'true')
-    expect(painel.inert).toBe(true)
+  it('segue tocando ao trocar de página', async () => {
+    const user = userEvent.setup()
+    abrir()
+    await trilha()
+    await user.click(screen.getByRole('button', { name: 'Tocar' }))
+    const { avisar } = await spotifyCarregou()
+    avisar({ isPaused: false })
+    const player = document.querySelector('.trilha-spotify')
 
-    await user.click(within(document.querySelector('.topo') as HTMLElement).getByRole('link', { name: 'Gerar treino' }))
+    await user.click(screen.getAllByRole('link', { name: 'Gerar treino' })[0])
     expect(screen.getByTestId('caminho')).toHaveTextContent('/gerador')
-    expect(document.querySelector('.trilha-player iframe')).toBe(painel.querySelector('iframe'))
-    expect(screen.getByRole('complementary', { name: 'Trilha da quadra' })).toHaveClass('tocando')
-
-    // Reabrir não baixa o script de novo nem cria outro player.
-    await user.click(await botao())
-    expect(scripts()).toHaveLength(1)
-    expect(painel).toHaveClass('aberta')
+    expect(document.querySelector('.trilha-spotify')).toBe(player)
+    expect(await trilha()).toHaveClass('tocando')
   })
 
-  it('Esc minimiza e devolve o foco ao botão', async () => {
+  it('se o script do Spotify não carregar, o play volta a funcionar no próximo clique', async () => {
     const user = userEvent.setup()
     abrir()
-    await user.click(await botao())
-    await user.keyboard('{Escape}')
-    expect(await botao()).toHaveAttribute('aria-expanded', 'false')
-    expect(await botao()).toHaveFocus()
-  })
-
-  it('se o script do Spotify não carregar, usa o player simples', async () => {
-    const user = userEvent.setup()
-    abrir()
-    await user.click(await botao())
+    await trilha()
+    await user.click(screen.getByRole('button', { name: 'Tocar' }))
     act(() => scripts()[0].dispatchEvent(new Event('error')))
-    const player = await screen.findByTitle('Playlist da trilha da quadra no Spotify')
-    expect(player).toHaveAttribute('src', expect.stringContaining('/embed/playlist/0rshzJAoeKoS8nYiBCAEJG'))
+    await waitFor(() => expect(document.querySelector('.trilha-spotify')).toBeNull())
+    await user.click(screen.getByRole('button', { name: 'Tocar' }))
+    expect(scripts()).toHaveLength(1)
   })
 })

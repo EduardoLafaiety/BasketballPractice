@@ -62,14 +62,8 @@ const CAMINHOS = {
   ),
   check: <path d="M5 12.5 10 17 19 7" />,
   xis: <path d="M6 6l12 12M18 6 6 18" />,
-  musica: (
-    <>
-      <path d="M9 18V5l12-2v13" />
-      <circle cx="6" cy="18" r="3" />
-      <circle cx="18" cy="16" r="3" />
-    </>
-  ),
-  minimizar: <path d="M6 9l6 6 6-6" />,
+  anterior: <path d="M18 5v14l-9-7zM6 5v14" fill="currentColor" />,
+  proxima: <path d="M6 5v14l9-7zM18 5v14" fill="currentColor" />,
   medalha: (
     <>
       <circle cx="12" cy="15" r="6" />

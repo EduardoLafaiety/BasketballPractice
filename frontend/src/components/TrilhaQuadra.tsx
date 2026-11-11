@@ -1,20 +1,26 @@
 import { useEffect, useRef, useState } from 'react'
 import Icone from './Icone'
 
-// A playlist do site: trocar as músicas no Spotify já muda o que toca aqui.
-const PLAYLIST_ID = '0rshzJAoeKoS8nYiBCAEJG'
-export const LINK_PLAYLIST = `https://open.spotify.com/playlist/${PLAYLIST_ID}`
+// A lista sai da playlist do Spotify a cada build (scripts/exportar-playlist.mjs).
+export const LISTA_FAIXAS = `${import.meta.env.BASE_URL}playlist.json`
 export const SCRIPT_SPOTIFY = 'https://open.spotify.com/embed/iframe-api/v1'
-const ALTURA_PLAYER = 352
+// Sem login no Spotify, o player toca só 30 s de cada faixa.
+const PREVIA_MS = 31_000
+// Perto do fim da faixa, um pause é o fim dela: hora de passar para a próxima.
+const FIM_MS = 1_500
+
+export type Faixa = { id: string; titulo: string; artista: string; duracao: number }
+export type Estado = { isPaused: boolean; position: number; duration: number }
 
 // O pedaço da iFrame API do Spotify que o player usa.
-type Controle = { addListener: (evento: 'playback_update', ouvir: (e: { data: { isPaused: boolean } }) => void) => void }
+export type Controle = {
+  loadUri: (uri: string) => void
+  play: () => void
+  togglePlay: () => void
+  addListener: (evento: 'playback_update', ouvir: (e: { data: Estado }) => void) => void
+}
 export type ApiSpotify = {
-  createController: (
-    el: HTMLElement,
-    opcoes: { uri: string; width: string; height: number },
-    pronto: (controle: Controle) => void,
-  ) => void
+  createController: (el: HTMLElement, opcoes: { uri: string; width: string; height: number }, pronto: (controle: Controle) => void) => void
 }
 declare global {
   interface Window { onSpotifyIframeApiReady?: (api: ApiSpotify) => void }
@@ -38,10 +44,27 @@ function carregarApi() {
   return carregando
 }
 
-/** Só nos testes: esquece o script baixado. */
+const capas = new Map<string, Promise<string | null>>()
+/** A capa do álbum vem do oEmbed do Spotify (aberto a qualquer site); sem ela, fica a bola. */
+function capaDa(id: string) {
+  if (!capas.has(id))
+    capas.set(
+      id,
+      fetch(`https://open.spotify.com/oembed?url=https://open.spotify.com/track/${id}`)
+        .then((r) => (r.ok ? r.json() : null))
+        .then((d: { thumbnail_url?: string } | null) => d?.thumbnail_url ?? null)
+        .catch(() => null),
+    )
+  return capas.get(id)!
+}
+
+/** Só nos testes: esquece o script e as capas já baixados. */
 export function reiniciarTrilha() {
   carregando = null
+  capas.clear()
 }
+
+const linkDa = (f: Faixa) => `https://open.spotify.com/track/${f.id}`
 
 /** Barras de equalizador: pulam enquanto a música toca. */
 function Equalizador() {
@@ -53,26 +76,44 @@ function Equalizador() {
 }
 
 /**
- * Player da playlist de rap no canto da tela, no visual da faixa de notícias.
- * O Spotify só carrega no primeiro clique (ele grava cookies) e, depois, nunca sai da tela:
- * minimizar só esconde o painel, para a música seguir enquanto o atleta navega.
+ * Player da playlist de rap no canto de baixo, à direita, colado na faixa de notícias.
+ * O player do Spotify fica escondido e só carrega no primeiro play (ele grava cookies);
+ * os botões e a capa à mostra são do site.
  */
 export default function TrilhaQuadra() {
-  const [aberta, setAberta] = useState(false)
+  const [faixas, setFaixas] = useState<Faixa[]>([])
+  const [indice, setIndice] = useState(0)
   const [ligada, setLigada] = useState(false)
   const [tocando, setTocando] = useState(false)
-  const [falhou, setFalhou] = useState(false)
+  const [previa, setPrevia] = useState(false)
+  const [capa, setCapa] = useState<string | null>(null)
   const lugar = useRef<HTMLDivElement>(null)
-  const botao = useRef<HTMLButtonElement>(null)
-  const painel = useRef<HTMLDivElement>(null)
-
-  // Minimizado, nada do painel recebe o foco do teclado (o React 18 não conhece o atributo inert).
-  useEffect(() => {
-    if (painel.current) painel.current.inert = !aberta
-  }, [aberta, ligada])
+  const controle = useRef<Controle | null>(null)
+  const ultimo = useRef<Estado | null>(null)
+  const avancar = useRef<() => void>(() => {})
 
   useEffect(() => {
-    if (!ligada) return
+    fetch(LISTA_FAIXAS)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d: { faixas?: Faixa[] } | null) => setFaixas(d?.faixas ?? []))
+      .catch(() => {})
+  }, [])
+
+  const faixa = faixas[indice] as Faixa | undefined
+
+  useEffect(() => {
+    if (!faixa) return
+    let ativo = true
+    setCapa(null)
+    capaDa(faixa.id).then((url) => ativo && setCapa(url))
+    return () => {
+      ativo = false
+    }
+  }, [faixa])
+
+  // Liga o Spotify no primeiro play, já com a faixa da vez.
+  useEffect(() => {
+    if (!ligada || !faixa) return
     let ativo = true
     carregarApi()
       .then((api) => {
@@ -80,75 +121,73 @@ export default function TrilhaQuadra() {
         // O Spotify troca o elemento pelo iframe dele; um filho próprio evita que o React perca a referência.
         const alvo = document.createElement('div')
         lugar.current.replaceChildren(alvo)
-        api.createController(alvo, { uri: `spotify:playlist:${PLAYLIST_ID}`, width: '100%', height: ALTURA_PLAYER }, (controle) =>
-          controle.addListener('playback_update', (e) => ativo && setTocando(!e.data.isPaused)),
-        )
+        // Escondido, o player do Spotify também fica fora do Tab.
+        lugar.current.inert = true
+        api.createController(alvo, { uri: `spotify:track:${faixa.id}`, width: '100%', height: 80 }, (c) => {
+          controle.current = c
+          c.addListener('playback_update', ({ data }) => {
+            if (!ativo) return
+            const antes = ultimo.current
+            ultimo.current = data
+            setTocando(!data.isPaused)
+            if (data.duration > 0) setPrevia(data.duration < PREVIA_MS)
+            const acabou = antes && !antes.isPaused && data.isPaused && antes.duration > 0 && antes.duration - antes.position < FIM_MS
+            if (acabou) avancar.current()
+          })
+          c.play()
+        })
       })
-      .catch(() => ativo && setFalhou(true))
+      .catch(() => ativo && setLigada(false))
     return () => {
       ativo = false
     }
+    // A faixa inicial só vale na criação do player; depois, quem troca é o loadUri.
   }, [ligada])
 
-  useEffect(() => {
-    if (!aberta) return
-    const aoTeclar = (e: KeyboardEvent) => {
-      if (e.key !== 'Escape') return
-      setAberta(false)
-      botao.current?.focus()
+  const ir = (passo: number) => {
+    if (!faixas.length) return
+    const novo = (indice + passo + faixas.length) % faixas.length
+    setIndice(novo)
+    ultimo.current = null
+    if (controle.current) {
+      controle.current.loadUri(`spotify:track:${faixas[novo].id}`)
+      controle.current.play()
     }
-    window.addEventListener('keydown', aoTeclar)
-    return () => window.removeEventListener('keydown', aoTeclar)
-  }, [aberta])
+  }
+  avancar.current = () => ir(1)
 
   const alternar = () => {
-    setLigada(true)
-    setAberta((a) => !a)
+    if (controle.current) controle.current.togglePlay()
+    else setLigada(true)
   }
+
+  if (!faixa) return null
 
   return (
     <aside className={`trilha${tocando ? ' tocando' : ''}`} aria-label="Trilha da quadra">
-      {ligada && (
-        <div id="trilha-painel" className={`trilha-painel${aberta ? ' aberta' : ''}`} aria-hidden={!aberta || undefined} ref={painel}>
-          <div className="trilha-topo">
-            <span className="noticias-visor">
-              <Icone nome="musica" tamanho={16} />
-              <i className="noticias-rec-ponto" />
-              {tocando ? 'No ar' : 'Pausado'}
-            </span>
-            <span className="trilha-titulo">Trilha da quadra</span>
-            <button type="button" className="trilha-minimizar" onClick={alternar} aria-label="Minimizar o player" title="Minimizar">
-              <Icone nome="minimizar" tamanho={16} />
-            </button>
-          </div>
-          <div className="trilha-player" ref={lugar} style={{ height: ALTURA_PLAYER }}>
-            {falhou && (
-              <iframe
-                title="Playlist da trilha da quadra no Spotify"
-                src={`https://open.spotify.com/embed/playlist/${PLAYLIST_ID}?theme=0`}
-                width="100%"
-                height={ALTURA_PLAYER}
-                allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-                loading="lazy"
-              />
-            )}
-          </div>
-          <div className="trilha-rodape">
-            <span>Sem login no Spotify, toca uma prévia de 30 s.</span>
-            <a href={LINK_PLAYLIST} target="_blank" rel="noopener noreferrer">Abrir no Spotify</a>
-          </div>
-        </div>
-      )}
-      <button ref={botao} type="button" className="trilha-botao" aria-expanded={aberta} aria-controls={ligada ? 'trilha-painel' : undefined} onClick={alternar}>
-        <span className="noticias-visor trilha-visor">
-          <Icone nome="musica" tamanho={16} />
+      <a className="trilha-capa" href={linkDa(faixa)} target="_blank" rel="noopener noreferrer" title="Ouvir no Spotify" aria-label={`Ouvir ${faixa.titulo} no Spotify`}>
+        {capa ? <img src={capa} alt="" width={64} height={64} /> : <Icone nome="bola" tamanho={34} />}
+      </a>
+      <div className="trilha-info">
+        <span className="trilha-rotulo">
           <Equalizador />
+          {tocando ? 'No ar' : 'Trilha da quadra'}
         </span>
-        <span className="trilha-textos">
-          <span className="trilha-rotulo">Trilha da quadra</span>
-          <span className="trilha-sub">{tocando ? 'Tocando agora' : 'Rap pra entrar no clima'}</span>
-        </span>
-      </button>
+        <span className="trilha-titulo" aria-live="polite">{faixa.titulo}</span>
+        <span className="trilha-artista">{previa ? `${faixa.artista} · prévia de 30 s` : faixa.artista}</span>
+      </div>
+      <div className="trilha-controles">
+        <button type="button" onClick={() => ir(-1)} aria-label="Música anterior" title="Anterior">
+          <Icone nome="anterior" tamanho={18} />
+        </button>
+        <button type="button" className="trilha-play" onClick={alternar} aria-label={tocando ? 'Pausar' : 'Tocar'} title={tocando ? 'Pausar' : 'Tocar'}>
+          <Icone nome={tocando ? 'pausa' : 'play'} tamanho={18} />
+        </button>
+        <button type="button" onClick={() => ir(1)} aria-label="Próxima música" title="Próxima">
+          <Icone nome="proxima" tamanho={18} />
+        </button>
+      </div>
+      {ligada && <div className="trilha-spotify" ref={lugar} aria-hidden />}
     </aside>
   )
 }

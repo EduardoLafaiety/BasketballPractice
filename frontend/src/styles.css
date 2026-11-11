@@ -2159,66 +2159,46 @@ html { -webkit-tap-highlight-color: transparent; }
   .nav-link span { min-width: 1.4rem; font-size: 0.7rem; }
 }
 
-/* ==== Trilha da quadra: a playlist de rap no canto da tela, no visual da faixa de notícias ==== */
+/* ==== Trilha da quadra: a playlist de rap colada no canto direito, logo acima da faixa de notícias ==== */
 .trilha {
   position: fixed;
-  right: 1rem;
-  bottom: 1rem;
+  right: 0;
+  bottom: 0;
   z-index: 10;
-  display: grid;
-  justify-items: end;
-  gap: 0.5rem;
-  color: #ffffff;
-  filter: drop-shadow(0 10px 24px rgb(0 0 0 / 0.4));
-}
-body:has(.noticias) .trilha { bottom: calc(44px + 1rem); }
-/* Botão fechado: a peça da marca da faixa espelhada, com o corte em diagonal do lado de dentro. */
-.trilha-botao {
   display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.55rem 1.1rem 0.55rem 1.6rem;
-  border: 0;
-  border-top: 2px solid var(--laranja);
+  align-items: stretch;
+  width: 21rem;
   background: linear-gradient(90deg, #1f1f1f, #2a2a2a);
-  clip-path: polygon(14px 0, 100% 0, 100% 100%, 0 100%);
-  color: inherit;
-  font: inherit;
-  text-align: left;
-  cursor: pointer;
+  border-top: 2px solid var(--laranja);
+  color: #ffffff;
 }
-.trilha-visor { color: #ffffff; }
-.trilha-textos { display: grid; line-height: 1.25; }
-.trilha-rotulo { color: var(--laranja); font-weight: 800; font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; }
-.trilha-sub { color: var(--lateral-muted); font-weight: 700; font-size: 0.62rem; letter-spacing: 0.08em; text-transform: uppercase; transition: color 0.2s; }
-.trilha-botao:hover .trilha-sub { color: #ffffff; }
-.trilha-botao:focus-visible { outline: 2px solid var(--laranja); outline-offset: 3px; }
+body:has(.noticias) .trilha { bottom: 44px; }
+/* A capa da faixa; sem ela, a bola do site no lugar. */
+.trilha-capa { flex-shrink: 0; display: grid; place-items: center; width: 64px; height: 64px; background: var(--laranja); color: #0b0b0b; }
+.trilha-capa img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.trilha-capa:focus-visible { outline: 2px solid #ffffff; outline-offset: -4px; }
+.trilha-info { flex: 1; min-width: 0; display: grid; align-content: center; gap: 0.1rem; padding: 0 0.75rem; line-height: 1.25; }
+.trilha-rotulo { display: flex; align-items: center; gap: 0.45rem; color: var(--laranja); font-weight: 800; font-size: 0.6rem; letter-spacing: 0.12em; text-transform: uppercase; }
+.trilha-titulo, .trilha-artista { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 700; }
+.trilha-titulo { font-size: 0.72rem; }
+.trilha-artista { color: var(--lateral-muted); font-size: 0.62rem; }
+.trilha-controles { display: flex; align-items: center; padding-right: 0.4rem; }
+.trilha-controles button { display: grid; place-items: center; width: 34px; height: 34px; padding: 0; border: 0; background: none; color: #ffffff; cursor: pointer; transition: color 0.2s; }
+.trilha-controles button:hover { color: var(--laranja); }
+.trilha-controles button:focus-visible { outline: 2px solid var(--laranja); outline-offset: -2px; }
+.trilha-controles .trilha-play { width: 38px; height: 38px; background: var(--laranja); color: #0b0b0b; transition: background-color 0.2s; }
+.trilha-controles .trilha-play:hover { background: #ff9a52; color: #0b0b0b; }
+/* O player do Spotify toca escondido: fora da tela, mas na página. */
+.trilha-spotify { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); pointer-events: none; }
 /* Equalizador: barras paradas e baixas no pause, pulando enquanto toca. */
-.trilha-eq { display: inline-flex; align-items: flex-end; gap: 2px; height: 12px; }
+.trilha-eq { display: inline-flex; align-items: flex-end; gap: 2px; height: 10px; }
 .trilha-eq i { width: 2px; height: 30%; border-radius: 1px; background: var(--laranja); }
 .tocando .trilha-eq i { animation: trilha-eq 0.8s ease-in-out infinite alternate; }
 .tocando .trilha-eq i:nth-child(2) { animation-duration: 0.55s; animation-delay: -0.3s; }
 .tocando .trilha-eq i:nth-child(3) { animation-duration: 0.95s; animation-delay: -0.5s; }
 .tocando .trilha-eq i:nth-child(4) { animation-duration: 0.65s; animation-delay: -0.15s; }
 @keyframes trilha-eq { from { height: 20%; } to { height: 100%; } }
-/* Painel aberto: o player do Spotify com o topo de visor de câmera. */
-.trilha-painel { width: 22rem; background: linear-gradient(#141414, #050505); border-top: 2px solid var(--laranja); }
-.trilha-painel.aberta { animation: trilha-abre 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); }
-@keyframes trilha-abre { from { opacity: 0; transform: translateY(12px); } }
-/* Minimizado, o painel some da tela sem sair da página: a música continua. */
-.trilha-painel:not(.aberta) { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); pointer-events: none; }
-.trilha-topo { display: flex; align-items: center; gap: 0.7rem; padding: 0.45rem 0.45rem 0.45rem 0.75rem; }
-.trilha:not(.tocando) .trilha-topo .noticias-rec-ponto { animation: none; background: var(--lateral-muted); }
-.trilha-titulo { flex: 1; color: var(--laranja); font-weight: 800; font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; }
-.trilha-minimizar { display: grid; place-items: center; padding: 0.35rem; border: 0; border-radius: 2px; background: none; color: #ffffff; cursor: pointer; transition: color 0.2s; }
-.trilha-minimizar:hover { color: var(--laranja); }
-.trilha-player { padding: 0 0.45rem; }
-.trilha-player iframe { display: block; border: 0; border-radius: 12px; }
-.trilha-rodape { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; padding: 0.55rem 0.75rem; color: var(--lateral-muted); font-weight: 700; font-size: 0.6rem; letter-spacing: 0.06em; text-transform: uppercase; }
-.trilha-rodape a { flex-shrink: 0; color: #ffffff; text-decoration: none; }
-.trilha-rodape a:hover { color: var(--laranja); text-decoration: underline; }
 :root[data-movimento='reduzido'] .tocando .trilha-eq i { animation: none; height: 70%; }
-:root[data-movimento='reduzido'] .trilha-painel.aberta { animation: none; }
 /* Por enquanto só no computador; no celular a barra de baixo ocupa o canto. */
 @media (max-width: 860px) {
   .trilha { display: none; }
