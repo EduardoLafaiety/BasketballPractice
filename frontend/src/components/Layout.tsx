@@ -15,6 +15,7 @@ import { LinksLegais } from './TelaAuth'
 const LINKS: { to: string; rotulo: string; fim?: boolean }[] = [
   { to: '/', rotulo: 'Início', fim: true },
   { to: '/treinos', rotulo: 'Treinos' },
+  { to: '/desafio', rotulo: 'Desafio do dia' },
   { to: '/jogue-como', rotulo: 'Jogue como' },
   { to: '/nba', rotulo: 'Estatísticas da NBA' },
   { to: '/rotina', rotulo: 'Rotina' },

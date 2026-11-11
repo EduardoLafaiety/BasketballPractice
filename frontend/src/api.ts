@@ -69,7 +69,8 @@ export function aoTokenExpirar(fn: (() => void) | null) {
   aoExpirar = fn
 }
 
-async function request<T>(metodo: string, caminho: string, corpo?: unknown): Promise<T> {
+/** Pedido à API (ou à API da demonstração, que roda no navegador). */
+export async function request<T>(metodo: string, caminho: string, corpo?: unknown): Promise<T> {
   let resposta: Response
   try {
     resposta = __DEMO__
@@ -331,7 +332,7 @@ export function dataLocal(d: Date) {
 }
 
 // Fuso do navegador, para o backend contar dias e semanas no horário local do atleta.
-const fuso = () => `tzOffset=${new Date().getTimezoneOffset()}`
+export const fuso = () => `tzOffset=${new Date().getTimezoneOffset()}`
 
 // Instante exato (ex.: meia-noite local) para o período, e o fuso para as semanas do resumo.
 function filtroPeriodo(desde?: Date, ate?: Date) {
