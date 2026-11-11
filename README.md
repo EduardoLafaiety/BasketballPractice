@@ -45,8 +45,6 @@
 - 🏀 **Visual De Quadra**: A Bola Da Abertura Amplia Sem Perder Nitidez Ao Rolar A Página, E Uma Listra Com As Costuras Dela Abre As Seções De Números E Ferramentas.
 - 📱 **PWA**: Instalável No Celular, Com Tema Claro/Escuro E Lembretes De Treino, Inclusive Com O App Fechado (Web Push).
 
-Detalhes De Cada Recurso, Da API E Da Hospedagem Em [`docs/DOCUMENTACAO.md`](docs/DOCUMENTACAO.md).
-
 ## 📸 Telas
 
 <table>
