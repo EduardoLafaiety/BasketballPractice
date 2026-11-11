@@ -1855,3 +1855,10 @@ body:has(.noticias) .aviso-cookies { bottom: calc(44px + 1rem); }
 .cartao-tabela th, .cartao-tabela td { padding: 0.55rem 0.7rem; border-bottom: 1px solid var(--borda); text-align: right; }
 .cartao-tabela th:first-child { text-align: left; }
 @media (max-width: 900px) { .cartao-topo { grid-template-columns: 1fr; } }
+
+/* Imagem da semana para compartilhar */
+.compartilhar { display: grid; gap: 1rem; }
+.compartilhar-topo { display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; }
+.compartilhar-topo p { margin: 0.4rem 0 0; }
+.compartilhar-previa { display: grid; gap: 0.85rem; justify-items: start; }
+.compartilhar-previa img { width: min(100%, 300px); aspect-ratio: 9 / 16; border-radius: 18px; box-shadow: var(--sombra); }

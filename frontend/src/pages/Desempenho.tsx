@@ -1,3 +1,4 @@
+import CompartilharSemana from '../compartilhar/CompartilharSemana'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { api, dataLocal } from '../api'
@@ -114,6 +115,8 @@ export default function Desempenho() {
           </div>
         )}
       </section>
+
+      <CompartilharSemana />
 
       <Comparacoes />
 
