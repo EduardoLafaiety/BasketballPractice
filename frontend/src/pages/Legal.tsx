@@ -150,11 +150,6 @@ export function PoliticaPrivacidade() {
           desafio quando você liga as notificações com o app fechado. A mensagem vai criptografada: o serviço entrega, mas não consegue ler o texto.
         </li>
         <li>
-          <strong>Spotify:</strong> a Trilha da quadra pede ao Spotify a capa de cada música, e o seu navegador fala direto com ele
-          (ele recebe o seu IP). O player só é carregado quando você aperta o play; a partir daí o Spotify pode gravar os próprios
-          cookies e reconhecer a sua conta de lá para tocar as faixas inteiras. O Basketball Practice não recebe nada do que você ouve.
-        </li>
-        <li>
           <strong>OpenStreetMap:</strong> na busca de quadras, o seu navegador pede direto aos servidores do OpenStreetMap os blocos
           do mapa, as quadras perto do ponto escolhido e, se você digitar um lugar, o endereço. Eles recebem a localização ou o
           texto da busca e o seu IP; o Basketball Practice não recebe nem guarda nada disso. A localização só é usada se você tocar

@@ -12,7 +12,6 @@ import type { Config } from '../types'
 import BarraNoticias from './BarraNoticias'
 import Icone from './Icone'
 import { LinksLegais } from './TelaAuth'
-import TrilhaQuadra from './TrilhaQuadra'
 
 const LINKS: { to: string; rotulo: string; fim?: boolean }[] = [
   { to: '/', rotulo: 'Início', fim: true },
@@ -199,7 +198,6 @@ export default function Layout() {
       </main>
       <footer className="rodape"><LinksLegais /></footer>
       <BarraNoticias />
-      <TrilhaQuadra />
 
       <nav className="doca" aria-label="Atalhos" onClick={() => vibrar(8)}>
         {DOCA_ESQUERDA.map((l) => <ItemDoca key={l.to} {...l} />)}
