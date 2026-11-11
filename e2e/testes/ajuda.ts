@@ -94,9 +94,12 @@ export function aceitarDialogos(page: Page) {
   return mensagens
 }
 
+/** O botão que abre o menu: "Menu" no topo do computador, "Mais" na barra de baixo do celular. */
+const botaoMenu = (page: Page) => page.locator('button[aria-controls="menu-tela"]:visible')
+
 /** Abre o menu em tela cheia (a navegação principal fica nele). */
 export async function abrirMenu(page: Page) {
-  await page.getByRole('button', { name: 'Menu', exact: true }).click()
+  await botaoMenu(page).click()
   return page.getByRole('navigation', { name: 'Principal' })
 }
 
@@ -104,5 +107,5 @@ export async function abrirMenu(page: Page) {
 export async function irPara(page: Page, secao: string) {
   const menu = await abrirMenu(page)
   await menu.getByRole('link', { name: secao, exact: false }).click()
-  await expect(page.getByRole('button', { name: 'Menu', exact: true })).toHaveAttribute('aria-expanded', 'false')
+  await expect(botaoMenu(page)).toHaveAttribute('aria-expanded', 'false')
 }
