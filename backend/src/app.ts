@@ -10,6 +10,7 @@ import { errorHandler, notFoundHandler } from './middleware/errors.js'
 import { emailDoLogin, limitarTentativas, type LimiteTentativas } from './middleware/rate-limit.js'
 import { adminRouter } from './routes/admin.js'
 import { authRouter } from './routes/auth.js'
+import { cardRouter } from './routes/card.js'
 import { challengesRouter } from './routes/challenges.js'
 import { quizRouter } from './routes/quiz.js'
 import { dataRouter } from './routes/data.js'
@@ -108,6 +109,7 @@ export function createApp(
   app.use('/api/goals', auth, goalsRouter(db))
   app.use('/api/challenges', auth, challengesRouter(db))
   app.use('/api/quiz', auth, quizRouter(db))
+  app.use('/api/card', auth, cardRouter(db))
   app.use('/api/tests', auth, testsRouter(db))
   app.use('/api/plans', auth, plansRouter(db))
   app.use('/api/styles', auth, stylesRouter(db))

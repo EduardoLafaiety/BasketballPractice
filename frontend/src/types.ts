@@ -148,7 +148,7 @@ export interface Progresso {
   conquistas: Conquista[]
 }
 
-export type TipoTeste = 'impulsao' | 'sprint' | 'agilidade' | 'suicidio' | 'lances_1min'
+export type TipoTeste = 'impulsao' | 'sprint' | 'agilidade' | 'suicidio' | 'lances_1min' | 'arremesso_5_pontos' | 'drible_cones'
 
 export interface InfoTeste {
   tipo: TipoTeste

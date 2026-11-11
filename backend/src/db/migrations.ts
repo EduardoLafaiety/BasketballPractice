@@ -234,6 +234,13 @@ const migrations: string[] = [
   );
   CREATE INDEX idx_quiz_results_day ON quiz_results(day);
   `,
+  `
+  -- Bateria do cartão do atleta: arremesso de 5 pontos e drible cronometrado.
+  ALTER TABLE physical_tests DROP CONSTRAINT physical_tests_kind_check;
+  ALTER TABLE physical_tests ADD CONSTRAINT physical_tests_kind_check CHECK (kind IN (
+    'impulsao', 'sprint', 'agilidade', 'suicidio', 'lances_1min', 'arremesso_5_pontos', 'drible_cones'
+  ));
+  `,
 ]
 
 /** Versão do schema depois de todas as migrações. */
