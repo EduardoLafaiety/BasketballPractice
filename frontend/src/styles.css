@@ -923,6 +923,8 @@ section + section, .card + section { margin-top: 1.5rem; }
 .estilo-divisao-linha .trilho span { display: block; height: 100%; background: var(--c); }
 .estilo-divisao-linha .meta { text-align: right; font-variant-numeric: tabular-nums; }
 .stats.faixa.estilo-faixa { margin-top: 2.5rem; }
+/* Números do jogador nas cores da própria tela (escuro no tema escuro), como os outros cartões, sem a faixa invertida. */
+.stats.faixa.estilo-faixa { --faixa-linha: var(--borda); --faixa-muted: var(--muted); --faixa-destaque: var(--laranja-texto); border-radius: 28px; background: var(--superficie); color: var(--texto); box-shadow: var(--sombra); }
 
 .movimentos { display: grid; gap: 1rem; }
 .movimento { display: grid; grid-template-columns: 52px minmax(0, 1fr) minmax(0, 280px); gap: 1.25rem; align-items: start; }
