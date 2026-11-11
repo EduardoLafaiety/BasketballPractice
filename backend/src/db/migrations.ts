@@ -224,6 +224,9 @@ const migrations: string[] = [
   `,
 ]
 
+/** Versão do schema depois de todas as migrações. */
+export const SCHEMA_VERSION = migrations.length
+
 export async function migrate(db: Database) {
   await db.transaction(async (tx) => {
     await tx.query('SET LOCAL statement_timeout = 0')
