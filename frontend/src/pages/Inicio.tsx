@@ -22,6 +22,7 @@ const ORDEM_SEMANA: DiaSemana[] = [1, 2, 3, 4, 5, 6, 0]
 // Um artigo de cada assunto que mais conversa com quem treina.
 const ARTIGOS_EM_DESTAQUE = ['sono-e-arremesso', 'treino-deliberado', 'salto-vertical', 'cesto-de-pessego'].map((id) => ARTIGOS.find((a) => a.id === id)!)
 const FERRAMENTAS: { to: string; titulo: string; texto: string }[] = [
+  { to: '/programas', titulo: 'Programas de 30 dias', texto: 'Um treino liberado por dia, com barra de progresso: arremesso, mão fraca e os primeiros 30 dias.' },
   { to: '/gerador', titulo: 'Gerador de treino', texto: 'Diga o tempo, o nível e o foco: a sessão começa pelo aquecimento e vai do mais fácil ao mais difícil.' },
   { to: '/ferramentas', titulo: 'Ferramentas de quadra', texto: 'Cronômetro, metrônomo, contador ao vivo, calculadoras e testes físicos.' },
   { to: '/desempenho', titulo: 'Desempenho', texto: 'Gráficos, mapa de arremessos e a sua evolução ao longo do tempo.' },
