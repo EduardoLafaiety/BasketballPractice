@@ -8,6 +8,7 @@ import { dataRouter } from '../../../backend/src/routes/data'
 import { exercisesRouter } from '../../../backend/src/routes/exercises'
 import { goalsRouter } from '../../../backend/src/routes/goals'
 import { plansRouter } from '../../../backend/src/routes/plans'
+import { quizRouter } from '../../../backend/src/routes/quiz'
 import { sessionsRouter } from '../../../backend/src/routes/sessions'
 import { settingsRouter } from '../../../backend/src/routes/settings'
 import { statsRouter } from '../../../backend/src/routes/stats'
@@ -81,6 +82,7 @@ export async function criarServidor({ dados }: { dados?: string } = {}) {
     ['/stats', montar(statsRouter(db))],
     ['/goals', montar(goalsRouter(db))],
     ['/challenges', montar(challengesRouter(db))],
+    ['/quiz', montar(quizRouter(db))],
     ['/tests', montar(testsRouter(db))],
     ['/plans', montar(plansRouter(db))],
     ['/styles', montar(stylesRouter(db))],

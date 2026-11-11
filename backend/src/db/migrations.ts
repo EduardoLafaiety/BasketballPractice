@@ -222,6 +222,18 @@ const migrations: string[] = [
   );
   CREATE INDEX idx_daily_challenge_results_day ON daily_challenge_results(day);
   `,
+  `
+  -- Quiz diário: uma resposta por atleta e por dia; as respostas ficam guardadas para a revisão.
+  CREATE TABLE quiz_results (
+    user_id    integer NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    day        date NOT NULL,
+    correct    integer NOT NULL CHECK (correct BETWEEN 0 AND 5),
+    answers    integer[] NOT NULL,
+    created_at timestamptz NOT NULL DEFAULT now(),
+    PRIMARY KEY (user_id, day)
+  );
+  CREATE INDEX idx_quiz_results_day ON quiz_results(day);
+  `,
 ]
 
 /** Versão do schema depois de todas as migrações. */

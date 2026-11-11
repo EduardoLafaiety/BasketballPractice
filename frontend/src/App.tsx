@@ -14,6 +14,7 @@ import Equipamentos from './pages/Equipamentos'
 import Artigos, { ArtigoDetalhe } from './pages/Artigos'
 import Desempenho from './pages/Desempenho'
 import DesafioDoDia from './pages/Desafio'
+import Quiz from './pages/Quiz'
 import Metas from './pages/Metas'
 import Ferramentas from './pages/Ferramentas'
 import Gerador from './pages/Gerador'
@@ -58,6 +59,7 @@ function Rotas() {
         <Route path="treinos/:id" element={<TreinoDetalhe />} />
         <Route path="gerador" element={<Gerador />} />
         <Route path="desafio" element={<DesafioDoDia />} />
+        <Route path="quiz" element={<Quiz />} />
         <Route path="sessao" element={<SessaoGuiada />} />
         <Route path="jogue-como" element={<JogueComo />} />
         <Route path="jogue-como/:id" element={<EstiloDetalhe />} />
