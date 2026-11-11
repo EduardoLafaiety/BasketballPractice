@@ -1951,3 +1951,55 @@ body:has(.noticias) .aviso-cookies { bottom: calc(44px + 1rem); }
 .jogo-numeros strong { font-family: var(--fonte-display); font-weight: var(--peso-display); font-size: 2.2rem; color: var(--texto); margin-right: 0.2rem; letter-spacing: 0; }
 .jogos-comparacao { display: grid; gap: 0.75rem; margin-bottom: 1rem; }
 .jogos-comparacao p { margin: 0; }
+
+/* Menu com muitas seções: duas colunas em telas largas */
+@media (min-width: 900px) {
+  .nav { display: grid; grid-template-columns: repeat(2, max-content); column-gap: clamp(3rem, 8vw, 9rem); }
+  .nav-link { font-size: min(clamp(1.8rem, 6.4vh, 4.6rem), 5.4vw); }
+}
+
+/* Aviso de recurso que precisa de servidor (demonstração) */
+.so-com-servidor { display: flex; gap: 1rem; align-items: flex-start; }
+.so-com-servidor .icone-svg { flex-shrink: 0; color: var(--laranja-texto); }
+.so-com-servidor p { margin: 0.5rem 0 0; }
+
+/* Ranking e desafios entre amigos */
+.ranking-entrar { max-width: 640px; border-top: 0; margin-bottom: 1.5rem; }
+.ranking-filtros { display: grid; gap: 0.5rem; margin-bottom: 1.25rem; }
+.podio { list-style: none; margin: 0 0 1rem; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.75rem; align-items: end; }
+.podio-lugar { display: grid; gap: 0.2rem; justify-items: center; text-align: center; padding: 1.25rem 0.75rem; border-radius: 22px; background: var(--superficie); box-shadow: var(--sombra); }
+.podio-lugar.lugar-1 { order: 2; padding-block: 2rem; background: #101010; color: #f4f2ea; --muted: #b5b3a6; box-shadow: var(--sombra), inset 0 6px 0 var(--laranja); }
+.podio-lugar.lugar-2 { order: 1; }
+.podio-lugar.lugar-3 { order: 3; }
+.podio-posicao { font-family: var(--fonte-display); font-weight: var(--peso-display); font-size: 1.6rem; color: var(--laranja-texto); }
+.podio-lugar.lugar-1 .podio-posicao { color: var(--laranja); }
+.podio-apelido { font-size: 0.85rem; font-weight: 800; letter-spacing: 0.04em; overflow-wrap: anywhere; }
+.podio-valor { font-family: var(--fonte-display); font-weight: var(--peso-display); font-size: clamp(2.6rem, 6vw, 4.6rem); line-height: 0.9; font-variant-numeric: tabular-nums; }
+.podio-lugar.eu { outline: 3px solid var(--laranja); outline-offset: 3px; }
+.ranking-lista { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.35rem; }
+.ranking-eu { margin-top: 0.75rem; padding-top: 0.75rem; border-top: 2px dashed var(--borda); }
+.ranking-linha { display: grid; grid-template-columns: 3rem minmax(0, 1fr) auto; gap: 0.75rem; align-items: center; padding: 0.7rem 1rem; border-radius: 14px; background: var(--superficie); }
+.ranking-linha.eu { box-shadow: inset 0 0 0 2px var(--laranja); }
+.ranking-posicao { font-family: var(--fonte-display); font-weight: var(--peso-display); font-size: 1.5rem; color: var(--muted); }
+.ranking-apelido { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; font-size: 0.85rem; font-weight: 800; }
+.ranking-valor { font-family: var(--fonte-display); font-weight: var(--peso-display); font-size: 1.6rem; font-variant-numeric: tabular-nums; }
+.ranking-valor .meta { font-family: 'Manrope Variable', system-ui, sans-serif; font-size: 0.65rem; font-weight: 800; letter-spacing: 0.08em; }
+.desafio-novo { border-top: 0; max-width: 720px; }
+.desafios-amigos { list-style: none; margin: 1rem 0 0; padding: 0; display: grid; gap: 0.6rem; }
+.desafio-amigo { display: grid; gap: 0.5rem; padding: 1rem 1.2rem; border-radius: 18px; background: var(--superficie); }
+.desafio-amigo h3 { margin: 0; }
+.desafio-amigo.status-aceito { box-shadow: inset 0 0 0 2px var(--laranja); }
+.desafio-amigo.status-recusado, .desafio-amigo.status-cancelado, .desafio-amigo.status-expirado { opacity: 0.65; }
+.desafio-amigo-topo { display: flex; justify-content: space-between; gap: 0.75rem; flex-wrap: wrap; }
+.placar-duelo { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 0.75rem; align-items: center; font-size: 0.7rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; }
+.placar-duelo strong { font-family: var(--fonte-display); font-weight: var(--peso-display); font-size: 2rem; margin-right: 0.25rem; letter-spacing: 0; }
+.placar-barra { height: 10px; border-radius: 5px; background: var(--texto); overflow: hidden; }
+.placar-barra i { display: block; height: 100%; background: var(--laranja); }
+.amigos-convite { display: grid; gap: 0.75rem; }
+.amigos-convite p { margin: 0; }
+.convite-link { display: block; padding: 0.7rem 0.9rem; border-radius: 12px; background: var(--superficie-2); font-size: 0.8rem; overflow-wrap: anywhere; }
+.amigos-lista { margin-top: 0.75rem; }
+.amigos-lista li { display: flex; justify-content: space-between; align-items: center; padding: 0.55rem 0.9rem; border-radius: 12px; background: var(--superficie); font-weight: 800; font-size: 0.85rem; }
+.convite { display: grid; gap: 0.75rem; justify-items: start; margin-bottom: 1rem; }
+.convite h2 { font-size: clamp(2.4rem, 6vw, 4rem); }
+@media (max-width: 640px) { .podio { grid-template-columns: 1fr; } .podio-lugar.lugar-1, .podio-lugar.lugar-2, .podio-lugar.lugar-3 { order: 0; } }
