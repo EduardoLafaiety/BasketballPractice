@@ -54,6 +54,7 @@ export function PoliticaPrivacidade() {
         <li><strong>Desafio do dia, quiz e programas:</strong> o placar de cada desafio e de cada quiz, os programas que você começou e os dias concluídos.</li>
         <li><strong>Prancheta:</strong> as jogadas que você desenha e salva.</li>
         <li><strong>Diário de jogos:</strong> data, adversário, placar e os seus números em cada partida que você anota.</li>
+        <li><strong>Notificações, se você ligar:</strong> o endereço de entrega que o navegador cria para o aparelho, as chaves dele e o fuso horário, para o lembrete chegar na hora certa. Desligar a opção apaga esses dados.</li>
         <li><strong>Ranking, se você entrar nele:</strong> o apelido, se ele aparece no ranking aberto, o código do seu link de convite, a lista de amigos e os desafios entre amigos.</li>
         <li><strong>Segurança:</strong> o endereço IP é usado para limitar tentativas de acesso. A contagem fica na memória do servidor e não é gravada no banco.</li>
         <li><strong>Pedidos de cadastro:</strong> o nome, o e-mail e o hash da senha ficam à espera da ativação por até 24 horas e são descartados quando um novo cadastro é feito depois desse prazo.</li>
@@ -139,6 +140,10 @@ export function PoliticaPrivacidade() {
         <li><strong>Cloudflare:</strong> entrega as páginas do site.</li>
         <li><strong>Resend:</strong> envia os e-mails de ativação e de recuperação de senha.</li>
         <li><strong>Google AdSense:</strong> mostra os anúncios, com os cookies descritos em <a className="link" href="#anuncios">Anúncios</a>.</li>
+        <li>
+          <strong>Serviço de notificações do navegador</strong> (Google, Mozilla ou Apple, conforme o aparelho): entrega os lembretes e os avisos de
+          desafio quando você liga as notificações com o app fechado. A mensagem vai criptografada: o serviço entrega, mas não consegue ler o texto.
+        </li>
         <li>
           <strong>OpenStreetMap:</strong> na busca de quadras, o seu navegador pede direto aos servidores do OpenStreetMap os blocos
           do mapa, as quadras perto do ponto escolhido e, se você digitar um lugar, o endereço. Eles recebem a localização ou o

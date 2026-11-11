@@ -1,4 +1,4 @@
-import { useRef, useState, type FormEvent } from 'react'
+import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { api, ApiError, dataLocal, definirToken, type ResultadoImportacao } from '../api'
 import { useAuth } from '../auth'
 import { Carregando, ErroCarga } from '../components/Estado'
@@ -6,6 +6,7 @@ import { baixarArquivo, sessoesParaCsv } from '../lib/arquivo'
 import { definirAnimacoes, useAnimacoes, type Animacoes } from '../lib/movimento'
 import { notificar, pedirPermissao, proximoLembrete, suportaNotificacoes } from '../lib/lembretes'
 import { instalar, rodandoComoApp, usePodeInstalar } from '../lib/pwa'
+import { ativarPush, desativarPush, inscricaoAtual, suportaPush, testarPush } from '../lib/push'
 import { DIAS, recarregarTudo, useConfig } from '../store'
 import type { Config, DiaSemana, Tema } from '../types'
 
@@ -141,8 +142,9 @@ function Lembretes({ config, atualizar }: { config: Config; atualizar: (c: Confi
             {proximo
               ? `Próximo lembrete: ${proximo.toLocaleString('pt-BR', { weekday: 'long', hour: '2-digit', minute: '2-digit' })}.`
               : 'Nenhum lembrete agendado.'}{' '}
-            O lembrete só chega com o site (ou o app instalado) aberto em alguma aba; não avisa se você já treinou no dia.
+            Sem a opção abaixo, o lembrete só chega com o site (ou o app instalado) aberto em alguma aba. Nunca avisa se você já treinou no dia.
           </p>
+          <PushNoCelular ativo={lembretes.ativo} />
           <button
             className="chip"
             type="button"
@@ -374,5 +376,59 @@ function Aplicativo() {
         </p>
       )}
     </section>
+  )
+}
+
+/** Web Push: o servidor manda o lembrete na hora certa, mesmo com o site fechado. */
+function PushNoCelular({ ativo }: { ativo: boolean }) {
+  const [inscrito, setInscrito] = useState<boolean | null>(null)
+  const [ocupado, setOcupado] = useState(false)
+  const [aviso, setAviso] = useState<string | null>(null)
+  const [erro, setErro] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (__DEMO__ || !suportaPush()) return
+    inscricaoAtual().then((i) => setInscrito(!!i), () => setInscrito(false))
+  }, [])
+
+  if (__DEMO__) return <p className="meta">Na demonstração não há servidor, então o lembrete com o app fechado não existe aqui.</p>
+  if (!suportaPush()) return <p className="meta">Este navegador não recebe notificações com o site fechado.</p>
+
+  async function mudar(ligar: boolean) {
+    setOcupado(true)
+    setErro(null)
+    setAviso(null)
+    try {
+      if (ligar) await ativarPush()
+      else await desativarPush()
+      setInscrito(ligar)
+    } catch (e) {
+      setErro((e as Error).message)
+    } finally {
+      setOcupado(false)
+    }
+  }
+
+  async function testar() {
+    setErro(null)
+    try {
+      await testarPush()
+      setAviso('Enviada. Ela chega em alguns segundos.')
+    } catch (e) {
+      setErro((e as Error).message)
+    }
+  }
+
+  return (
+    <div className="push-celular">
+      <label className="check">
+        <input type="checkbox" checked={!!inscrito} disabled={ocupado || inscrito === null} onChange={(e) => void mudar(e.target.checked)} />
+        Avisar neste aparelho mesmo com o app fechado
+      </label>
+      {inscrito && !ativo && <p className="meta">Ligue "Me lembrar de treinar" acima para os lembretes chegarem.</p>}
+      {erro && <p className="erro" role="alert">{erro}</p>}
+      {aviso && <p className="meta" role="status">{aviso}</p>}
+      {inscrito && <button className="chip" type="button" onClick={testar}>Testar no aparelho</button>}
+    </div>
   )
 }

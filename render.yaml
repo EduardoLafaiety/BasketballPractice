@@ -42,3 +42,14 @@ services:
         sync: false
       - key: GNEWS_API_KEY
         sync: false
+      # Web Push (lembretes com o app fechado): gere com `npx web-push generate-vapid-keys`.
+      - key: VAPID_PUBLIC_KEY
+        sync: false
+      - key: VAPID_PRIVATE_KEY
+        sync: false
+      # mailto:seu-email, exigido pelos serviços de push.
+      - key: VAPID_SUBJECT
+        sync: false
+      # No plano grátis a API dorme e o agendador para: um cron externo chama POST /api/push/run com este segredo.
+      - key: PUSH_CRON_SECRET
+        generateValue: true
