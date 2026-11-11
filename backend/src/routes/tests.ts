@@ -6,22 +6,30 @@ import { idParam, isoDate, parse } from '../lib/validate.js'
 import { currentUser } from '../middleware/auth.js'
 
 // Testes físicos periódicos. `better` diz se o valor maior ou menor é o melhor resultado.
+// `max` barra valores fora do alcance humano (eles iriam para o cartão do atleta e para o ranking).
 export const TEST_KINDS = {
-  impulsao: { name: 'Impulsão vertical', unit: 'cm', better: 'higher' },
-  sprint: { name: 'Sprint de quadra inteira', unit: 's', better: 'lower' },
-  agilidade: { name: 'Agilidade no garrafão', unit: 's', better: 'lower' },
-  suicidio: { name: 'Suicídio completo', unit: 's', better: 'lower' },
-  lances_1min: { name: 'Lances livres em 1 minuto', unit: 'cestas', better: 'higher' },
+  impulsao: { name: 'Impulsão vertical', unit: 'cm', better: 'higher', max: 150 },
+  sprint: { name: 'Sprint de quadra inteira', unit: 's', better: 'lower', max: 60 },
+  agilidade: { name: 'Agilidade no garrafão', unit: 's', better: 'lower', max: 60 },
+  suicidio: { name: 'Suicídio completo', unit: 's', better: 'lower', max: 300 },
+  lances_1min: { name: 'Lances livres em 1 minuto', unit: 'cestas', better: 'higher', max: 40 },
+  arremesso_5_pontos: { name: 'Arremesso de 5 pontos', unit: 'cestas', better: 'higher', max: 25 },
+  drible_cones: { name: 'Drible cronometrado', unit: 's', better: 'lower', max: 120 },
 } as const
 
 const kinds = Object.keys(TEST_KINDS) as [keyof typeof TEST_KINDS, ...(keyof typeof TEST_KINDS)[]]
 
-export const testSchema = z.object({
-  kind: z.enum(kinds),
-  value: z.number().positive().max(100000),
-  performedAt: isoDate.transform((value) => new Date(value).toISOString()),
-  notes: z.string().trim().max(500).nullish(),
-})
+export const testSchema = z
+  .object({
+    kind: z.enum(kinds),
+    value: z.number().positive().max(100000),
+    performedAt: isoDate.transform((value) => new Date(value).toISOString()),
+    notes: z.string().trim().max(500).nullish(),
+  })
+  .refine((test) => test.value <= TEST_KINDS[test.kind].max, {
+    message: 'Valor fora do possível para este teste',
+    path: ['value'],
+  })
 
 const listQuery = z.object({ kind: z.enum(kinds).optional() })
 

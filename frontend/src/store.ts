@@ -191,7 +191,7 @@ export function useTestes() {
   const adicionar = useCallback(
     async (t: Omit<TesteFisico, 'id'>) => {
       const criado = await api.registrarTeste(t)
-      invalidar('progresso')
+      invalidar('progresso', 'cartao')
       setDados((atual = []) => [criado, ...atual].sort((a, b) => b.data.localeCompare(a.data)))
     },
     [setDados],
@@ -200,7 +200,7 @@ export function useTestes() {
   const remover = useCallback(
     async (id: string) => {
       await api.removerTeste(id)
-      invalidar('progresso')
+      invalidar('progresso', 'cartao')
       setDados((atual = []) => atual.filter((t) => t.id !== id))
     },
     [setDados],
