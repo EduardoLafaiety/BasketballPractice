@@ -7,6 +7,7 @@ import { cardRouter } from '../../../backend/src/routes/card'
 import { challengesRouter } from '../../../backend/src/routes/challenges'
 import { dataRouter } from '../../../backend/src/routes/data'
 import { exercisesRouter } from '../../../backend/src/routes/exercises'
+import { gamesRouter } from '../../../backend/src/routes/games'
 import { goalsRouter } from '../../../backend/src/routes/goals'
 import { plansRouter } from '../../../backend/src/routes/plans'
 import { playsRouter } from '../../../backend/src/routes/plays'
@@ -91,6 +92,7 @@ export async function criarServidor({ dados }: { dados?: string } = {}) {
     ['/plans', montar(plansRouter(db))],
     ['/programs', montar(programsRouter(db))],
     ['/plays', montar(playsRouter(db))],
+    ['/games', montar(gamesRouter(db))],
     ['/styles', montar(stylesRouter(db))],
     ['/settings', montar(settingsRouter(db))],
     ['/data', montar(dataRouter(db))],
