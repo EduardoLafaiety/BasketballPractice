@@ -22,7 +22,12 @@ export default function JogueComo() {
   }, [])
   useEffect(carregar, [carregar])
 
-  const lista = estilos?.filter((e) => filtro === 'Todos' || e.posicao === filtro) ?? []
+  const [busca, setBusca] = useState('')
+  // A busca ignora acentos: "doncic" acha "Dončić".
+  const semAcento = (t: string) => t.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()
+  const termo = semAcento(busca.trim())
+  const lista =
+    estilos?.filter((e) => (filtro === 'Todos' || e.posicao === filtro) && (!termo || semAcento(e.nome).includes(termo))) ?? []
 
   return (
     <div className="pagina-larga faixa-escura">
@@ -33,18 +38,30 @@ export default function JogueComo() {
       />
 
       <div className="jogue-corpo">
-        <div className="chips filtros" role="group" aria-label="Filtrar por posição">
-          {FILTROS.map((f) => (
-            <button key={f} className={`chip ${filtro === f ? 'ativo' : ''}`} aria-pressed={filtro === f} onClick={() => setFiltro(f)}>
-              {PLURAL[f]}
-            </button>
-          ))}
+        <div className="filtros jogue-filtros">
+          <input
+            type="search"
+            className="input"
+            placeholder="Buscar jogador"
+            aria-label="Buscar jogador"
+            value={busca}
+            onChange={(e) => setBusca(e.target.value)}
+          />
+          <div className="chips" role="group" aria-label="Filtrar por posição">
+            {FILTROS.map((f) => (
+              <button key={f} className={`chip ${filtro === f ? 'ativo' : ''}`} aria-pressed={filtro === f} onClick={() => setFiltro(f)}>
+                {PLURAL[f]}
+              </button>
+            ))}
+          </div>
         </div>
 
         {!estilos ? (
           erro ? <ErroCarga erro={erro} tentarDeNovo={carregar} /> : <Carregando texto="Carregando jogadores…" />
-        ) : (
+        ) : lista.length ? (
           <GradeJogadores estilos={lista} />
+        ) : (
+          <div className="vazio">Nenhum jogador com esse nome.</div>
         )}
 
         <p className="meta aviso-estilos">

@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { AvisoDesatualizado, Carregando, ErroCarga } from '../components/Estado'
 import { DIAS, useDrills, useModelosRotina, useRotina } from '../store'
@@ -13,6 +13,18 @@ export default function Rotina() {
 
   const adicionar = (dia: DiaSemana, drillId: string) => alterarDia(dia, (ids) => [...ids, drillId])
   const remover = (dia: DiaSemana, indice: number) => alterarDia(dia, (ids) => ids.filter((_, i) => i !== indice))
+
+  // Arrastar um treino de um dia para outro (no computador): sai do dia de origem e entra no fim do destino.
+  const arrastando = useRef<{ dia: DiaSemana; indice: number; id: string } | null>(null)
+  const [alvo, setAlvo] = useState<DiaSemana | null>(null)
+  const soltar = (dia: DiaSemana) => {
+    const origem = arrastando.current
+    arrastando.current = null
+    setAlvo(null)
+    if (!origem || origem.dia === dia) return
+    remover(origem.dia, origem.indice)
+    adicionar(dia, origem.id)
+  }
 
   // A API devolve os exercícios ordenados por categoria; agrupar deixa a lista do select legível.
   const porCategoria = useMemo(() => {
@@ -46,9 +58,25 @@ export default function Rotina() {
           {ORDEM.map((dia) => {
             const itens = rotina[dia]
             return (
-              <div key={dia} className={`card dia ${dia === hoje ? 'hoje' : ''}`}>
+              <div
+                key={dia}
+                className={`card dia ${dia === hoje ? 'hoje' : ''} ${alvo === dia ? 'alvo' : ''}`}
+                onDragOver={(e) => {
+                  if (!arrastando.current) return
+                  e.preventDefault()
+                  setAlvo(dia)
+                }}
+                onDragLeave={() => setAlvo((a) => (a === dia ? null : a))}
+                onDrop={(e) => {
+                  e.preventDefault()
+                  soltar(dia)
+                }}
+              >
                 <div className="dia-topo">
-                  <h3>{DIAS[dia]}</h3>
+                  <h3>
+                    {DIAS[dia]}
+                    {dia === hoje && <span className="dia-hoje">Hoje</span>}
+                  </h3>
                   <span className="meta">
                     {itens.length ? `${itens.length} ${itens.length === 1 ? 'treino' : 'treinos'}` : 'Descanso'}
                   </span>
@@ -58,7 +86,19 @@ export default function Rotina() {
                     const d = drills.drillPorId(id)
                     if (!d) return null
                     return (
-                      <li key={`${id}-${i}`}>
+                      <li
+                        key={`${id}-${i}`}
+                        draggable
+                        title="Arraste para outro dia"
+                        onDragStart={(e) => {
+                          arrastando.current = { dia, indice: i, id }
+                          e.dataTransfer.effectAllowed = 'move'
+                        }}
+                        onDragEnd={() => {
+                          arrastando.current = null
+                          setAlvo(null)
+                        }}
+                      >
                         <Link to={`/treinos/${d.id}`} className="link">{d.nome}</Link>
                         <button className="remover" aria-label={`Remover ${d.nome}`} onClick={() => remover(dia, i)}>×</button>
                       </li>

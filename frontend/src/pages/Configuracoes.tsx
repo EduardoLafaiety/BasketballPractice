@@ -22,6 +22,14 @@ const ANIMACOES: { id: Animacoes; rotulo: string }[] = [
   { id: 'desligadas', rotulo: 'Desligadas' },
 ]
 
+const INDICE = [
+  { id: 'config-aparencia', rotulo: 'Aparência' },
+  { id: 'config-lembretes', rotulo: 'Lembretes' },
+  { id: 'config-dados', rotulo: 'Seus dados' },
+  { id: 'config-conta', rotulo: 'Sua conta' },
+  { id: 'config-aplicativo', rotulo: 'Aplicativo' },
+]
+
 export default function Configuracoes() {
   const { config, carregado, erro, recarregar, salvar } = useConfig()
   const [erroSalvar, setErroSalvar] = useState<string | null>(null)
@@ -36,50 +44,69 @@ export default function Configuracoes() {
     <>
       <h1>Configurações</h1>
       {erroSalvar && <p className="erro aviso" role="alert">{erroSalvar}</p>}
-      {!carregado ? (
-        erro ? <ErroCarga erro={erro} tentarDeNovo={recarregar} /> : <Carregando texto="Carregando preferências…" />
-      ) : (
-        <>
-          <section className="card form form-solto">
-            <h2 className="sem-margem">Aparência</h2>
-            <div className="chips" role="radiogroup" aria-label="Tema">
-              {TEMAS.map((t) => (
-                <button
-                  key={t.id}
-                  role="radio"
-                  aria-checked={config.tema === t.id}
-                  className={`chip ${config.tema === t.id ? 'ativo' : ''}`}
-                  onClick={() => atualizar({ ...config, tema: t.id })}
-                >
-                  {t.rotulo}
-                </button>
-              ))}
-            </div>
-            <h3 className="sem-margem">Animações e efeitos</h3>
-            <p className="muted sem-margem">Rolagem, mouse e demonstrações em movimento. Desligue se o movimento na tela incomodar.</p>
-            <div className="chips" role="radiogroup" aria-label="Animações e efeitos">
-              {ANIMACOES.map((a) => (
-                <button
-                  key={a.id}
-                  role="radio"
-                  aria-checked={animacoes === a.id}
-                  className={`chip ${animacoes === a.id ? 'ativo' : ''}`}
-                  onClick={() => definirAnimacoes(a.id)}
-                >
-                  {a.rotulo}
-                </button>
-              ))}
-            </div>
-          </section>
+      {/* No computador, um índice fixo à esquerda leva a cada grupo de preferências. */}
+      <div className="config-corpo">
+        <nav className="config-indice" aria-label="Seções das configurações">
+          {INDICE.filter((i) => !(__DEMO__ && i.id === 'config-conta')).map((i) => (
+            <a
+              key={i.id}
+              href={`#${i.id}`}
+              onClick={(e) => {
+                e.preventDefault()
+                document.getElementById(i.id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+              }}
+            >
+              {i.rotulo}
+            </a>
+          ))}
+        </nav>
+        <div className="config-secoes">
+          {!carregado ? (
+            erro ? <ErroCarga erro={erro} tentarDeNovo={recarregar} /> : <Carregando texto="Carregando preferências…" />
+          ) : (
+            <>
+              <section className="card form form-solto" id="config-aparencia">
+                <h2 className="sem-margem">Aparência</h2>
+                <div className="chips" role="radiogroup" aria-label="Tema">
+                  {TEMAS.map((t) => (
+                    <button
+                      key={t.id}
+                      role="radio"
+                      aria-checked={config.tema === t.id}
+                      className={`chip ${config.tema === t.id ? 'ativo' : ''}`}
+                      onClick={() => atualizar({ ...config, tema: t.id })}
+                    >
+                      {t.rotulo}
+                    </button>
+                  ))}
+                </div>
+                <h3 className="sem-margem">Animações e efeitos</h3>
+                <p className="muted sem-margem">Rolagem, mouse e demonstrações em movimento. Desligue se o movimento na tela incomodar.</p>
+                <div className="chips" role="radiogroup" aria-label="Animações e efeitos">
+                  {ANIMACOES.map((a) => (
+                    <button
+                      key={a.id}
+                      role="radio"
+                      aria-checked={animacoes === a.id}
+                      className={`chip ${animacoes === a.id ? 'ativo' : ''}`}
+                      onClick={() => definirAnimacoes(a.id)}
+                    >
+                      {a.rotulo}
+                    </button>
+                  ))}
+                </div>
+              </section>
 
-          <Lembretes config={config} atualizar={atualizar} />
-        </>
-      )}
+              <Lembretes config={config} atualizar={atualizar} />
+            </>
+          )}
 
-      <Dados />
-      {/* Na demonstração não há conta de verdade para mudar a senha ou excluir. */}
-      {!__DEMO__ && <Conta />}
-      <Aplicativo />
+          <Dados />
+          {/* Na demonstração não há conta de verdade para mudar a senha ou excluir. */}
+          {!__DEMO__ && <Conta />}
+          <Aplicativo />
+        </div>
+      </div>
     </>
   )
 }
@@ -100,7 +127,7 @@ function Lembretes({ config, atualizar }: { config: Config; atualizar: (c: Confi
   }
 
   return (
-    <section className="card form form-solto">
+    <section className="card form form-solto" id="config-lembretes">
       <h2 className="sem-margem">Lembretes de treino</h2>
       {!suportaNotificacoes() ? (
         <p className="muted">Este navegador não suporta notificações.</p>
@@ -204,7 +231,7 @@ function Dados() {
     })
 
   return (
-    <section className="card form form-solto">
+    <section className="card form form-solto" id="config-dados">
       <h2 className="sem-margem">Seus dados</h2>
       <p className="muted">
         Baixe um backup completo (JSON) para guardar ou levar para outra conta, ou o histórico de sessões em planilha (CSV).
@@ -245,7 +272,7 @@ function Dados() {
 
 function Conta() {
   return (
-    <section className="card form form-solto">
+    <section className="card form form-solto" id="config-conta">
       <h2 className="sem-margem">Sua conta</h2>
       <TrocarSenha />
       <hr className="divisor" />
@@ -360,7 +387,7 @@ function Aplicativo() {
   const instalado = rodandoComoApp()
 
   return (
-    <section className="card form form-solto">
+    <section className="card form form-solto" id="config-aplicativo">
       <h2 className="sem-margem">Aplicativo</h2>
       {instalado ? (
         <p className="muted">Você está usando o app instalado. ✔</p>

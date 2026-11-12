@@ -14,7 +14,9 @@ function abrir(caminho: string) {
   abrirApp(caminho)
 }
 
-const links = () => screen.getAllByRole('link').filter((l) => l.getAttribute('href')?.startsWith('/artigos/'))
+// Os cartões da lista; o destaque da semana, no alto, fica de fora da contagem.
+const links = () =>
+  screen.getAllByRole('link').filter((l) => l.getAttribute('href')?.startsWith('/artigos/') && !l.classList.contains('artigo-destaque'))
 
 describe('Artigos', () => {
   it('aparece no menu principal', async () => {

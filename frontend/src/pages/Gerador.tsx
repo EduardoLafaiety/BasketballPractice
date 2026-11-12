@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react'
+import { useEffect, useState, type FormEvent } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { api } from '../api'
 import { CATEGORIAS } from '../components/FormExercicio'
@@ -9,6 +9,8 @@ import type { PlanoGuiado } from './SessaoGuiada'
 
 const ORDEM_DIAS: DiaSemana[] = [1, 2, 3, 4, 5, 6, 0]
 const ATALHOS_MINUTOS = [15, 30, 45, 60, 90]
+
+const ATRASO_PREVIA_MS = 500
 
 export default function Gerador() {
   const navigate = useNavigate()
@@ -43,6 +45,15 @@ export default function Gerador() {
       setGerando(false)
     }
   }
+
+  // Prévia ao vivo: depois do primeiro treino gerado, mudar uma escolha já remonta a sessão (com uma pausa curta
+  // para não pedir um treino a cada passo do controle de tempo).
+  const jaGerou = blocos !== null
+  useEffect(() => {
+    if (!jaGerou) return
+    const t = window.setTimeout(() => void gerar(), ATRASO_PREVIA_MS)
+    return () => window.clearTimeout(t)
+  }, [minutos, nivel, foco, aquecimento])
 
   const resumo = [
     `${minutos} min`,

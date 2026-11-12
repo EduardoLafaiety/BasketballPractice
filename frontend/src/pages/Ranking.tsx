@@ -21,13 +21,40 @@ import {
   type Periodo,
 } from '../social/api'
 
+/** Pódio e lista de exemplo, apagados atrás do aviso da demonstração. */
+function RankingExemplo() {
+  const linhas = [['Rafa', 47], ['Bia', 44], ['Duda', 41], ['Léo', 38], ['Nina', 35]] as const
+  return (
+    <>
+      <ol className="podio">
+        {linhas.slice(0, 3).map(([nome, valor], i) => (
+          <li key={nome} className={`podio-lugar lugar-${i + 1}`}>
+            <span className="podio-posicao">{i + 1}º</span>
+            <span className="podio-apelido">{nome}</span>
+            <span className="podio-valor">{valor}</span>
+          </li>
+        ))}
+      </ol>
+      <ol className="ranking-lista">
+        {linhas.slice(3).map(([nome, valor], i) => (
+          <li key={nome} className="ranking-linha">
+            <span className="ranking-posicao">{i + 4}º</span>
+            <span className="ranking-apelido">{nome}</span>
+            <span className="ranking-valor">{valor}</span>
+          </li>
+        ))}
+      </ol>
+    </>
+  )
+}
+
 export default function RankingPagina() {
   return (
     <>
       <h1>Ranking</h1>
       <p className="muted">Lances livres, desafio do dia, quiz, sequência e nota do cartão: compare com todo mundo ou só com os amigos, nesta semana ou desde sempre.</p>
       {__DEMO__ ? (
-        <SoComServidor recurso="O ranking" porque="O ranking e os desafios entre amigos comparam várias contas." />
+        <SoComServidor recurso="O ranking" porque="O ranking e os desafios entre amigos comparam várias contas." exemplo={<RankingExemplo />} />
       ) : (
         <ConteudoRanking />
       )}

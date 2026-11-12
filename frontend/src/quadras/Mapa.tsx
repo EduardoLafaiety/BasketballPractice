@@ -13,10 +13,16 @@ interface Props {
   quadras: QuadraOsm[]
   selecionada: string | null
   aoSelecionar: (id: string) => void
+  /** Antes da busca: o país inteiro, sem o marcador do ponto de partida. */
+  panorama?: boolean
 }
 
+// Zoom do panorama (o Brasil inteiro) e o de uma vizinhança.
+const ZOOM_PANORAMA = 4
+const ZOOM_PERTO = 14
+
 /** Mapa do Leaflet com os blocos do OpenStreetMap; carregado só quando a aba de quadras abre. */
-export default function Mapa({ centro, quadras, selecionada, aoSelecionar }: Props) {
+export default function Mapa({ centro, quadras, selecionada, aoSelecionar, panorama }: Props) {
   const div = useRef<HTMLDivElement>(null)
   const mapa = useRef<L.Map | null>(null)
   const camada = useRef<L.LayerGroup | null>(null)
@@ -24,7 +30,7 @@ export default function Mapa({ centro, quadras, selecionada, aoSelecionar }: Pro
 
   // O mapa é criado uma vez; centro e marcadores mudam nos efeitos abaixo.
   useEffect(() => {
-    const m = L.map(div.current!, { scrollWheelZoom: false }).setView([centroInicial.current.lat, centroInicial.current.lon], 14)
+    const m = L.map(div.current!, { scrollWheelZoom: false }).setView([centroInicial.current.lat, centroInicial.current.lon], panorama ? ZOOM_PANORAMA : ZOOM_PERTO)
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">colaboradores do OpenStreetMap</a> (ODbL)',
@@ -42,13 +48,13 @@ export default function Mapa({ centro, quadras, selecionada, aoSelecionar }: Pro
     const grupo = camada.current
     if (!m || !grupo) return
     grupo.clearLayers()
-    L.marker([centro.lat, centro.lon], { icon: iconeVoce, keyboard: false, title: 'Ponto de partida' }).addTo(grupo)
+    if (!panorama) L.marker([centro.lat, centro.lon], { icon: iconeVoce, keyboard: false, title: 'Ponto de partida' }).addTo(grupo)
     for (const q of quadras) {
       L.marker([q.lat, q.lon], { icon: iconeQuadra(q.id === selecionada), title: q.nome ?? 'Quadra de basquete' })
         .on('click', () => aoSelecionar(q.id))
         .addTo(grupo)
     }
-  }, [centro, quadras, selecionada, aoSelecionar])
+  }, [centro, quadras, selecionada, aoSelecionar, panorama])
 
   // Enquadra o ponto de partida e as quadras mais perto quando a lista muda.
   useEffect(() => {
@@ -56,8 +62,8 @@ export default function Mapa({ centro, quadras, selecionada, aoSelecionar }: Pro
     if (!m) return
     const pontos = [[centro.lat, centro.lon], ...quadras.slice(0, 15).map((q) => [q.lat, q.lon])] as [number, number][]
     if (pontos.length > 1) m.fitBounds(L.latLngBounds(pontos), { padding: [30, 30], maxZoom: 16 })
-    else m.setView([centro.lat, centro.lon], 14)
-  }, [centro, quadras])
+    else m.setView([centro.lat, centro.lon], panorama ? ZOOM_PANORAMA : ZOOM_PERTO)
+  }, [centro, quadras, panorama])
 
   useEffect(() => {
     const q = quadras.find((x) => x.id === selecionada)

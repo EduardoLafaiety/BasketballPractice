@@ -18,6 +18,15 @@ const UNIDADE: Record<IdHabilidade, string> = { lance_livre: 'cestas', arremesso
 
 const mesAtual = () => dataLocal(new Date()).slice(0, 7)
 
+// Notas de um cartão de exemplo, só para a prévia apagada de quem ainda não fez nenhum teste.
+const NOTAS_EXEMPLO = [72, 64, 81, 58]
+const exemplo = (habilidades: Habilidade[]): CartaoMes => ({
+  mes: mesAtual(),
+  geral: 69,
+  completo: true,
+  notas: Object.fromEntries(habilidades.map((h, i) => [h.id, { valor: 0, nota: NOTAS_EXEMPLO[i % NOTAS_EXEMPLO.length] }])) as CartaoMes['notas'],
+})
+
 export default function CartaoDoAtleta() {
   const { cartao, erro, recarregar } = useCartao()
   if (!cartao) return erro ? <ErroCarga erro={erro} tentarDeNovo={recarregar} /> : <Carregando texto="Montando o seu cartão…" />
@@ -46,7 +55,16 @@ export default function CartaoDoAtleta() {
           </section>
         </div>
       ) : (
-        <div className="vazio">Seu cartão aparece depois do primeiro teste da bateria. Comece pelo que der para fazer hoje.</div>
+        // Antes do primeiro teste, um cartão de exemplo apagado mostra o que vai aparecer aqui.
+        <div className="desempenho-vazio">
+          <div className="desempenho-fantasma cartao-topo" aria-hidden>
+            <Ficha mes={exemplo(cartao.habilidades)} habilidades={cartao.habilidades} atual />
+            <section className="card cartao-radar">
+              <Radar habilidades={cartao.habilidades} mes={exemplo(cartao.habilidades)} />
+            </section>
+          </div>
+          <div className="vazio desempenho-chamada">Seu cartão aparece depois do primeiro teste da bateria. Comece pelo que der para fazer hoje.</div>
+        </div>
       )}
 
       <Bateria habilidades={cartao.habilidades} mes={desteMes} />

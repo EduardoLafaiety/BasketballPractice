@@ -36,27 +36,49 @@ export default function Jogos() {
 
       <Comparativo />
 
-      {editando ? (
-        <FormJogo inicial={editando} aoTerminar={() => setEditando(null)} />
-      ) : (
-        <button className="btn btn-primario" onClick={() => setEditando(NOVO())}>+ Registrar jogo</button>
-      )}
+      {/* No computador: a lista à esquerda; à direita, o registro e as médias por jogo. */}
+      <div className="jogos-corpo">
+        <aside className="jogos-lado">
+          {editando ? (
+            <FormJogo inicial={editando} aoTerminar={() => setEditando(null)} />
+          ) : (
+            <button className="btn btn-primario" onClick={() => setEditando(NOVO())}>+ Registrar jogo</button>
+          )}
+          {jogos && jogos.length > 0 && <Medias jogos={jogos} />}
+        </aside>
 
-      <section>
-        <h2>Jogos</h2>
-        {!jogos ? (
-          erro ? <ErroCarga erro={erro} tentarDeNovo={recarregar} /> : <Carregando texto="Carregando jogos…" />
-        ) : jogos.length === 0 ? (
-          <div className="vazio">Nenhum jogo anotado ainda. Depois da próxima partida, registre os seus números.</div>
-        ) : (
-          <ul className="jogos-lista">
-            {jogos.map((j) => (
-              <LinhaJogo key={j.id} jogo={j} aoEditar={() => setEditando(j)} />
-            ))}
-          </ul>
-        )}
-      </section>
+        <section className="jogos-principal">
+          <h2>Jogos</h2>
+          {!jogos ? (
+            erro ? <ErroCarga erro={erro} tentarDeNovo={recarregar} /> : <Carregando texto="Carregando jogos…" />
+          ) : jogos.length === 0 ? (
+            <div className="vazio">Nenhum jogo anotado ainda. Depois da próxima partida, registre os seus números.</div>
+          ) : (
+            <ul className="jogos-lista">
+              {jogos.map((j) => (
+                <LinhaJogo key={j.id} jogo={j} aoEditar={() => setEditando(j)} />
+              ))}
+            </ul>
+          )}
+        </section>
+      </div>
     </>
+  )
+}
+
+/** Médias por jogo de tudo o que foi anotado. */
+function Medias({ jogos }: { jogos: Jogo[] }) {
+  const media = (campo: 'pontos' | 'rebotes' | 'assistencias') =>
+    (jogos.reduce((t, j) => t + j[campo], 0) / jogos.length).toLocaleString('pt-BR', { maximumFractionDigits: 1 })
+  return (
+    <div className="card jogos-medias">
+      <span className="rotulo-forte">Médias em {jogos.length} {jogos.length === 1 ? 'jogo' : 'jogos'}</span>
+      <dl>
+        <div><dt>Pontos</dt><dd>{media('pontos')}</dd></div>
+        <div><dt>Rebotes</dt><dd>{media('rebotes')}</dd></div>
+        <div><dt>Assistências</dt><dd>{media('assistencias')}</dd></div>
+      </dl>
+    </div>
   )
 }
 
