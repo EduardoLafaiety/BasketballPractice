@@ -47,7 +47,7 @@ export default function TreinoDetalhe() {
   }, [rodando])
 
   if (!drill) {
-    if (!carregado) return erro ? <ErroCarga erro={erro} tentarDeNovo={recarregar} /> : <Carregando texto="Carregando treino…" />
+    if (!carregado) return erro ? <ErroCarga erro={erro} tentarDeNovo={recarregar} /> : <Carregando texto="Carregando treino" />
     return (
       <div className="vazio">
         Treino não encontrado. <Link to="/treinos" className="link">Voltar aos treinos</Link>
@@ -228,7 +228,7 @@ export default function TreinoDetalhe() {
             </label>
             {erroSalvar && <p className="erro" role="alert">{erroSalvar}</p>}
             <button className="btn btn-primario" type="submit" disabled={!!arremessoInvalido || semDuracao || salvando}>
-              {salvando ? 'Salvando…' : 'Salvar sessão'}
+              {salvando ? 'Salvando' : 'Salvar sessão'}
             </button>
           </form>
         </aside>

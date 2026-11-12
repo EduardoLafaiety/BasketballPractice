@@ -49,7 +49,7 @@ export default function SessaoGuiada() {
     if (params.get('hoje') !== null) {
       const erro = rotina.erro ?? drills.erro
       if (!rotina.carregado || !drills.carregado)
-        return erro ? <ErroCarga erro={erro} tentarDeNovo={() => { rotina.recarregar(); drills.recarregar() }} /> : <Carregando texto="Montando o treino de hoje…" />
+        return erro ? <ErroCarga erro={erro} tentarDeNovo={() => { rotina.recarregar(); drills.recarregar() }} /> : <Carregando texto="Montando o treino de hoje" />
     }
     return <SemPlano />
   }
@@ -327,7 +327,7 @@ function Final({
         </label>
         {erro && <p className="erro" role="alert">{erro}</p>}
         <button className="btn btn-primario" type="submit" disabled={salvando}>
-          {salvando ? 'Salvando…' : 'Salvar sessão'}
+          {salvando ? 'Salvando' : 'Salvar sessão'}
         </button>
       </form>
     </>

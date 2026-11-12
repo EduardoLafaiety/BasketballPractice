@@ -48,7 +48,7 @@ export default function RecuperarSenha() {
           </label>
           {erro && Object.keys(campos).length === 0 && <p className="erro" role="alert">{erro}</p>}
           <button className="btn btn-primario btn-grande" type="submit" disabled={enviando || !email}>
-            {enviando ? 'Aguarde…' : 'Enviar link'}
+            {enviando ? 'Aguarde' : 'Enviar link'}
             <Icone nome="seta" />
           </button>
           <p className="muted auth-troca"><Link to="/entrar" className="link">Voltar para entrar</Link></p>

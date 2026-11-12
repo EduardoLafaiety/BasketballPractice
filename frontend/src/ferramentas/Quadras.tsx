@@ -66,13 +66,13 @@ export default function Quadras() {
 
   const selecionar = useCallback((id: string) => setSelecionada(id), [])
   const titulo =
-    estado === 'buscando' ? 'Procurando quadras…' : quadras ? `${quadras.length} ${quadras.length === 1 ? 'quadra' : 'quadras'} perto de ${origem?.nome.split(',')[0]}` : ''
+    estado === 'buscando' ? 'Procurando quadras' : quadras ? `${quadras.length} ${quadras.length === 1 ? 'quadra' : 'quadras'} perto de ${origem?.nome.split(',')[0]}` : ''
 
   return (
     <div className="quadras">
       <div className="quadras-busca">
         <button className="btn btn-primario" onClick={usarLocalizacao} disabled={estado === 'localizando'}>
-          {estado === 'localizando' ? 'Localizando…' : 'Usar minha localização'}
+          {estado === 'localizando' ? 'Localizando' : 'Usar minha localização'}
         </button>
         <form className="quadras-form" onSubmit={procurar} role="search">
           <input className="input" type="search" aria-label="Cidade, bairro ou endereço" placeholder="Cidade, bairro ou endereço" value={busca} onChange={(e) => setBusca(e.target.value)} />
@@ -91,7 +91,7 @@ export default function Quadras() {
 
       {/* O mapa aparece desde o começo, com o país inteiro; a busca aproxima e acrescenta a lista ao lado. */}
       <div className="quadras-corpo">
-        <Suspense fallback={<div className="mapa mapa-carregando" role="status">Carregando o mapa…</div>}>
+        <Suspense fallback={<div className="mapa mapa-carregando" role="status">Carregando o mapa</div>}>
           <Mapa centro={origem ?? CENTRO_BRASIL} panorama={!origem} quadras={quadras ?? []} selecionada={selecionada} aoSelecionar={selecionar} />
         </Suspense>
         {!origem ? (

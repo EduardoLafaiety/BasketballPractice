@@ -47,7 +47,7 @@ export default function Inicio() {
   const contagem = (id: Nivel) => drills.drills.filter((d) => d.nivel === id && !d.aquecimento).length
 
   const pct = resumo ? aproveitamento(resumo.acertos, resumo.tentativas) : null
-  const valor = (n: number | string | undefined) => (n === undefined ? (erroResumo ? '!' : '…') : n)
+  const valor = (n: number | string | undefined) => (n === undefined ? (erroResumo ? '!' : '—') : n)
 
   const erroHoje = rotina.erro ?? drills.erro
   // Na segunda-feira, o balanço da semana que passou vem logo no alto.
@@ -70,7 +70,7 @@ export default function Inicio() {
         <Link to={treinosHoje.length ? '/sessao?hoje' : '/rotina'} className="inicio-grande">
           <span className="rotulo-forte">Treino de hoje</span>
           <strong>
-            {!prontoHoje ? '…' : treinosHoje.length ? <>{treinosHoje.length} <small>{treinosHoje.length === 1 ? 'exercício' : 'exercícios'}</small></> : 'Descanso'}
+            {!prontoHoje ? '—' : treinosHoje.length ? <>{treinosHoje.length} <small>{treinosHoje.length === 1 ? 'exercício' : 'exercícios'}</small></> : 'Descanso'}
           </strong>
           <span className="inicio-grande-texto">
             {!prontoHoje
@@ -84,7 +84,7 @@ export default function Inicio() {
         <div className="inicio-lado">
           <Link to="/desafio" className="card inicio-mini">
             <span className="rotulo-forte">Desafio do dia{desafioHoje?.resultado ? ' · feito' : ''}</span>
-            <strong>{desafioHoje ? desafioHoje.desafio.titulo : '…'}</strong>
+            <strong>{desafioHoje ? desafioHoje.desafio.titulo : '—'}</strong>
             <Icone nome="seta" tamanho={22} />
           </Link>
           <Link to="/desempenho" className="card inicio-mini">
@@ -119,7 +119,7 @@ export default function Inicio() {
           erroHoje ? (
             <ErroCarga erro={erroHoje} tentarDeNovo={() => { rotina.recarregar(); drills.recarregar() }} />
           ) : (
-            <Carregando texto="Carregando treino de hoje…" />
+            <Carregando texto="Carregando treino de hoje" />
           )
         ) : treinosHoje.length > 0 ? (
           <ol className="lista-treino">

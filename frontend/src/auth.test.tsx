@@ -98,7 +98,7 @@ describe('falha passageira ao conferir a sessão', () => {
     const alerta = await screen.findByRole('alert')
     expect(alerta).toHaveTextContent(mensagem)
     expect(within(alerta).getByRole('button', { name: 'Tentar de novo' })).toBeInTheDocument()
-    expect(screen.queryByText('Conferindo sua sessão…')).toBeNull()
+    expect(screen.queryByText('Conferindo sua sessão')).toBeNull()
     expect(tokenAtual()).toBe('tk')
     expect(chamadas.some((c) => c.caminho.startsWith('/admin'))).toBe(false)
   })
@@ -115,7 +115,7 @@ describe('falha passageira ao conferir a sessão', () => {
     abrirApp('/admin')
 
     await userEvent.click(await screen.findByRole('button', { name: 'Tentar de novo' }))
-    expect(screen.getByText('Conferindo sua sessão…')).toBeInTheDocument()
+    expect(screen.getByText('Conferindo sua sessão')).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Tentar de novo' })).toBeNull()
 
     liberar(usuarioFalso({ isAdmin: true }))

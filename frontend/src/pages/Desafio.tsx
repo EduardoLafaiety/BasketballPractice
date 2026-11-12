@@ -30,7 +30,7 @@ export default function DesafioDoDia() {
   const { hoje, erro, recarregar, enviar } = useDesafioDoDia()
   const historico = useHistorico(hoje?.resultado?.dia)
 
-  if (!hoje) return erro ? <ErroCarga erro={erro} tentarDeNovo={recarregar} /> : <Carregando texto="Sorteando o desafio de hoje…" />
+  if (!hoje) return erro ? <ErroCarga erro={erro} tentarDeNovo={recarregar} /> : <Carregando texto="Sorteando o desafio de hoje" />
 
   return (
     <>
@@ -184,7 +184,7 @@ function Execucao({ desafio, enviar }: { desafio: Desafio; enviar: ReturnType<ty
         {erro && <p className="erro" role="alert">{erro}</p>}
         <div className="acoes">
           <button className="btn btn-primario" onClick={salvar} disabled={salvando || contador.tentativas === 0}>
-            {salvando ? 'Salvando…' : 'Salvar resultado'}
+            {salvando ? 'Salvando' : 'Salvar resultado'}
           </button>
           <button className="btn" onClick={comecar} disabled={salvando}>Recomeçar</button>
         </div>

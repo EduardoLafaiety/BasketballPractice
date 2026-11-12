@@ -21,8 +21,8 @@ describe('BarraProgresso', () => {
 
 describe('estados de carregamento', () => {
   it('Carregando anuncia o texto para leitores de tela', () => {
-    render(<Carregando texto="Carregando metas…" />)
-    expect(screen.getByRole('status')).toHaveTextContent('Carregando metas…')
+    render(<Carregando texto="Carregando metas" />)
+    expect(screen.getByRole('status')).toHaveTextContent('Carregando metas')
   })
 
   it('ErroCarga mostra a mensagem e o botão de tentar de novo', async () => {

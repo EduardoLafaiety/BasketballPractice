@@ -9,6 +9,7 @@ import { aplicarTema, temaSalvo } from './lib/tema'
 // Fontes servidas pelo próprio site: sem depender do Google Fonts e funcionando offline no PWA.
 import '@fontsource-variable/big-shoulders-display'
 import '@fontsource-variable/manrope'
+import '@fontsource/instrument-serif/400-italic.css'
 import './styles.css'
 
 // Subpasta do site (VITE_BASE), ex.: /BasketballPractice no GitHub Pages; "/" no site normal.

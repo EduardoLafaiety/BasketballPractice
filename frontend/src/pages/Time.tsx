@@ -59,7 +59,7 @@ function ListaDeTimes() {
   const criar = useAcao()
   const entrar = useAcao()
 
-  if (!times) return erro ? <ErroCarga erro={erro} tentarDeNovo={recarregar} /> : <Carregando texto="Carregando times…" />
+  if (!times) return erro ? <ErroCarga erro={erro} tentarDeNovo={recarregar} /> : <Carregando texto="Carregando times" />
 
   return (
     <>
@@ -122,7 +122,7 @@ export function EntrarNoTime() {
 
   if (__DEMO__) return <><h1>Time</h1>{AVISO_DEMO}</>
   if (erro) return <><h1>Time</h1><ErroCarga erro={erro.message.includes('não encontrado') ? new Error('Este código de time não existe mais. Peça um novo ao técnico.') : erro} /></>
-  if (!convite) return <Carregando texto="Abrindo o convite…" />
+  if (!convite) return <Carregando texto="Abrindo o convite" />
   return (
     <>
       <h1>Time</h1>
@@ -151,7 +151,7 @@ export function TimeDetalhe() {
 
 function TimeComServidor({ id }: { id: number }) {
   const { time, erro, recarregar } = useTime(id)
-  if (!time) return erro ? <ErroCarga erro={erro} tentarDeNovo={recarregar} /> : <Carregando texto="Carregando o time…" />
+  if (!time) return erro ? <ErroCarga erro={erro} tentarDeNovo={recarregar} /> : <Carregando texto="Carregando o time" />
   return (
     <>
       <Link to="/time" className="link">← Times</Link>

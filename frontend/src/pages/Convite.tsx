@@ -31,7 +31,7 @@ function ConviteComServidor() {
   }, [codigo])
 
   if (erro) return <><h1>Convite</h1><ErroCarga erro={erro.message.includes('não encontrado') ? new Error('Este convite não existe mais. Peça um link novo.') : erro} /></>
-  if (!convite || !carregado) return <Carregando texto="Abrindo o convite…" />
+  if (!convite || !carregado) return <Carregando texto="Abrindo o convite" />
 
   async function aceitar() {
     setErroAceitar(null)

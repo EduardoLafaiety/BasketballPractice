@@ -34,7 +34,7 @@ export default function EstiloDetalhe() {
           Jogador não encontrado. <Link to="/jogue-como" className="link">Ver todos os jogadores</Link>
         </div>
       )
-    return erro ? <ErroCarga erro={erro} tentarDeNovo={carregar} /> : <Carregando texto="Carregando jogador…" />
+    return erro ? <ErroCarga erro={erro} tentarDeNovo={carregar} /> : <Carregando texto="Carregando jogador" />
   }
 
   const titulo = `Jogue como ${estilo.nome}`

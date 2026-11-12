@@ -52,7 +52,7 @@ export default function Metas() {
       ) : erroProgresso ? (
         <ErroCarga erro={erroProgresso} tentarDeNovo={recarregarProgresso} />
       ) : (
-        <Carregando texto="Calculando sua sequência…" />
+        <Carregando texto="Calculando sua sequência" />
       )}
 
       {/* No computador, metas e conquistas ficam lado a lado. */}
@@ -193,7 +193,7 @@ function SecaoMetas() {
           </div>
           {erroForm && <p className="erro" role="alert">{erroForm}</p>}
           <div className="acoes">
-            <button className="btn btn-primario" type="submit" disabled={salvando}>{salvando ? 'Salvando…' : 'Criar meta'}</button>
+            <button className="btn btn-primario" type="submit" disabled={salvando}>{salvando ? 'Salvando' : 'Criar meta'}</button>
             <button className="btn" type="button" onClick={() => setCriando(false)}>Cancelar</button>
           </div>
         </form>
@@ -201,7 +201,7 @@ function SecaoMetas() {
 
       {carregado && <AvisoDesatualizado erro={erro} tentarDeNovo={recarregar} />}
       {!carregado ? (
-        erro ? <ErroCarga erro={erro} tentarDeNovo={recarregar} /> : <Carregando texto="Carregando metas…" />
+        erro ? <ErroCarga erro={erro} tentarDeNovo={recarregar} /> : <Carregando texto="Carregando metas" />
       ) : metas.length === 0 ? (
         !criando && <div className="vazio">Nenhuma meta ainda. Que tal “treinar 3x por semana”?</div>
       ) : (
@@ -308,7 +308,7 @@ function SecaoTestes() {
 
         <div className="card">
           {!carregado ? (
-            erro ? <ErroCarga erro={erro} tentarDeNovo={recarregar} /> : <Carregando texto="Carregando testes…" />
+            erro ? <ErroCarga erro={erro} tentarDeNovo={recarregar} /> : <Carregando texto="Carregando testes" />
           ) : doTipo.length === 0 ? (
             <p className="muted">Nenhum resultado de {info?.nome.toLowerCase() ?? 'teste'} ainda.</p>
           ) : (

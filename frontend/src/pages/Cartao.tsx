@@ -29,7 +29,7 @@ const exemplo = (habilidades: Habilidade[]): CartaoMes => ({
 
 export default function CartaoDoAtleta() {
   const { cartao, erro, recarregar } = useCartao()
-  if (!cartao) return erro ? <ErroCarga erro={erro} tentarDeNovo={recarregar} /> : <Carregando texto="Montando o seu cartão…" />
+  if (!cartao) return erro ? <ErroCarga erro={erro} tentarDeNovo={recarregar} /> : <Carregando texto="Montando o seu cartão" />
 
   const ultimo = cartao.meses.at(-1)
   const anterior = cartao.meses.at(-2)
@@ -216,7 +216,7 @@ function TesteDaBateria({ habilidade, feito }: { habilidade: Habilidade; feito: 
         <input className="input" inputMode="decimal" value={valor} onChange={(e) => setValor(e.target.value)} />
       </label>
       {erro && <p className="erro" role="alert">{erro}</p>}
-      <button className="btn" type="submit" disabled={salvando}>{salvando ? 'Salvando…' : feito ? 'Registrar outra tentativa' : 'Registrar'}</button>
+      <button className="btn" type="submit" disabled={salvando}>{salvando ? 'Salvando' : feito ? 'Registrar outra tentativa' : 'Registrar'}</button>
     </form>
   )
 }

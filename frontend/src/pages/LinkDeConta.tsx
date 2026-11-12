@@ -77,7 +77,7 @@ function TelaDoLink({
             <CampoSenha rotulo={rotulo} valor={senha} aoMudar={setSenha} autoComplete={autoComplete} dica={dica} erros={erros} />
             {erro && <p className="erro" role="alert">{erro}</p>}
             <button className="btn btn-primario btn-grande" type="submit" disabled={enviando || !senha}>
-              {enviando ? 'Aguarde…' : botao}
+              {enviando ? 'Aguarde' : botao}
               <Icone nome="seta" />
             </button>
           </>

@@ -50,7 +50,7 @@ export default function Jogos() {
         <section className="jogos-principal">
           <h2>Jogos</h2>
           {!jogos ? (
-            erro ? <ErroCarga erro={erro} tentarDeNovo={recarregar} /> : <Carregando texto="Carregando jogos…" />
+            erro ? <ErroCarga erro={erro} tentarDeNovo={recarregar} /> : <Carregando texto="Carregando jogos" />
           ) : jogos.length === 0 ? (
             <div className="vazio">Nenhum jogo anotado ainda. Depois da próxima partida, registre os seus números.</div>
           ) : (
@@ -205,7 +205,7 @@ function FormJogo({ inicial, aoTerminar }: { inicial: Jogo; aoTerminar: () => vo
       </label>
       {erro && <p className="erro" role="alert">{erro}</p>}
       <div className="acoes">
-        <button className="btn btn-primario" type="submit" disabled={salvando}>{salvando ? 'Salvando…' : 'Salvar jogo'}</button>
+        <button className="btn btn-primario" type="submit" disabled={salvando}>{salvando ? 'Salvando' : 'Salvar jogo'}</button>
         <button className="btn" type="button" onClick={aoTerminar} disabled={salvando}>Cancelar</button>
       </div>
     </form>

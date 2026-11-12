@@ -42,7 +42,7 @@ export default function Programas() {
       <h1>Programas</h1>
       <p className="muted">Planos de quatro semanas que liberam um treino por dia. Faça o do dia, volte amanhã para o próximo e acompanhe a barra até o fim.</p>
       {!programas ? (
-        erro ? <ErroCarga erro={erro} tentarDeNovo={recarregar} /> : <Carregando texto="Carregando programas…" />
+        erro ? <ErroCarga erro={erro} tentarDeNovo={recarregar} /> : <Carregando texto="Carregando programas" />
       ) : (
         <div className="grade programas-grade">
           {programas.map((p) => (
@@ -75,7 +75,7 @@ export function ProgramaDetalhe() {
   const [ocupado, setOcupado] = useState(false)
   const [erroAcao, setErroAcao] = useState<string | null>(null)
 
-  if (!programa) return erro ? <ErroCarga erro={erro} tentarDeNovo={recarregar} /> : <Carregando texto="Carregando o programa…" />
+  if (!programa) return erro ? <ErroCarga erro={erro} tentarDeNovo={recarregar} /> : <Carregando texto="Carregando o programa" />
 
   async function acao(fazer: () => Promise<void>) {
     setOcupado(true)

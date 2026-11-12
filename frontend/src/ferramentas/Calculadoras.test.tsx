@@ -20,7 +20,7 @@ describe('Calculadoras', () => {
     render(<Calculadoras />)
     mudar('Cestas de quadra', '10')
     mudar('Arremessos de quadra', '20')
-    mudar('…sendo de três', '4')
+    mudar('Sendo de três', '4')
     mudar('Lances livres convertidos', '0')
     mudar('Lances livres tentados', '0')
     expect(resultado('FG%')).toHaveTextContent('50%')
@@ -46,7 +46,7 @@ describe('Calculadoras', () => {
     render(<Calculadoras />)
     mudar('Cestas de quadra', '2')
     mudar('Arremessos de quadra', '4')
-    mudar('…sendo de três', '9')
+    mudar('Sendo de três', '9')
     mudar('Lances livres convertidos', '0')
     // Conta como 2 de três: eFG = (2 + 1) / 4.
     expect(resultado('eFG%')).toHaveTextContent('75%')

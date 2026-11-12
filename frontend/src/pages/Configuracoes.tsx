@@ -62,7 +62,7 @@ export default function Configuracoes() {
         </nav>
         <div className="config-secoes">
           {!carregado ? (
-            erro ? <ErroCarga erro={erro} tentarDeNovo={recarregar} /> : <Carregando texto="Carregando preferências…" />
+            erro ? <ErroCarga erro={erro} tentarDeNovo={recarregar} /> : <Carregando texto="Carregando preferências" />
           ) : (
             <>
               <section className="card form form-solto" id="config-aparencia">
@@ -237,10 +237,10 @@ function Dados() {
         Baixe um backup completo (JSON) para guardar ou levar para outra conta, ou o histórico de sessões em planilha (CSV).
       </p>
       <div className="acoes">
-        <button className="btn" onClick={exportarJson} disabled={!!ocupado}>{ocupado === 'json' ? 'Gerando…' : 'Baixar backup (JSON)'}</button>
-        <button className="btn" onClick={exportarCsv} disabled={!!ocupado}>{ocupado === 'csv' ? 'Gerando…' : 'Baixar sessões (CSV)'}</button>
+        <button className="btn" onClick={exportarJson} disabled={!!ocupado}>{ocupado === 'json' ? 'Gerando' : 'Baixar backup (JSON)'}</button>
+        <button className="btn" onClick={exportarCsv} disabled={!!ocupado}>{ocupado === 'csv' ? 'Gerando' : 'Baixar sessões (CSV)'}</button>
         <button className="btn" onClick={() => arquivo.current?.click()} disabled={!!ocupado}>
-          {ocupado === 'importar' ? 'Importando…' : 'Importar backup'}
+          {ocupado === 'importar' ? 'Importando' : 'Importar backup'}
         </button>
         <input
           ref={arquivo}
@@ -324,7 +324,7 @@ function TrocarSenha() {
       {trocada && <p className="sucesso" role="status">Senha trocada. As sessões em outros aparelhos foram encerradas.</p>}
       <div className="acoes">
         <button className="btn btn-primario" type="submit" disabled={enviando || !atual || !nova}>
-          {enviando ? 'Trocando…' : 'Trocar a senha'}
+          {enviando ? 'Trocando' : 'Trocar a senha'}
         </button>
       </div>
     </form>
@@ -374,7 +374,7 @@ function ExcluirConta() {
       {erro && !doCampo && <p className="erro" role="alert">{erro.message}</p>}
       <div className="acoes">
         <button className="btn btn-perigo" type="submit" disabled={enviando || !senha}>
-          {enviando ? 'Excluindo…' : 'Excluir definitivamente'}
+          {enviando ? 'Excluindo' : 'Excluir definitivamente'}
         </button>
         <button className="btn" type="button" disabled={enviando} onClick={() => { setAberto(false); setSenha(''); setErro(null) }}>Cancelar</button>
       </div>

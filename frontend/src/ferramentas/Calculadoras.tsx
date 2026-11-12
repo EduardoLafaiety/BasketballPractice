@@ -57,7 +57,7 @@ export default function Calculadoras() {
         <div className="linha linha-3">
           <Campo rotulo="Cestas de quadra" valor={cestas} mudar={setCestas} />
           <Campo rotulo="Arremessos de quadra" valor={tentativas} mudar={setTentativas} />
-          <Campo rotulo="…sendo de três" valor={cestas3} mudar={setCestas3} />
+          <Campo rotulo="Sendo de três" valor={cestas3} mudar={setCestas3} />
         </div>
         <div className="linha">
           <Campo rotulo="Lances livres convertidos" valor={lances} mudar={setLances} />

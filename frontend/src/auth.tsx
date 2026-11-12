@@ -107,7 +107,7 @@ export function useAuth() {
 export function RequerLogin({ children }: { children: ReactNode }) {
   const { usuario, verificando, temToken } = useAuth()
   const local = useLocation()
-  if (verificando) return <Carregando texto={__DEMO__ ? 'Preparando o app…' : 'Conferindo sua sessão…'} />
+  if (verificando) return <Carregando texto={__DEMO__ ? 'Preparando o app' : 'Conferindo sua sessão'} />
   if (!usuario && !temToken) return <Navigate to="/entrar" replace state={{ de: local.pathname + local.search + local.hash }} />
   return <>{children}</>
 }
@@ -116,6 +116,6 @@ export function RequerLogin({ children }: { children: ReactNode }) {
 export function RequerAdmin({ children, senao }: { children: ReactNode; senao: ReactNode }) {
   const { usuario, erroSessao, reconferirSessao } = useAuth()
   if (!usuario && erroSessao) return <ErroCarga erro={erroSessao} tentarDeNovo={reconferirSessao} />
-  if (!usuario) return <Carregando texto="Conferindo sua sessão…" />
+  if (!usuario) return <Carregando texto="Conferindo sua sessão" />
   return <>{usuario.isAdmin ? children : senao}</>
 }
