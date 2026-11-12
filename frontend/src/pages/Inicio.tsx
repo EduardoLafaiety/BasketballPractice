@@ -8,6 +8,7 @@ import { AvisoDesatualizado, Carregando, ErroCarga } from '../components/Estado'
 import GradeJogadores from '../components/GradeJogadores'
 import Icone from '../components/Icone'
 import { DesafioNoInicio, ResumoSemana } from '../components/InicioDestaques'
+import { useDesafioDoDia } from '../desafio/api'
 import { AberturaBola, EscadaRolagem, Figura, FraseRolagem, ListraBola, NomesRolagem } from '../components/rolagem'
 import { corDoJogador } from '../lib/cor-do-time'
 import { NIVEIS } from '../lib/niveis'
@@ -35,6 +36,7 @@ export default function Inicio() {
   const { resumo, erro: erroResumo } = useResumo(diasAtras(6))
   const rotina = useRotina()
   const drills = useDrills()
+  const { hoje: desafioHoje } = useDesafioDoDia()
   const [estilos, setEstilos] = useState<EstiloResumo[]>([])
   useEffect(() => {
     api.estilos().then(setEstilos, () => setEstilos([]))
@@ -65,21 +67,32 @@ export default function Inicio() {
 
       {/* Atalhos logo depois da abertura: o que fazer hoje sem precisar rolar a página inteira. */}
       <nav className="inicio-atalhos" aria-label="Atalhos de hoje">
-        <Link to={treinosHoje.length ? '/sessao?hoje' : '/rotina'} className="card inicio-atalho">
+        <Link to={treinosHoje.length ? '/sessao?hoje' : '/rotina'} className="inicio-grande">
           <span className="rotulo-forte">Treino de hoje</span>
-          <strong>{!prontoHoje ? '…' : treinosHoje.length ? `${treinosHoje.length} ${treinosHoje.length === 1 ? 'exercício' : 'exercícios'}` : 'Descanso'}</strong>
-          <span className="link-forte">{treinosHoje.length ? 'Começar' : 'Planejar a semana'} <Icone nome="seta" /></span>
+          <strong>
+            {!prontoHoje ? '…' : treinosHoje.length ? <>{treinosHoje.length} <small>{treinosHoje.length === 1 ? 'exercício' : 'exercícios'}</small></> : 'Descanso'}
+          </strong>
+          <span className="inicio-grande-texto">
+            {!prontoHoje
+              ? ''
+              : treinosHoje.length
+                ? treinosHoje.slice(0, 3).map((d) => d.nome).join(' · ')
+                : 'Nada na rotina hoje. Que tal montar a semana?'}
+          </span>
+          <span className="inicio-grande-acao">{treinosHoje.length ? 'Começar treino' : 'Planejar a semana'} <Icone nome="seta" /></span>
         </Link>
-        <Link to="/desafio" className="card inicio-atalho">
-          <span className="rotulo-forte">Desafio do dia</span>
-          <strong>O mesmo para todo mundo</strong>
-          <span className="link-forte">Aceitar <Icone nome="seta" /></span>
-        </Link>
-        <Link to="/desempenho" className="card inicio-atalho">
-          <span className="rotulo-forte">Últimos 7 dias</span>
-          <strong>{valor(resumo?.sessoes)} {resumo?.sessoes === 1 ? 'sessão' : 'sessões'}</strong>
-          <span className="link-forte">Ver desempenho <Icone nome="seta" /></span>
-        </Link>
+        <div className="inicio-lado">
+          <Link to="/desafio" className="card inicio-mini">
+            <span className="rotulo-forte">Desafio do dia{desafioHoje?.resultado ? ' · feito' : ''}</span>
+            <strong>{desafioHoje ? desafioHoje.desafio.titulo : '…'}</strong>
+            <Icone nome="seta" tamanho={22} />
+          </Link>
+          <Link to="/desempenho" className="card inicio-mini">
+            <span className="rotulo-forte">Últimos 7 dias</span>
+            <strong>{valor(resumo?.sessoes)} <small>{resumo?.sessoes === 1 ? 'sessão' : 'sessões'}</small></strong>
+            <Icone nome="seta" tamanho={22} />
+          </Link>
+        </div>
       </nav>
 
       <FraseRolagem texto="Ninguém começa arremessando de três. Primeiro vem a bola na mão, depois o arremesso colado à cesta, e só então a distância." />
