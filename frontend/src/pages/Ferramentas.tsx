@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import Calculadoras from '../ferramentas/Calculadoras'
 import Prancheta from '../ferramentas/Prancheta'
@@ -53,6 +54,7 @@ export default function Ferramentas() {
             role="tab"
             aria-selected={a.id === aba}
             className={`ferr-aba ${a.id === aba ? 'ativo' : ''}`}
+            style={{ '--i': i } as CSSProperties}
             onClick={() => setParams({ aba: a.id }, { replace: true })}
           >
             <span className="ferr-aba-num" aria-hidden>{String(i + 1).padStart(2, '0')}</span>
