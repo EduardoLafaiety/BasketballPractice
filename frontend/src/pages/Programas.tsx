@@ -20,6 +20,21 @@ function Progresso({ p }: { p: ResumoPrograma }) {
   )
 }
 
+/** As quatro semanas do programa em quadradinhos: feitos, o próximo dia e os que faltam. */
+function Semanas({ p }: { p: ResumoPrograma }) {
+  const proximo = p.status.comecado && !p.status.concluido ? p.status.proximoDia : 0
+  return (
+    <ol className="programa-semanas" aria-hidden>
+      {Array.from({ length: p.totalDias }, (_, i) => (
+        <li key={i} className={i < p.status.feitos ? 'feito' : i + 1 === proximo ? 'proximo' : undefined} />
+      ))}
+    </ol>
+  )
+}
+
+const chamada = (p: ResumoPrograma) =>
+  !p.status.comecado ? 'Ver o programa' : p.status.concluido ? 'Rever o programa' : p.status.proximoDia ? `Continuar: dia ${p.status.proximoDia}` : 'Continuar'
+
 export default function Programas() {
   const { programas, erro, recarregar } = useProgramas()
   return (
@@ -35,8 +50,9 @@ export default function Programas() {
               <span className="rotulo-forte">{p.foco} · {ROTULO_NIVEL[p.nivel]}</span>
               <h2 className="sem-margem">{p.nome}</h2>
               <p className="muted">{p.resumo}</p>
+              <Semanas p={p} />
               <Progresso p={p} />
-              <span className="link-forte">{p.status.comecado ? 'Continuar' : 'Ver o programa'} <Icone nome="seta" /></span>
+              <span className="link-forte">{chamada(p)} <Icone nome="seta" /></span>
             </Link>
           ))}
         </div>

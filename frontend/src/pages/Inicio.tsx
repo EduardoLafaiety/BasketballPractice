@@ -63,6 +63,25 @@ export default function Inicio() {
         }
       />
 
+      {/* Atalhos logo depois da abertura: o que fazer hoje sem precisar rolar a página inteira. */}
+      <nav className="inicio-atalhos" aria-label="Atalhos de hoje">
+        <Link to={treinosHoje.length ? '/sessao?hoje' : '/rotina'} className="card inicio-atalho">
+          <span className="rotulo-forte">Treino de hoje</span>
+          <strong>{!prontoHoje ? '…' : treinosHoje.length ? `${treinosHoje.length} ${treinosHoje.length === 1 ? 'exercício' : 'exercícios'}` : 'Descanso'}</strong>
+          <span className="link-forte">{treinosHoje.length ? 'Começar' : 'Planejar a semana'} <Icone nome="seta" /></span>
+        </Link>
+        <Link to="/desafio" className="card inicio-atalho">
+          <span className="rotulo-forte">Desafio do dia</span>
+          <strong>O mesmo para todo mundo</strong>
+          <span className="link-forte">Aceitar <Icone nome="seta" /></span>
+        </Link>
+        <Link to="/desempenho" className="card inicio-atalho">
+          <span className="rotulo-forte">Últimos 7 dias</span>
+          <strong>{valor(resumo?.sessoes)} {resumo?.sessoes === 1 ? 'sessão' : 'sessões'}</strong>
+          <span className="link-forte">Ver desempenho <Icone nome="seta" /></span>
+        </Link>
+      </nav>
+
       <FraseRolagem texto="Ninguém começa arremessando de três. Primeiro vem a bola na mão, depois o arremesso colado à cesta, e só então a distância." />
 
       {segunda && <ResumoSemana />}

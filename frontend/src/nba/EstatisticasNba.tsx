@@ -235,9 +235,16 @@ export default function EstatisticasNba() {
     <>
       <h1>Estatísticas da NBA</h1>
       <p className="muted">A classificação das conferências, quem lidera a temporada em pontos, rebotes, assistências e tocos, e as notícias do dia.</p>
-      <Classificacao />
-      <Lideres />
-      <Noticias />
+      {/* No computador, as notícias ficam numa coluna ao lado da classificação e dos líderes. */}
+      <div className="nba-corpo">
+        <div className="nba-principal">
+          <Classificacao />
+          <Lideres />
+        </div>
+        <aside className="nba-lado">
+          <Noticias />
+        </aside>
+      </div>
       <p className="nba-fonte">Dados da ESPN e da CBS Sports, atualizados ao abrir a página. As notícias abrem no site de origem.</p>
     </>
   )

@@ -10,6 +10,9 @@ interface Toque {
 }
 
 /** Estado do contador ao vivo: tudo é recalculado a partir da lista de toques (desfazer é só tirar o último). */
+// Quantas das últimas tentativas aparecem na fileira de bolinhas.
+const ULTIMAS = 10
+
 export function useContador() {
   const [toques, setToques] = useState<Toque[]>([])
   const [zona, setZona] = useState<Zona | null>(null)
@@ -51,6 +54,8 @@ export function useContador() {
     zonas,
     zona,
     setZona,
+    /** Acerto ou erro das últimas tentativas, da mais antiga para a mais nova. */
+    ultimas: toques.slice(-ULTIMAS).map((t) => t.acertou),
     registrar,
     desfazer: useCallback(() => setToques((atual) => atual.slice(0, -1)), []),
     zerar: useCallback(() => setToques([]), []),
@@ -83,6 +88,15 @@ export default function Contador({ contador, comQuadra = true }: { contador: Est
           <span className="meta">recorde da sessão</span>
         </div>
       </div>
+
+      {tentativas > 0 && (
+        <ol className="contador-ultimas" aria-label={`Últimas ${contador.ultimas.length} tentativas: ${contador.ultimas.filter(Boolean).length} acertos`}>
+          {Array.from({ length: ULTIMAS }, (_, i) => {
+            const t = contador.ultimas[i]
+            return <li key={i} className={t === undefined ? '' : t ? 'acerto' : 'erro'} />
+          })}
+        </ol>
+      )}
 
       {comQuadra && (
         <>

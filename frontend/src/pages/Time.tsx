@@ -9,7 +9,19 @@ import { useDrills } from '../store'
 import { apiTime, linkDoTime, useTime, useTimes, type ProgressoAtleta, type Tarefa, type Time } from '../time/api'
 import type { PlanoGuiado } from './SessaoGuiada'
 
-const AVISO_DEMO = <SoComServidor recurso="O modo técnico" porque="Um time liga a conta do técnico às contas dos atletas." />
+// Atrás do aviso da demonstração, dois times de exemplo apagados mostram o que o modo técnico organiza.
+const TIMES_EXEMPLO = (
+  <div className="grade times-grade">
+    {[['Sub-15 da escolinha', '12 atletas · 3 tarefas abertas'], ['Pelada de quinta', '8 atletas · 1 tarefa aberta']].map(([nome, resumo]) => (
+      <div key={nome} className="card time-cartao">
+        <span className="rotulo-forte">Técnico</span>
+        <h2 className="sem-margem">{nome}</h2>
+        <span className="meta">{resumo}</span>
+      </div>
+    ))}
+  </div>
+)
+const AVISO_DEMO = <SoComServidor recurso="O modo técnico" porque="Um time liga a conta do técnico às contas dos atletas." exemplo={TIMES_EXEMPLO} />
 
 /** Executa uma ação da tela guardando o erro para mostrar. */
 function useAcao() {

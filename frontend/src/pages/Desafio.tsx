@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { dataLocal } from '../api'
 import Contador, { useContador } from '../components/Contador'
+import { Figura } from '../components/rolagem'
+import { COREOGRAFIAS } from '../demonstracoes/coreografias'
 import { Carregando, ErroCarga } from '../components/Estado'
 import Icone from '../components/Icone'
 import { apiDesafio, useDesafioDoDia, type Desafio, type ResultadoDesafio } from '../desafio/api'
@@ -25,6 +28,7 @@ function ateAmanha(agora = new Date()) {
 
 export default function DesafioDoDia() {
   const { hoje, erro, recarregar, enviar } = useDesafioDoDia()
+  const historico = useHistorico(hoje?.resultado?.dia)
 
   if (!hoje) return erro ? <ErroCarga erro={erro} tentarDeNovo={recarregar} /> : <Carregando texto="Sorteando o desafio de hoje…" />
 
@@ -32,15 +36,64 @@ export default function DesafioDoDia() {
     <>
       <h1>Desafio do dia</h1>
       <p className="muted">O mesmo desafio para todo mundo, trocado à meia-noite. Vale a primeira tentativa, e o resultado conta como treino na sua sequência de dias.</p>
-      <section className="card desafio">
-        <span className="rotulo-forte">{formatoDesafio(hoje.desafio)} · meta: {hoje.desafio.meta} cestas</span>
-        <h2 className="sem-margem">{hoje.desafio.titulo}</h2>
-        <p>{hoje.desafio.descricao}</p>
-        <p className="meta">Exercício: {hoje.desafio.exercicio}</p>
-        {hoje.resultado ? <Resultado resultado={hoje.resultado} /> : <Execucao desafio={hoje.desafio} enviar={enviar} />}
-      </section>
-      <Historico atualizado={hoje.resultado?.dia} />
+      {/* No computador: o desafio à esquerda; à direita, o exercício animado e a última semana. */}
+      <div className="desafio-corpo">
+        <section className="card desafio">
+          <span className="rotulo-forte">{formatoDesafio(hoje.desafio)} · meta: {hoje.desafio.meta} cestas</span>
+          <h2 className="sem-margem">{hoje.desafio.titulo}</h2>
+          <p>{hoje.desafio.descricao}</p>
+          <p className="meta">Exercício: {hoje.desafio.exercicio}</p>
+          {hoje.resultado ? <Resultado resultado={hoje.resultado} /> : <Execucao desafio={hoje.desafio} enviar={enviar} />}
+        </section>
+        <aside className="desafio-lado">
+          {COREOGRAFIAS[hoje.desafio.exercicio] && (
+            <div className="card desafio-demo">
+              <span className="rotulo-forte">Como fazer</span>
+              <Figura nome={hoje.desafio.exercicio} />
+            </div>
+          )}
+          <UltimaSemana lista={historico} />
+        </aside>
+      </div>
+      <Historico lista={historico} />
     </>
+  )
+}
+
+/** Resultados dos últimos desafios; recarrega quando o de hoje é salvo. */
+function useHistorico(atualizado?: string) {
+  const [lista, setLista] = useState<ResultadoDesafio[] | null>(null)
+  useEffect(() => {
+    apiDesafio.historico().then(setLista, () => setLista([]))
+  }, [atualizado])
+  return lista
+}
+
+/** Os últimos 7 dias, de hoje para trás: medalha no cumprido, ponto no feito e vazio no dia sem desafio. */
+function UltimaSemana({ lista }: { lista: ResultadoDesafio[] | null }) {
+  if (!lista) return null
+  const porDia = new Map(lista.map((r) => [r.dia, r]))
+  const dias = Array.from({ length: 7 }, (_, i) => {
+    const d = new Date()
+    d.setDate(d.getDate() - (6 - i))
+    return d
+  })
+  return (
+    <div className="card desafio-semana">
+      <span className="rotulo-forte">Últimos 7 dias</span>
+      <ol>
+        {dias.map((d) => {
+          const r = porDia.get(dataLocal(d))
+          return (
+            <li key={d.toISOString()} className={r ? (r.cumprido ? 'cumprido' : 'feito') : undefined}>
+              <span>{d.toLocaleDateString('pt-BR', { weekday: 'short' }).replace('.', '')}</span>
+              <i aria-hidden>{r?.cumprido ? <Icone nome="medalha" tamanho={16} /> : null}</i>
+              <span className="escondido">{r ? (r.cumprido ? 'cumprido' : 'feito') : 'sem desafio'}</span>
+            </li>
+          )
+        })}
+      </ol>
+    </div>
   )
 }
 
@@ -151,11 +204,7 @@ function Execucao({ desafio, enviar }: { desafio: Desafio; enviar: ReturnType<ty
   )
 }
 
-function Historico({ atualizado }: { atualizado?: string }) {
-  const [lista, setLista] = useState<ResultadoDesafio[] | null>(null)
-  useEffect(() => {
-    apiDesafio.historico().then(setLista, () => setLista([]))
-  }, [atualizado])
+function Historico({ lista }: { lista: ResultadoDesafio[] | null }) {
   if (!lista?.length) return null
   const cumpridos = lista.filter((r) => r.cumprido).length
   return (

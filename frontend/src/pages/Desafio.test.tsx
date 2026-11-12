@@ -115,8 +115,8 @@ describe('Desafio do dia', () => {
       'GET /challenges/history': [resultado({ makes: 1, completed: false }), resultado({ day: '2026-10-27', makes: 3 })],
     })
 
-    expect(await screen.findByText('1/3')).toBeInTheDocument()
-    expect(screen.getByText(/Desafio feito/)).toBeInTheDocument()
+    const resultadoHoje = (await screen.findByText(/Desafio feito/)).closest('.desafio-resultado') as HTMLElement
+    expect(within(resultadoHoje).getByText('1/3')).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /Começar desafio/ })).toBeNull()
     const historico = (await screen.findByRole('heading', { name: 'Seus desafios' })).closest('section')!
     expect(within(historico).getByText('1 de 2 cumpridos nos últimos desafios.')).toBeInTheDocument()

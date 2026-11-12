@@ -43,9 +43,26 @@ export default function Desempenho() {
       <>
         {titulo}
         <AvisoDesatualizado erro={erro} tentarDeNovo={recarregar} />
-        <div className="vazio">
-          Você ainda não registrou nenhuma sessão.{' '}
-          <Link to="/treinos" className="link">Escolha um treino para começar</Link>
+        {/* Uma prévia apagada do painel mostra o que aparece aqui depois do primeiro treino. */}
+        <div className="desempenho-vazio">
+          <div className="desempenho-fantasma" aria-hidden>
+            <div className="stats">
+              <div className="card stat"><strong>12</strong><span className="muted">sessões no total</span></div>
+              <div className="card stat"><strong>340</strong><span className="muted">minutos treinados</span></div>
+              <div className="card stat"><strong>68%</strong><span className="muted">aproveitamento</span></div>
+            </div>
+            <div className="card">
+              <div className="grafico">
+                {[30, 0, 45, 20, 60, 0, 35].map((m, i) => (
+                  <div key={i} className="barra-col"><div className="barra" style={{ height: `${(m / 60) * 100}%` }} /></div>
+                ))}
+              </div>
+            </div>
+          </div>
+          <div className="vazio desempenho-chamada">
+            Você ainda não registrou nenhuma sessão.{' '}
+            <Link to="/treinos" className="link">Escolha um treino para começar</Link>
+          </div>
         </div>
       </>
     )
@@ -120,21 +137,24 @@ export default function Desempenho() {
 
       <Comparacoes />
 
-      <section className="card">
-        <h2 className="sem-margem">Últimos 7 dias</h2>
-        <div className="grafico" role="img" aria-label="Minutos treinados por dia nos últimos 7 dias">
-          {dias.map((d, i) => (
-            <div key={i} className="barra-col">
-              <span className="barra-valor">{d.minutos || ''}</span>
-              <div className="barra" style={{ height: `${(d.minutos / maxMin) * 100}%` }} />
-              <span className="barra-rotulo">{d.rotulo}</span>
-            </div>
-          ))}
-        </div>
-      </section>
+      {/* No computador, os gráficos ficam lado a lado, em grade. */}
+      <div className="desempenho-graficos">
+        <section className="card">
+          <h2 className="sem-margem">Últimos 7 dias</h2>
+          <div className="grafico" role="img" aria-label="Minutos treinados por dia nos últimos 7 dias">
+            {dias.map((d, i) => (
+              <div key={i} className="barra-col">
+                <span className="barra-valor">{d.minutos || ''}</span>
+                <div className="barra" style={{ height: `${(d.minutos / maxMin) * 100}%` }} />
+                <span className="barra-rotulo">{d.rotulo}</span>
+              </div>
+            ))}
+          </div>
+        </section>
 
-      <Evolucao />
-      <MapaZonas />
+        <Evolucao />
+        <MapaZonas />
+      </div>
 
       <section>
         <div className="secao-topo">

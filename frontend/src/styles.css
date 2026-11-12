@@ -2183,3 +2183,186 @@ html { -webkit-tap-highlight-color: transparent; }
   .abertura.tocou .abertura-dica { opacity: 0; }
   @keyframes abertura-dica { 50% { transform: translateY(-4px); } }
 }
+
+/* ==== Páginas internas no computador: aproveitam a largura. Topo, menu, barras fixas, cores e fontes não mudam. ==== */
+
+/* Peças novas, em qualquer tela */
+.dia-hoje { margin-left: 0.5rem; padding: 0.1rem 0.45rem; border-radius: 999px; background: var(--laranja); color: #111111; font-size: 0.6rem; font-weight: 800; letter-spacing: 0.1em; vertical-align: middle; }
+.dia.alvo { box-shadow: inset 0 0 0 2px var(--laranja), var(--sombra); }
+.dia-lista li[draggable='true'] { cursor: grab; }
+
+.programa-semanas { list-style: none; margin: 0.25rem 0; padding: 0; display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; max-width: 150px; }
+.programa-semanas li { aspect-ratio: 1; border-radius: 4px; background: var(--superficie-2); }
+.programa-semanas li.feito { background: var(--laranja); }
+.programa-semanas li.proximo { box-shadow: inset 0 0 0 2px var(--laranja); }
+
+.desafio-corpo { display: grid; gap: 1rem; }
+.desafio-lado { display: none; }
+.desafio-semana ol { list-style: none; margin: 0.75rem 0 0; padding: 0; display: grid; grid-template-columns: repeat(7, 1fr); gap: 0.4rem; text-align: center; }
+.conteudo .desafio-semana li { display: grid; gap: 0.35rem; justify-items: center; color: var(--muted); }
+.desafio-semana i { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; background: var(--superficie-2); }
+.desafio-semana li.feito i { background: color-mix(in srgb, var(--laranja) 35%, var(--superficie-2)); }
+.desafio-semana li.cumprido i { background: var(--laranja); color: #111111; }
+.desafio-demo { display: grid; gap: 0.5rem; }
+.desafio-demo .figura { max-height: 240px; }
+
+.jogue-filtros { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; }
+.jogue-filtros .input { flex: 1 1 220px; max-width: 320px; }
+.estilo-comecar { margin-top: 1.25rem; }
+
+.contador-ultimas { list-style: none; margin: 0; padding: 0; display: flex; justify-content: center; gap: 6px; }
+.contador-ultimas li { width: 14px; height: 14px; border-radius: 50%; background: var(--superficie-2); box-shadow: inset 0 0 0 1px var(--borda); }
+.contador-ultimas li.acerto { background: var(--verde); box-shadow: none; }
+.contador-ultimas li.erro { background: var(--vermelho); box-shadow: none; }
+
+/* Timer: o anel esvazia com a fase, na cor dela; em tela cheia, o relógio cresce. */
+.timer-anel { position: relative; display: grid; place-items: center; width: min(78vw, 340px); aspect-ratio: 1; margin: 0 auto; color: var(--laranja); }
+.timer-preparar .timer-anel { color: #f5c542; }
+.timer-trabalho .timer-anel { color: #2fbf71; }
+.timer-descanso .timer-anel { color: #4da3ff; }
+.timer-anel svg { position: absolute; inset: 0; width: 100%; height: 100%; transform: rotate(-90deg); }
+.timer-anel circle { fill: none; stroke-width: 3.5; }
+.timer-anel-trilho { stroke: var(--borda); }
+.timer-anel-cheio { stroke: currentColor; stroke-linecap: round; transition: stroke-dasharray 1s linear; }
+.timer:fullscreen { display: grid; place-content: center; justify-items: center; gap: 1.5rem; border-radius: 0; }
+.timer:fullscreen .timer-anel { width: min(70vh, 80vw); }
+.timer:fullscreen .timer-relogio { font-size: min(20vh, 18vw); }
+:root[data-movimento='reduzido'] .timer-anel-cheio { transition: none; }
+
+/* Calculadoras: menos e mais nas pontas de cada campo. */
+.campo-passo { position: relative; }
+.campo-passo label { display: grid; gap: 0.35rem; }
+.conteudo .campo-passo .input { min-height: 2.75rem; padding-inline: 2.5rem; text-align: center; }
+.campo-passo-botao { position: absolute; bottom: 0; width: 2.5rem; height: 2.75rem; border: 0; background: none; color: var(--texto); font: inherit; font-size: 1.2rem; font-weight: 800; cursor: pointer; }
+.campo-passo-botao.menos { left: 0; }
+.campo-passo-botao.mais { right: 0; }
+.campo-passo-botao:hover { color: var(--laranja-texto); }
+
+/* Artigo da semana em destaque, grande, no alto da lista. */
+.artigo-destaque { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); align-items: center; margin: 1.5rem 0; padding: 0; overflow: hidden; color: inherit; text-decoration: none; box-shadow: var(--sombra), inset 0 4px 0 var(--c); transition: transform 0.25s, box-shadow 0.25s; }
+.artigo-destaque:hover { transform: translateY(-4px); box-shadow: var(--sombra-alta), inset 0 4px 0 var(--c); }
+.artigo-destaque .artigo-imagem { height: 100%; border-radius: 0; }
+.artigo-destaque-texto { display: grid; gap: 0.7rem; justify-items: start; padding: clamp(1.25rem, 3vw, 2.5rem); }
+.artigo-destaque-titulo { font-family: var(--fonte-display); font-size: clamp(2rem, 3.6vw, 3.4rem); font-weight: var(--peso-display); line-height: 0.95; text-transform: uppercase; }
+.artigo-destaque-resumo { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.06em; line-height: 1.55; text-transform: uppercase; color: var(--muted); }
+.artigo-sumario { display: none; }
+.artigo-corpo section, .artigo-ciencia, .artigo-pratica { scroll-margin-top: 100px; }
+
+/* Prévia apagada atrás de um aviso (Desempenho e Cartão sem dados, Ranking e Time na demonstração). */
+.desempenho-vazio { display: grid; }
+.desempenho-vazio > * { grid-area: 1 / 1; }
+.desempenho-fantasma { display: grid; gap: 1rem; opacity: 0.35; filter: grayscale(0.4) blur(1.5px); pointer-events: none; user-select: none; }
+.desempenho-chamada { position: relative; z-index: 1; align-self: center; justify-self: center; width: min(560px, 100%); }
+
+.jogos-corpo { display: grid; gap: 1rem; margin-top: 1rem; }
+.jogos-lado { display: grid; gap: 1rem; align-content: start; justify-items: start; }
+.jogos-lado > :not(.btn) { justify-self: stretch; }
+.jogos-medias dl { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.5rem; margin: 0.75rem 0 0; }
+.jogos-medias dd { margin: 0; font-family: var(--fonte-display); font-size: 2.4rem; font-weight: var(--peso-display); line-height: 1; }
+.jogos-principal > h2:first-child { margin-top: 0.5rem; }
+
+.quiz-corpo { display: grid; gap: 1rem; }
+.quiz-lado { display: none; }
+.quiz-lado .card { display: grid; gap: 0.6rem; justify-items: start; }
+.quiz-lado-numero { font-family: var(--fonte-display); font-size: 2.6rem; font-weight: var(--peso-display); line-height: 1; }
+
+.config-indice { display: none; }
+
+/* Início: atalhos de hoje logo depois da abertura. */
+.inicio-atalhos { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; padding: 2rem clamp(1.25rem, 5vw, 5rem); background: var(--bg); }
+.inicio-atalho { display: grid; gap: 0.5rem; justify-items: start; color: inherit; text-decoration: none; transition: transform 0.25s, box-shadow 0.25s; }
+.inicio-atalho strong { font-family: var(--fonte-display); font-size: clamp(1.8rem, 3vw, 2.6rem); font-weight: var(--peso-display); line-height: 1; text-transform: uppercase; }
+.inicio-atalho:hover { transform: translateY(-4px); box-shadow: var(--sombra-alta); }
+@media (max-width: 760px) {
+  .inicio-atalhos { grid-template-columns: minmax(0, 1fr); }
+  .artigo-destaque { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* Computador */
+@media (min-width: 1024px) {
+  /* Títulos das páginas internas menores: o conteúdo aparece já na primeira tela. O Início e o Jogue como têm composição própria. */
+  .conteudo > h1 { font-size: clamp(3.6rem, 6.4vw, 6.6rem); margin-bottom: 0.8rem; }
+  .conteudo > h1 + .muted { max-width: 46em; }
+
+  /* Treinos: filtros numa coluna fixa à esquerda. */
+  .treinos-corpo { display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 2rem; align-items: start; margin-top: 1.5rem; }
+  .treinos-corpo > .filtros { position: sticky; top: 92px; flex-direction: column; align-items: stretch; margin: 0; padding: 1.25rem; border-radius: 28px; background: var(--superficie); box-shadow: var(--sombra); }
+  .treinos-corpo > .filtros > .input[type='search'] { flex: none; max-width: none; }
+  .treinos-corpo .filtros .chips { flex-direction: column; align-items: stretch; }
+  .treinos-corpo .filtros .chip { justify-content: flex-start; }
+  .treinos-corpo .filtros .select { width: 100%; }
+  .treinos-lista > section:first-of-type > h2 { margin-top: 0; }
+  .treinos-lista .grade { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
+
+  /* Rotina: a semana como calendário de 7 colunas. */
+  .semana { grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 0.6rem; }
+  .semana .dia { min-height: 340px; padding: 1rem 0.8rem; }
+  .semana .dia-topo { flex-direction: column; align-items: flex-start; gap: 0.2rem; }
+  .semana .dia-lista li { align-items: flex-start; }
+
+  /* Desafio: o desafio à esquerda; o exercício animado e a semana à direita. */
+  .desafio-corpo { grid-template-columns: minmax(0, 1.5fr) minmax(300px, 1fr); align-items: start; }
+  .desafio-lado { display: grid; gap: 1rem; align-content: start; position: sticky; top: 92px; }
+
+  /* Jogador: o painel do treino fica preso ao rolar. */
+  .estilo-lado { position: sticky; top: 92px; }
+
+  /* Alimentação: posição e tipo de dia presos no alto ao rolar o cardápio. */
+  .dieta-seletores { position: sticky; top: 84px; z-index: 2; padding: 0.75rem 1.25rem; border-radius: 999px; background: var(--superficie); box-shadow: var(--sombra); }
+
+  /* Artigo: sumário fixo à direita do texto. */
+  .artigo-leitura { display: grid; grid-template-columns: minmax(0, var(--largura)) 240px; gap: 3rem; align-items: start; }
+  .artigo-leitura > .artigo-corpo { grid-column: 1; grid-row: 1; }
+  .artigo-sumario { display: grid; gap: 0.6rem; grid-column: 2; grid-row: 1; position: sticky; top: 100px; margin-top: 2.25rem; padding: 1.25rem; border-radius: 22px; background: var(--superficie); box-shadow: var(--sombra); }
+  .artigo-sumario ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.45rem; }
+  .artigo-sumario a { color: var(--texto); text-decoration: none; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.04em; line-height: 1.4; text-transform: uppercase; }
+  .artigo-sumario a:hover { color: var(--laranja-texto); }
+
+  /* Quiz: painel ao lado. */
+  .quiz-corpo { grid-template-columns: minmax(0, 1fr) 300px; align-items: start; }
+  .quiz-lado { display: grid; gap: 1rem; position: sticky; top: 92px; }
+
+  /* Desempenho: gráficos em grade de duas colunas. */
+  .desempenho-graficos { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; align-items: start; margin-top: 1.5rem; }
+  .desempenho-graficos > * { margin: 0; }
+
+  /* Diário de jogos: a lista à esquerda, o registro e as médias à direita. */
+  .jogos-corpo { grid-template-columns: minmax(0, 1fr) 360px; align-items: start; }
+  .jogos-lado { grid-column: 2; grid-row: 1; position: sticky; top: 92px; }
+  .jogos-principal { grid-column: 1; grid-row: 1; }
+
+  /* Metas e conquistas lado a lado. */
+  .metas-colunas { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 2rem; align-items: start; }
+  .metas-colunas .conquistas { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+
+  /* Ferramentas: abas numa lista vertical à esquerda. */
+  .ferramentas-corpo { display: grid; grid-template-columns: 260px minmax(0, 1fr); gap: 2rem; align-items: start; margin-top: 1rem; }
+  .ferramentas-corpo > .niveis-abas { grid-template-columns: minmax(0, 1fr); margin: 0; position: sticky; top: 92px; }
+  .ferramentas-painel > .muted:first-child { margin-top: 0; }
+  /* Prancheta: a barra de ferramentas vira uma coluna colada à quadra. */
+  .prancheta { grid-template-columns: 190px minmax(0, 1fr); align-items: start; column-gap: 1.25rem; }
+  .prancheta-barra { grid-row: 1 / span 3; position: sticky; top: 92px; }
+  .prancheta-barra .chips { flex-direction: column; align-items: stretch; }
+  .prancheta > :not(.prancheta-barra) { grid-column: 2; }
+  /* Quadras: mapa grande e a lista ao lado. */
+  .quadras-corpo { grid-template-columns: minmax(0, 1.6fr) minmax(280px, 1fr); }
+
+  /* Configurações: índice fixo à esquerda. */
+  .config-corpo { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 2rem; align-items: start; }
+  .config-indice { display: grid; gap: 0.25rem; position: sticky; top: 92px; padding: 1rem; border-radius: 22px; background: var(--superficie); box-shadow: var(--sombra); }
+  .config-indice a { padding: 0.5rem 0.75rem; border-radius: 12px; color: var(--texto); text-decoration: none; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; }
+  .config-indice a:hover { background: var(--superficie-2); color: var(--laranja-texto); }
+  .config-secoes { display: grid; gap: 1.25rem; }
+  .config-secoes > section { margin: 0; scroll-margin-top: 100px; }
+
+  /* Início: trechos presos à rolagem um pouco mais curtos no computador. */
+  .manifesto { min-height: 140vh; }
+  .escada { height: 320vh; }
+}
+/* Estatísticas da NBA: notícias numa coluna ao lado, só onde há largura para as duas tabelas. */
+@media (min-width: 1280px) {
+  .nba-corpo { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 2rem; align-items: start; }
+  .nba-lado { position: sticky; top: 92px; max-height: calc(100vh - 150px); overflow-y: auto; padding: 0 0.5rem 1rem 0; }
+  .nba-lado .nba-noticias { grid-template-columns: minmax(0, 1fr); }
+  .nba-conferencias { grid-template-columns: minmax(0, 1fr); }
+}

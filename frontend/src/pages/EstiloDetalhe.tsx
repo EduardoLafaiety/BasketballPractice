@@ -80,6 +80,7 @@ export default function EstiloDetalhe() {
               </div>
             ))}
           </div>
+          <button className="btn btn-primario estilo-comecar" onClick={iniciar}><Icone nome="raio" /> Começar o treino do {estilo.nome.split(' ')[0]}</button>
         </div>
       </section>
 

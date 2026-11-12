@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { bipe, vibrar } from '../lib/audio'
 import { useTelaLigada } from '../lib/telaLigada'
 
@@ -15,6 +15,7 @@ const PREPARO = 5
 const fmt = (s: number) => `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`
 
 export default function TimerIntervalos() {
+  const painel = useRef<HTMLDivElement>(null)
   const [trabalho, setTrabalho] = useState(30)
   const [descanso, setDescanso] = useState(30)
   const [rodadas, setRodadas] = useState(8)
@@ -70,14 +71,23 @@ export default function TimerIntervalos() {
   const totalSeg = PREPARO + rodadas * trabalho + (rodadas - 1) * descanso
 
   if (fase) {
+    // O anel em volta do relógio esvazia conforme a fase atual acaba, na cor da fase.
+    const duracaoFase = fase === 'preparar' ? PREPARO : fase === 'trabalho' ? trabalho : descanso
+    const fracao = duracaoFase ? Math.max(0, Math.min(1, restante / duracaoFase)) : 0
     return (
-      <div className={`timer placar-preto timer-${fase}`}>
+      <div className={`timer placar-preto timer-${fase}`} ref={painel}>
         <p className="timer-fase">
           {fase === 'preparar' ? 'Prepare-se' : fase === 'trabalho' ? 'Trabalho' : fase === 'descanso' ? 'Descanso' : 'Fim! 💪'}
         </p>
         {fase !== 'fim' && (
           <>
-            <div className="timer-relogio">{fmt(Math.max(0, restante))}</div>
+            <div className="timer-anel">
+              <svg viewBox="0 0 100 100" aria-hidden>
+                <circle cx="50" cy="50" r="46" className="timer-anel-trilho" />
+                <circle cx="50" cy="50" r="46" className="timer-anel-cheio" pathLength={1} strokeDasharray={`${fracao} 1`} />
+              </svg>
+              <div className="timer-relogio">{fmt(Math.max(0, restante))}</div>
+            </div>
             <p className="meta">
               Rodada {rodada} de {rodadas}
             </p>
@@ -92,6 +102,14 @@ export default function TimerIntervalos() {
           <button className="btn" onClick={() => setFase(null)}>
             {fase === 'fim' ? 'Voltar' : 'Encerrar'}
           </button>
+          {fase !== 'fim' && typeof document !== 'undefined' && document.fullscreenEnabled && (
+            <button
+              className="btn"
+              onClick={() => (document.fullscreenElement ? document.exitFullscreen() : painel.current?.requestFullscreen())}
+            >
+              Tela cheia
+            </button>
+          )}
           {fase === 'fim' && (
             <button className="btn btn-primario" onClick={iniciar}>
               Repetir

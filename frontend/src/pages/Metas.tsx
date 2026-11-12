@@ -55,34 +55,37 @@ export default function Metas() {
         <Carregando texto="Calculando sua sequência…" />
       )}
 
-      <SecaoMetas />
+      {/* No computador, metas e conquistas ficam lado a lado. */}
+      <div className="metas-colunas">
+        <SecaoMetas />
 
-      <section>
-        <h2>Conquistas</h2>
-        {progresso && (
-          <ul className="conquistas">
-            {progresso.conquistas.map((c) => (
-              <li key={c.id} className={`card conquista ${c.desbloqueada ? 'desbloqueada' : ''}`}>
-                <span className="conquista-icone">
-                  <Icone nome={c.desbloqueada ? (ICONE_CONQUISTA[c.id] ?? 'medalha') : 'cadeado'} tamanho={22} />
-                </span>
-                <div>
-                  <strong>{c.titulo}</strong>
-                  <span className="meta">{c.descricao}</span>
-                  {!c.desbloqueada && (
-                    <>
-                      <BarraProgresso valor={c.progresso} alvo={c.alvo} rotulo={`Progresso: ${c.titulo}`} />
-                      <span className="meta">
-                        {c.progresso}/{c.alvo}
-                      </span>
-                    </>
-                  )}
-                </div>
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
+        <section>
+          <h2>Conquistas</h2>
+          {progresso && (
+            <ul className="conquistas">
+              {progresso.conquistas.map((c) => (
+                <li key={c.id} className={`card conquista ${c.desbloqueada ? 'desbloqueada' : ''}`}>
+                  <span className="conquista-icone">
+                    <Icone nome={c.desbloqueada ? (ICONE_CONQUISTA[c.id] ?? 'medalha') : 'cadeado'} tamanho={22} />
+                  </span>
+                  <div>
+                    <strong>{c.titulo}</strong>
+                    <span className="meta">{c.descricao}</span>
+                    {!c.desbloqueada && (
+                      <>
+                        <BarraProgresso valor={c.progresso} alvo={c.alvo} rotulo={`Progresso: ${c.titulo}`} />
+                        <span className="meta">
+                          {c.progresso}/{c.alvo}
+                        </span>
+                      </>
+                    )}
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+      </div>
 
       <SecaoTestes />
     </>

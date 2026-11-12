@@ -42,36 +42,41 @@ export default function Ferramentas() {
   return (
     <>
       <h1>Ferramentas</h1>
-      <div className="niveis niveis-abas" role="tablist" aria-label="Ferramentas">
-        {ABAS.map((a) => (
-          <button
-            key={a.id}
-            role="tab"
-            aria-selected={a.id === aba}
-            className={`nivel-opcao ${a.id === aba ? 'ativo' : ''}`}
-            onClick={() => setParams({ aba: a.id }, { replace: true })}
-          >
-            <strong><Icone nome={a.icone} tamanho={16} />{a.rotulo}</strong>
-            <span>{a.resumo}</span>
-          </button>
-        ))}
-      </div>
-      <p className="muted">{atual.descricao}</p>
+      {/* No computador, as abas viram uma lista vertical à esquerda e a ferramenta ocupa o resto da largura. */}
+      <div className="ferramentas-corpo">
+        <div className="niveis niveis-abas" role="tablist" aria-label="Ferramentas">
+          {ABAS.map((a) => (
+            <button
+              key={a.id}
+              role="tab"
+              aria-selected={a.id === aba}
+              className={`nivel-opcao ${a.id === aba ? 'ativo' : ''}`}
+              onClick={() => setParams({ aba: a.id }, { replace: true })}
+            >
+              <strong><Icone nome={a.icone} tamanho={16} />{a.rotulo}</strong>
+              <span>{a.resumo}</span>
+            </button>
+          ))}
+        </div>
+        <div className="ferramentas-painel">
+          <p className="muted">{atual.descricao}</p>
 
-      <section className={SEM_CARTAO.includes(aba) ? undefined : 'card'} role="tabpanel">
-        {aba === 'timer' && <TimerIntervalos />}
-        {aba === 'arremessos' && <LancesLivres />}
-        {aba === 'metronomo' && (
-          <Metronomo
-            bpmInicial={config.metronomoBpm}
-            aoSalvarBpm={(bpm) => void salvar({ ...config, metronomoBpm: bpm }).catch((e: Error) => window.alert(e.message))}
-          />
-        )}
-        {aba === 'prancheta' && <Prancheta />}
-        {aba === 'quadras' && <Quadras />}
-        {aba === 'video' && <VideoIndisponivel />}
-        {aba === 'calculadoras' && <Calculadoras />}
-      </section>
+          <section className={SEM_CARTAO.includes(aba) ? undefined : 'card'} role="tabpanel">
+            {aba === 'timer' && <TimerIntervalos />}
+            {aba === 'arremessos' && <LancesLivres />}
+            {aba === 'metronomo' && (
+              <Metronomo
+                bpmInicial={config.metronomoBpm}
+                aoSalvarBpm={(bpm) => void salvar({ ...config, metronomoBpm: bpm }).catch((e: Error) => window.alert(e.message))}
+              />
+            )}
+            {aba === 'prancheta' && <Prancheta />}
+            {aba === 'quadras' && <Quadras />}
+            {aba === 'video' && <VideoIndisponivel />}
+            {aba === 'calculadoras' && <Calculadoras />}
+          </section>
+        </div>
+      </div>
     </>
   )
 }

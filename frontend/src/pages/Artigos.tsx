@@ -25,6 +25,28 @@ function CartaoArtigo({ artigo }: { artigo: Artigo }) {
   )
 }
 
+/** O artigo em destaque troca toda semana, passando pela lista inteira. */
+function artigoDaSemana(agora = new Date()) {
+  const semana = Math.floor(agora.getTime() / (7 * 24 * 60 * 60 * 1000))
+  return ARTIGOS[semana % ARTIGOS.length]
+}
+
+function Destaque({ artigo }: { artigo: Artigo }) {
+  const cat = categoria(artigo.categoria)
+  return (
+    <Link to={`/artigos/${artigo.id}`} className="card artigo-destaque" style={{ '--c': cat.cor } as CSSProperties}>
+      <ImagemArtigo id={artigo.id} />
+      <span className="artigo-destaque-texto">
+        <span className="rotulo-forte">Destaque da semana</span>
+        <span className="tag">{cat.nome}</span>
+        <strong className="artigo-destaque-titulo">{artigo.titulo}</strong>
+        <span className="artigo-destaque-resumo">{artigo.resumo}</span>
+        <span className="link-forte">Ler em {minutosDeLeitura(artigo)} min <Icone nome="seta" /></span>
+      </span>
+    </Link>
+  )
+}
+
 export default function Artigos() {
   const [params, setParams] = useSearchParams()
   const [busca, setBusca] = useState('')
@@ -43,6 +65,8 @@ export default function Artigos() {
         Leituras curtas sobre a história do jogo, a cabeça do atleta, o corpo e o descanso. Cada ideia vem com o estudo por trás dela.
       </p>
       <Link to="/quiz" className="link-forte">Quiz do dia: 5 perguntas sobre o que está aqui</Link>
+
+      {!filtro && !q && <Destaque artigo={artigoDaSemana()} />}
 
       <div className="grade artigo-categorias" role="group" aria-label="Categorias">
         {CATEGORIAS.map((c) => {
@@ -119,49 +143,76 @@ export function ArtigoDetalhe() {
       </header>
       <ImagemArtigo id={artigo.id} capa />
 
-      <div className="artigo-corpo artigo-texto">
-        {artigo.secoes.map((s) => (
-          <section key={s.titulo}>
-            <h2>{s.titulo}</h2>
-            {s.paragrafos.map((p) => <p key={p}>{p}</p>)}
-          </section>
-        ))}
+      {/* No computador, um sumário fixo ao lado do texto leva a cada parte do artigo. */}
+      <div className="artigo-leitura">
+        <nav className="artigo-sumario" aria-label="Neste artigo">
+          <span className="artigo-rotulo">Neste artigo</span>
+          <ol>
+            {[
+              ...artigo.secoes.map((s, i) => ({ id: `secao-${i}`, titulo: s.titulo })),
+              ...(artigo.ciencia.length ? [{ id: 'artigo-ciencia', titulo: 'O que a ciência diz' }] : []),
+              { id: 'artigo-pratica', titulo: 'Na prática' },
+              { id: 'artigo-fontes', titulo: 'Fontes' },
+            ].map((item) => (
+              <li key={item.id}>
+                <a
+                  href={`#${item.id}`}
+                  onClick={(e) => {
+                    e.preventDefault()
+                    document.getElementById(item.id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                  }}
+                >
+                  {item.titulo}
+                </a>
+              </li>
+            ))}
+          </ol>
+        </nav>
 
-        {artigo.ciencia.length > 0 && (
-          <aside className="artigo-ciencia" aria-label="O que a ciência diz">
-            <span className="artigo-rotulo">O que a ciência diz</span>
+        <div className="artigo-corpo artigo-texto">
+          {artigo.secoes.map((s, i) => (
+            <section key={s.titulo} id={`secao-${i}`}>
+              <h2>{s.titulo}</h2>
+              {s.paragrafos.map((p) => <p key={p}>{p}</p>)}
+            </section>
+          ))}
+
+          {artigo.ciencia.length > 0 && (
+            <aside className="artigo-ciencia" id="artigo-ciencia" aria-label="O que a ciência diz">
+              <span className="artigo-rotulo">O que a ciência diz</span>
+              <ul>
+                {artigo.ciencia.map((c) => (
+                  <li key={c.fonte}>
+                    {c.achado}
+                    <cite><Fonte texto={c.fonte} /></cite>
+                  </li>
+                ))}
+              </ul>
+            </aside>
+          )}
+
+          <aside className="card artigo-pratica" id="artigo-pratica" aria-label="Na prática">
+            <span className="artigo-rotulo">Na prática</span>
             <ul>
-              {artigo.ciencia.map((c) => (
-                <li key={c.fonte}>
-                  {c.achado}
-                  <cite><Fonte texto={c.fonte} /></cite>
-                </li>
+              {artigo.pratica.map((p) => (
+                <li key={p}><Icone nome="check" tamanho={16} />{p}</li>
               ))}
             </ul>
+            {artigo.noApp && (
+              <Link to={artigo.noApp.to} className="link-forte artigo-no-app">
+                {artigo.noApp.rotulo} <Icone nome="seta" />
+              </Link>
+            )}
           </aside>
-        )}
 
-        <aside className="card artigo-pratica" aria-label="Na prática">
-          <span className="artigo-rotulo">Na prática</span>
-          <ul>
-            {artigo.pratica.map((p) => (
-              <li key={p}><Icone nome="check" tamanho={16} />{p}</li>
-            ))}
-          </ul>
-          {artigo.noApp && (
-            <Link to={artigo.noApp.to} className="link-forte artigo-no-app">
-              {artigo.noApp.rotulo} <Icone nome="seta" />
-            </Link>
-          )}
-        </aside>
-
-        <section className="artigo-fontes">
-          <h2>Fontes</h2>
-          <ol>
-            {artigo.fontes.map((f) => <li key={f}><Fonte texto={f} /></li>)}
-          </ol>
-          <p className="meta">{AVISO}</p>
-        </section>
+          <section className="artigo-fontes" id="artigo-fontes">
+            <h2>Fontes</h2>
+            <ol>
+              {artigo.fontes.map((f) => <li key={f}><Fonte texto={f} /></li>)}
+            </ol>
+            <p className="meta">{AVISO}</p>
+          </section>
+        </div>
       </div>
 
       {mais.length > 0 && (

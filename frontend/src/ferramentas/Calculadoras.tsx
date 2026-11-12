@@ -13,12 +13,18 @@ import {
 const n = (texto: string) => Math.max(0, Number(texto.replace(',', '.')) || 0)
 const mostrar = (v: number | null) => (v === null ? '—' : `${v.toLocaleString('pt-BR')}%`)
 
+/** Campo numérico com botões de menos e mais dos lados, para ajustar sem digitar. */
 function Campo({ rotulo, valor, mudar }: { rotulo: string; valor: string; mudar: (v: string) => void }) {
+  const passo = (d: number) => mudar(String(Math.max(0, n(valor) + d)))
   return (
-    <label>
-      {rotulo}
-      <input className="input" inputMode="decimal" value={valor} onChange={(e) => mudar(e.target.value)} />
-    </label>
+    <div className="campo-passo">
+      <label>
+        {rotulo}
+        <input className="input" inputMode="decimal" value={valor} onChange={(e) => mudar(e.target.value)} />
+      </label>
+      <button type="button" className="campo-passo-botao menos" aria-label={`Diminuir ${rotulo}`} onClick={() => passo(-1)}>−</button>
+      <button type="button" className="campo-passo-botao mais" aria-label={`Aumentar ${rotulo}`} onClick={() => passo(1)}>+</button>
+    </div>
   )
 }
 

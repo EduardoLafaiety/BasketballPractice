@@ -76,67 +76,72 @@ export default function Treinos() {
       </div>
       <p className="muted">{nivel.foco}</p>
 
-      <div className="filtros">
-        <input
-          type="search"
-          className="input"
-          placeholder="Buscar treino"
-          value={busca}
-          onChange={(e) => setBusca(e.target.value)}
-        />
-        <div className="chips">
-          {(['Todas', ...CATEGORIAS] as const).map((c) => (
-            <button
-              key={c}
-              className={`chip ${categoria === c ? 'ativo' : ''}`}
-              onClick={() => setCategoria(c)}
-            >
-              {c}
-            </button>
-          ))}
+      {/* No computador, os filtros ficam numa coluna fixa à esquerda e os cartões ao lado. */}
+      <div className="treinos-corpo">
+        <div className="filtros">
+          <input
+            type="search"
+            className="input"
+            placeholder="Buscar treino"
+            value={busca}
+            onChange={(e) => setBusca(e.target.value)}
+          />
+          <div className="chips">
+            {(['Todas', ...CATEGORIAS] as const).map((c) => (
+              <button
+                key={c}
+                className={`chip ${categoria === c ? 'ativo' : ''}`}
+                onClick={() => setCategoria(c)}
+              >
+                {c}
+              </button>
+            ))}
+          </div>
+          <select
+            className="input select"
+            value={metrica}
+            onChange={(e) => setMetrica(e.target.value as Metrica | 'Todas')}
+          >
+            <option value="Todas">Qualquer registro</option>
+            {METRICAS.map((m) => (
+              <option key={m} value={m}>{ROTULO_METRICA[m]}</option>
+            ))}
+          </select>
         </div>
-        <select
-          className="input select"
-          value={metrica}
-          onChange={(e) => setMetrica(e.target.value as Metrica | 'Todas')}
-        >
-          <option value="Todas">Qualquer registro</option>
-          {METRICAS.map((m) => (
-            <option key={m} value={m}>{ROTULO_METRICA[m]}</option>
-          ))}
-        </select>
-      </div>
 
-      {carregado && <AvisoDesatualizado erro={erro} tentarDeNovo={recarregar} />}
-      {!carregado ? (
-        erro ? <ErroCarga erro={erro} tentarDeNovo={recarregar} /> : <Carregando texto="Carregando treinos…" />
-      ) : lista.length > 0 ? (
-        <>
-          {aquecimento.length > 0 && (
-            <section aria-label="Aquecimento">
-              <h2>Aquecimento</h2>
-              <p className="muted">Comece por aqui, nesta ordem: do geral ao específico e, no arremesso, de perto para longe da cesta.</p>
-              <div className="grade">
-                {aquecimento.map((d, i) => (
-                  <DrillCard key={d.id} drill={d} passo={i + 1} />
-                ))}
-              </div>
-            </section>
+        <div className="treinos-lista">
+          {carregado && <AvisoDesatualizado erro={erro} tentarDeNovo={recarregar} />}
+          {!carregado ? (
+            erro ? <ErroCarga erro={erro} tentarDeNovo={recarregar} /> : <Carregando texto="Carregando treinos…" />
+          ) : lista.length > 0 ? (
+            <>
+              {aquecimento.length > 0 && (
+                <section aria-label="Aquecimento">
+                  <h2>Aquecimento</h2>
+                  <p className="muted">Comece por aqui, nesta ordem: do geral ao específico e, no arremesso, de perto para longe da cesta.</p>
+                  <div className="grade">
+                    {aquecimento.map((d, i) => (
+                      <DrillCard key={d.id} drill={d} passo={i + 1} />
+                    ))}
+                  </div>
+                </section>
+              )}
+              {exercicios.length > 0 && (
+                <section aria-label="Exercícios">
+                  {aquecimento.length > 0 && <h2>Exercícios</h2>}
+                  <div className="grade">
+                    {exercicios.map((d) => (
+                      <DrillCard key={d.id} drill={d} />
+                    ))}
+                  </div>
+                </section>
+              )}
+            </>
+          ) : (
+            <div className="vazio">Nenhum treino encontrado com esses filtros.</div>
           )}
-          {exercicios.length > 0 && (
-            <section aria-label="Exercícios">
-              {aquecimento.length > 0 && <h2>Exercícios</h2>}
-              <div className="grade">
-                {exercicios.map((d) => (
-                  <DrillCard key={d.id} drill={d} />
-                ))}
-              </div>
-            </section>
-          )}
-        </>
-      ) : (
-        <div className="vazio">Nenhum treino encontrado com esses filtros.</div>
-      )}
+        </div>
+      </div>
     </>
   )
 }

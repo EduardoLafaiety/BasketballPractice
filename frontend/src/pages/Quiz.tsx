@@ -14,8 +14,40 @@ export default function Quiz() {
     <>
       <h1>Entenda o jogo</h1>
       <p className="muted">Quiz diário: 5 perguntas sobre regras, história, NBA e treino, todas tiradas dos artigos do site. As mesmas para todo mundo, trocadas à meia-noite. Vale a primeira tentativa.</p>
-      {quiz.resultado ? <Revisao quiz={quiz} /> : <Perguntas quiz={quiz} responder={responder} />}
+      {/* No computador, um painel ao lado diz quando chegam as próximas perguntas e quais assuntos caíram hoje. */}
+      <div className="quiz-corpo">
+        <div>{quiz.resultado ? <Revisao quiz={quiz} /> : <Perguntas quiz={quiz} responder={responder} />}</div>
+        <QuizLado quiz={quiz} />
+      </div>
     </>
+  )
+}
+
+/** Horas e minutos até a meia-noite, quando o quiz troca. */
+function ateAmanha(agora = new Date()) {
+  const amanha = new Date(agora)
+  amanha.setHours(24, 0, 0, 0)
+  const min = Math.ceil((amanha.getTime() - agora.getTime()) / 60000)
+  return min >= 60 ? `${Math.floor(min / 60)} h ${min % 60} min` : `${min} min`
+}
+
+function QuizLado({ quiz }: { quiz: QuizDoDia }) {
+  const assuntos = [...new Set(quiz.perguntas.map((p) => ROTULO_CATEGORIA[p.categoria]))]
+  return (
+    <aside className="quiz-lado">
+      <div className="card">
+        <span className="rotulo-forte">Próximas perguntas</span>
+        <strong className="quiz-lado-numero">{ateAmanha()}</strong>
+        <p className="meta">Vale a primeira tentativa de cada dia.</p>
+      </div>
+      <div className="card">
+        <span className="rotulo-forte">Assuntos de hoje</span>
+        <div className="chips">
+          {assuntos.map((a) => <span key={a} className="chip">{a}</span>)}
+        </div>
+        <Link to="/artigos" className="link-forte">Estudar nos artigos <Icone nome="seta" /></Link>
+      </div>
+    </aside>
   )
 }
 

@@ -4,6 +4,8 @@ import { buscarLugar, buscarQuadras, formatarDistancia, linkRota, type Ponto, ty
 const Mapa = lazy(() => import('../quadras/Mapa'))
 
 const RAIOS = [2000, 5000, 10000]
+// Centro do Brasil, para o mapa de antes da busca.
+const CENTRO_BRASIL: Ponto = { lat: -14.2, lon: -51.9 }
 
 export default function Quadras() {
   const [origem, setOrigem] = useState<(Ponto & { nome: string }) | null>(null)
@@ -87,11 +89,17 @@ export default function Quadras() {
       <p className="meta">A busca vai direto do seu navegador para os servidores do OpenStreetMap. O Basketball Practice não recebe nem guarda a sua localização.</p>
       {erro && <p className="erro" role="alert">{erro}</p>}
 
-      {origem && (
-        <div className="quadras-corpo">
-          <Suspense fallback={<div className="mapa mapa-carregando" role="status">Carregando o mapa…</div>}>
-            <Mapa centro={origem} quadras={quadras ?? []} selecionada={selecionada} aoSelecionar={selecionar} />
-          </Suspense>
+      {/* O mapa aparece desde o começo, com o país inteiro; a busca aproxima e acrescenta a lista ao lado. */}
+      <div className="quadras-corpo">
+        <Suspense fallback={<div className="mapa mapa-carregando" role="status">Carregando o mapa…</div>}>
+          <Mapa centro={origem ?? CENTRO_BRASIL} panorama={!origem} quadras={quadras ?? []} selecionada={selecionada} aoSelecionar={selecionar} />
+        </Suspense>
+        {!origem ? (
+          <div className="quadras-lista">
+            <h3>Onde você quer jogar?</h3>
+            <p className="muted">Use a sua localização ou procure uma cidade ou bairro para ver as quadras públicas por perto.</p>
+          </div>
+        ) : (
           <div className="quadras-lista" aria-busy={estado === 'buscando'}>
             <h3>{titulo}</h3>
             {quadras?.length === 0 && estado !== 'buscando' && (
@@ -113,8 +121,8 @@ export default function Quadras() {
               ))}
             </ul>
           </div>
-        </div>
-      )}
+        )}
+      </div>
       <p className="meta credito-osm">
         Mapa e dados das quadras ©{' '}
         <a className="link" href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">colaboradores do OpenStreetMap</a>, disponíveis sob a licença ODbL. As
