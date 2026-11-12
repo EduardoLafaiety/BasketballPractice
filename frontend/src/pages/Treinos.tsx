@@ -112,7 +112,7 @@ export default function Treinos() {
         <div className="treinos-lista">
           {carregado && <AvisoDesatualizado erro={erro} tentarDeNovo={recarregar} />}
           {!carregado ? (
-            erro ? <ErroCarga erro={erro} tentarDeNovo={recarregar} /> : <Carregando texto="Carregando treinos…" />
+            erro ? <ErroCarga erro={erro} tentarDeNovo={recarregar} /> : <Carregando texto="Carregando treinos" />
           ) : lista.length > 0 ? (
             <>
               {aquecimento.length > 0 && (

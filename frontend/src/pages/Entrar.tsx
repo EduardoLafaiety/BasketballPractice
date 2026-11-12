@@ -124,7 +124,7 @@ export default function Entrar({ modo, demonstracao = __DEMO__ }: { modo: 'entra
         )}
 
         <button className="btn btn-primario btn-grande" type="submit" disabled={enviando || !email || !senha || (cadastro && !nome)}>
-          {enviando ? 'Aguarde…' : cadastro ? 'Criar conta' : 'Entrar'}
+          {enviando ? 'Aguarde' : cadastro ? 'Criar conta' : 'Entrar'}
           <Icone nome="seta" />
         </button>
 

@@ -55,7 +55,7 @@ export default function Admin() {
       {erroAcao && <p className="erro aviso" role="alert">{erroAcao}</p>}
 
       {!usuarios ? (
-        erro ? <ErroCarga erro={erro} tentarDeNovo={carregar} /> : <Carregando texto="Carregando contas…" />
+        erro ? <ErroCarga erro={erro} tentarDeNovo={carregar} /> : <Carregando texto="Carregando contas" />
       ) : (
         <ul className="metas admin-usuarios">
           {usuarios.map((u) => {

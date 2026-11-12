@@ -83,17 +83,17 @@ export function ResumoSemana({ agora = new Date() }: { agora?: Date }) {
       ) : (
         <div className="resumo-semana-grade">
           <div>
-            <strong>{resumo ? esta.sessoes : '…'}</strong>
+            <strong>{resumo ? esta.sessoes : '—'}</strong>
             <span>treinos</span>
             {resumo && <Variacao atual={esta.sessoes} anterior={antes.sessoes} />}
           </div>
           <div>
-            <strong>{resumo ? esta.minutos : '…'}</strong>
+            <strong>{resumo ? esta.minutos : '—'}</strong>
             <span>minutos</span>
             {resumo && <Variacao atual={esta.minutos} anterior={antes.minutos} unidade=" min" />}
           </div>
           <div>
-            <strong>{resumo ? (pct === null ? '—' : `${pct}%`) : '…'}</strong>
+            <strong>{resumo ? (pct === null ? '—' : `${pct}%`) : '—'}</strong>
             <span>aproveitamento no arremesso</span>
             {resumo && <Variacao atual={pct} anterior={pctAntes} unidade=" pontos" />}
           </div>

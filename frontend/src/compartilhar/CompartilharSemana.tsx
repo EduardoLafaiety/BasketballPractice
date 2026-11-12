@@ -64,7 +64,7 @@ function Previa() {
 
   const falha = erro ?? (erroZonas ?? erroResumo ?? erroProgresso)?.message
   if (falha) return <p className="erro" role="alert">Não foi possível gerar a imagem: {falha}</p>
-  if (!png) return <p className="meta" role="status">Gerando a imagem…</p>
+  if (!png) return <p className="meta" role="status">Gerando a imagem</p>
 
   const nome = `minha-semana-${dataLocal(segunda)}.png`
   const arquivo = new File([png.blob], nome, { type: 'image/png' })

@@ -69,7 +69,7 @@ export default function LancesLivres() {
       <Contador contador={contador} />
       {erro && <p className="erro" role="alert">{erro}</p>}
       <button className="btn btn-primario" onClick={salvar} disabled={!contador.tentativas || !drillId || salvando}>
-        {salvando ? 'Salvando…' : 'Salvar como sessão'}
+        {salvando ? 'Salvando' : 'Salvar como sessão'}
       </button>
     </div>
   )

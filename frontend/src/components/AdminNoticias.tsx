@@ -88,13 +88,13 @@ export default function AdminNoticias() {
           </select>
         </label>
         <div className="acoes">
-          <button className="btn btn-primario" type="submit" disabled={salvando}>{salvando ? 'Publicando…' : 'Publicar manchete'}</button>
+          <button className="btn btn-primario" type="submit" disabled={salvando}>{salvando ? 'Publicando' : 'Publicar manchete'}</button>
         </div>
       </form>
       {erroAcao && <p className="erro aviso" role="alert">{erroAcao}</p>}
 
       {!noticias ? (
-        erro ? <ErroCarga erro={erro} tentarDeNovo={carregar} /> : <Carregando texto="Carregando manchetes…" />
+        erro ? <ErroCarga erro={erro} tentarDeNovo={carregar} /> : <Carregando texto="Carregando manchetes" />
       ) : noticias.length === 0 ? (
         <p className="meta">Nenhuma manchete na barra agora.</p>
       ) : (

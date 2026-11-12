@@ -122,7 +122,7 @@ describe('Backup', () => {
     await screen.findByRole('status')
 
     await user.click(screen.getByRole('link', { name: /Metas/ }))
-    expect(await screen.findByText('Carregando metas…')).toBeInTheDocument()
+    expect(await screen.findByText('Carregando metas')).toBeInTheDocument()
     expect(screen.queryByText(/Nenhuma meta ainda/)).toBeNull()
 
     await waitFor(() => expect(responderMetas).not.toBeNull())

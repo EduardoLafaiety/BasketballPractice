@@ -85,7 +85,7 @@ function Classificacao() {
     <section className="nba-secao" aria-labelledby="nba-classificacao">
       <h2 id="nba-classificacao">Classificação</h2>
       {!dados ? (
-        <Estado erro={erro} carregar={carregar} texto="Carregando a classificação…" />
+        <Estado erro={erro} carregar={carregar} texto="Carregando a classificação" />
       ) : (
         <>
           <div className="nba-conferencias">
@@ -140,7 +140,7 @@ function Lideres() {
     <section className="nba-secao" aria-labelledby="nba-lideres">
       <h2 id="nba-lideres">Líderes da temporada</h2>
       {!dados ? (
-        <Estado erro={erro} carregar={carregar} texto="Carregando as estatísticas da NBA…" />
+        <Estado erro={erro} carregar={carregar} texto="Carregando as estatísticas da NBA" />
       ) : (
         <div className="nba-grade">
           {dados.categorias.map((c) => (
@@ -215,7 +215,7 @@ function Noticias() {
       <h2 id="nba-noticias">Notícias</h2>
       <p className="nba-legenda">Das últimas 24 horas, da ESPN e da CBS Sports (em inglês). A lista se atualiza sozinha.</p>
       {!dados ? (
-        <Estado erro={erro} carregar={carregar} texto="Carregando as notícias…" />
+        <Estado erro={erro} carregar={carregar} texto="Carregando as notícias" />
       ) : (
         <>
           <div className="nba-noticias">

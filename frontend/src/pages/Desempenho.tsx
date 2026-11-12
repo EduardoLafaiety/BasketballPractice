@@ -33,7 +33,7 @@ export default function Desempenho() {
     return (
       <>
         {titulo}
-        {erro ? <ErroCarga erro={erro} tentarDeNovo={recarregar} /> : <Carregando texto="Carregando suas sessões…" />}
+        {erro ? <ErroCarga erro={erro} tentarDeNovo={recarregar} /> : <Carregando texto="Carregando suas sessões" />}
       </>
     )
   }
@@ -160,7 +160,7 @@ export default function Desempenho() {
         <div className="secao-topo">
           <h2>Histórico</h2>
           <button className="btn" onClick={exportarCsv} disabled={exportando}>
-            {exportando ? 'Gerando…' : 'Exportar CSV'}
+            {exportando ? 'Gerando' : 'Exportar CSV'}
           </button>
         </div>
         {erroRemover && <p className="erro" role="alert">{erroRemover}</p>}
@@ -216,7 +216,7 @@ function Comparacao({ titulo, atual, anterior }: { titulo: string; atual?: Resum
     return (
       <div className="card comparacao-card">
         <h3>{titulo}</h3>
-        <p className="meta">Carregando…</p>
+        <p className="meta">Carregando</p>
       </div>
     )
   const pA = aproveitamento(atual.acertos, atual.tentativas)

@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import Calculadoras from '../ferramentas/Calculadoras'
 import Prancheta from '../ferramentas/Prancheta'
@@ -40,43 +41,46 @@ export default function Ferramentas() {
   const { config, salvar } = useConfig()
 
   return (
-    <>
-      <h1>Ferramentas</h1>
-      {/* No computador, as abas viram uma lista vertical à esquerda e a ferramenta ocupa o resto da largura. */}
-      <div className="ferramentas-corpo">
-        <div className="niveis niveis-abas" role="tablist" aria-label="Ferramentas">
-          {ABAS.map((a) => (
-            <button
-              key={a.id}
-              role="tab"
-              aria-selected={a.id === aba}
-              className={`nivel-opcao ${a.id === aba ? 'ativo' : ''}`}
-              onClick={() => setParams({ aba: a.id }, { replace: true })}
-            >
-              <strong><Icone nome={a.icone} tamanho={16} />{a.rotulo}</strong>
-              <span>{a.resumo}</span>
-            </button>
-          ))}
-        </div>
-        <div className="ferramentas-painel">
-          <p className="muted">{atual.descricao}</p>
+    <div className="pagina-larga faixa-escura ferramentas-palco">
+      <header className="ferr-cabeca">
+        <p className="ferr-lema" aria-hidden>tudo para o seu <em>treino</em></p>
+        <h1>Ferramentas</h1>
+      </header>
 
-          <section className={SEM_CARTAO.includes(aba) ? undefined : 'card'} role="tabpanel">
-            {aba === 'timer' && <TimerIntervalos />}
-            {aba === 'arremessos' && <LancesLivres />}
-            {aba === 'metronomo' && (
-              <Metronomo
-                bpmInicial={config.metronomoBpm}
-                aoSalvarBpm={(bpm) => void salvar({ ...config, metronomoBpm: bpm }).catch((e: Error) => window.alert(e.message))}
-              />
-            )}
-            {aba === 'prancheta' && <Prancheta />}
-            {aba === 'quadras' && <Quadras />}
-            {aba === 'video' && <VideoIndisponivel />}
-            {aba === 'calculadoras' && <Calculadoras />}
-          </section>
-        </div>
+      <div className="ferr-abas" role="tablist" aria-label="Ferramentas">
+        {ABAS.map((a, i) => (
+          <button
+            key={a.id}
+            role="tab"
+            aria-selected={a.id === aba}
+            className={`ferr-aba ${a.id === aba ? 'ativo' : ''}`}
+            style={{ '--i': i } as CSSProperties}
+            onClick={() => setParams({ aba: a.id }, { replace: true })}
+          >
+            <span className="ferr-aba-num" aria-hidden>{String(i + 1).padStart(2, '0')}</span>
+            <Icone nome={a.icone} tamanho={16} />
+            {a.rotulo}
+            {a.id === 'video' && <span className="ferr-aba-selo">{a.resumo}</span>}
+          </button>
+        ))}
       </div>
-    </>
+
+      <p className="muted ferr-descricao">{atual.descricao}</p>
+
+      <section className={`ferr-painel ${SEM_CARTAO.includes(aba) ? '' : 'card'}`} role="tabpanel">
+        {aba === 'timer' && <TimerIntervalos />}
+        {aba === 'arremessos' && <LancesLivres />}
+        {aba === 'metronomo' && (
+          <Metronomo
+            bpmInicial={config.metronomoBpm}
+            aoSalvarBpm={(bpm) => void salvar({ ...config, metronomoBpm: bpm }).catch((e: Error) => window.alert(e.message))}
+          />
+        )}
+        {aba === 'prancheta' && <Prancheta />}
+        {aba === 'quadras' && <Quadras />}
+        {aba === 'video' && <VideoIndisponivel />}
+        {aba === 'calculadoras' && <Calculadoras />}
+      </section>
+    </div>
   )
 }

@@ -1,4 +1,4 @@
-export function Carregando({ texto = 'Carregando…' }: { texto?: string }) {
+export function Carregando({ texto = 'Carregando' }: { texto?: string }) {
   return (
     <div className="vazio estado" role="status" aria-live="polite">
       <span className="spinner" aria-hidden />

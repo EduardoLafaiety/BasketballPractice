@@ -150,7 +150,7 @@ export default function Gerador() {
         <div className="gerador-acao placar-preto">
           <p className="meta">{resumo}</p>
           <button className="btn btn-primario btn-grande" type="submit" disabled={gerando}>
-            {gerando ? 'Montando…' : blocos ? 'Gerar outro' : 'Gerar treino'}
+            {gerando ? 'Montando' : blocos ? 'Gerar outro' : 'Gerar treino'}
           </button>
         </div>
       </form>

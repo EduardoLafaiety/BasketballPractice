@@ -54,7 +54,7 @@ const antes = (iso: string) => new Date(new Date(iso).getTime() - 1).toISOString
 
 /**
  * /stats/summary responde conforme o período pedido ("from" e "to"); um período que a tela
- * não deveria pedir responde 400, e a tela fica em "Carregando…".
+ * não deveria pedir responde 400, e a tela fica em "Carregando".
  */
 function resumos(porPeriodo: Record<string, unknown>) {
   return (_c: unknown, url: URL) => {
@@ -129,13 +129,13 @@ describe('Desempenho', () => {
   it('compara esta semana com a passada e este mês com o anterior', async () => {
     abrirDesempenho()
 
-    await waitFor(() => expect(within(cartao('Esta semana × semana passada')).queryByText('Carregando…')).toBeNull())
+    await waitFor(() => expect(within(cartao('Esta semana × semana passada')).queryByText('Carregando')).toBeNull())
     expect(linhas('Esta semana × semana passada')).toEqual([
       ['Sessões', '3', 'antes 2', '▲ 1'],
       ['Minutos', '90', 'antes 100', '▼ 10'],
       ['Aproveitamento', '60%', 'antes 50%', '▲ 10%'],
     ])
-    await waitFor(() => expect(within(cartao('Este mês × mês passado')).queryByText('Carregando…')).toBeNull())
+    await waitFor(() => expect(within(cartao('Este mês × mês passado')).queryByText('Carregando')).toBeNull())
     expect(linhas('Este mês × mês passado')).toEqual([
       ['Sessões', '8', 'antes 8', '='],
       ['Minutos', '200', 'antes 150', '▲ 50'],
@@ -151,7 +151,7 @@ describe('Desempenho', () => {
     abrirDesempenho({
       'GET /stats/summary': resumos({ ...periodosPadrao, [`${SEGUNDA_PASSADA}|${antes(SEGUNDA)}`]: resumo(1, 20, 0, 0) }),
     })
-    await waitFor(() => expect(within(cartao('Esta semana × semana passada')).queryByText('Carregando…')).toBeNull())
+    await waitFor(() => expect(within(cartao('Esta semana × semana passada')).queryByText('Carregando')).toBeNull())
     expect(linhas('Esta semana × semana passada')[2]).toEqual(['Aproveitamento', '60%', 'antes —', ''])
   })
 
@@ -201,7 +201,7 @@ describe('Desempenho', () => {
         [`${DOZE_SEMANAS}|`]: resumo(1, 30, 5, 10, { byWeek: [{ weekStart: '2026-10-26', sessions: 1, minutes: 30, makes: 5, attempts: 10 }] }),
       }),
     })
-    await waitFor(() => expect(within(cartao('Esta semana × semana passada')).queryByText('Carregando…')).toBeNull())
+    await waitFor(() => expect(within(cartao('Esta semana × semana passada')).queryByText('Carregando')).toBeNull())
     expect(screen.queryByRole('heading', { name: /Evolução/ })).toBeNull()
   })
 

@@ -80,7 +80,7 @@ export default function FormExercicio({
       {erro && <p className="erro" role="alert">{erro}</p>}
       <div className="acoes">
         <button className="btn btn-primario" type="submit" disabled={salvando}>
-          {salvando ? 'Salvando…' : 'Salvar'}
+          {salvando ? 'Salvando' : 'Salvar'}
         </button>
         <button className="btn" type="button" onClick={aoCancelar}>
           Cancelar

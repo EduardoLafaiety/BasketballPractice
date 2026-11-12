@@ -57,7 +57,7 @@ export default function JogueComo() {
         </div>
 
         {!estilos ? (
-          erro ? <ErroCarga erro={erro} tentarDeNovo={carregar} /> : <Carregando texto="Carregando jogadores…" />
+          erro ? <ErroCarga erro={erro} tentarDeNovo={carregar} /> : <Carregando texto="Carregando jogadores" />
         ) : lista.length ? (
           <GradeJogadores estilos={lista} />
         ) : (

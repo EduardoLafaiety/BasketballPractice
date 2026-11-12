@@ -9,7 +9,7 @@ const LETRAS = ['A', 'B', 'C', 'D']
 
 export default function Quiz() {
   const { quiz, erro, recarregar, responder } = useQuizDoDia()
-  if (!quiz) return erro ? <ErroCarga erro={erro} tentarDeNovo={recarregar} /> : <Carregando texto="Separando as perguntas de hoje…" />
+  if (!quiz) return erro ? <ErroCarga erro={erro} tentarDeNovo={recarregar} /> : <Carregando texto="Separando as perguntas de hoje" />
   return (
     <>
       <h1>Entenda o jogo</h1>
@@ -80,7 +80,7 @@ function Perguntas({ quiz, responder }: { quiz: QuizDoDia; responder: (respostas
           {erro && <p className="erro" role="alert">{erro}</p>}
           <div className="acoes">
             <button className="btn btn-primario" onClick={enviar} disabled={enviando}>
-              {enviando ? 'Corrigindo…' : 'Ver resultado'} <Icone nome="seta" />
+              {enviando ? 'Corrigindo' : 'Ver resultado'} <Icone nome="seta" />
             </button>
             <button className="btn" onClick={() => setRespostas((r) => r.slice(0, -1))} disabled={enviando}>Voltar uma</button>
           </div>

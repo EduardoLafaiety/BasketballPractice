@@ -147,13 +147,13 @@ export default function Prancheta() {
             {erro && <p className="erro" role="alert">{erro}</p>}
             {aviso && <p className="meta" role="status">{aviso}</p>}
             <button className="btn btn-primario" onClick={salvar} disabled={salvando}>
-              {salvando ? 'Salvando…' : jogada.id ? 'Salvar alterações' : 'Salvar jogada'}
+              {salvando ? 'Salvando' : jogada.id ? 'Salvar alterações' : 'Salvar jogada'}
             </button>
           </div>
 
           <h3>Jogadas salvas</h3>
           {salvas === null ? (
-            <p className="meta">Carregando…</p>
+            <p className="meta">Carregando</p>
           ) : salvas.length === 0 ? (
             <p className="meta">Nenhuma jogada salva ainda.</p>
           ) : (

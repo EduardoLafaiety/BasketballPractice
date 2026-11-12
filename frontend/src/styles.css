@@ -2349,9 +2349,6 @@ html { -webkit-tap-highlight-color: transparent; }
   .metas-colunas .conquistas { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
 
   /* Ferramentas: abas numa lista vertical à esquerda. */
-  .ferramentas-corpo { display: grid; grid-template-columns: 260px minmax(0, 1fr); gap: 2rem; align-items: start; margin-top: 1rem; }
-  .ferramentas-corpo > .niveis-abas { grid-template-columns: minmax(0, 1fr); margin: 0; position: sticky; top: 92px; }
-  .ferramentas-painel > .muted:first-child { margin-top: 0; }
   /* Prancheta: a barra de ferramentas vira uma coluna colada à quadra. */
   .prancheta { grid-template-columns: 190px minmax(0, 1fr); align-items: start; column-gap: 1.25rem; }
   .prancheta-barra { grid-row: 1 / span 3; position: sticky; top: 92px; }
@@ -2398,3 +2395,83 @@ html { -webkit-tap-highlight-color: transparent; }
 .campo-rotulo { top: 1.75rem; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
 .campo input:focus ~ .campo-rotulo,
 .campo input:not(:placeholder-shown) ~ .campo-rotulo { transform: translateY(-1.55rem); }
+
+
+/* ==== Ferramentas: palco escuro com linhas de relevo, abas em pílula e movimento, nas cores do site ==== */
+.ferramentas-palco {
+  --realce: var(--laranja);
+  --realce-texto: var(--laranja-texto);
+  --relevo: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 900 740' preserveAspectRatio='xMidYMid slice'%3E%3Cg fill='none' stroke='%23ff6a13' stroke-width='1.3'%3E%3Cpath transform='translate(0 0) scale(1.00) rotate(0 450 370)' d='M450 40C640 20 820 130 860 310C900 490 760 660 560 700C360 740 150 650 100 460C50 270 230 60 450 40Z'/%3E%3Cpath transform='translate(51 33) scale(0.90) rotate(2 450 370)' d='M450 40C640 20 820 130 860 310C900 490 760 660 560 700C360 740 150 650 100 460C50 270 230 60 450 40Z'/%3E%3Cpath transform='translate(102 66) scale(0.80) rotate(4 450 370)' d='M450 40C640 20 820 130 860 310C900 490 760 660 560 700C360 740 150 650 100 460C50 270 230 60 450 40Z'/%3E%3Cpath transform='translate(153 99) scale(0.70) rotate(6 450 370)' d='M450 40C640 20 820 130 860 310C900 490 760 660 560 700C360 740 150 650 100 460C50 270 230 60 450 40Z'/%3E%3Cpath transform='translate(204 132) scale(0.60) rotate(8 450 370)' d='M450 40C640 20 820 130 860 310C900 490 760 660 560 700C360 740 150 650 100 460C50 270 230 60 450 40Z'/%3E%3Cpath transform='translate(255 165) scale(0.50) rotate(10 450 370)' d='M450 40C640 20 820 130 860 310C900 490 760 660 560 700C360 740 150 650 100 460C50 270 230 60 450 40Z'/%3E%3Cpath transform='translate(306 198) scale(0.40) rotate(12 450 370)' d='M450 40C640 20 820 130 860 310C900 490 760 660 560 700C360 740 150 650 100 460C50 270 230 60 450 40Z'/%3E%3Cpath transform='translate(357 231) scale(0.30) rotate(14 450 370)' d='M450 40C640 20 820 130 860 310C900 490 760 660 560 700C360 740 150 650 100 460C50 270 230 60 450 40Z'/%3E%3Cpath transform='translate(408 264) scale(0.20) rotate(16 450 370)' d='M450 40C640 20 820 130 860 310C900 490 760 660 560 700C360 740 150 650 100 460C50 270 230 60 450 40Z'/%3E%3C/g%3E%3C/svg%3E");
+  position: relative;
+  overflow: hidden;
+  padding: 118px clamp(1.25rem, 5vw, 5rem) calc(7rem + var(--doca, 0px));
+}
+.ferramentas-palco::before { content: ''; position: absolute; inset: 0; pointer-events: none; background: var(--relevo) center / cover no-repeat; opacity: 0.35; }
+.ferramentas-palco > * { position: relative; }
+.ferr-cabeca, .ferr-abas, .ferr-descricao, .ferr-painel { max-width: 1240px; margin-inline: auto; }
+.ferr-cabeca { display: grid; gap: 0.35rem; }
+/* O lema em serifa itálica, como um sussurro acima do título gigante. */
+.conteudo p.ferr-lema { margin: 0; font-family: 'Instrument Serif', Georgia, 'Times New Roman', serif; font-size: clamp(1.7rem, 3.2vw, 2.8rem); font-style: italic; font-weight: 400; letter-spacing: 0; line-height: 1; text-transform: none; color: var(--realce-texto); }
+.conteudo .ferr-cabeca h1 { margin: 0; font-size: clamp(3rem, 13vw, 12rem); line-height: 0.84; }
+.ferr-abas { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 2.25rem; }
+.ferr-aba {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 46px;
+  padding: 0 1.15rem 0 0.95rem;
+  border: 1.5px solid rgba(244, 242, 234, 0.35);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--texto);
+  font: inherit;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: transform 0.35s cubic-bezier(0.3, 1.6, 0.5, 1), background-color 0.2s, border-color 0.2s, color 0.2s;
+}
+.ferr-aba-num { font-size: 0.6rem; letter-spacing: 0.1em; color: var(--realce-texto); }
+.ferr-aba:hover { border-color: var(--realce); color: var(--realce-texto); transform: translateY(-3px) rotate(1deg); }
+.ferr-aba.ativo { background: var(--realce); border-color: var(--realce); color: #111111; transform: rotate(-1.5deg); animation: ferr-pula 0.55s cubic-bezier(0.3, 1.6, 0.5, 1); }
+.ferr-aba.ativo .ferr-aba-num { color: #111111; }
+.ferr-aba-selo { padding: 0.15rem 0.5rem; border-radius: 999px; background: var(--realce); color: #111111; font-size: 0.58rem; letter-spacing: 0.1em; }
+.ferr-aba.ativo .ferr-aba-selo { background: #111111; color: var(--realce-texto); }
+.ferr-descricao { margin-top: 1.75rem; margin-bottom: 1.1rem; }
+/* O painel da ferramenta é um ingresso: contorno fino e um recorte em cada lado. */
+.ferr-painel.card { position: relative; border: 1.5px solid rgba(244, 242, 234, 0.25); border-radius: 36px; background: rgba(244, 242, 234, 0.05); box-shadow: none; backdrop-filter: blur(6px); }
+.ferr-painel.card::before, .ferr-painel.card::after { content: ''; position: absolute; top: 50%; width: 30px; height: 30px; margin-top: -15px; border: 1.5px solid rgba(244, 242, 234, 0.25); border-radius: 50%; background: var(--bg); }
+.ferr-painel.card::before { left: -15px; clip-path: inset(0 0 0 50%); }
+.ferr-painel.card::after { right: -15px; clip-path: inset(0 50% 0 0); }
+.ferramentas-palco .placar-preto { border: 1.5px solid rgba(255, 106, 19, 0.3); border-radius: 36px; background: #121310; }
+.ferramentas-palco .chip.ativo { background: var(--realce); border-color: var(--realce); color: #111111; }
+.ferramentas-palco .btn-primario::before { background: #ff9a52; }
+.ferramentas-palco .conteudo, .ferramentas-palco .btn { --raio: 999px; }
+@media (max-width: 860px) {
+  .ferramentas-palco { padding-top: 100px; }
+  .ferr-abas { flex-wrap: nowrap; margin-inline: calc(clamp(1.25rem, 5vw, 5rem) * -1); padding: 0.4rem clamp(1.25rem, 5vw, 5rem); overflow-x: auto; scrollbar-width: none; }
+  .ferr-abas::-webkit-scrollbar { display: none; }
+  .ferr-aba { flex-shrink: 0; }
+  .ferr-painel.card::before, .ferr-painel.card::after { display: none; }
+}
+:root[data-movimento='reduzido'] .ferr-aba { transition: none; }
+:root[data-movimento='reduzido'] .ferr-aba.ativo { transform: none; }
+
+/* Todo texto pequeno em maiúsculas, inclusive o que a pessoa digita nos campos de busca e de nome (e-mail, senha e endereço ficam como foram escritos). */
+.conteudo input:not([type='email']):not([type='password']):not([type='url']):not([type='file']):not([type='checkbox']):not([type='radio']):not([type='range']):not([type='number']),
+.conteudo textarea { text-transform: uppercase; letter-spacing: 0.04em; }
+.ferramentas-palco .chip { border: 1px solid rgba(244, 242, 234, 0.3); background: rgba(244, 242, 234, 0.06); color: var(--texto); box-shadow: none; }
+.ferramentas-palco .chip:hover:not(.ativo) { border-color: var(--realce); color: var(--realce-texto); }
+
+/* Movimento: o relevo deriva devagar, o título e as abas sobem em sequência e a aba escolhida dá um pulinho. */
+.ferramentas-palco::before { inset: -8%; animation: ferr-relevo 38s ease-in-out infinite alternate; }
+@keyframes ferr-relevo { to { transform: translate(-2.5%, 3%) scale(1.07) rotate(2.5deg); } }
+@keyframes ferr-sobe { from { opacity: 0; transform: translateY(38px); } }
+@keyframes ferr-pula { 0% { transform: translateY(8px) rotate(-6deg) scale(0.92); } }
+.ferr-lema { animation: ferr-sobe 0.8s 0.05s cubic-bezier(0.2, 0.8, 0.2, 1) backwards; }
+.ferr-cabeca h1 { animation: ferr-sobe 0.9s 0.15s cubic-bezier(0.2, 0.8, 0.2, 1) backwards; }
+.ferr-aba { animation: ferr-sobe 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) backwards; animation-delay: calc(0.3s + var(--i, 0) * 0.05s); }
+.ferr-aba.ativo { animation: ferr-pula 0.55s cubic-bezier(0.3, 1.6, 0.5, 1); }
+.ferr-descricao, .ferr-painel { animation: ferr-sobe 0.8s 0.55s cubic-bezier(0.2, 0.8, 0.2, 1) backwards; }
+:root[data-movimento='reduzido'] .ferramentas-palco::before, :root[data-movimento='reduzido'] .ferr-lema, :root[data-movimento='reduzido'] .ferr-cabeca h1, :root[data-movimento='reduzido'] .ferr-aba, :root[data-movimento='reduzido'] .ferr-descricao, :root[data-movimento='reduzido'] .ferr-painel { animation: none; }

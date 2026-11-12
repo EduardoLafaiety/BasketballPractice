@@ -51,7 +51,7 @@ export default function Rotina() {
         erroCarga ? (
           <ErroCarga erro={erroCarga} tentarDeNovo={() => { recarregar(); drills.recarregar() }} />
         ) : (
-          <Carregando texto="Carregando rotina…" />
+          <Carregando texto="Carregando rotina" />
         )
       ) : (
         <div className="semana">

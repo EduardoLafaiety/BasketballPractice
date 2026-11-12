@@ -64,7 +64,7 @@ export default function RankingPagina() {
 
 function ConteudoRanking() {
   const { perfil, carregado, erro, recarregar } = usePerfil()
-  if (!carregado) return erro ? <ErroCarga erro={erro} tentarDeNovo={recarregar} /> : <Carregando texto="Carregando o ranking…" />
+  if (!carregado) return erro ? <ErroCarga erro={erro} tentarDeNovo={recarregar} /> : <Carregando texto="Carregando o ranking" />
   return (
     <>
       {!perfil && <CriarPerfil />}
@@ -117,7 +117,7 @@ export function CriarPerfil({ aoCriar }: { aoCriar?: () => void }) {
         Aparecer no ranking aberto a todos (sem marcar, só os seus amigos veem)
       </label>
       {erro && <p className="erro" role="alert">{erro}</p>}
-      <button className="btn btn-primario" type="submit" disabled={salvando}>{salvando ? 'Criando…' : 'Criar perfil'}</button>
+      <button className="btn btn-primario" type="submit" disabled={salvando}>{salvando ? 'Criando' : 'Criar perfil'}</button>
     </form>
   )
 }
@@ -157,7 +157,7 @@ function Classificacao({ temPerfil }: { temPerfil: boolean }) {
       </div>
 
       {!ranking ? (
-        erro ? <ErroCarga erro={erro} tentarDeNovo={recarregar} /> : <Carregando texto="Montando a classificação…" />
+        erro ? <ErroCarga erro={erro} tentarDeNovo={recarregar} /> : <Carregando texto="Montando a classificação" />
       ) : ranking.linhas.length === 0 ? (
         <div className="vazio">
           {escopo === 'amigos' && !temPerfil
