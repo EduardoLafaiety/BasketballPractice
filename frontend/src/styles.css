@@ -1390,9 +1390,6 @@ select.input:hover:not(:disabled) { border-color: var(--laranja); }
   .marca { width: 42px; height: 42px; }
   .topo-secao { display: none; }
   .conteudo { padding-top: 84px; }
-  .abertura-a { top: 12vh; }
-  .abertura-b { bottom: auto; top: 58vh; }
-  .abertura-palco { place-items: center; padding-bottom: 12vh; }
   .niveis-grade, .ferramenta-linha { grid-template-columns: minmax(0, 1fr); }
   .nivel-cartao:nth-child(n) { margin-top: 0; min-height: 0; }
   .escada-fixa { grid-template-columns: minmax(0, 1fr); align-content: center; gap: 1rem; padding-top: 60px; }
@@ -2151,4 +2148,38 @@ html { -webkit-tap-highlight-color: transparent; }
   .menu-tela { padding-top: calc(76px + env(safe-area-inset-top, 0px)); }
   .nav-link { gap: 0.9rem; padding-block: 0.12rem; font-size: clamp(1.75rem, 8.6vw, 2.4rem); line-height: 1.05; }
   .nav-link span { min-width: 1.4rem; font-size: 0.7rem; }
+}
+
+/* Abertura no celular: a bola grande no meio da tela, "Bora pra" logo acima e "quadra." logo abaixo, sem encostar nela. */
+.abertura-dica { display: none; }
+@media (max-width: 860px) {
+  .abertura-fixa { height: 100svh; }
+  .abertura-fixa { --bola: min(78vw, 44svh); --titulo: min(17vw, 9svh); }
+  .abertura-fixa .abertura-bola { width: var(--bola); }
+  .abertura-fixa .abertura-dentro { height: calc(var(--bola) * 0.94); }
+  .conteudo .abertura-titulo { font-size: var(--titulo); }
+  .abertura-a { top: calc(50% - var(--bola) / 2 - 1em); }
+  .abertura-b { top: calc(50% + var(--bola) / 2 + 0.12em); bottom: auto; }
+}
+/* Dica de toque: só em tela de toque, some no primeiro toque e ao rolar. */
+@media (max-width: 860px) and (hover: none) {
+  .abertura-dica {
+    display: block;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: calc(50% + var(--bola) / 2 + var(--titulo) * 1.08);
+    margin: 0;
+    text-align: center;
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    opacity: calc(1 - var(--saida) * 6);
+    transition: opacity 0.4s;
+    animation: abertura-dica 1.8s ease-in-out infinite;
+  }
+  .abertura.tocou .abertura-dica { opacity: 0; }
+  @keyframes abertura-dica { 50% { transform: translateY(-4px); } }
 }
