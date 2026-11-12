@@ -2366,3 +2366,22 @@ html { -webkit-tap-highlight-color: transparent; }
   .nba-lado .nba-noticias { grid-template-columns: minmax(0, 1fr); }
   .nba-conferencias { grid-template-columns: minmax(0, 1fr); }
 }
+
+/*
+ * ==== Texto pequeno do site inteiro: maiúsculas e 0,7rem. ====
+ * Ficam de fora os destaques grandes (títulos das páginas, "Bora pra quadra", números de placar, nomes dos jogadores)
+ * e os títulos de cartão, um degrau acima (0,85rem), também em maiúsculas.
+ */
+.meta, .link-forte, .faixa .stat span, .dieta-foco span, .dieta-quando .meta, .ranking-valor .meta, .quiz-alternativa,
+.artigo-destaque-resumo, .nba-sigla, .dia-hoje, .doca-item, .noticias-assunto, .noticias-selo, .noticias-visor,
+.auth-troca, .aviso-cookies p, .campo .meta {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+}
+.dieta-foco span, .dieta-quando .meta, .quiz-alternativa, .auth-troca, .aviso-cookies p { font-weight: 700; letter-spacing: 0.06em; }
+/* Na tela inicial (que usa iniciais maiúsculas), os nomes de artigo e de posição viram títulos de cartão. */
+.artigos-chamada-nome strong, .dieta-chamada-nome strong { font-size: 0.85rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; }
+/* Rótulos dos campos de entrar e cadastrar: o mesmo texto pequeno; ao subir, só trocam de lugar e de cor. */
+.campo-rotulo { top: 1.75rem; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
+.campo input:focus ~ .campo-rotulo,
+.campo input:not(:placeholder-shown) ~ .campo-rotulo { transform: translateY(-1.55rem); }
