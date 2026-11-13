@@ -60,7 +60,7 @@ function TabelaConferencia({ titulo, linhas }: { titulo: string; linhas: LinhaTa
       </thead>
       <tbody>
         {linhas.map((l) => (
-          <tr key={l.sigla} className={l.posicao <= 6 ? 'nba-direto' : l.posicao <= 10 ? 'nba-playin' : undefined} style={{ '--time': l.cor } as CSSProperties}>
+          <tr key={l.sigla} className={l.posicao <= 6 ? 'nba-direto' : l.posicao <= 10 ? 'nba-playin' : 'nba-fora'} style={{ '--time': l.cor } as CSSProperties}>
             <td>{l.posicao}</td>
             <th scope="row">
               <Escudo time={l} />
@@ -95,6 +95,7 @@ function Classificacao() {
           <p className="nba-legenda">
             <span className="nba-legenda-direto">1º ao 6º: vaga direta nos playoffs</span>
             <span className="nba-legenda-playin">7º ao 10º: play-in</span>
+            <span className="nba-legenda-fora">11º ao 15º: fora dos playoffs</span>
           </p>
         </>
       )}
@@ -234,17 +235,10 @@ export default function EstatisticasNba() {
   return (
     <>
       <h1>Estatísticas da NBA</h1>
-      <p className="muted">A classificação das conferências, quem lidera a temporada em pontos, rebotes, assistências e tocos, e as notícias do dia.</p>
-      {/* No computador, as notícias ficam numa coluna ao lado da classificação e dos líderes. */}
-      <div className="nba-corpo">
-        <div className="nba-principal">
-          <Classificacao />
-          <Lideres />
-        </div>
-        <aside className="nba-lado">
-          <Noticias />
-        </aside>
-      </div>
+      <p className="muted">A classificação das conferências, as notícias do dia e quem lidera a temporada em pontos, rebotes, assistências e tocos.</p>
+      <Classificacao />
+      <Noticias />
+      <Lideres />
       <p className="nba-fonte">Dados da ESPN e da CBS Sports, atualizados ao abrir a página. As notícias abrem no site de origem.</p>
     </>
   )

@@ -1589,10 +1589,11 @@ body:has(.noticias) .aviso-cookies { bottom: calc(44px + 1rem); }
 .nba-secao > h2 { margin: 0 0 1rem; }
 .nba-legenda { display: flex; flex-wrap: wrap; gap: 0.4rem 1.25rem; margin: 0.75rem 0 0; color: var(--muted); font-size: 0.8rem; }
 .nba-secao > h2 + .nba-legenda { margin: -0.5rem 0 1rem; }
-.nba-legenda-direto, .nba-legenda-playin { display: inline-flex; align-items: center; gap: 0.4rem; }
-.nba-legenda-direto::before, .nba-legenda-playin::before { content: ''; width: 4px; height: 1em; border-radius: 2px; }
+.nba-legenda-direto, .nba-legenda-playin, .nba-legenda-fora { display: inline-flex; align-items: center; gap: 0.4rem; }
+.nba-legenda-direto::before, .nba-legenda-playin::before, .nba-legenda-fora::before { content: ''; width: 4px; height: 1em; border-radius: 2px; }
 .nba-legenda-direto::before { background: var(--verde); }
 .nba-legenda-playin::before { background: var(--laranja); }
+.nba-legenda-fora::before { background: var(--muted); }
 
 .nba-conferencias { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: 1.25rem; }
 .nba-tabela { width: 100%; border-collapse: separate; border-spacing: 0; overflow: hidden; background: var(--superficie); border: 1px solid var(--borda); border-radius: var(--raio); box-shadow: var(--sombra); font-variant-numeric: tabular-nums; }
@@ -1603,12 +1604,11 @@ body:has(.noticias) .aviso-cookies { bottom: calc(44px + 1rem); }
 .nba-tabela abbr { text-decoration: none; }
 .nba-tabela tbody th { width: 100%; text-align: left; font-weight: 700; white-space: nowrap; }
 .nba-tabela tbody tr:last-child > * { border-bottom: 0; }
-/* Linha tracejada separando quem vai direto, o play-in e quem está fora. */
-.nba-tabela tr.nba-direto:has(+ tr.nba-playin) > *, .nba-tabela tr.nba-playin:has(+ tr:not(.nba-playin)) > * { border-bottom: 1px dashed var(--muted); }
-/* Faixa à esquerda: verde para quem vai direto aos playoffs, laranja para o play-in. */
+/* Faixa à esquerda: verde para quem vai direto aos playoffs, laranja para o play-in, cinza para quem está fora. */
 .nba-tabela tbody td:first-child { width: 2.2rem; border-left: 4px solid transparent; color: var(--muted); font-weight: 700; }
 .nba-tabela tr.nba-direto td:first-child { border-left-color: var(--verde); }
 .nba-tabela tr.nba-playin td:first-child { border-left-color: var(--laranja); }
+.nba-tabela tr.nba-fora td:first-child { border-left-color: var(--muted); }
 /* Derrotas e jogos atrás mais apagados, para as vitórias e o aproveitamento saltarem aos olhos. */
 .nba-tabela tbody td:nth-child(4), .nba-tabela tbody td:nth-child(6) { color: var(--muted); }
 
@@ -2368,13 +2368,6 @@ html { -webkit-tap-highlight-color: transparent; }
   /* Início: trechos presos à rolagem um pouco mais curtos no computador. */
   .manifesto { min-height: 140vh; }
   .escada { height: 320vh; }
-}
-/* Estatísticas da NBA: notícias numa coluna ao lado, só onde há largura para as duas tabelas. */
-@media (min-width: 1280px) {
-  .nba-corpo { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 2rem; align-items: start; }
-  .nba-lado { position: sticky; top: 92px; max-height: calc(100vh - 150px); overflow-y: auto; padding: 0 0.5rem 1rem 0; }
-  .nba-lado .nba-noticias { grid-template-columns: minmax(0, 1fr); }
-  .nba-conferencias { grid-template-columns: minmax(0, 1fr); }
 }
 
 /*
