@@ -1589,12 +1589,15 @@ body:has(.noticias) .aviso-cookies { bottom: calc(44px + 1rem); }
 .nba-secao > h2 { margin: 0 0 1rem; }
 .nba-legenda { display: flex; flex-wrap: wrap; gap: 0.4rem 1.25rem; margin: 0.75rem 0 0; color: var(--muted); font-size: 0.8rem; }
 .nba-secao > h2 + .nba-legenda { margin: -0.5rem 0 1rem; }
-.nba-legenda-direto, .nba-legenda-playin, .nba-legenda-fora { display: inline-flex; align-items: center; gap: 0.4rem; }
-.nba-legenda-direto::before, .nba-legenda-playin::before, .nba-legenda-fora::before { content: ''; width: 4px; height: 1em; border-radius: 2px; }
+.nba-legenda-direto, .nba-legenda-playin, .nba-legenda-fora, .nba-legenda-rebaixado { display: inline-flex; align-items: center; gap: 0.4rem; }
+.nba-legenda-direto::before, .nba-legenda-playin::before, .nba-legenda-fora::before, .nba-legenda-rebaixado::before { content: ''; width: 4px; height: 1em; border-radius: 2px; }
 .nba-legenda-direto::before { background: var(--verde); }
 .nba-legenda-playin::before { background: var(--laranja); }
 .nba-legenda-fora::before { background: var(--muted); }
+.nba-legenda-rebaixado::before { background: var(--vermelho); }
 
+/* NBB: uma tabela só, sem ficar larguíssima no computador. */
+.nbb-tabela-unica { max-width: 960px; }
 .nba-conferencias { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: 1.25rem; }
 .nba-tabela { width: 100%; border-collapse: separate; border-spacing: 0; background: var(--superficie); border: 1px solid var(--borda); border-radius: var(--raio); box-shadow: var(--sombra); font-variant-numeric: tabular-nums; }
 .nba-tabela caption { padding: 0 0 0.6rem; text-align: left; font-weight: 800; font-size: 0.85rem; letter-spacing: 0.1em; text-transform: uppercase; }
@@ -1614,6 +1617,7 @@ body:has(.noticias) .aviso-cookies { bottom: calc(44px + 1rem); }
 .nba-tabela tr.nba-direto td:first-child { border-left-color: var(--verde); }
 .nba-tabela tr.nba-playin td:first-child { border-left-color: var(--laranja); }
 .nba-tabela tr.nba-fora td:first-child { border-left-color: var(--muted); }
+.nba-tabela tr.nba-rebaixado td:first-child { border-left-color: var(--vermelho); }
 /* Derrotas e jogos atrás mais apagados, para as vitórias e o aproveitamento saltarem aos olhos. */
 .nba-tabela tbody td:nth-child(4), .nba-tabela tbody td:nth-child(6) { color: var(--muted); }
 

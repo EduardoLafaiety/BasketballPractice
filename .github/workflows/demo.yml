@@ -63,6 +63,12 @@ jobs:
         env:
           GNEWS_API_KEY: ${{ secrets.GNEWS_API_KEY }}
 
+      # A LNB não libera a leitura pelo navegador: a classificação do NBB é lida aqui e vira um JSON estático.
+      # Se a LNB estiver fora do ar, o arquivo não é criado e a página da NBB mostra que está indisponível.
+      - name: Classificação do NBB
+        run: npx tsx src/scripts/export-nbb.ts ../frontend/dist/nbb.json
+        working-directory: backend
+
       # Prévia para avaliar: se existir a branch `teste`, ela sai em /teste/ junto da demonstração.
       # O site oficial (a main) continua na raiz; apagar a branch `teste` tira a prévia na próxima publicação.
       - name: Prévia da branch teste
@@ -74,6 +80,7 @@ jobs:
             (cd ../teste/frontend && npm ci && VITE_BASE=/${{ github.event.repository.name }}/teste/ npm run build:demo)
             cp -r ../teste/frontend/dist frontend/dist/teste
             cp frontend/dist/noticias.json frontend/dist/teste/noticias.json
+            cp frontend/dist/nbb.json frontend/dist/teste/nbb.json || true
           else
             echo "Sem branch teste: nada a publicar em /teste/."
           fi
