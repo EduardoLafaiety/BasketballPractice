@@ -1,3 +1,6 @@
+import { execFile } from 'node:child_process'
+import { promisify } from 'node:util'
+
 // Classificação do NBB (Novo Basquete Brasil), lida da página pública da LNB (Liga Nacional de Basquete).
 // A LNB não tem API e a página não libera leitura pelo navegador (CORS), então a leitura é feita aqui, ao publicar
 // o site, e vira um JSON estático (src/scripts/export-nbb.ts).
@@ -77,15 +80,34 @@ export function parseNbbStandings(html: string): NbbStandings {
   return { season, teams: teams.sort((a, b) => a.position - b.position) }
 }
 
-// O filtro da LNB (Cloudflare) devolve 403 a quem não se identifica como navegador, inclusive a um User-Agent próprio
-// (testado a partir do GitHub Actions). É uma página pública, lida poucas vezes por dia ao publicar o site.
+// O filtro da LNB (Cloudflare) devolve 403 a quem não parece um navegador. Nos testes a partir do GitHub Actions, o fetch
+// do Node levou 403 mesmo com User-Agent de navegador (o filtro reconhece o jeito como ele abre a conexão), mas o curl passou.
+// Por isso: tenta o fetch e, se a LNB recusar, tenta o curl. É uma página pública, lida poucas vezes por dia ao publicar o site.
 const BROWSER_UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36'
+const HEADERS = { 'User-Agent': BROWSER_UA, Accept: 'text/html', 'Accept-Language': 'pt-BR,pt;q=0.9' }
+
+async function viaFetch(): Promise<string> {
+  const response = await fetch(NBB_URL, { headers: HEADERS, signal: AbortSignal.timeout(20_000) })
+  if (!response.ok) throw new Error(`LNB respondeu ${response.status}`)
+  return response.text()
+}
+
+async function viaCurl(): Promise<string> {
+  const args = ['--silent', '--show-error', '--fail', '--compressed', '--max-time', '30', ...Object.entries(HEADERS).flatMap(([k, v]) => ['-H', `${k}: ${v}`]), NBB_URL]
+  const { stdout } = await promisify(execFile)('curl', args, { maxBuffer: 20 * 1024 * 1024 })
+  return stdout
+}
 
 export async function fetchNbbStandings(): Promise<NbbStandings> {
-  const response = await fetch(NBB_URL, {
-    headers: { 'User-Agent': BROWSER_UA, Accept: 'text/html', 'Accept-Language': 'pt-BR,pt;q=0.9' },
-    signal: AbortSignal.timeout(20_000),
-  })
-  if (!response.ok) throw new Error(`LNB respondeu ${response.status}`)
-  return parseNbbStandings(await response.text())
+  let html: string
+  try {
+    html = await viaFetch()
+  } catch (error) {
+    try {
+      html = await viaCurl()
+    } catch {
+      throw error
+    }
+  }
+  return parseNbbStandings(html)
 }
