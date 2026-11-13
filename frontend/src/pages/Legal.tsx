@@ -51,7 +51,7 @@ export function PoliticaPrivacidade() {
         <li><strong>Conta:</strong> nome, e-mail e a senha em forma de hash, nunca o texto dela.</li>
         <li><strong>Treino:</strong> exercícios, treinos, sessões, arremessos por zona, notas, metas e preferências que você registra.</li>
         <li><strong>Testes físicos:</strong> os resultados que você registra, como impulsão e sprint, que também formam o cartão do atleta.</li>
-        <li><strong>Desafio do dia, quiz e programas:</strong> o placar de cada desafio e de cada quiz, os programas que você começou e os dias concluídos.</li>
+        <li><strong>Programas:</strong> os programas que você começou e os dias concluídos. O desafio do dia e o quiz saíram do app, mas os resultados que você já tinha neles continuam guardados na sua conta até você excluí-la.</li>
         <li><strong>Prancheta:</strong> as jogadas que você desenha e salva.</li>
         <li><strong>Diário de jogos:</strong> data, adversário, placar e os seus números em cada partida que você anota.</li>
         <li><strong>Notificações, se você ligar:</strong> o endereço de entrega que o navegador cria para o aparelho, as chaves dele e o fuso horário, para o lembrete chegar na hora certa. Desligar a opção apaga esses dados.</li>
@@ -69,7 +69,7 @@ export function PoliticaPrivacidade() {
       <h2 id="ranking">O que fica visível no ranking</h2>
       <p>
         O ranking é opcional: sem criar um perfil, nada seu aparece para outras pessoas. Ao criar o perfil, os outros atletas passam a
-        ver o seu <strong>apelido</strong> e os seus <strong>números em cada lista</strong> (lances livres, desafio do dia, quiz,
+        ver o seu <strong>apelido</strong> e os seus <strong>números em cada lista</strong> (lances livres,
         dias de treino e nota do cartão), além da sua posição. Nome, e-mail, notas e o restante dos treinos nunca aparecem.
       </p>
       <ul>

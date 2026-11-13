@@ -65,11 +65,14 @@ describe('Ranking', () => {
     const user = userEvent.setup()
     const { ultima } = abrir('/ranking')
     await screen.findByRole('list', { name: 'Pódio' })
-    await user.click(screen.getByRole('button', { name: 'Quiz' }))
+    await user.click(screen.getByRole('button', { name: 'Sequência' }))
     await user.click(screen.getByRole('button', { name: 'Geral' }))
     await user.click(screen.getByRole('button', { name: 'Amigos' }))
     const params = ultima('GET', '/social/ranking')!.url.searchParams
-    expect([params.get('metric'), params.get('period'), params.get('scope')]).toEqual(['quiz', 'geral', 'amigos'])
+    expect([params.get('metric'), params.get('period'), params.get('scope')]).toEqual(['sequencia', 'geral', 'amigos'])
+    // O desafio do dia e o quiz saíram do app, e com eles as duas listas.
+    expect(screen.queryByRole('button', { name: 'Quiz' })).toBeNull()
+    expect(screen.queryByRole('button', { name: 'Desafio do dia' })).toBeNull()
     expect(screen.getByRole('button', { name: 'Amigos' })).toHaveAttribute('aria-pressed', 'true')
   })
 

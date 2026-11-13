@@ -1729,14 +1729,8 @@ body:has(.noticias) .aviso-cookies { bottom: calc(44px + 1rem); }
 .artigo-capa { max-width: var(--largura); margin: 1.75rem 0 0; }
 .conteudo .artigo-capa .credito-foto { margin-top: 0.6rem; font-size: 0.66rem; font-weight: 700; letter-spacing: 0.06em; line-height: 1.55; text-transform: uppercase; }
 
-/* Desafio do dia e resumo da semana (Início e página do desafio) */
+/* Resumo da semana (Início) */
 .banda-curta { padding: clamp(3rem, 8vh, 5rem) clamp(1.25rem, 5vw, 5rem); border-top: 1px solid var(--borda); }
-.desafio-inicio { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 2rem clamp(2rem, 6vw, 6rem); align-items: center; }
-.desafio-inicio h2 { margin: 0.4rem 0 0.75rem; font-size: clamp(2.4rem, 6vw, 4.8rem); }
-.desafio-inicio-lado { display: grid; justify-items: start; gap: 0.6rem; }
-.desafio-inicio-numero { font-family: var(--fonte-display); font-weight: var(--peso-display); font-size: clamp(4rem, 10vw, 8rem); line-height: 0.85; color: var(--laranja); font-variant-numeric: tabular-nums; }
-.desafio-inicio[aria-busy='true'] { min-height: 14rem; }
-@media (max-width: 800px) { .desafio-inicio { grid-template-columns: 1fr; } }
 
 .resumo-semana.destaque { background: var(--laranja); --texto: #111111; --muted: #2b1505; --laranja-texto: #111111; --borda: #111111; color: #111111; }
 .resumo-semana h2 { margin: 0.4rem 0 1.5rem; font-size: clamp(2.2rem, 5vw, 4rem); }
@@ -1750,49 +1744,8 @@ body:has(.noticias) .aviso-cookies { bottom: calc(44px + 1rem); }
 .resumo-semana.destaque .variacao { color: #111111; }
 @media (max-width: 640px) { .resumo-semana-grade { grid-template-columns: 1fr; } }
 
-.desafio { display: grid; gap: 0.6rem; justify-items: start; }
-.desafio > p { margin: 0; }
-.desafio .btn-grande { margin-top: 0.75rem; }
-.desafio-execucao, .desafio-fim { display: grid; gap: 0.85rem; width: 100%; }
-.desafio-relogio { margin: 0; font-family: var(--fonte-display); font-weight: var(--peso-display); font-size: clamp(4rem, 14vw, 8rem); line-height: 0.9; text-align: center; color: var(--laranja-texto); font-variant-numeric: tabular-nums; }
-.conteudo .desafio-placar { margin: 0; font-size: 0.85rem; }
-.desafio-placar strong { font-family: var(--fonte-display); font-weight: var(--peso-display); font-size: 4rem; line-height: 1; color: var(--laranja-texto); margin-right: 0.3rem; }
-.desafio-resultado { display: grid; grid-template-columns: auto 1fr; gap: 0.4rem 0.9rem; align-items: center; width: 100%; margin-top: 0.5rem; padding: 1rem; border: 1.5px solid var(--borda); border-radius: var(--raio); }
-.desafio-resultado.cumprido { border-color: var(--laranja); }
-.desafio-resultado .icone-svg { color: var(--laranja-texto); }
-.desafio-resultado > div { display: grid; }
-.desafio-resultado strong { font-family: var(--fonte-display); font-weight: var(--peso-display); font-size: 2.6rem; line-height: 1; }
-.desafio-resultado span { font-size: 0.7rem; font-weight: 800; letter-spacing: 0.08em; }
-.desafio-resultado p { grid-column: 1 / -1; margin: 0; }
 .lista-simples { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.4rem; }
-.desafio-historico { display: grid; grid-template-columns: 4.5rem minmax(0, 1fr) auto 1.2rem; gap: 0.75rem; align-items: center; padding: 0.6rem 0.8rem; border-radius: 18px; background: var(--superficie); }
-.desafio-historico strong { font-variant-numeric: tabular-nums; }
-.desafio-historico .icone-svg { color: var(--laranja-texto); }
 
-/* Quiz diário "Entenda o jogo" */
-.quiz { display: grid; gap: 1rem; }
-.quiz-quadros { display: flex; gap: 0.4rem; list-style: none; margin: 0; padding: 0; }
-.quiz-quadros li { width: 2.1rem; height: 2.1rem; border-radius: 6px; border: 2px solid var(--borda); background: transparent; }
-.quiz-quadros li.feito { background: var(--superficie-2); border-color: var(--texto); }
-.quiz-quadros li.certo { background: var(--laranja); border-color: var(--laranja); }
-.quiz-quadros li.errado { background: var(--texto); border-color: var(--texto); }
-.quiz-pergunta { border: 0; margin: 0; padding: 0; display: grid; gap: 1rem; }
-.quiz-pergunta legend { display: grid; gap: 0.5rem; padding: 0; }
-.conteudo .quiz-enunciado { font-family: var(--fonte-display); font-weight: var(--peso-display); font-size: clamp(1.8rem, 4vw, 2.8rem); line-height: 1; letter-spacing: 0.01em; }
-.quiz-alternativas { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.6rem; }
-.quiz-alternativa { display: flex; align-items: center; gap: 0.8rem; min-height: 64px; padding: 0.8rem 1rem; border: 1.5px solid var(--borda); border-radius: var(--raio); background: var(--superficie-2); color: var(--texto); font: inherit; font-size: 0.78rem; font-weight: 800; letter-spacing: 0.06em; text-align: left; cursor: pointer; transition: border-color 0.15s, color 0.15s; }
-.quiz-alternativa span { display: grid; place-items: center; flex-shrink: 0; width: 2rem; height: 2rem; border-radius: 50%; background: var(--texto); color: var(--bg); font-size: 0.75rem; }
-.quiz-alternativa:hover, .quiz-alternativa:focus-visible { border-color: var(--laranja); color: var(--laranja-texto); }
-.quiz-fim { display: grid; gap: 0.75rem; }
-.quiz-placar h2 { font-size: clamp(2.4rem, 6vw, 4rem); }
-.quiz-texto { margin: 0; padding: 0.8rem 1rem; border-radius: var(--raio); background: var(--superficie-2); font: inherit; font-size: 0.85rem; white-space: pre-wrap; }
-.quiz-revisao { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.75rem; }
-.quiz-revisao li { display: grid; gap: 0.35rem; padding: 1rem 1.1rem; border-left: 4px solid var(--borda); border-radius: 18px; background: var(--superficie); }
-.quiz-revisao li.certo { border-left-color: var(--laranja); }
-.quiz-revisao li p { margin: 0; }
-.quiz-revisao .rotulo-forte { display: inline-flex; align-items: center; gap: 0.35rem; }
-.quiz-revisao li.errado .rotulo-forte { color: var(--muted); }
-@media (max-width: 640px) { .quiz-alternativas { grid-template-columns: 1fr; } }
 
 /* Cartão do atleta */
 .cartao-topo { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 1rem; margin-bottom: 1rem; }
@@ -2300,15 +2253,6 @@ html { -webkit-tap-highlight-color: transparent; }
 .programa-semanas li.feito { background: var(--laranja); }
 .programa-semanas li.proximo { box-shadow: inset 0 0 0 2px var(--laranja); }
 
-.desafio-corpo { display: grid; gap: 1rem; }
-.desafio-lado { display: none; }
-.desafio-semana ol { list-style: none; margin: 0.75rem 0 0; padding: 0; display: grid; grid-template-columns: repeat(7, 1fr); gap: 0.4rem; text-align: center; }
-.conteudo .desafio-semana li { display: grid; gap: 0.35rem; justify-items: center; color: var(--muted); }
-.desafio-semana i { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; background: var(--superficie-2); }
-.desafio-semana li.feito i { background: color-mix(in srgb, var(--laranja) 35%, var(--superficie-2)); }
-.desafio-semana li.cumprido i { background: var(--laranja); color: #111111; }
-.desafio-demo { display: grid; gap: 0.5rem; }
-.desafio-demo .figura { max-height: 240px; }
 
 .jogue-filtros { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; }
 .jogue-filtros .input { flex: 1 1 220px; max-width: 320px; }
@@ -2365,10 +2309,6 @@ html { -webkit-tap-highlight-color: transparent; }
 .jogos-medias dd { margin: 0; font-family: var(--fonte-display); font-size: 2.4rem; font-weight: var(--peso-display); line-height: 1; }
 .jogos-principal > h2:first-child { margin-top: 0.5rem; }
 
-.quiz-corpo { display: grid; gap: 1rem; }
-.quiz-lado { display: none; }
-.quiz-lado .card { display: grid; gap: 0.6rem; justify-items: start; }
-.quiz-lado-numero { font-family: var(--fonte-display); font-size: 2.6rem; font-weight: var(--peso-display); line-height: 1; }
 
 .config-indice { display: none; }
 
@@ -2399,9 +2339,6 @@ html { -webkit-tap-highlight-color: transparent; }
   .semana .dia-topo { flex-direction: column; align-items: flex-start; gap: 0.2rem; }
   .semana .dia-lista li { align-items: flex-start; }
 
-  /* Desafio: o desafio à esquerda; o exercício animado e a semana à direita. */
-  .desafio-corpo { grid-template-columns: minmax(0, 1.5fr) minmax(300px, 1fr); align-items: start; }
-  .desafio-lado { display: grid; gap: 1rem; align-content: start; position: sticky; top: 92px; }
 
   /* Jogador: o painel do treino fica preso ao rolar. */
   .estilo-lado { position: sticky; top: 92px; }
@@ -2417,9 +2354,6 @@ html { -webkit-tap-highlight-color: transparent; }
   .artigo-sumario a { color: var(--texto); text-decoration: none; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.04em; line-height: 1.4; text-transform: uppercase; }
   .artigo-sumario a:hover { color: var(--laranja-texto); }
 
-  /* Quiz: painel ao lado. */
-  .quiz-corpo { grid-template-columns: minmax(0, 1fr) 300px; align-items: start; }
-  .quiz-lado { display: grid; gap: 1rem; position: sticky; top: 92px; }
 
   /* Desempenho: gráficos em grade de duas colunas. */
   .desempenho-graficos { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; align-items: start; margin-top: 1.5rem; }
@@ -2461,13 +2395,13 @@ html { -webkit-tap-highlight-color: transparent; }
  * Ficam de fora os destaques grandes (títulos das páginas, "Bora pra quadra", números de placar, nomes dos jogadores)
  * e os títulos de cartão, um degrau acima (0,85rem), também em maiúsculas.
  */
-.meta, .link-forte, .faixa .stat span, .dieta-foco span, .dieta-quando .meta, .ranking-valor .meta, .quiz-alternativa,
+.meta, .link-forte, .faixa .stat span, .dieta-foco span, .dieta-quando .meta, .ranking-valor .meta,
 .artigo-destaque-resumo, .nba-sigla, .dia-hoje, .doca-item, .noticias-assunto, .noticias-selo, .noticias-visor,
 .auth-troca, .aviso-cookies p, .campo .meta {
   font-size: 0.7rem;
   text-transform: uppercase;
 }
-.dieta-foco span, .dieta-quando .meta, .quiz-alternativa, .auth-troca, .aviso-cookies p { font-weight: 700; letter-spacing: 0.06em; }
+.dieta-foco span, .dieta-quando .meta, .auth-troca, .aviso-cookies p { font-weight: 700; letter-spacing: 0.06em; }
 /* Na tela inicial (que usa iniciais maiúsculas), os nomes de artigo e de posição viram títulos de cartão. */
 .artigos-chamada-nome strong, .dieta-chamada-nome strong { font-size: 0.85rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; }
 /* Rótulos dos campos de entrar e cadastrar: o mesmo texto pequeno; ao subir, só trocam de lugar e de cor. */

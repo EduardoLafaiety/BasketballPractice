@@ -1,35 +1,7 @@
 import { Link } from 'react-router-dom'
 import { dataLocal } from '../api'
-import { useDesafioDoDia } from '../desafio/api'
-import { formatoDesafio } from '../pages/Desafio'
 import { aproveitamento, useResumo } from '../store'
 import type { Semana } from '../types'
-import Icone from './Icone'
-
-/** Chamada do desafio do dia: o que é, a meta e se já foi feito. */
-export function DesafioNoInicio() {
-  const { hoje, erro } = useDesafioDoDia()
-  if (!hoje) return erro ? null : <section className="faixa-escura banda-curta desafio-inicio" aria-busy />
-  const { desafio, resultado } = hoje
-  return (
-    <section className="faixa-escura banda-curta desafio-inicio" aria-labelledby="desafio-inicio-titulo">
-      <div>
-        <span className="rotulo-forte">Desafio do dia</span>
-        <h2 id="desafio-inicio-titulo">{desafio.titulo}</h2>
-        <p className="muted">{desafio.descricao}</p>
-      </div>
-      <div className="desafio-inicio-lado">
-        <span className="desafio-inicio-numero">{resultado ? `${resultado.acertos}/${resultado.tentativas}` : desafio.meta}</span>
-        <span className="meta">{resultado ? (resultado.cumprido ? 'Cumprido hoje' : 'Feito hoje') : `cestas em ${formatoDesafio(desafio)}`}</span>
-        {resultado ? (
-          <Link to="/desafio" className="link-forte"><Icone nome="check" /> Ver resultado</Link>
-        ) : (
-          <Link to="/desafio" className="btn btn-primario">Aceitar desafio <Icone nome="seta" /></Link>
-        )}
-      </div>
-    </section>
-  )
-}
 
 /** Segunda-feira da semana de `d`, à meia-noite local. */
 export function segundaDe(d: Date) {

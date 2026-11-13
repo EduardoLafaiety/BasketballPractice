@@ -14,8 +14,6 @@ import Alimentacao from './pages/Alimentacao'
 import Equipamentos from './pages/Equipamentos'
 import Artigos, { ArtigoDetalhe } from './pages/Artigos'
 import Desempenho from './pages/Desempenho'
-import DesafioDoDia from './pages/Desafio'
-import Quiz from './pages/Quiz'
 import CartaoDoAtleta from './pages/Cartao'
 import Programas, { ProgramaDetalhe } from './pages/Programas'
 import Jogos from './pages/Jogos'
@@ -65,8 +63,9 @@ function Rotas() {
         <Route path="treinos/:id" element={<TreinoDetalhe />} />
         {/* O gerador agora fica na Rotina: os endereços e links antigos continuam funcionando. */}
         <Route path="gerador" element={<Navigate to="/rotina" replace />} />
-        <Route path="desafio" element={<DesafioDoDia />} />
-        <Route path="quiz" element={<Quiz />} />
+        {/* O desafio do dia e o quiz saíram do app: os links antigos levam aos artigos. */}
+        <Route path="desafio" element={<Navigate to="/artigos" replace />} />
+        <Route path="quiz" element={<Navigate to="/artigos" replace />} />
         <Route path="cartao" element={<CartaoDoAtleta />} />
         <Route path="programas" element={<Programas />} />
         <Route path="programas/:id" element={<ProgramaDetalhe />} />

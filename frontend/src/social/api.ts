@@ -1,15 +1,13 @@
 import { fuso, request } from '../api'
 import { invalidar, useRecurso } from '../store'
 
-export type MetricaRanking = 'lances_livres' | 'desafio' | 'quiz' | 'sequencia' | 'cartao'
-export type MetricaDesafio = 'lances_livres' | 'cestas' | 'minutos' | 'desafio' | 'quiz'
+export type MetricaRanking = 'lances_livres' | 'sequencia' | 'cartao'
+export type MetricaDesafio = 'lances_livres' | 'cestas' | 'minutos'
 export type Periodo = 'semana' | 'geral'
 export type Escopo = 'todos' | 'amigos'
 
 export const METRICAS_RANKING: { id: MetricaRanking; rotulo: string; unidade: (p: Periodo) => string }[] = [
   { id: 'lances_livres', rotulo: 'Lances livres', unidade: () => 'cestas' },
-  { id: 'desafio', rotulo: 'Desafio do dia', unidade: () => 'cestas' },
-  { id: 'quiz', rotulo: 'Quiz', unidade: () => 'acertos' },
   { id: 'sequencia', rotulo: 'Sequência', unidade: (p) => (p === 'semana' ? 'dias na semana' : 'dias seguidos') },
   { id: 'cartao', rotulo: 'Nota do cartão', unidade: (p) => (p === 'semana' ? 'nota do mês' : 'melhor nota') },
 ]
@@ -18,8 +16,6 @@ export const METRICAS_DESAFIO: { id: MetricaDesafio; rotulo: string; unidade: st
   { id: 'lances_livres', rotulo: 'Quem acerta mais lances livres', unidade: 'cestas' },
   { id: 'cestas', rotulo: 'Quem faz mais cestas no treino', unidade: 'cestas' },
   { id: 'minutos', rotulo: 'Quem treina mais minutos', unidade: 'min' },
-  { id: 'desafio', rotulo: 'Quem faz mais no desafio do dia', unidade: 'cestas' },
-  { id: 'quiz', rotulo: 'Quem acerta mais no quiz', unidade: 'acertos' },
 ]
 
 export interface Perfil {

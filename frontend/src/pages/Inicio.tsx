@@ -7,7 +7,7 @@ import { api } from '../api'
 import { AvisoDesatualizado, Carregando, ErroCarga } from '../components/Estado'
 import GradeJogadores from '../components/GradeJogadores'
 import Icone from '../components/Icone'
-import { DesafioNoInicio, ResumoSemana } from '../components/InicioDestaques'
+import { ResumoSemana } from '../components/InicioDestaques'
 import { AberturaBola, EscadaRolagem, Figura, FraseRolagem, ListraBola, NomesRolagem } from '../components/rolagem'
 import { corDoJogador } from '../lib/cor-do-time'
 import { NIVEIS } from '../lib/niveis'
@@ -23,7 +23,7 @@ const ORDEM_SEMANA: DiaSemana[] = [1, 2, 3, 4, 5, 6, 0]
 // Um artigo de cada assunto que mais conversa com quem treina.
 const ARTIGOS_EM_DESTAQUE = ['sono-e-arremesso', 'treino-deliberado', 'salto-vertical', 'cesto-de-pessego', 'qual-recuperacao-funciona'].map((id) => ARTIGOS.find((a) => a.id === id)!)
 const FERRAMENTAS: { to: string; titulo: string; texto: string }[] = [
-  { to: '/ranking', titulo: 'Ranking e desafios', texto: 'Lances livres, desafio do dia, quiz e sequência contra todo mundo ou só contra os amigos, com duelos semanais.' },
+  { to: '/ranking', titulo: 'Ranking e desafios', texto: 'Lances livres, sequência e nota do cartão contra todo mundo ou só contra os amigos, com duelos semanais.' },
   { to: '/programas', titulo: 'Programas de 30 dias', texto: 'Um treino liberado por dia, com barra de progresso: arremesso, mão fraca e os primeiros 30 dias.' },
   { to: '/rotina', titulo: 'Rotina semanal', texto: 'Escolha os dias, o tempo, o nível e o foco: o app monta a semana inteira, do aquecimento ao mais difícil.' },
   { to: '/ferramentas', titulo: 'Ferramentas de quadra', texto: 'Cronômetro, metrônomo, contador ao vivo, calculadoras e testes físicos.' },
@@ -66,7 +66,6 @@ export default function Inicio() {
       <FraseRolagem texto="Ninguém começa arremessando de três. Primeiro vem a bola na mão, depois o arremesso colado à cesta, e só então a distância." />
 
       {segunda && <ResumoSemana />}
-      <DesafioNoInicio />
 
       <section className="faixa-clara banda">
         <div className="secao-topo secao-forte">
@@ -226,7 +225,6 @@ export default function Inicio() {
           </div>
           <div className="acoes">
             <Link to="/artigos" className="link-forte">Ver todos os artigos</Link>
-            <Link to="/quiz" className="link-forte">Quiz do dia</Link>
           </div>
         </div>
         <div className="artigos-chamada-lista">

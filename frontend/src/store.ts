@@ -332,5 +332,3 @@ export function diasAtras(dias: number) {
   return d
 }
 
-/** Uma sessão foi registrada por fora do useSessoes (ex.: desafio do dia): números, metas e sequência mudam. */
-export const sessaoRegistrada = () => invalidar('sessoes', ...DERIVADOS)

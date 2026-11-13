@@ -97,16 +97,14 @@ describe('Ranking', () => {
     assert.equal((await api('GET', '/social/ranking', undefined, dani.token)).body.me.nickname, 'dani_priv')
   })
 
-  it('soma desafio do dia, quiz e dias treinados; a nota do cartão vale com a bateria completa', async () => {
+  it('soma os dias treinados; a nota do cartão vale com a bateria completa; as métricas que saíram são recusadas', async () => {
     const gil = await atleta('gil_rk')
-    await api('POST', '/challenges/today', { makes: 5, attempts: 6 }, gil.token)
-    await api('POST', '/quiz/today', { answers: [0, 0, 0, 0, 0] }, gil.token)
+    await treinarLances(gil.token, 5)
     const ranking = async (metric: string, period = 'semana') =>
       (await api('GET', `/social/ranking?metric=${metric}&period=${period}`, undefined, gil.token)).body.me?.value ?? 0
 
-    assert.equal(await ranking('desafio'), 5)
-    const { rows } = await db.query<{ correct: number }>('SELECT correct FROM quiz_results WHERE user_id = $1', [gil.id])
-    assert.equal(await ranking('quiz'), rows[0].correct)
+    // O desafio do dia e o quiz saíram do app, e com eles as duas listas do ranking.
+    for (const saiu of ['desafio', 'quiz']) assert.equal((await api('GET', `/social/ranking?metric=${saiu}`, undefined, gil.token)).status, 400)
     assert.equal(await ranking('sequencia'), 1)
     assert.equal(await ranking('sequencia', 'geral'), 1)
 
@@ -202,10 +200,12 @@ describe('Desafios entre amigos', () => {
     const pedro = await atleta('pedro_df')
     const quem = await atleta('quem_df')
     await amigos(olga, pedro)
-    assert.equal((await api('POST', '/social/challenges', { opponentId: quem.id, metric: 'quiz' }, olga.token)).status, 400)
+    assert.equal((await api('POST', '/social/challenges', { opponentId: quem.id, metric: 'cestas' }, olga.token)).status, 400)
     assert.equal((await api('POST', '/social/challenges', { opponentId: pedro.id, metric: 'altura' }, olga.token)).status, 400)
+    // As métricas do desafio do dia e do quiz saíram do app: nem entre amigos dá para disputar.
+    for (const saiu of ['desafio', 'quiz']) assert.equal((await api('POST', '/social/challenges', { opponentId: pedro.id, metric: saiu }, olga.token)).status, 400)
 
-    const a = (await api('POST', '/social/challenges', { opponentId: pedro.id, metric: 'quiz' }, olga.token)).body
+    const a = (await api('POST', '/social/challenges', { opponentId: pedro.id, metric: 'cestas' }, olga.token)).body
     assert.equal((await api('POST', `/social/challenges/${a.id}/decline`, undefined, pedro.token)).body.status, 'recusado')
     assert.equal((await api('POST', `/social/challenges/${a.id}/accept`, undefined, pedro.token)).status, 409)
 
@@ -213,5 +213,16 @@ describe('Desafios entre amigos', () => {
     assert.equal((await api('POST', `/social/challenges/${b.id}/cancel`, undefined, pedro.token)).status, 403)
     assert.equal((await api('POST', `/social/challenges/${b.id}/cancel`, undefined, olga.token)).body.status, 'cancelado')
     assert.equal((await api('POST', `/social/challenges/${b.id}/accept`, undefined, quem.token)).status, 404)
+  })
+
+  it('duelos antigos de métricas que saíram do app (desafio do dia, quiz) deixam de aparecer, sem quebrar a lista', async () => {
+    const rui = await atleta('rui_df')
+    const sol = await atleta('sol_df')
+    await amigos(rui, sol)
+    await db.query(`INSERT INTO friend_challenges (challenger_id, opponent_id, metric, week_start) VALUES ($1, $2, 'quiz', $3)`, [rui.id, sol.id, localToday(0)])
+    const novo = (await api('POST', '/social/challenges', { opponentId: sol.id, metric: 'minutos' }, rui.token)).body
+
+    const lista = (await api('GET', '/social/challenges', undefined, rui.token)).body as { id: number; metric: string }[]
+    assert.deepEqual(lista.map((c) => [c.id, c.metric]), [[novo.id, 'minutos']])
   })
 })

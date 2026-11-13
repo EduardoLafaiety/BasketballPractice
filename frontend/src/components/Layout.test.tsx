@@ -95,3 +95,25 @@ describe('Barra de atalhos do celular', () => {
     expect(mais).toHaveFocus()
   })
 })
+
+describe('Desafio do dia e quiz do dia saíram do app', () => {
+  it.each(['/desafio', '/quiz'])('o endereço antigo %s leva aos artigos', async (rota) => {
+    abrir(rota)
+    await waitFor(() => expect(screen.getByTestId('caminho')).toHaveTextContent('/artigos'))
+    expect(await screen.findByRole('heading', { name: 'Artigos', level: 1 })).toBeInTheDocument()
+  })
+
+  it('o menu não tem mais os dois, e a barra do celular passa a levar aos artigos', async () => {
+    const user = userEvent.setup()
+    abrir()
+    await user.click(await botaoMenu())
+    const menu = within(tela())
+    expect(menu.getByRole('link', { name: 'Artigos' })).toHaveAttribute('href', '/artigos')
+    expect(menu.queryByRole('link', { name: /Desafio do dia/ })).toBeNull()
+    expect(menu.queryByRole('link', { name: /Quiz do dia/ })).toBeNull()
+
+    const doca = within(screen.getByRole('navigation', { name: 'Atalhos' }))
+    expect(doca.getAllByRole('link').map((l) => l.textContent?.trim())).toEqual(['Início', 'Treinos', 'Gerar', 'Artigos'])
+    expect(doca.queryByRole('link', { name: /Desafio/ })).toBeNull()
+  })
+})

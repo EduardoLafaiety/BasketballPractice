@@ -122,7 +122,7 @@ describe('Web Push: desafios entre amigos', () => {
     await api('POST', '/push/subscriptions', ea, a.token)
     await api('POST', '/push/subscriptions', eb, b.token)
 
-    const desafio = (await api('POST', '/social/challenges', { opponentId: b.id, metric: 'quiz' }, a.token)).body
+    const desafio = (await api('POST', '/social/challenges', { opponentId: b.id, metric: 'lances_livres' }, a.token)).body
     await esperar(() => falso.enviados.some((e) => e.endpoint === eb.endpoint && /te desafiou/.test(e.message.title)))
     await api('POST', `/social/challenges/${desafio.id}/accept`, undefined, b.token)
     await esperar(() => falso.enviados.some((e) => e.endpoint === ea.endpoint && /aceitou o desafio/.test(e.message.title)))
