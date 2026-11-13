@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState, type CSSProperties } from 'react'
 import { tempoAtras } from '../lib/noticias'
+import { CartaoCategoria, CartaoNoticia } from './cartoes'
 import { Escudo, Estado } from './componentes'
-import { buscarLideres, numero, type Categoria, type Lider } from './lideres'
+import { buscarLideres } from './lideres'
 import { timesCitados } from './escudos'
-import { buscarNoticiasNba, ultimas24h, type NoticiaNba } from './noticias'
+import { buscarNoticiasNba, ultimas24h } from './noticias'
 import { useCarga } from './useCarga'
 import { aproveitamento, buscarTabela, jogosAtras, type LinhaTabela } from './tabela'
 
@@ -72,38 +73,6 @@ function Classificacao() {
   )
 }
 
-/** Uma categoria: o líder em destaque, na cor do time, e do 2º ao 10º com barras para comparar. */
-function CartaoCategoria({ categoria, lideres }: { categoria: Categoria; lideres: Lider[] }) {
-  const [primeiro, ...resto] = lideres
-  const maior = primeiro.valor || 1
-  const id = `nba-${categoria.id}`
-  return (
-    <section className="card nba-cartao" aria-labelledby={id}>
-      <h3 id={id}>{categoria.rotulo}</h3>
-      <div className="nba-lider" style={{ '--time': primeiro.cor } as CSSProperties}>
-        <span className="nba-coroa">1º</span>
-        <Escudo time={primeiro} soEscuro className="nba-escudo-lider" />
-        <span className="nba-valor">{numero(primeiro.valor)}</span>
-        <span className="nba-unidade">{categoria.unidade}</span>
-        <strong className="nba-nome-lider">{primeiro.nome}</strong>
-        <span className="nba-time">{primeiro.time}</span>
-      </div>
-      <ol className="nba-ranking" start={2}>
-        {resto.map((l) => (
-          <li key={l.posicao} style={{ '--time': l.cor, '--pct': l.valor / maior } as CSSProperties}>
-            <span className="nba-pos" aria-hidden>{l.posicao}</span>
-            <Escudo time={l} className="nba-escudo-ranking" />
-            <span className="nba-nome">{l.nome}</span>
-            <abbr className="nba-sigla" title={l.time}>{l.sigla}</abbr>
-            <span className="nba-barra" aria-hidden><i /></span>
-            <span className="nba-num">{numero(l.valor)}</span>
-          </li>
-        ))}
-      </ol>
-    </section>
-  )
-}
-
 function Lideres() {
   const { dados, erro, carregar } = useCarga(buscarLideres)
   return (
@@ -119,30 +88,6 @@ function Lideres() {
         </div>
       )}
     </section>
-  )
-}
-
-function CartaoNoticia({ n }: { n: NoticiaNba }) {
-  // Os escudos dos times citados no título (e, se faltar, no resumo), até três.
-  const times = timesCitados(`${n.titulo} ${n.resumo}`)
-  return (
-    <a className="card nba-noticia" href={n.url} target="_blank" rel="noopener noreferrer">
-      {n.imagem && <img className="nba-noticia-foto" src={n.imagem} alt="" loading="lazy" referrerPolicy="no-referrer" />}
-      <span className="nba-noticia-meta">
-        <span>
-          <strong>{n.fonte}</strong> · {tempoAtras(n.publicada)}
-        </span>
-        {times.length > 0 && (
-          <span className="nba-noticia-times" title={times.map((t) => t.nome).join(', ')}>
-            {times.map((t) => (
-              <Escudo key={t.sigla} time={t} />
-            ))}
-          </span>
-        )}
-      </span>
-      <h3>{n.titulo}</h3>
-      {n.resumo && <p>{n.resumo}</p>}
-    </a>
   )
 }
 
@@ -190,7 +135,7 @@ function Noticias() {
         <>
           <div className="nba-noticias">
             {visiveis.map((n) => (
-              <CartaoNoticia key={n.id} n={n} />
+              <CartaoNoticia key={n.id} url={n.url} imagem={n.imagem} fonte={n.fonte} quando={tempoAtras(n.publicada)} titulo={n.titulo} resumo={n.resumo} times={timesCitados(`${n.titulo} ${n.resumo}`)} />
             ))}
           </div>
           {falta && <div ref={fim} className="nba-noticias-fim" aria-hidden />}

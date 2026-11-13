@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { buscarNbb, lerNbb, saldoComSinal } from './classificacao'
+import { buscarNbb, diaRelativo, lerNbb, saldoComSinal, timesCitadosNbb } from './classificacao'
 import { jsonNbb } from './exemplo-nbb'
 
 describe('Classificação da NBB', () => {
@@ -42,6 +42,68 @@ describe('Classificação da NBB', () => {
   })
 })
 
+describe('Líderes e notícias da NBB', () => {
+  it('lê as categorias com os líderes na ordem da posição, ligados ao escudo do time, e deixa de fora a categoria vazia', () => {
+    const { categorias } = lerNbb(jsonNbb)
+    expect(categorias.map((c) => c.id)).toEqual(['pontos', 'rebotes'])
+    expect(categorias[0]).toMatchObject({ rotulo: 'Pontos', unidade: 'pontos por jogo', curto: 'pontos' })
+    expect(categorias[0].lideres.map((l) => `${l.posicao} ${l.nome}`)).toEqual(['1 Dupree #11', '2 Harris #1', '3 Time Novo #7'])
+    expect(categorias[0].lideres[1]).toEqual({ posicao: 2, nome: 'Harris #1', time: 'Mogi Basquete', sigla: 'MOG', escudo: 'https://lnb.com.br/uploads/mog-150.png', valor: 21.71 })
+    expect(categorias[0].lideres[2]).toMatchObject({ sigla: '', escudo: '' })
+  })
+
+  it('lê as notícias com link, título, resumo, foto e dia; foto sem https vira nulo e dia inválido deixa a notícia de fora', () => {
+    const { noticias } = lerNbb({
+      news: [
+        { url: 'https://lnb.com.br/n/1', title: 'Um', summary: 'a', image: 'http://x/y.jpg', date: '2026-11-12' },
+        { url: 'https://lnb.com.br/n/2', title: 'Dois', date: '12/11/2026' },
+        { url: 'http://lnb.com.br/n/3', title: 'Três', date: '2026-11-12' },
+      ],
+    })
+    expect(noticias).toEqual([{ url: 'https://lnb.com.br/n/1', titulo: 'Um', resumo: 'a', imagem: null, data: '2026-11-12' }])
+  })
+
+  it('conta o dia em palavras: hoje, ontem e há N dias', () => {
+    const agora = new Date(2026, 10, 13, 15, 0)
+    expect([diaRelativo('2026-11-13', agora), diaRelativo('2026-11-12', agora), diaRelativo('2026-11-09', agora), diaRelativo('2026-11-14', agora)]).toEqual(['hoje', 'ontem', 'há 4 dias', 'hoje'])
+  })
+})
+
+describe('Times citados nas notícias da NBB', () => {
+  const linha = (posicao: number, sigla: string, nome: string) => ({ posicao, sigla, nome, escudo: `https://lnb.com.br/${sigla}.png`, jogos: 7, vitorias: 4, derrotas: 3, aproveitamento: 0.5, saldo: 0, pontos: 11 })
+  const linhas = [
+    linha(1, 'MIN', 'Minas Storm'),
+    linha(2, 'PIN', 'Pinheiros'),
+    linha(3, 'FRA', 'Sesi Franca'),
+    linha(4, 'COR', 'Corinthians'),
+    linha(5, 'UCO', 'Ceisc/União Corinthians'),
+    linha(6, 'PAT', 'Pato Basquete'),
+    linha(7, 'BOT', 'Botafogo'),
+  ]
+  const siglas = (texto: string) => timesCitadosNbb(texto, linhas).map((t) => t.sigla)
+
+  it('acha os times pelo nome da classificação e pelos apelidos, na ordem em que aparecem', () => {
+    expect(siglas('Pinheiros bate o Minas na rodada')).toEqual(['PIN', 'MIN'])
+    expect(siglas('Franca vence o Botafogo')).toEqual(['FRA', 'BOT'])
+    expect(siglas('Sesi Franca cresce no terceiro período')).toEqual(['FRA'])
+    expect(timesCitadosNbb('Minas Storm vence', linhas)[0]).toEqual({ sigla: 'MIN', nome: 'Minas Storm', escudo: 'https://lnb.com.br/MIN.png', escudoEscuro: 'https://lnb.com.br/MIN.png' })
+  })
+
+  it('separa o Corinthians do Ceisc/União Corinthians', () => {
+    expect(siglas('Corinthians 79 x 91 Pinheiros')).toEqual(['COR', 'PIN'])
+    expect(siglas('Ceisc/União Corinthians recebe o Pinheiros')).toEqual(['UCO', 'PIN'])
+  })
+
+  it('só conta nome com maiúscula e palavra inteira, e "Minas Gerais" não é o Minas', () => {
+    expect(siglas('O pato nadou, mas Patos de Minas Gerais não conta')).toEqual([])
+    expect(siglas('Pato Basquete reage no último período')).toEqual(['PAT'])
+  })
+
+  it('no máximo três escudos, e cada time uma vez só', () => {
+    expect(siglas('Minas, Pinheiros, Franca e Botafogo; Minas de novo')).toEqual(['MIN', 'PIN', 'FRA'])
+  })
+})
+
 describe('Busca da classificação da NBB', () => {
   const fetch = vi.fn()
   beforeEach(() => {
@@ -61,12 +123,12 @@ describe('Busca da classificação da NBB', () => {
   })
 
   it('arquivo ausente, rede fora do ar ou tabela vazia viram a mesma mensagem clara', async () => {
-    const mensagem = 'A classificação da NBB não está disponível agora.'
+    const mensagem = 'Os dados da NBB não estão disponíveis agora.'
     fetch.mockImplementation(async () => new Response('não achei', { status: 404 }))
     await expect(buscarNbb()).rejects.toThrow(mensagem)
     fetch.mockRejectedValueOnce(new TypeError('Failed to fetch'))
     await expect(buscarNbb()).rejects.toThrow(mensagem)
-    fetch.mockImplementation(async () => new Response('{"teams":[]}'))
+    fetch.mockImplementation(async () => new Response('{"teams":[],"leaders":[],"news":[]}'))
     await expect(buscarNbb()).rejects.toThrow(mensagem)
     fetch.mockImplementation(async () => new Response('<html>'))
     await expect(buscarNbb()).rejects.toThrow(mensagem)
