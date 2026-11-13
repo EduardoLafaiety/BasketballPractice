@@ -140,7 +140,10 @@ export function lerNbb(json: unknown): TabelaNbb {
   return { temporada, atualizada: updatedAt ?? '', linhas, categorias, noticias }
 }
 
-export const buscarNbb = comValidade('bp.nbb.classificacao', 15 * 60_000, async () => {
+// Guardado só por 2 minutos (o suficiente para trocar de página sem buscar de novo): o arquivo é pequeno, o servidor
+// responde 304 quando nada mudou, e uma leitura velha na aba mostrava "indisponível" depois de a LNB ter respondido.
+// A chave mudou (era bp.nbb.classificacao) para as abas que ainda guardavam essa leitura velha a descartarem.
+export const buscarNbb = comValidade('bp.nbb.dados', 2 * 60_000, async () => {
   const falhou = new Error('Os dados da NBB não estão disponíveis agora.')
   // O Pages manda o arquivo com cache de 10 minutos: "no-cache" faz o navegador perguntar se mudou (um 304 barato) em vez
   // de mostrar a leitura da publicação anterior, que podia não ter líderes ou notícias.
