@@ -39,7 +39,8 @@ describe('Estatísticas da NBA', () => {
     expect(linhas.map((l) => within(l).getByRole('rowheader').textContent)).toEqual(['Philadelphia 76ersPHI', 'New York KnicksNYK', 'Milwaukee BucksMIL'])
     expect(linhas[0]).toHaveTextContent(/^1Philadelphia 76ersPHI92\.818—V1$/)
     expect(linhas[0]).toHaveClass('nba-direto')
-    expect(linhas[2]).not.toHaveClass('nba-direto')
+    expect(linhas[1]).toHaveClass('nba-direto')
+    expect(linhas[2]).toHaveClass('nba-fora')
     // Escudo do time, decorativo; se não carregar, volta a bolinha na cor do time.
     const escudo = linhas[0].querySelector('img.nba-escudo-escuro')
     expect(escudo).toHaveAttribute('src', expect.stringContaining('/500-dark/phi.png'))
@@ -48,6 +49,7 @@ describe('Estatísticas da NBA', () => {
     expect(linhas[0].querySelector('.nba-time-cor')).not.toBeNull()
     expect(screen.getByRole('table', { name: 'Conferência Oeste' })).toHaveTextContent('Los Angeles Lakers')
     expect(screen.getByText('7º ao 10º: play-in')).toBeInTheDocument()
+    expect(screen.getByText('11º ao 15º: fora dos playoffs')).toBeInTheDocument()
   })
 
   it('mostra um cartão por categoria, com o líder em destaque e os seguintes em ranking', async () => {

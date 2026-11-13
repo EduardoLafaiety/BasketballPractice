@@ -45,7 +45,8 @@ function abrirRotina(rotas: Parameters<typeof apiFalsa>[0]) {
   return api
 }
 
-const cartaoDoDia = (dia: string) => screen.getByRole('heading', { name: dia }).closest('.dia') as HTMLElement
+// O dia de hoje ganha o selo "Hoje" no título ("SextaHoje"); por isso o nome só precisa começar com o dia.
+const cartaoDoDia = (dia: string) => screen.getByRole('heading', { name: new RegExp(`^${dia}`) }).closest('.dia') as HTMLElement
 
 describe('Rotina semanal', () => {
   it('mostra os exercícios de cada dia salvos no servidor', async () => {
