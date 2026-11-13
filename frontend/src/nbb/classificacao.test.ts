@@ -113,14 +113,29 @@ describe('Busca da classificação da NBB', () => {
   })
   afterEach(() => vi.unstubAllGlobals())
 
-  it('lê o nbb.json do próprio site e reaproveita por 15 minutos', async () => {
+  it('lê o nbb.json do próprio site e reaproveita por 2 minutos', async () => {
     fetch.mockImplementation(async () => new Response(JSON.stringify(jsonNbb)))
     const agora = Date.now()
     await buscarNbb(agora)
-    await buscarNbb(agora + 14 * 60_000)
+    await buscarNbb(agora + 119_000)
     expect(fetch).toHaveBeenCalledTimes(1)
     // Sempre revalida com o servidor: o cache HTTP do Pages (10 minutos) mostrava a leitura da publicação anterior.
     expect(fetch).toHaveBeenCalledWith('/nbb.json', { cache: 'no-cache' })
+  })
+
+  it('busca de novo passados 2 minutos e ignora a leitura velha que abas antigas guardaram na chave anterior', async () => {
+    // Uma aba aberta antes das notícias e dos líderes existirem guardou a classificação sozinha, e ela ficava na tela.
+    const velha = { quando: Date.now(), dados: { temporada: '2026/27', atualizada: '2026-11-13T13:09:00Z', linhas: lerNbb(jsonNbb).linhas } }
+    sessionStorage.setItem('bp.nbb.classificacao', JSON.stringify(velha))
+    fetch.mockImplementation(async () => new Response(JSON.stringify(jsonNbb)))
+
+    const agora = Date.now()
+    const primeira = await buscarNbb(agora)
+    expect(primeira.noticias).toHaveLength(3)
+    expect(primeira.categorias).toHaveLength(2)
+    await buscarNbb(agora + 121_000)
+    expect(fetch).toHaveBeenCalledTimes(2)
+    sessionStorage.removeItem('bp.nbb.classificacao')
   })
 
   it('arquivo ausente, rede fora do ar ou tabela vazia viram a mesma mensagem clara', async () => {
