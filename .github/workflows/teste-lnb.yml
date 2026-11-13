@@ -1,0 +1,19 @@
+name: Teste LNB (temporário)
+on:
+  push:
+    branches: [nbb-teste-lnb]
+jobs:
+  testar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Variações de pedido
+        run: |
+          U=https://lnb.com.br/nbb/classificacao/
+          UA='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36'
+          t() { echo "== $1"; shift; curl -s -m 30 -o /tmp/o.html -w "%{http_code} %{size_download}\n" "$@"; grep -c 'table_ap' /tmp/o.html || true; }
+          t "simples" "$U"
+          t "UA navegador" -A "$UA" "$U"
+          t "headers completos" -A "$UA" -H 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8' -H 'Accept-Language: pt-BR,pt;q=0.9,en;q=0.8' -H 'Referer: https://lnb.com.br/nbb/' -H 'Upgrade-Insecure-Requests: 1' -H 'Sec-Fetch-Dest: document' -H 'Sec-Fetch-Mode: navigate' -H 'Sec-Fetch-Site: same-origin' --compressed "$U"
+          t "home da LNB" -A "$UA" https://lnb.com.br/
+          t "feed wp-json" -A "$UA" https://lnb.com.br/wp-json/wp/v2/pages?per_page=1
+          t "r.jina.ai" -A "$UA" "https://r.jina.ai/$U"
