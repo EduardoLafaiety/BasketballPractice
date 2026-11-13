@@ -142,7 +142,9 @@ export function lerNbb(json: unknown): TabelaNbb {
 
 export const buscarNbb = comValidade('bp.nbb.classificacao', 15 * 60_000, async () => {
   const falhou = new Error('Os dados da NBB não estão disponíveis agora.')
-  const resposta = await fetch(`${import.meta.env.BASE_URL}nbb.json`).catch(() => {
+  // O Pages manda o arquivo com cache de 10 minutos: "no-cache" faz o navegador perguntar se mudou (um 304 barato) em vez
+  // de mostrar a leitura da publicação anterior, que podia não ter líderes ou notícias.
+  const resposta = await fetch(`${import.meta.env.BASE_URL}nbb.json`, { cache: 'no-cache' }).catch(() => {
     throw falhou
   })
   if (!resposta.ok) throw falhou

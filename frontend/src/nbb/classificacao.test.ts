@@ -119,7 +119,8 @@ describe('Busca da classificação da NBB', () => {
     await buscarNbb(agora)
     await buscarNbb(agora + 14 * 60_000)
     expect(fetch).toHaveBeenCalledTimes(1)
-    expect(fetch).toHaveBeenCalledWith('/nbb.json')
+    // Sempre revalida com o servidor: o cache HTTP do Pages (10 minutos) mostrava a leitura da publicação anterior.
+    expect(fetch).toHaveBeenCalledWith('/nbb.json', { cache: 'no-cache' })
   })
 
   it('arquivo ausente, rede fora do ar ou tabela vazia viram a mesma mensagem clara', async () => {
