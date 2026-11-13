@@ -20,6 +20,7 @@ const LINKS: { to: string; rotulo: string; fim?: boolean }[] = [
   { to: '/desafio', rotulo: 'Desafio do dia' },
   { to: '/jogue-como', rotulo: 'Jogue como' },
   { to: '/nba', rotulo: 'Estatísticas da NBA' },
+  { to: '/nbb', rotulo: 'NBB' },
   { to: '/rotina', rotulo: 'Rotina' },
   { to: '/alimentacao', rotulo: 'Alimentação' },
   { to: '/equipamentos', rotulo: 'Equipamentos' },

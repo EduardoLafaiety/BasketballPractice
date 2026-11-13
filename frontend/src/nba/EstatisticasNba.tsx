@@ -1,47 +1,16 @@
-import { useCallback, useEffect, useRef, useState, type CSSProperties } from 'react'
-import { Carregando, ErroCarga } from '../components/Estado'
+import { useEffect, useRef, useState, type CSSProperties } from 'react'
 import { tempoAtras } from '../lib/noticias'
+import { Escudo, Estado } from './componentes'
 import { buscarLideres, numero, type Categoria, type Lider } from './lideres'
-import { timesCitados, type Escudos } from './escudos'
+import { timesCitados } from './escudos'
 import { buscarNoticiasNba, ultimas24h, type NoticiaNba } from './noticias'
+import { useCarga } from './useCarga'
 import { aproveitamento, buscarTabela, jogosAtras, type LinhaTabela } from './tabela'
 
 // As notícias se atualizam sozinhas com a página aberta; as que passam de 24 horas saem da lista.
 const ATUALIZAR_NOTICIAS_MS = 10 * 60_000
 // Entram de 12 em 12 conforme a página rola (12 fecha fileiras de 1, 2, 3 ou 4 cartões).
 const NOTICIAS_POR_VEZ = 12
-
-/** Busca ao abrir, com carregando, erro e "tentar de novo". */
-function useCarga<T>(buscar: () => Promise<T>) {
-  const [dados, setDados] = useState<T | null>(null)
-  const [erro, setErro] = useState<Error | null>(null)
-  const carregar = useCallback(() => {
-    setErro(null)
-    buscar().then(setDados, setErro)
-  }, [buscar])
-  useEffect(carregar, [carregar])
-  return { dados, erro, carregar }
-}
-
-function Estado({ erro, carregar, texto }: { erro: Error | null; carregar: () => void; texto: string }) {
-  return erro ? <ErroCarga erro={erro} tentarDeNovo={carregar} /> : <Carregando texto={texto} />
-}
-
-/**
- * Escudo nas versões para fundo claro e escuro (o CSS mostra a do tema); se não carregar, fica a bolinha
- * na cor do time. `soEscuro` é para fundos sempre escuros, como o cartão do líder: sem escudo, não mostra nada.
- */
-function Escudo({ time, soEscuro = false, className = '' }: { time: Escudos; soEscuro?: boolean; className?: string }) {
-  const [falhou, setFalhou] = useState(false)
-  // Dados guardados no cache antes de existirem os escudos vêm sem eles.
-  if (falhou || !time.escudo || !time.escudoEscuro) return soEscuro ? null : <span className="nba-time-cor" aria-hidden />
-  const img = (src: string, classe?: string) => <img className={classe} src={src} alt="" width={28} height={28} loading="lazy" onError={() => setFalhou(true)} />
-  return (
-    <span className={`nba-escudo ${className}`.trim()} aria-hidden>
-      {soEscuro ? img(time.escudoEscuro) : <>{img(time.escudo, 'nba-escudo-claro')}{img(time.escudoEscuro, 'nba-escudo-escuro')}</>}
-    </span>
-  )
-}
 
 function TabelaConferencia({ titulo, linhas }: { titulo: string; linhas: LinhaTabela[] }) {
   return (
