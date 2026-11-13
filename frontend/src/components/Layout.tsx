@@ -17,7 +17,6 @@ const LINKS: { to: string; rotulo: string; fim?: boolean }[] = [
   { to: '/', rotulo: 'Início', fim: true },
   { to: '/treinos', rotulo: 'Treinos' },
   { to: '/programas', rotulo: 'Programas' },
-  { to: '/desafio', rotulo: 'Desafio do dia' },
   { to: '/jogue-como', rotulo: 'Jogue como' },
   { to: '/nba', rotulo: 'Estatísticas da NBA' },
   { to: '/nbb', rotulo: 'NBB' },
@@ -25,7 +24,6 @@ const LINKS: { to: string; rotulo: string; fim?: boolean }[] = [
   { to: '/alimentacao', rotulo: 'Alimentação' },
   { to: '/equipamentos', rotulo: 'Equipamentos' },
   { to: '/artigos', rotulo: 'Artigos' },
-  { to: '/quiz', rotulo: 'Quiz do dia' },
   { to: '/desempenho', rotulo: 'Desempenho' },
   { to: '/cartao', rotulo: 'Cartão do atleta' },
   { to: '/jogos', rotulo: 'Diário de jogos' },
@@ -36,12 +34,12 @@ const LINKS: { to: string; rotulo: string; fim?: boolean }[] = [
 ]
 
 // Barra de baixo do celular: os atalhos ao alcance do polegar, com a bola de gerar treino no meio.
-type AtalhoDoca = { to: string; rotulo: string; icone: 'inicio' | 'treinos' | 'fogo'; fim?: boolean }
+type AtalhoDoca = { to: string; rotulo: string; icone: 'inicio' | 'treinos' | 'prancheta'; fim?: boolean }
 const DOCA_ESQUERDA: AtalhoDoca[] = [
   { to: '/', rotulo: 'Início', icone: 'inicio', fim: true },
   { to: '/treinos', rotulo: 'Treinos', icone: 'treinos' },
 ]
-const DOCA_DIREITA: AtalhoDoca[] = [{ to: '/desafio', rotulo: 'Desafio', icone: 'fogo' }]
+const DOCA_DIREITA: AtalhoDoca[] = [{ to: '/artigos', rotulo: 'Artigos', icone: 'prancheta' }]
 
 function ItemDoca({ to, rotulo, icone, fim }: AtalhoDoca) {
   return (

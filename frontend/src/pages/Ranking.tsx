@@ -52,7 +52,7 @@ export default function RankingPagina() {
   return (
     <>
       <h1>Ranking</h1>
-      <p className="muted">Lances livres, desafio do dia, quiz, sequência e nota do cartão: compare com todo mundo ou só com os amigos, nesta semana ou desde sempre.</p>
+      <p className="muted">Lances livres, sequência e nota do cartão: compare com todo mundo ou só com os amigos, nesta semana ou desde sempre.</p>
       {__DEMO__ ? (
         <SoComServidor recurso="O ranking" porque="O ranking e os desafios entre amigos comparam várias contas." exemplo={<RankingExemplo />} />
       ) : (

@@ -32,7 +32,6 @@
 - 🗓️ **Rotina Semanal**: Monte O Que Treinar Em Cada Dia Ou Comece De Um Modelo Pronto.
 - 📈 **Desempenho**: Comparativos, Gráficos E Mapa De Arremessos Por Zona Da Quadra.
 - 🏆 **Metas E Conquistas**: Barras De Progresso, Sequência De Dias Seguidos E Medalhas.
-- 🎯 **Desafio Do Dia E Quiz Diário**: O Mesmo Desafio De Quadra E As Mesmas 5 Perguntas Para Todo Mundo, Trocados À Meia-Noite, Com Placar Em Quadradinhos Para Compartilhar.
 - 🪪 **Cartão Do Atleta**: Bateria Mensal De Quatro Testes, Nota De 0 A 99, Radar E Evolução Mês A Mês.
 - 📅 **Programas De 30 Dias**: Um Treino Liberado Por Dia, Com Barra De Progresso.
 - 🥇 **Ranking E Desafios Entre Amigos**: Listas Da Semana E Gerais, Convite Por Link E Duelos Semanais.

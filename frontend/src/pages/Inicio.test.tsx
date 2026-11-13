@@ -132,6 +132,10 @@ describe('Início', () => {
     expect(within(secao).getByRole('link', { name: /Dormir mais acerta mais arremessos/ })).toHaveAttribute('href', '/artigos/sono-e-arremesso')
     expect(within(secao).getByRole('link', { name: /Massagem, compressão, gelo/ })).toHaveAttribute('href', '/artigos/qual-recuperacao-funciona')
     expect(within(secao).getAllByRole('link', { name: /min de leitura/ })).toHaveLength(5)
+    // O desafio do dia e o quiz saíram do app: sobram só os artigos.
+    expect(screen.queryByRole('link', { name: 'Quiz do dia' })).toBeNull()
+    expect(screen.queryByText('Desafio do dia')).toBeNull()
+    expect(screen.queryByRole('link', { name: /Aceitar desafio/ })).toBeNull()
   })
 
   it('sem resposta dos jogadores, o resto da página continua', async () => {
@@ -169,27 +173,7 @@ describe('Início', () => {
 })
 
 const semana = (weekStart: string, sessions: number, minutes: number, makes: number, attempts: number) => ({ weekStart, sessions, minutes, makes, attempts })
-const desafioHoje = (result: object | null = null) => ({
-  day: '2026-10-28',
-  challenge: { id: 'tres-25', title: '25 bolas de três', description: 'Cinco de cada posição.', exercise: 'Arremesso de três', mode: 'tentativas', attempts: 25, goal: 10, maxAttempts: 25 },
-  result,
-})
-
-describe('Início: desafio do dia e resumo da semana', () => {
-  it('chama para o desafio do dia e mostra quando ele já foi feito', async () => {
-    abrirInicio({ 'GET /challenges/today': desafioHoje() })
-    const secao = (await screen.findByRole('heading', { name: '25 bolas de três' })).closest('section')!
-    expect(within(secao).getByText('cestas em 25 arremessos')).toBeInTheDocument()
-    expect(within(secao).getByRole('link', { name: /Aceitar desafio/ })).toHaveAttribute('href', '/desafio')
-  })
-
-  it('o desafio já feito mostra o placar do dia', async () => {
-    abrirInicio({ 'GET /challenges/today': desafioHoje({ day: '2026-10-28', challengeId: 'tres-25', title: '25 bolas de três', makes: 12, attempts: 25, goal: 10, completed: true }) })
-    const secao = (await screen.findByRole('heading', { name: '25 bolas de três' })).closest('section')!
-    expect(within(secao).getByText('12/25')).toBeInTheDocument()
-    expect(within(secao).getByText('Cumprido hoje')).toBeInTheDocument()
-  })
-
+describe('Início: resumo da semana', () => {
   it('no meio da semana, compara a semana até agora com a anterior', async () => {
     const { chamadas } = abrirInicio({
       'GET /stats/summary': { ...resumo(4, 95, 30, 40), byWeek: [semana('2026-10-19', 2, 60, 10, 20), semana('2026-10-26', 3, 90, 15, 20)] },
@@ -213,7 +197,6 @@ describe('Início: desafio do dia e resumo da semana', () => {
       'GET /settings': configFalsa,
       'GET /exercises': catalogo,
       'GET /stats/summary': { ...resumo(1, 30, 0, 0), byWeek: [semana('2026-10-12', 4, 120, 30, 40), semana('2026-10-19', 2, 60, 10, 20)] },
-      'GET /challenges/today': desafioHoje(),
       ...rotinaDe({}),
     })
     abrirApp('/')
@@ -223,8 +206,8 @@ describe('Início: desafio do dia e resumo da semana', () => {
     expect(within(secao).getByText('Segunda é dia de balanço')).toBeInTheDocument()
     expect(await within(secao).findByText('−2 em relação à semana anterior')).toHaveClass('desce')
     expect(within(secao).getByText('−25 pontos em relação à semana anterior')).toBeInTheDocument()
-    // Vem antes do desafio do dia.
-    const desafio = screen.getByRole('heading', { name: '25 bolas de três' })
-    expect(secao.compareDocumentPosition(desafio) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    // Vem antes da seção do treino de hoje.
+    const treino = screen.getByRole('heading', { name: 'Treino de hoje' })
+    expect(secao.compareDocumentPosition(treino) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
   })
 })

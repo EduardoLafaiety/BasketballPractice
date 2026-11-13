@@ -2,13 +2,14 @@ import assert from 'node:assert/strict'
 import { describe, it } from 'node:test'
 import { startApi } from './http.js'
 
-const { api, register } = await startApi()
+const { api, db, register } = await startApi()
 
 describe('Backup com os recursos novos', () => {
-  it('a exportação traz desafio, quiz, programas, jogos, jogadas e perfil do ranking, e a importação ignora essa parte', async () => {
-    const { token } = await register()
-    await api('POST', '/challenges/today', { makes: 3, attempts: 5 }, token)
-    await api('POST', '/quiz/today', { answers: [0, 1, 2, 3, 0] }, token)
+  it('a exportação traz o histórico de desafio e quiz que já existia, programas, jogos, jogadas e perfil do ranking, e a importação ignora essa parte', async () => {
+    const { token, id } = await register()
+    // O desafio do dia e o quiz saíram do app, mas o que já estava guardado continua sendo dado da pessoa: entra na exportação.
+    await db.query(`INSERT INTO daily_challenge_results (user_id, day, challenge_id, makes, attempts) VALUES ($1, '2026-11-08', 'x', 3, 5)`, [id])
+    await db.query(`INSERT INTO quiz_results (user_id, day, correct, answers) VALUES ($1, '2026-11-08', 3, '{0,1,2,3,0}')`, [id])
     await api('POST', '/programs/primeiros-30/start', undefined, token)
     await api('POST', '/programs/primeiros-30/days/1/complete', {}, token)
     await api('POST', '/games', { playedOn: '2026-11-08', points: 12 }, token)

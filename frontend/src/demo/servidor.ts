@@ -4,7 +4,6 @@ import { PGlite, type Transaction } from '@electric-sql/pglite'
 import { one, prepareDatabase, type Database, type Queryable } from '../../../backend/src/db/index'
 import { errorHandler, notFoundHandler } from '../../../backend/src/middleware/errors'
 import { cardRouter } from '../../../backend/src/routes/card'
-import { challengesRouter } from '../../../backend/src/routes/challenges'
 import { dataRouter } from '../../../backend/src/routes/data'
 import { exercisesRouter } from '../../../backend/src/routes/exercises'
 import { gamesRouter } from '../../../backend/src/routes/games'
@@ -12,7 +11,6 @@ import { goalsRouter } from '../../../backend/src/routes/goals'
 import { plansRouter } from '../../../backend/src/routes/plans'
 import { playsRouter } from '../../../backend/src/routes/plays'
 import { programsRouter } from '../../../backend/src/routes/programs'
-import { quizRouter } from '../../../backend/src/routes/quiz'
 import { sessionsRouter } from '../../../backend/src/routes/sessions'
 import { settingsRouter } from '../../../backend/src/routes/settings'
 import { statsRouter } from '../../../backend/src/routes/stats'
@@ -85,8 +83,6 @@ export async function criarServidor({ dados }: { dados?: string } = {}) {
     ['/sessions', montar(sessionsRouter(db))],
     ['/stats', montar(statsRouter(db))],
     ['/goals', montar(goalsRouter(db))],
-    ['/challenges', montar(challengesRouter(db))],
-    ['/quiz', montar(quizRouter(db))],
     ['/card', montar(cardRouter(db))],
     ['/tests', montar(testsRouter(db))],
     ['/plans', montar(plansRouter(db))],

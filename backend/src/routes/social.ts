@@ -12,9 +12,9 @@ import { localToday, streaks } from './stats.js'
 // ---------- Métricas ----------
 
 /** O que entra no ranking. Todas saem de dados que o servidor já validou. */
-export const RANKING_METRICS = ['lances_livres', 'desafio', 'quiz', 'sequencia', 'cartao'] as const
+export const RANKING_METRICS = ['lances_livres', 'sequencia', 'cartao'] as const
 /** O que dá para disputar num desafio entre amigos. */
-export const CHALLENGE_METRICS = ['lances_livres', 'cestas', 'minutos', 'desafio', 'quiz'] as const
+export const CHALLENGE_METRICS = ['lances_livres', 'cestas', 'minutos'] as const
 
 type RankingMetric = (typeof RANKING_METRICS)[number]
 type ChallengeMetric = (typeof CHALLENGE_METRICS)[number]
@@ -83,15 +83,6 @@ function sumMinutes(db: Queryable, ids: number[], p: Period) {
   ).then(toMap)
 }
 
-function sumDaily(db: Queryable, table: 'daily_challenge_results' | 'quiz_results', column: string, ids: number[], p: Period) {
-  return many<{ userId: number; value: number }>(
-    db,
-    `SELECT user_id AS "userId", SUM(${column})::float8 AS value FROM ${table}
-     WHERE user_id = ANY($1::int[]) AND ($2::date IS NULL OR day >= $2) AND day < $3::date GROUP BY 1`,
-    [ids, p.fromDay, p.toDay],
-  ).then(toMap)
-}
-
 /** Semana: dias com treino na semana. Geral: sequência atual de dias. */
 async function trainingDays(db: Queryable, ids: number[], p: Period, tzOffset: number, weekly: boolean) {
   const rows = await many<{ userId: number; day: string }>(
@@ -144,14 +135,13 @@ export function metricValues(db: Queryable, metric: RankingMetric | ChallengeMet
       return sumMakes(db, ids, p, false)
     case 'minutos':
       return sumMinutes(db, ids, p)
-    case 'desafio':
-      return sumDaily(db, 'daily_challenge_results', 'makes', ids, p)
-    case 'quiz':
-      return sumDaily(db, 'quiz_results', 'correct', ids, p)
     case 'sequencia':
       return trainingDays(db, ids, p, tzOffset, weekly)
     case 'cartao':
       return cardRatings(db, ids, tzOffset, weekly)
+    default:
+      // Duelo antigo de uma métrica que saiu do app (desafio do dia, quiz): sem placar, em vez de quebrar.
+      return Promise.resolve(new Map() as Values)
   }
 }
 
@@ -382,9 +372,9 @@ export function socialRouter(db: Database, { notificar }: { notificar?: Notify }
       db,
       `SELECT ${challengeColumns} FROM friend_challenges c
        JOIN profiles pc ON pc.user_id = c.challenger_id JOIN profiles po ON po.user_id = c.opponent_id
-       WHERE (c.challenger_id = $1 OR c.opponent_id = $1) AND c.week_start >= $2::date - 28
+       WHERE (c.challenger_id = $1 OR c.opponent_id = $1) AND c.week_start >= $2::date - 28 AND c.metric = ANY($3::text[])
        ORDER BY c.week_start DESC, c.id DESC LIMIT 30`,
-      [userId, localToday(tzOffset)],
+      [userId, localToday(tzOffset), [...CHALLENGE_METRICS]],
     )
     res.json(await withScore(rows, userId, tzOffset))
   })
