@@ -1324,41 +1324,6 @@ select.input:hover:not(:disabled) { border-color: var(--laranja); }
 .estilo-lado .select { width: 100%; text-align: center; }
 
 
-/* Gerador: tempo e ação em painéis de placar, escolhas em passos numerados. */
-.gerador { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); grid-template-rows: auto 1fr; grid-template-areas: 'tempo passos' 'acao passos'; gap: 1rem; margin-top: 1rem; }
-.gerador-tempo { grid-area: tempo; display: grid; gap: 0.6rem; }
-.gerador-passos { grid-area: passos; display: grid; align-content: space-between; gap: 1.5rem; }
-.gerador-acao { grid-area: acao; display: grid; align-content: end; gap: 1rem; text-align: center; }
-.gerador-acao p { margin: 0; }
-.gerador-tempo label { display: grid; justify-items: center; gap: 0.35rem; }
-.gerador-tempo .timer-relogio small { font-size: 0.3em; letter-spacing: 0.04em; }
-.gerador-tempo input[type='range'] { width: 100%; margin-top: 0.5rem; accent-color: var(--laranja); cursor: pointer; }
-.gerador-escala { display: flex; justify-content: space-between; }
-.gerador-tempo .chips { justify-content: center; }
-.gerador-passo { min-width: 0; margin: 0; padding: 0; border: 0; }
-.gerador-passo legend { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.6rem; margin-bottom: 0.6rem; padding: 0; font-family: var(--fonte-display); font-size: 1.6rem; font-weight: var(--peso-display); line-height: 1; text-transform: uppercase; }
-.gerador-passo legend > span, .gerador-numero { color: var(--laranja-texto); font-family: var(--fonte-display); font-size: 1.6rem; font-weight: var(--peso-display); line-height: 1; }
-.gerador-passo legend small { font-family: var(--fonte-corpo, inherit); }
-.gerador .niveis { margin: 0; }
-.gerador .nivel-opcao { align-content: start; cursor: pointer; }
-.gerador-focos { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.5rem; }
-.gerador-foco { justify-content: flex-start; min-height: 44px; padding: 0.5rem 0.9rem; border: 1px solid var(--borda); border-radius: 14px; background: transparent; font: inherit; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer; transition: border-color 0.15s, background-color 0.15s; }
-.gerador-foco:hover { border-color: var(--texto); }
-.gerador-foco.ativo { border-color: var(--texto); background: var(--texto); color: var(--bg); }
-.conteudo .gerador-aquecimento { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 0.6rem; padding-top: 1rem; border-top: 1px solid var(--borda); cursor: pointer; }
-.gerador-aquecimento input { appearance: none; position: relative; width: 46px; height: 26px; margin: 0; border-radius: 999px; background: var(--borda); cursor: pointer; transition: background-color 0.15s; }
-.gerador-aquecimento input::before { content: ''; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: #ffffff; transition: transform 0.15s; }
-.gerador-aquecimento input:checked { background: var(--laranja); }
-.gerador-aquecimento input:checked::before { transform: translateX(20px); }
-@media (max-width: 860px) {
-  .gerador { grid-template-columns: minmax(0, 1fr); grid-template-rows: none; grid-template-areas: 'tempo' 'passos' 'acao'; }
-}
-@media (max-width: 560px) {
-  .gerador .niveis { grid-template-columns: minmax(0, 1fr); }
-  .gerador .nivel-opcao { padding: 0.75rem 1rem; text-align: left; }
-  .gerador-focos { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-}
-
 /* Ferramentas: abas em cartões, como os níveis de Treinos. */
 .niveis-abas { grid-template-columns: repeat(5, minmax(0, 1fr)); }
 .niveis-abas .nivel-opcao { align-content: start; padding: 0.9rem 1.1rem; text-align: left; cursor: pointer; }
@@ -2129,14 +2094,14 @@ html { -webkit-tap-highlight-color: transparent; }
   .drill-card:hover, .cartao-jogador:hover, .nivel-cartao:hover, .treino-linha:hover { transform: none; box-shadow: var(--sombra); }
   .nav-link:hover { transform: none; }
   .ferramenta-linha:hover { padding-left: 0; }
-  .btn, .chip, .gerador-foco, .nivel-opcao, .ferramenta-linha, .time-cartao, .artigo-cartao {
+  .btn, .chip, .nivel-opcao, .ferramenta-linha, .time-cartao, .artigo-cartao {
     transition: transform 0.35s cubic-bezier(0.3, 1.6, 0.5, 1), color 0.3s, background-color 0.15s, border-color 0.3s, box-shadow 0.25s;
   }
   .drill-card, .cartao-jogador, .nivel-cartao, .treino-linha { transition: transform 0.35s cubic-bezier(0.3, 1.6, 0.5, 1), box-shadow 0.25s; }
-  .btn:active:not(:disabled), .chip:active:not(:disabled), .gerador-foco:active, .nivel-opcao:active { transform: scale(0.93); transition-duration: 0.08s; }
+  .btn:active:not(:disabled), .chip:active:not(:disabled), .nivel-opcao:active { transform: scale(0.93); transition-duration: 0.08s; }
   .drill-card:active, .cartao-jogador:active, .nivel-cartao:active, .treino-linha:active, .ferramenta-linha:active, .time-cartao:active, .artigo-cartao:active { transform: scale(0.97); transition-duration: 0.08s; }
 }
-:root[data-movimento='reduzido'] :is(.btn, .chip, .gerador-foco, .nivel-opcao, .drill-card, .cartao-jogador, .nivel-cartao, .treino-linha, .ferramenta-linha, .time-cartao, .artigo-cartao):active { transform: none; }
+:root[data-movimento='reduzido'] :is(.btn, .chip, .nivel-opcao, .drill-card, .cartao-jogador, .nivel-cartao, .treino-linha, .ferramenta-linha, .time-cartao, .artigo-cartao):active { transform: none; }
 
 /* Dedo, não mouse: chips, campos e o x de remover ganham altura de toque. */
 @media (pointer: coarse) {
@@ -2148,7 +2113,6 @@ html { -webkit-tap-highlight-color: transparent; }
 @media (max-width: 560px) {
   .niveis .nivel-opcao { padding-inline: 0.4rem; }
   .niveis .nivel-opcao strong { letter-spacing: 0.02em; }
-  .gerador-foco { gap: 0.4rem; padding-inline: 0.7rem; letter-spacing: 0.02em; }
 }
 /* Menu no celular: as seções cabem quase todas na tela, sem rolar tanto. */
 @media (max-width: 560px) {
@@ -2262,6 +2226,74 @@ html { -webkit-tap-highlight-color: transparent; }
 @media (min-width: 1500px) { .conteudo .semana { grid-template-columns: repeat(7, minmax(0, 1fr)); } }
 @media (max-width: 560px) { .led { min-width: 0; flex: 1; font-size: 0.85rem; padding: 0.35rem 0; } .placar-leds { width: 100%; } }
 @media (prefers-reduced-motion: reduce) { .dia { animation: none; transition: none; } .dia.hoje, .dia.alvo { transform: none; } }
+
+/*
+ * Gerador da rotina semanal: o único lugar do app que gera treino. Um painel só (dias, tempo, nível, foco e aquecimento)
+ * com a barra escura de ação embaixo; o resultado aparece como prévia nos cartões da rotina.
+ */
+.gs { display: grid; margin-top: 1.25rem; border: 1px solid var(--borda); border-radius: 22px; background: var(--superficie); box-shadow: var(--sombra); overflow: hidden; }
+.gs-corpo { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr)); gap: 1.6rem 2.5rem; padding: 1.5rem 1.6rem; }
+.gs-coluna { display: grid; gap: 1.6rem; align-content: start; min-width: 0; }
+.gs-bloco { display: grid; gap: 0.6rem; align-content: start; min-width: 0; margin: 0; padding: 0; border: 0; }
+.gs-bloco > legend, .gs-titulo { display: flex; align-items: baseline; justify-content: space-between; gap: 0.75rem; width: 100%; padding: 0; }
+.gs-rotulo { color: var(--muted); font-size: 0.7rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; }
+.gs-dica { color: var(--muted); font-size: 0.66rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
+
+.gs-leds { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 0.4rem; }
+.gs-leds .led { min-width: 0; padding: 0.6rem 0; cursor: pointer; font-size: 1.15rem; transition: background 0.15s, color 0.15s, border-color 0.15s; }
+.gs-leds .led:hover { border-color: var(--laranja); color: #bbbbbb; }
+.led[aria-pressed='true'] { border-color: var(--laranja); background: color-mix(in srgb, var(--laranja) 16%, #151515); color: var(--laranja); text-shadow: 0 0 10px rgba(255, 106, 19, 0.7); }
+
+.gs-tempo { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 1.1rem; padding: 0.9rem 1.1rem; border-radius: 14px; background: #0b0b0b; color: #ffffff; }
+.gs-tempo .gs-minutos { color: var(--laranja); font-family: var(--fonte-display); font-weight: var(--peso-display); font-size: 3.2rem; line-height: 0.9; font-variant-numeric: tabular-nums; }
+.gs-tempo .gs-minutos small { margin-left: 0.25rem; color: #a3a3a3; font-family: inherit; font-size: 0.7rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; }
+.gs-tempo input[type='range'] { flex: 1 1 160px; min-width: 0; accent-color: var(--laranja); }
+.gs-atalhos { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.gs-chip { padding: 0.4rem 0.8rem; border: 1px solid var(--borda); border-radius: 999px; background: transparent; color: var(--muted); font-size: 0.7rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; transition: border-color 0.15s, color 0.15s, background 0.15s; }
+.gs-tempo .gs-chip { border-color: #2c2c2c; color: #a3a3a3; }
+.gs-chip:hover { border-color: var(--laranja); color: var(--laranja-texto); }
+.gs-chip[aria-pressed='true'] { border-color: var(--laranja); background: color-mix(in srgb, var(--laranja) 14%, transparent); color: var(--laranja); }
+
+.gs-niveis { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 150px), 1fr)); gap: 0.5rem; }
+.gs-nivel { display: grid; gap: 0.25rem; align-content: start; padding: 0.75rem 0.9rem; border: 1px solid var(--borda); border-radius: 12px; background: transparent; color: inherit; text-align: left; cursor: pointer; transition: border-color 0.15s, background 0.15s; }
+.gs-nivel strong { font-size: 0.78rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; }
+.gs-nivel span { color: var(--muted); font-size: 0.68rem; font-weight: 600; line-height: 1.45; letter-spacing: 0.02em; text-transform: none; }
+.gs-nivel:hover { border-color: var(--laranja); }
+.gs-nivel[aria-pressed='true'] { border-color: var(--laranja); background: color-mix(in srgb, var(--laranja) 12%, transparent); }
+
+.gs-focos { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.gs-foco { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.45rem 0.8rem; border: 1px solid var(--borda); border-radius: 999px; background: transparent; color: var(--texto); font-size: 0.7rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; transition: border-color 0.15s, background 0.15s; }
+.gs-foco::before { content: ''; width: 9px; height: 9px; border-radius: 50%; background: var(--c); }
+.gs-foco:hover { border-color: var(--c); }
+.gs-foco[aria-pressed='true'] { border-color: var(--c); background: color-mix(in srgb, var(--c) 20%, transparent); }
+.conteudo .gs-aquecimento { display: flex; align-items: center; gap: 0.6rem; cursor: pointer; }
+.gs-aquecimento input { width: 18px; height: 18px; accent-color: var(--laranja); }
+
+.gs-rodape { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.75rem 1.5rem; padding: 1rem 1.6rem; background: #0b0b0b; color: #ffffff; }
+.conteudo .gs-resumo { margin: 0; min-width: 0; color: #a3a3a3; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.08em; line-height: 1.6; text-transform: uppercase; }
+.gs-resumo strong { color: #ffffff; }
+.gs-acoes { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.gs-botao { padding: 0.75rem 1.4rem; border: 1.5px solid var(--laranja); border-radius: 999px; background: transparent; color: var(--laranja); font-size: 0.74rem; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; transition: background 0.15s, color 0.15s; }
+.gs-botao:hover:not(:disabled) { background: color-mix(in srgb, var(--laranja) 16%, transparent); }
+.gs-botao.gs-primario { background: var(--laranja); color: #111111; }
+.gs-botao.gs-primario:hover:not(:disabled) { background: #ff7d33; }
+.gs-botao:disabled { opacity: 0.45; cursor: not-allowed; }
+.conteudo .gs-aviso { margin: 0; padding: 0.6rem 1.6rem 0.9rem; background: #0b0b0b; color: #a3a3a3; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.06em; line-height: 1.6; text-transform: uppercase; }
+.conteudo .gs-aviso.gs-erro { color: #ff8a8a; }
+@media (max-width: 560px) {
+  .gs-corpo { padding: 1.1rem 1rem; }
+  .gs-rodape { padding: 0.9rem 1rem; }
+  .gs-aviso { padding-inline: 1rem; }
+  .gs-leds .led { font-size: 0.95rem; }
+  .gs-acoes, .gs-acoes .gs-botao { width: 100%; }
+}
+
+/* A prévia da semana gerada: cartões tracejados até virarem a rotina, com a duração de cada bloco. */
+.semana.em-previa .dia { border-style: dashed; }
+.rota-min { padding-top: 0.2rem; color: var(--muted); font-size: 0.68rem; font-weight: 800; letter-spacing: 0.04em; font-variant-numeric: tabular-nums; }
+.rota-aq .rota-no { background: var(--superficie); color: var(--c); box-shadow: inset 0 0 0 2px var(--c); font-size: 0.6rem; }
+.placar-item.placar-previa { padding: 0.15rem 0.7rem; border: 1px solid var(--laranja); border-radius: 999px; color: var(--laranja); }
+
 
 .programa-semanas { list-style: none; margin: 0.25rem 0; padding: 0; display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; max-width: 150px; }
 .programa-semanas li { aspect-ratio: 1; border-radius: 4px; background: var(--superficie-2); }

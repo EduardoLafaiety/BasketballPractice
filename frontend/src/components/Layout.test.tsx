@@ -47,8 +47,8 @@ describe('Menu em tela cheia', () => {
     const user = userEvent.setup()
     abrir()
     await user.click(await botaoMenu())
-    await user.click(within(document.querySelector('.topo') as HTMLElement).getByRole('link', { name: 'Gerar treino' }))
-    await waitFor(() => expect(screen.getByTestId('caminho')).toHaveTextContent('/gerador'))
+    await user.click(within(document.querySelector('.topo') as HTMLElement).getByRole('link', { name: 'Gerar rotina' }))
+    await waitFor(() => expect(screen.getByTestId('caminho')).toHaveTextContent('/rotina'))
     expect(tela()).not.toHaveClass('aberto')
   })
 
@@ -74,9 +74,9 @@ describe('Barra de atalhos do celular', () => {
     await botaoMenu()
     expect(doca().getByRole('link', { name: 'Treinos' })).toHaveClass('active')
 
-    await user.click(doca().getByRole('link', { name: 'Gerar treino' }))
-    await waitFor(() => expect(screen.getByTestId('caminho')).toHaveTextContent('/gerador'))
-    expect(doca().getByRole('link', { name: 'Gerar treino' })).toHaveClass('active')
+    await user.click(doca().getByRole('link', { name: 'Gerar rotina' }))
+    await waitFor(() => expect(screen.getByTestId('caminho')).toHaveTextContent('/rotina'))
+    expect(doca().getByRole('link', { name: 'Gerar rotina' })).toHaveClass('active')
     expect(doca().getByRole('link', { name: 'Treinos' })).not.toHaveClass('active')
   })
 

@@ -26,7 +26,7 @@ const ARTIGOS_EM_DESTAQUE = ['sono-e-arremesso', 'treino-deliberado', 'salto-ver
 const FERRAMENTAS: { to: string; titulo: string; texto: string }[] = [
   { to: '/ranking', titulo: 'Ranking e desafios', texto: 'Lances livres, desafio do dia, quiz e sequência contra todo mundo ou só contra os amigos, com duelos semanais.' },
   { to: '/programas', titulo: 'Programas de 30 dias', texto: 'Um treino liberado por dia, com barra de progresso: arremesso, mão fraca e os primeiros 30 dias.' },
-  { to: '/gerador', titulo: 'Gerador de treino', texto: 'Diga o tempo, o nível e o foco: a sessão começa pelo aquecimento e vai do mais fácil ao mais difícil.' },
+  { to: '/rotina', titulo: 'Rotina semanal', texto: 'Escolha os dias, o tempo, o nível e o foco: o app monta a semana inteira, do aquecimento ao mais difícil.' },
   { to: '/ferramentas', titulo: 'Ferramentas de quadra', texto: 'Cronômetro, metrônomo, contador ao vivo, calculadoras e testes físicos.' },
   { to: '/desempenho', titulo: 'Desempenho', texto: 'Gráficos, mapa de arremessos e a sua evolução ao longo do tempo.' },
   { to: '/metas', titulo: 'Metas', texto: 'Objetivos com prazo, conquistas e sequência de dias treinando.' },
