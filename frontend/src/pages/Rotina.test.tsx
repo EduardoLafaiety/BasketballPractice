@@ -1,4 +1,4 @@
-import { screen, waitFor, within } from '@testing-library/react'
+import { fireEvent, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import { definirToken } from '../api'
@@ -145,5 +145,65 @@ describe('Rotina semanal', () => {
       'bp-rotina:5': [],
       'bp-rotina:6': [],
     })
+  })
+
+  it('mostra o placar da semana e cada dia como uma jogada numerada, com categoria e métrica', async () => {
+    const { rotas } = servidorDeRotina({
+      3: { id: 3, name: 'Rotina de quarta', description: 'bp-rotina:3', exercises: [{ exerciseId: 2 }, { exerciseId: 1 }] },
+      5: { id: 5, name: 'Rotina de sexta', description: 'bp-rotina:5', exercises: [{ exerciseId: 1 }] },
+    })
+    abrirRotina(rotas)
+    await screen.findByRole('heading', { name: 'Quarta' })
+
+    const placar = screen.getByRole('region', { name: 'Resumo da semana' })
+    expect(placar).toHaveTextContent('3 treinos')
+    expect(placar).toHaveTextContent('2 dias de treino')
+    expect(placar).toHaveTextContent('foco em Arremesso')
+    // O equilíbrio lista todas as categorias; a que não tem treino fica apagada.
+    const equilibrio = within(screen.getByRole('list', { name: 'Treinos por categoria' })).getAllByRole('listitem')
+    expect(equilibrio.map((li) => li.textContent)).toEqual(['Arremesso 2', 'Drible 0', 'Passe 0', 'Finalização 0', 'Defesa 0', 'Condicionamento 1'])
+    expect(equilibrio[0]).not.toHaveClass('apagada')
+    expect(equilibrio[4]).toHaveClass('apagada')
+
+    // O dia é uma rota: treinos numerados na ordem, cada um com a categoria e a métrica.
+    const rota = within(cartaoDoDia('Quarta')).getAllByRole('listitem')
+    expect(rota.map((li) => li.querySelector('.rota-no')?.textContent)).toEqual(['1', '2'])
+    expect(rota.map((li) => li.querySelector('.rota-sub')?.textContent)).toEqual(['Condicionamento · Tempo', 'Arremesso · Acertos'])
+    expect(rota[0]).toHaveClass('tag-Condicionamento')
+    expect(cartaoDoDia('Quarta').querySelectorAll('.dia-mix i')).toHaveLength(2)
+  })
+
+  it('sem treino nenhum, o placar diz que a semana está em branco e os dias convidam a arrastar', async () => {
+    abrirRotina(servidorDeRotina().rotas)
+    await screen.findByRole('heading', { name: 'Quarta' })
+
+    const placar = screen.getByRole('region', { name: 'Resumo da semana' })
+    expect(placar).toHaveTextContent('0 treinos')
+    expect(placar).toHaveTextContent('semana em branco')
+    const quarta = cartaoDoDia('Quarta')
+    expect(quarta).toHaveClass('dia-folga')
+    expect(within(quarta).getByText('Descanso')).toBeInTheDocument()
+    expect(within(quarta).getByText(/Arraste um treino para cá/)).toBeInTheDocument()
+  })
+
+  it('ao arrastar, a semana mostra onde soltar e o treino passa para o outro dia', async () => {
+    const { rotas } = servidorDeRotina({
+      3: { id: 3, name: 'Rotina de quarta', description: 'bp-rotina:3', exercises: [{ exerciseId: 2 }] },
+    })
+    abrirRotina(rotas)
+    await screen.findByRole('heading', { name: 'Quarta' })
+    const semana = cartaoDoDia('Quarta').closest('.semana')!
+    const dataTransfer = { effectAllowed: 'none' }
+
+    fireEvent.dragStart(within(cartaoDoDia('Quarta')).getByRole('listitem'), { dataTransfer })
+    expect(semana).toHaveClass('em-arraste')
+    fireEvent.dragOver(cartaoDoDia('Terça'), { dataTransfer })
+    expect(cartaoDoDia('Terça')).toHaveClass('alvo')
+    fireEvent.drop(cartaoDoDia('Terça'), { dataTransfer })
+
+    expect(semana).not.toHaveClass('em-arraste')
+    expect(cartaoDoDia('Terça')).not.toHaveClass('alvo')
+    await waitFor(() => expect(within(cartaoDoDia('Terça')).getAllByRole('link').map((l) => l.textContent)).toEqual(['Suicídio']))
+    expect(within(cartaoDoDia('Quarta')).queryByRole('link')).toBeNull()
   })
 })
