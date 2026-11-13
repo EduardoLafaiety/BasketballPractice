@@ -541,7 +541,7 @@ export const api = {
     }))
   },
 
-  async gerarTreino(minutos: number, foco: Categoria[], aquecimento: boolean, semente?: number, nivel?: Nivel) {
+  async gerarTreino(minutos: number, foco: Categoria[], aquecimento: boolean, semente?: number, nivel?: Nivel, evitar: string[] = []) {
     const r = await request<{
       minutes: number
       blocks: { exerciseId: number; name: string; category: string; metric: Metrica; minutes: number }[]
@@ -551,6 +551,8 @@ export const api = {
       warmup: aquecimento,
       seed: semente,
       level: nivel,
+      // Os exercícios já usados nos outros dias da semana: só voltam se a categoria não tiver outro.
+      exclude: evitar.length ? evitar.map(Number) : undefined,
     })
     return r.blocks.map(
       (b): BlocoPlano => ({
@@ -561,15 +563,6 @@ export const api = {
         minutos: b.minutes,
       }),
     )
-  },
-
-  /** Salva um plano gerado como modelo de treino reutilizável. */
-  async salvarPlano(nome: string, blocos: BlocoPlano[]) {
-    const salvo = await request<WorkoutApi>('POST', '/workouts', {
-      name: nome,
-      exercises: blocos.map((b) => ({ exerciseId: Number(b.drillId), targetSeconds: b.minutos * 60 })),
-    })
-    return salvo.id
   },
 
   async estilos(): Promise<EstiloResumo[]> {

@@ -209,6 +209,20 @@ describe('Ferramentas na API', () => {
     assert.deepEqual(posicoes, [...posicoes].sort((a, b) => a - b))
   })
 
+  it('gera treino evitando os exercícios que já foram usados, para a semana não repetir', async () => {
+    const pedido = { minutes: 60, focus: ['drible', 'passe'], level: 'iniciante', warmup: false, seed: 5 }
+    const ids = (plano: { body: { blocks: { exerciseId: number }[] } }) => plano.body.blocks.map((b) => b.exerciseId)
+    const usados = ids(await api('POST', '/plans/generate', pedido))
+    assert.ok(usados.length >= 5)
+    // Sem a lista, o mesmo treino volta (mesma semente); com ela, nenhum dos exercícios se repete.
+    assert.deepEqual(ids(await api('POST', '/plans/generate', pedido)), usados)
+    const outro = ids(await api('POST', '/plans/generate', { ...pedido, exclude: usados }))
+    assert.equal(outro.length, usados.length)
+    assert.ok(outro.every((id) => !usados.includes(id)))
+    // Lista inválida é recusada.
+    assert.equal((await api('POST', '/plans/generate', { minutes: 30, exclude: ['x'] })).status, 400)
+  })
+
   it('exporta e importa os dados sem duplicar', async () => {
     const custom = await api('POST', '/exercises', { name: 'Floater', category: 'finalizacao', metric: 'acertos' })
     await api('POST', '/workouts', { name: 'Rotina de sábado', description: 'bp-rotina:6', exercises: [{ exerciseId: custom.body.id }] })

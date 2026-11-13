@@ -67,6 +67,8 @@ const generateSchema = z.object({
   level: z.enum(LEVELS).optional(),
   warmup: z.boolean().default(true),
   seed: z.number().int().optional(),
+  // Exercícios a evitar (a rotina semanal passa os já usados nos outros dias); só se repetem se não houver outro da categoria.
+  exclude: z.array(z.number().int()).max(500).default([]),
 })
 
 type ExerciseRow = { id: number; name: string; category: string; metric: string; level?: string | null; warmup?: boolean; position?: number | null }
@@ -102,7 +104,7 @@ export function generatePlan(exercises: ExerciseRow[], input: z.infer<typeof gen
   const rand = random(input.seed ?? Math.floor(Math.random() * 2 ** 31))
   const pick = <T>(list: T[]) => list[Math.floor(rand() * list.length)]
   const focus = input.focus.length ? input.focus : [...CATEGORIES]
-  const used = new Set<number>()
+  const used = new Set<number>(input.exclude)
   const warmups: (ExerciseRow & { minutes: number })[] = []
   const main: (ExerciseRow & { minutes: number })[] = []
   // Exercício do atleta não tem nível e serve para todos; o aquecimento nunca entra na parte principal.
@@ -112,7 +114,9 @@ export function generatePlan(exercises: ExerciseRow[], input: z.infer<typeof gen
   let remaining = input.minutes
   if (input.warmup && remaining >= 20) {
     const options = ofLevel.filter((e) => e.warmup)
-    const general = options.filter((e) => e.category === 'condicionamento')
+    // O geral é sorteado, então dá para preferir o que ainda não saiu; o específico segue a ordem da lista e não pula nada.
+    const generalAll = options.filter((e) => e.category === 'condicionamento')
+    const general = generalAll.some((e) => !used.has(e.id)) ? generalAll.filter((e) => !used.has(e.id)) : generalAll
     // O aquecimento específico segue a ordem da lista: no arremesso, sempre de perto para longe da cesta.
     const specific = options.filter((e) => e.category !== 'condicionamento' && focus.includes(e.category as (typeof focus)[number]))
     const chosen = [general.length ? pick(general) : undefined, ...specific.slice(0, remaining >= 45 ? 2 : 1)].filter((e) => e !== undefined)

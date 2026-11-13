@@ -207,3 +207,136 @@ describe('Rotina semanal', () => {
     expect(within(cartaoDoDia('Quarta')).queryByRole('link')).toBeNull()
   })
 })
+
+describe('Gerador da rotina semanal', () => {
+  const blocos = [
+    { exerciseId: 2, name: 'Suicídio', category: 'condicionamento', metric: 'tempo', minutes: 5 },
+    { exerciseId: 1, name: 'Lance livre', category: 'arremesso', metric: 'acertos', minutes: 40 },
+  ]
+  const respostaGerador = { minutes: 45, blocks: blocos }
+  const geradas = (api: ReturnType<typeof abrirRotina>) => api.chamadas.filter((c) => c.metodo === 'POST' && c.caminho === '/plans/generate').map((c) => c.corpo as Record<string, unknown>)
+
+  it('gera a semana nos dias escolhidos, com as escolhas no pedido e sem repetir exercício entre os dias', async () => {
+    const user = userEvent.setup()
+    const { rotas } = servidorDeRotina()
+    const api = abrirRotina({ ...rotas, 'POST /plans/generate': respostaGerador })
+    await user.click(await screen.findByRole('button', { name: 'Arremesso' }))
+    await user.click(screen.getByRole('button', { name: /^Avançado/ }))
+    await user.click(screen.getByRole('button', { name: '60 min' }))
+    await user.click(screen.getByRole('checkbox', { name: /aquecimento/ }))
+    await user.click(screen.getByRole('button', { name: 'Gerar semana' }))
+
+    // Segunda, quarta e sexta são os dias de treino de quem ainda não tem rotina.
+    await waitFor(() => expect(geradas(api)).toHaveLength(3))
+    const [primeiro, segundo, terceiro] = geradas(api)
+    expect(primeiro).toMatchObject({ minutes: 60, focus: ['arremesso'], warmup: false, level: 'avancado' })
+    expect(primeiro).not.toHaveProperty('exclude')
+    expect(segundo.exclude).toEqual([2, 1])
+    expect(terceiro.exclude).toEqual([2, 1, 2, 1])
+    expect(new Set([primeiro.seed, segundo.seed, terceiro.seed]).size).toBe(3)
+  })
+
+  it('mostra a semana como prévia, sem salvar nada, e só vira a rotina ao aplicar', async () => {
+    const user = userEvent.setup()
+    const { treinos, rotas } = servidorDeRotina()
+    const api = abrirRotina({ ...rotas, 'POST /plans/generate': respostaGerador })
+    await user.click(await screen.findByRole('button', { name: 'Gerar semana' }))
+
+    const aviso = await screen.findByText('Prévia, ainda não salva')
+    expect(aviso.closest('section')).toHaveTextContent('6 blocos')
+    const segunda = cartaoDoDia('Segunda')
+    expect(within(segunda).getAllByRole('link').map((l) => l.textContent)).toEqual(['Suicídio', 'Lance livre'])
+    expect(segunda.querySelectorAll('.rota-min')).toHaveLength(2)
+    expect(within(segunda).getByText('2 blocos · 45 min')).toBeInTheDocument()
+    expect(within(cartaoDoDia('Terça')).getByText('Descanso')).toBeInTheDocument()
+    // Prévia não se edita nem se arrasta, e nada foi salvo.
+    expect(within(segunda).queryByRole('button', { name: /Remover/ })).toBeNull()
+    expect(within(segunda).queryByRole('combobox')).toBeNull()
+    expect(api.chamadas.some((c) => c.metodo !== 'GET' && c.caminho !== '/plans/generate')).toBe(false)
+    expect(treinos.size).toBe(0)
+
+    await user.click(screen.getByRole('button', { name: 'Aplicar à rotina' }))
+
+    expect(await screen.findByRole('status')).toHaveTextContent('Semana gerada aplicada à sua rotina.')
+    await waitFor(() => expect(treinos.size).toBe(7))
+    const porDia = Object.fromEntries([...treinos.values()].map((t) => [t.description, t.exercises.map((e) => e.exerciseId)]))
+    expect(porDia).toEqual({
+      'bp-rotina:0': [],
+      'bp-rotina:1': [2, 1],
+      'bp-rotina:2': [],
+      'bp-rotina:3': [2, 1],
+      'bp-rotina:4': [],
+      'bp-rotina:5': [2, 1],
+      'bp-rotina:6': [],
+    })
+    // Aplicada, a prévia some e os cartões voltam a ser editáveis.
+    await waitFor(() => expect(within(cartaoDoDia('Segunda')).getAllByRole('button', { name: /Remover/ })).toHaveLength(2))
+    expect(screen.queryByText('Prévia, ainda não salva')).toBeNull()
+  })
+
+  it('mudar uma escolha depois de gerar remonta a semana, e descartar volta à rotina salva', async () => {
+    const user = userEvent.setup()
+    const { rotas } = servidorDeRotina({
+      3: { id: 3, name: 'Rotina de quarta', description: 'bp-rotina:3', exercises: [{ exerciseId: 2 }] },
+    })
+    const api = abrirRotina({ ...rotas, 'POST /plans/generate': respostaGerador })
+    // Quem já tem rotina começa com os dias dela acesos: só a quarta.
+    const quartaAcesa = await screen.findByRole('button', { name: /^Quarta/ })
+    expect(quartaAcesa).toHaveAttribute('aria-pressed', 'true')
+    expect(screen.getByRole('button', { name: /^Segunda/ })).toHaveAttribute('aria-pressed', 'false')
+
+    await user.click(screen.getByRole('button', { name: 'Gerar semana' }))
+    await waitFor(() => expect(geradas(api)).toHaveLength(1))
+    await user.click(screen.getByRole('button', { name: /^Terça/ }))
+    await waitFor(() => expect(geradas(api)).toHaveLength(3), { timeout: 3000 })
+    await waitFor(() => expect(within(cartaoDoDia('Terça')).getAllByRole('link')).toHaveLength(2))
+
+    await user.click(screen.getByRole('button', { name: 'Descartar' }))
+    expect(screen.queryByText('Prévia, ainda não salva')).toBeNull()
+    expect(within(cartaoDoDia('Quarta')).getAllByRole('link').map((l) => l.textContent)).toEqual(['Suicídio'])
+    expect(within(cartaoDoDia('Terça')).getByText('Descanso')).toBeInTheDocument()
+  })
+
+  it('pergunta antes de trocar a rotina que já existe e não troca se a pessoa cancelar', async () => {
+    const user = userEvent.setup()
+    const confirmar = vi.spyOn(window, 'confirm').mockReturnValue(false)
+    const { treinos, rotas } = servidorDeRotina({
+      3: { id: 3, name: 'Rotina de quarta', description: 'bp-rotina:3', exercises: [{ exerciseId: 2 }] },
+    })
+    const api = abrirRotina({ ...rotas, 'POST /plans/generate': respostaGerador })
+    await user.click(await screen.findByRole('button', { name: 'Gerar semana' }))
+    await screen.findByText('Prévia, ainda não salva')
+
+    await user.click(screen.getByRole('button', { name: 'Aplicar à rotina' }))
+    expect(confirmar).toHaveBeenCalledWith('Aplicar a semana gerada? Isso substitui toda a sua rotina semanal.')
+    expect(screen.getByText('Prévia, ainda não salva')).toBeInTheDocument()
+    expect(api.chamadas.some((c) => c.metodo === 'PUT' || (c.metodo === 'POST' && c.caminho === '/workouts'))).toBe(false)
+
+    confirmar.mockReturnValue(true)
+    await user.click(screen.getByRole('button', { name: 'Aplicar à rotina' }))
+    await waitFor(() => expect(treinos.get(3)?.exercises).toEqual([{ exerciseId: 2 }, { exerciseId: 1 }]))
+  })
+
+  it('mostra o erro quando o servidor não consegue montar a semana, sem criar prévia', async () => {
+    const user = userEvent.setup()
+    const { rotas } = servidorDeRotina()
+    abrirRotina({ ...rotas, 'POST /plans/generate': new Resposta(500, { error: 'Banco fora do ar' }) })
+    await user.click(await screen.findByRole('button', { name: 'Gerar semana' }))
+
+    expect(await screen.findByRole('alert')).toHaveTextContent('Banco fora do ar')
+    expect(screen.queryByText('Prévia, ainda não salva')).toBeNull()
+    expect(screen.getByRole('button', { name: 'Gerar semana' })).toBeEnabled()
+  })
+
+  it('sem nenhum dia escolhido não dá para gerar, e o endereço antigo do gerador leva para a rotina', async () => {
+    const user = userEvent.setup()
+    definirToken('tk')
+    apiFalsa({ ...servidorDeRotina().rotas, 'POST /plans/generate': respostaGerador })
+    abrirApp('/gerador')
+
+    expect(await screen.findByRole('heading', { name: 'Rotina semanal', level: 1 })).toBeInTheDocument()
+    for (const dia of ['Segunda', 'Quarta', 'Sexta']) await user.click(screen.getByRole('button', { name: new RegExp(`^${dia}`) }))
+    expect(screen.getByText('Escolha ao menos um dia')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Gerar semana' })).toBeDisabled()
+  })
+})

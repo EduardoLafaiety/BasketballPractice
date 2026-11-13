@@ -288,7 +288,7 @@ export const ARTIGOS: Artigo[] = [
       'FIBA, regras oficiais e história do basquete 3x3.',
       'Comitê Olímpico Internacional, o basquete 3x3 nos Jogos Olímpicos.',
     ],
-    noApp: { to: '/gerador', rotulo: 'Montar um treino curto' },
+    noApp: { to: '/rotina', rotulo: 'Montar uma rotina curta' },
   },
   {
     id: 'basquete-em-cadeira-de-rodas',
@@ -559,7 +559,7 @@ export const ARTIGOS: Artigo[] = [
       },
     ],
     fontes: ['Shea JB, Morgan RL. Contextual interference effects on the acquisition, retention, and transfer of a motor skill. Journal of Experimental Psychology: Human Learning and Memory, 1979.'],
-    noApp: { to: '/gerador', rotulo: 'Montar um treino variado' },
+    noApp: { to: '/rotina', rotulo: 'Montar uma rotina variada' },
   },
   {
     id: 'foco-no-aro',

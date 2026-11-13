@@ -63,8 +63,7 @@ function SemPlano({ hoje = false }: { hoje?: boolean }) {
       <h1>Sessão guiada</h1>
       <div className="vazio">
         {hoje ? 'Nenhum treino na rotina de hoje. ' : 'Escolha o que treinar primeiro. '}
-        <Link to="/gerador" className="link">Gerar um treino</Link> ou{' '}
-        <Link to="/rotina" className="link">montar a rotina</Link>.
+        <Link to="/rotina" className="link">Gerar a rotina da semana</Link>.
       </div>
     </>
   )

@@ -24,7 +24,6 @@ import Convite from './pages/Convite'
 import Times, { EntrarNoTime, TimeDetalhe } from './pages/Time'
 import Metas from './pages/Metas'
 import Ferramentas from './pages/Ferramentas'
-import Gerador from './pages/Gerador'
 import SessaoGuiada from './pages/SessaoGuiada'
 import Configuracoes from './pages/Configuracoes'
 import NaoEncontrada from './pages/NaoEncontrada'
@@ -64,7 +63,8 @@ function Rotas() {
         <Route index element={<Inicio />} />
         <Route path="treinos" element={<Treinos />} />
         <Route path="treinos/:id" element={<TreinoDetalhe />} />
-        <Route path="gerador" element={<Gerador />} />
+        {/* O gerador agora fica na Rotina: os endereços e links antigos continuam funcionando. */}
+        <Route path="gerador" element={<Navigate to="/rotina" replace />} />
         <Route path="desafio" element={<DesafioDoDia />} />
         <Route path="quiz" element={<Quiz />} />
         <Route path="cartao" element={<CartaoDoAtleta />} />

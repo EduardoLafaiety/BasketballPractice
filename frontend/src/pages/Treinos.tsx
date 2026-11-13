@@ -1,7 +1,6 @@
 import { useMemo, useState } from 'react'
-import { Link, useNavigate, useSearchParams } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import DrillCard from '../components/DrillCard'
-import Icone from '../components/Icone'
 import FormExercicio from '../components/FormExercicio'
 import { AvisoDesatualizado, Carregando, ErroCarga } from '../components/Estado'
 import { NIVEIS } from '../lib/niveis'
@@ -49,7 +48,6 @@ export default function Treinos() {
       <div className="secao-topo">
         <h1>Treinos</h1>
         <div className="acoes">
-          <Link to="/gerador" className="btn btn-primario"><Icone nome="raio" /> Gerar treino</Link>
           {!criando && <button className="btn" onClick={() => setCriando(true)}>+ Novo exercício</button>}
         </div>
       </div>

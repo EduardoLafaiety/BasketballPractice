@@ -156,7 +156,7 @@ export default function Layout() {
           <Icone nome="bola" tamanho={34} />
         </Link>
         {secao && <span className="topo-secao">{secao}</span>}
-        <Link to="/gerador" className="topo-acao">Gerar treino</Link>
+        <Link to="/rotina" className="topo-acao">Gerar rotina</Link>
         <button className="topo-menu" aria-expanded={menuAberto} aria-controls="menu-tela" onClick={alternarMenu}>
           <span className="topo-tracos" aria-hidden />
           {menuAberto ? 'Fechar' : 'Menu'}
@@ -202,7 +202,7 @@ export default function Layout() {
 
       <nav className="doca" aria-label="Atalhos" onClick={() => vibrar(8)}>
         {DOCA_ESQUERDA.map((l) => <ItemDoca key={l.to} {...l} />)}
-        <NavLink to="/gerador" className="doca-item doca-gerar" aria-label="Gerar treino">
+        <NavLink to="/rotina" className="doca-item doca-gerar" aria-label="Gerar rotina">
           <Icone nome="bola" tamanho={22} />
           Gerar
         </NavLink>
