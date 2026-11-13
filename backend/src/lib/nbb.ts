@@ -77,8 +77,15 @@ export function parseNbbStandings(html: string): NbbStandings {
   return { season, teams: teams.sort((a, b) => a.position - b.position) }
 }
 
+// O filtro da LNB (Cloudflare) devolve 403 a quem não se identifica como navegador, inclusive a um User-Agent próprio
+// (testado a partir do GitHub Actions). É uma página pública, lida poucas vezes por dia ao publicar o site.
+const BROWSER_UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36'
+
 export async function fetchNbbStandings(): Promise<NbbStandings> {
-  const response = await fetch(NBB_URL, { headers: { 'User-Agent': 'Mozilla/5.0 (BasketballPractice)' }, signal: AbortSignal.timeout(20_000) })
+  const response = await fetch(NBB_URL, {
+    headers: { 'User-Agent': BROWSER_UA, Accept: 'text/html', 'Accept-Language': 'pt-BR,pt;q=0.9' },
+    signal: AbortSignal.timeout(20_000),
+  })
   if (!response.ok) throw new Error(`LNB respondeu ${response.status}`)
   return parseNbbStandings(await response.text())
 }
