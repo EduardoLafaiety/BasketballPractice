@@ -2,8 +2,8 @@ import { useMemo, useRef, useState, type CSSProperties } from 'react'
 import { Link } from 'react-router-dom'
 import { AvisoDesatualizado, Carregando, ErroCarga } from '../components/Estado'
 import { CATEGORIAS } from '../components/FormExercicio'
-import { DIAS, useDrills, useModelosRotina, useRotina } from '../store'
-import type { Categoria, DiaSemana, Drill, Rotina as RotinaSemana } from '../types'
+import { DIAS, useDrills, useRotina } from '../store'
+import type { Categoria, DiaSemana, Drill } from '../types'
 import GeradorSemana, { ORDEM_SEMANA as ORDEM, previaComoRotina, type PreviaSemana } from './GeradorSemana'
 
 const SIGLA = DIAS.map((d) => d.slice(0, 3).toUpperCase())
@@ -93,14 +93,6 @@ export default function Rotina() {
     <>
       <h1>Rotina semanal</h1>
       <p className="muted">Planeje o que treinar em cada dia da semana.</p>
-      {pronto && (
-        <Modelos
-          aplicar={(modelo) => {
-            aplicarModelo(modelo)
-            setPrevia(null)
-          }}
-        />
-      )}
 
       {erroSalvar && <p className="erro" role="alert">Não foi possível salvar a rotina: {erroSalvar.message}</p>}
 
@@ -264,49 +256,6 @@ function Placar({ semana, hoje, previa }: { semana: Semana; hoje: number; previa
           </li>
         ))}
       </ul>
-    </section>
-  )
-}
-
-/** Rotinas semanais prontas; aplicar substitui a semana inteira. */
-function Modelos({ aplicar }: { aplicar: (modelo: RotinaSemana) => void }) {
-  const { modelos, carregado, erro } = useModelosRotina()
-  const [aberto, setAberto] = useState(false)
-  const [aplicado, setAplicado] = useState<string | null>(null)
-
-  if (erro || (carregado && modelos.length === 0)) return null
-
-  return (
-    <section className="modelos">
-      <button className="link botao-link" onClick={() => setAberto((a) => !a)} aria-expanded={aberto}>
-        {aberto ? '▾' : '▸'} Usar um modelo pronto
-      </button>
-      {aberto && (
-        <div className="grade">
-          {modelos.map((m) => {
-            const dias = Object.values(m.dias).filter((d) => d.length > 0).length
-            return (
-              <div key={m.id} className="card modelo">
-                <strong>{m.nome}</strong>
-                <p className="muted">{m.descricao}</p>
-                <span className="meta">{dias} dias de treino por semana</span>
-                <button
-                  className="btn"
-                  onClick={() => {
-                    if (!window.confirm(`Aplicar "${m.nome}"? Isso substitui toda a sua rotina semanal.`)) return
-                    aplicar(m.dias)
-                    setAplicado(m.nome)
-                    setAberto(false)
-                  }}
-                >
-                  Aplicar
-                </button>
-              </div>
-            )
-          })}
-        </div>
-      )}
-      {aplicado && <p className="sucesso" role="status">Rotina “{aplicado}” aplicada.</p>}
     </section>
   )
 }

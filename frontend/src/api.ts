@@ -13,7 +13,6 @@ import type {
   InfoTeste,
   Meta,
   Metrica,
-  ModeloRotina,
   Posicao,
   NovaSessao,
   Progresso,
@@ -505,20 +504,6 @@ export const api = {
       metronomeBpm: c.metronomoBpm,
     })
     return paraConfig(salvo)
-  },
-
-  async modelosRotina(): Promise<ModeloRotina[]> {
-    const r = await request<
-      { id: string; name: string; description: string; days: Record<string, { exerciseId: number }[]> }[]
-    >('GET', '/plans/templates')
-    return r.map((m) => ({
-      id: m.id,
-      nome: m.name,
-      descricao: m.description,
-      dias: Object.fromEntries(
-        Object.entries(m.days).map(([dia, itens]) => [dia, itens.map((i) => String(i.exerciseId))]),
-      ) as Rotina,
-    }))
   },
 
   async gerarTreino(minutos: number, foco: Categoria[], aquecimento: boolean, semente?: number, nivel?: Nivel, evitar: string[] = []) {

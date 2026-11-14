@@ -209,11 +209,6 @@ export function useTestes() {
   return { testes: dados ?? [], carregado: dados !== undefined, adicionar, remover, ...resto }
 }
 
-export function useModelosRotina() {
-  const { dados, ...resto } = useRecurso('modelos-rotina', api.modelosRotina)
-  return { modelos: dados ?? [], carregado: dados !== undefined, ...resto }
-}
-
 export const CONFIG_PADRAO: Config = {
   tema: 'sistema',
   lembretes: { ativo: false, horario: '18:00', dias: [1, 2, 3, 4, 5] },

@@ -20,7 +20,6 @@ function servidorDeRotina(inicial: Record<number, Corpo & { id: number }> = {}) 
     'GET /auth/me': usuarioFalso(),
     'GET /settings': configFalsa,
     'GET /exercises': catalogo,
-    'GET /plans/templates': [],
     'GET /workouts': () => [...treinos.values()].map(({ exercises: _, ...resumo }) => resumo),
     'POST /workouts': (corpo) => {
       const novo = { id: proximoId++, ...(corpo as Corpo) }
@@ -116,35 +115,6 @@ describe('Rotina semanal', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent('Não foi possível salvar a rotina: Banco fora do ar')
     await waitFor(() => expect(within(cartaoDoDia('Sexta')).queryByRole('link')).toBeNull())
     expect(within(cartaoDoDia('Sexta')).getByText('Descanso')).toBeInTheDocument()
-  })
-
-  it('só troca a semana inteira por um modelo depois de confirmar', async () => {
-    const user = userEvent.setup()
-    const confirmar = vi.spyOn(window, 'confirm').mockReturnValue(false)
-    const { treinos, rotas } = servidorDeRotina()
-    const modelo = { id: 'arremessador', name: 'Arremessador', description: 'Foco em arremesso', days: { 1: [{ exerciseId: 1 }], 4: [{ exerciseId: 1 }, { exerciseId: 2 }] } }
-    const { chamadas } = abrirRotina({ ...rotas, 'GET /plans/templates': [modelo] })
-
-    await user.click(await screen.findByRole('button', { name: /Usar um modelo pronto/ }))
-    await user.click(screen.getByRole('button', { name: 'Aplicar' }))
-    expect(chamadas.some((c) => c.metodo !== 'GET')).toBe(false)
-
-    // Cancelar deixa a lista de modelos aberta.
-    confirmar.mockReturnValue(true)
-    await user.click(screen.getByRole('button', { name: 'Aplicar' }))
-
-    expect(await screen.findByRole('status')).toHaveTextContent('Rotina “Arremessador” aplicada.')
-    await waitFor(() => expect(treinos.size).toBe(7))
-    const porDia = Object.fromEntries([...treinos.values()].map((t) => [t.description, t.exercises.map((e) => e.exerciseId)]))
-    expect(porDia).toEqual({
-      'bp-rotina:0': [],
-      'bp-rotina:1': [1],
-      'bp-rotina:2': [],
-      'bp-rotina:3': [],
-      'bp-rotina:4': [1, 2],
-      'bp-rotina:5': [],
-      'bp-rotina:6': [],
-    })
   })
 
   it('mostra o placar da semana e cada dia como uma jogada numerada, com categoria e métrica', async () => {

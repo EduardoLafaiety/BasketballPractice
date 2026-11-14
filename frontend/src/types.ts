@@ -165,13 +165,6 @@ export interface TesteFisico {
   notas?: string
 }
 
-export interface ModeloRotina {
-  id: string
-  nome: string
-  descricao: string
-  dias: Rotina
-}
-
 export interface BlocoPlano {
   drillId: string
   nome: string
