@@ -2174,8 +2174,9 @@ html::-webkit-scrollbar, .menu-tela::-webkit-scrollbar { display: none; }
 
 .gs-niveis { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 150px), 1fr)); gap: 0.5rem; }
 .gs-nivel { display: grid; gap: 0.25rem; align-content: start; padding: 0.75rem 0.9rem; border: 1px solid var(--borda); border-radius: 12px; background: transparent; color: inherit; text-align: left; cursor: pointer; transition: border-color 0.15s, background 0.15s; }
-.gs-nivel strong { font-size: 0.78rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; }
-.gs-nivel span { color: var(--muted); font-size: 0.68rem; font-weight: 600; line-height: 1.45; letter-spacing: 0.02em; text-transform: none; }
+.gs-nivel strong { font-size: 0.7rem; font-weight: 800; letter-spacing: 0.06em; line-height: 1.55; text-transform: uppercase; }
+/* A descrição segue o padrão do site para texto pequeno: maiúsculas, 0,7 rem. */
+.gs-nivel span { color: var(--muted); font-size: 0.7rem; font-weight: 700; line-height: 1.55; letter-spacing: 0.06em; text-transform: uppercase; }
 .gs-nivel:hover { border-color: var(--laranja); }
 .gs-nivel[aria-pressed='true'] { border-color: var(--laranja); background: color-mix(in srgb, var(--laranja) 12%, transparent); }
 
