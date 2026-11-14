@@ -2352,14 +2352,10 @@ html::-webkit-scrollbar, .menu-tela::-webkit-scrollbar { display: none; }
 .ferr-descricao, .ferr-painel { animation: ferr-sobe 0.8s 0.55s cubic-bezier(0.2, 0.8, 0.2, 1) backwards; }
 :root[data-movimento='reduzido'] .ferramentas-palco::before, :root[data-movimento='reduzido'] .ferr-lema, :root[data-movimento='reduzido'] .ferr-cabeca h1, :root[data-movimento='reduzido'] .ferr-aba, :root[data-movimento='reduzido'] .ferr-descricao, :root[data-movimento='reduzido'] .ferr-painel { animation: none; }
 
-/* Início: Treino de hoje, centralizado */
-.treino-hoje { text-align: center; }
-.hoje-topo { display: flex; flex-direction: column; align-items: center; gap: 0.6rem; margin-bottom: 2rem; }
-.hoje-dia { padding: 0.3rem 0.9rem; border-radius: 999px; background: var(--laranja); color: #111; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
-.hoje-topo h2 { margin: 0; font-size: clamp(2.6rem, 6vw, 4.6rem); }
-.hoje-acoes { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 0.75rem 1.5rem; margin-top: 0.6rem; }
-.treino-hoje .lista-treino { max-width: 52rem; margin-inline: auto; text-align: left; }
-.treino-hoje .secao-forte ~ .vazio { text-align: center; }
-.hoje-vazio { display: flex; flex-direction: column; align-items: center; gap: 1rem; max-width: 34rem; margin-inline: auto; padding: 2.5rem 1.5rem; border: 0; border-bottom: 0; }
-.hoje-vazio p { margin: 0; font-weight: 700; font-size: 0.8rem; letter-spacing: 0.06em; text-transform: uppercase; }
-.hoje-quadra { width: 5.5rem; height: 5.5rem; fill: none; stroke: var(--laranja); stroke-width: 2; opacity: 0.85; }
+/* Início: Treino de hoje, com o dia da semana vazado atrás do título */
+.treino-hoje { position: relative; overflow: hidden; }
+.hoje-fundo { margin: 0; font-family: var(--fonte-display); font-weight: var(--peso-display); text-transform: uppercase; font-size: clamp(7rem, 26vw, 19rem); line-height: 0.8; color: transparent; -webkit-text-stroke: 2px var(--borda); user-select: none; }
+.hoje-frente { position: relative; display: flex; flex-direction: column; align-items: flex-start; gap: 1rem; margin-top: calc(-1 * clamp(2.6rem, 10vw, 7rem)); margin-bottom: 2rem; }
+.hoje-frente h2 { margin: 0; font-size: clamp(3rem, 8vw, 6rem); }
+.hoje-aviso { margin: 0; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.hoje-acoes { display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem 1.5rem; }
