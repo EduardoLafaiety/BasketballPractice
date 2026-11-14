@@ -68,17 +68,26 @@ export default function Inicio() {
       {segunda && <ResumoSemana />}
 
       <section className="faixa-clara banda treino-hoje">
-        <div className="hoje-topo">
-          <span className="hoje-dia">{DIAS[hoje]}</span>
+        <div className="hoje-fundo" aria-hidden>{DIAS[hoje]}</div>
+        <div className="hoje-frente">
           <h2>Treino de hoje</h2>
-          <div className="hoje-acoes">
-            {prontoHoje && treinosHoje.length > 0 && (
+          {prontoHoje && treinosHoje.length === 0 && (
+            <>
+              <p className="hoje-aviso">Nenhum treino planejado para {DIAS[hoje].toLowerCase()}.</p>
+              <div className="hoje-acoes">
+                <Link to="/rotina" className="btn btn-primario">Adicione à rotina <Icone nome="seta" /></Link>
+                <Link to="/rotina" className="link-forte">Editar rotina</Link>
+              </div>
+            </>
+          )}
+          {prontoHoje && treinosHoje.length > 0 && (
+            <div className="hoje-acoes">
               <Link to="/sessao?hoje" className="btn btn-primario">
                 Começar treino de hoje <Icone nome="seta" />
               </Link>
-            )}
-            <Link to="/rotina" className="link-forte">Editar rotina</Link>
-          </div>
+              <Link to="/rotina" className="link-forte">Editar rotina</Link>
+            </div>
+          )}
         </div>
         {prontoHoje && (
           <AvisoDesatualizado erro={erroHoje} tentarDeNovo={() => { rotina.recarregar(); drills.recarregar() }} />
@@ -105,17 +114,7 @@ export default function Inicio() {
               </li>
             ))}
           </ol>
-        ) : (
-          <div className="vazio hoje-vazio">
-            <svg className="hoje-quadra" viewBox="0 0 120 120" aria-hidden>
-              <circle cx="60" cy="60" r="52" />
-              <path d="M8 60h104M60 8v104" />
-              <circle cx="60" cy="60" r="16" />
-            </svg>
-            <p>Nenhum treino planejado para {DIAS[hoje].toLowerCase()}.</p>
-            <Link to="/rotina" className="btn btn-primario">Adicione à rotina <Icone nome="seta" /></Link>
-          </div>
-        )}
+        ) : null}
       </section>
 
       <section className="faixa-preta banda">
