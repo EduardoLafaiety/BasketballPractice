@@ -1082,10 +1082,8 @@ section + section, .card + section { margin-top: 1.5rem; }
 .topo > * { pointer-events: auto; }
 .marca { display: grid; place-items: center; width: 48px; height: 48px; border-radius: 50%; background: #101010; color: var(--laranja); }
 .topo-secao { padding: 0.35rem 0.6rem; border-radius: 4px; background: #101010; color: #f4f2ea; font-size: 0.68rem; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; }
-.topo-acao, .topo-menu { display: inline-flex; align-items: center; gap: 0.55rem; min-height: 44px; padding: 0 1rem; border: 1.5px solid #111111; border-radius: 6px; font: inherit; font-size: 0.76rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; text-decoration: none; cursor: pointer; color: #111111; }
-.topo-acao { margin-left: auto; background: var(--laranja); }
-.topo-acao:hover { background: #ff8a3f; }
-.topo-menu { background: #f4f2ea; }
+.topo-menu { display: inline-flex; align-items: center; gap: 0.55rem; min-height: 44px; padding: 0 1rem; border: 1.5px solid #111111; border-radius: 6px; font: inherit; font-size: 0.76rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; text-decoration: none; cursor: pointer; color: #111111; }
+.topo-menu { margin-left: auto; background: #f4f2ea; }
 .topo-menu:hover { background: #ffffff; }
 .topo-tracos { display: block; width: 18px; height: 8px; border-block: 2px solid currentColor; transition: height 0.2s; }
 .topo-menu[aria-expanded='true'] .topo-tracos { height: 2px; border-bottom: 0; }
@@ -1298,7 +1296,7 @@ section + section, .card + section { margin-top: 1.5rem; }
 .secao-forte ~ .vazio { padding: 1rem 0 1.5rem; background: transparent; box-shadow: none; text-align: left; }
 .chip { border: 0; border-radius: 999px; background: var(--superficie); box-shadow: 0 3px 10px rgba(40, 34, 15, 0.08); }
 .chip.ativo { background: var(--texto); color: var(--bg); }
-.btn, .topo-acao, .topo-menu { border-radius: 999px; }
+.btn, .topo-menu { border-radius: 999px; }
 .input { border-radius: 14px; }
 .demo-cena, .foto-jogador-grande { border-radius: 24px; }
 .nivel-opcao, .card, .drill-card { --raio: 28px; }
@@ -1349,7 +1347,7 @@ select.input:hover:not(:disabled) { border-color: var(--laranja); }
 .placar-campos input::-webkit-inner-spin-button, .placar-campos input::-webkit-outer-spin-button { appearance: none; margin: 0; }
 
 @media (max-width: 860px) {
-  .topo-acao, .topo-menu { min-height: 40px; padding: 0 0.7rem; font-size: 0.68rem; }
+  .topo-menu { min-height: 40px; padding: 0 0.7rem; font-size: 0.68rem; }
   .marca { width: 42px; height: 42px; }
   .topo-secao { display: none; }
   .conteudo { padding-top: 84px; }
@@ -1976,7 +1974,7 @@ html { -webkit-tap-highlight-color: transparent; }
   :root:has(.doca) { --doca: calc(64px + env(safe-area-inset-bottom, 0px)); }
   /* Gerar treino e o menu descem para a barra; no alto fica só a marca. */
   .topo { padding-top: calc(0.8rem + env(safe-area-inset-top, 0px)); }
-  .topo-acao, .topo-menu { display: none; }
+  .topo-menu { display: none; }
   .doca {
     position: fixed;
     inset: auto 0 0;

@@ -47,9 +47,17 @@ describe('Menu em tela cheia', () => {
     const user = userEvent.setup()
     abrir()
     await user.click(await botaoMenu())
-    await user.click(within(document.querySelector('.topo') as HTMLElement).getByRole('link', { name: 'Gerar rotina' }))
-    await waitFor(() => expect(screen.getByTestId('caminho')).toHaveTextContent('/rotina'))
+    await user.click(within(document.querySelector('.topo') as HTMLElement).getByRole('link', { name: /início/i }))
+    await waitFor(() => expect(screen.getByTestId('caminho')).toHaveTextContent(/^\/$/))
     expect(tela()).not.toHaveClass('aberto')
+  })
+
+  it('o topo não tem mais o botão Gerar rotina: sobram a marca e o menu', async () => {
+    abrir()
+    await botaoMenu()
+    const topo = within(document.querySelector('.topo') as HTMLElement)
+    expect(topo.queryByRole('link', { name: /Gerar rotina/ })).toBeNull()
+    expect(topo.getByRole('button', { name: 'Menu' })).toBeInTheDocument()
   })
 
   it('navegar fecha o menu, e o topo mostra a seção atual', async () => {

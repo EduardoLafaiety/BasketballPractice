@@ -154,7 +154,6 @@ export default function Layout() {
           <Icone nome="bola" tamanho={34} />
         </Link>
         {secao && <span className="topo-secao">{secao}</span>}
-        <Link to="/rotina" className="topo-acao">Gerar rotina</Link>
         <button className="topo-menu" aria-expanded={menuAberto} aria-controls="menu-tela" onClick={alternarMenu}>
           <span className="topo-tracos" aria-hidden />
           {menuAberto ? 'Fechar' : 'Menu'}
