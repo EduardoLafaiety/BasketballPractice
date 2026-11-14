@@ -68,22 +68,12 @@ export default function Inicio() {
       {segunda && <ResumoSemana />}
 
       <section className="faixa-clara banda treino-hoje">
-        <div className="hoje-fundo" aria-hidden>{hoje === 0 || hoje === 6 ? DIAS[hoje] : `${DIAS[hoje]}-feira`}</div>
         <div className="hoje-frente">
           <h2>Treino de hoje</h2>
-          {prontoHoje && treinosHoje.length === 0 && (
-            <>
-              <p className="hoje-aviso">Nenhum treino planejado para {DIAS[hoje].toLowerCase()}.</p>
-              <Link to="/rotina" className="link-forte">Editar rotina</Link>
-            </>
-          )}
           {prontoHoje && treinosHoje.length > 0 && (
-            <div className="hoje-acoes">
-              <Link to="/sessao?hoje" className="btn btn-primario">
-                Começar treino de hoje <Icone nome="seta" />
-              </Link>
-              <Link to="/rotina" className="link-forte">Editar rotina</Link>
-            </div>
+            <Link to="/sessao?hoje" className="btn btn-primario">
+              Começar treino de hoje <Icone nome="seta" />
+            </Link>
           )}
         </div>
         {prontoHoje && (
@@ -112,6 +102,9 @@ export default function Inicio() {
             ))}
           </ol>
         ) : null}
+        <div className="hoje-rodape">
+          <Link to="/rotina" className="link-forte">Editar rotina</Link>
+        </div>
       </section>
 
       <section className="faixa-preta banda">

@@ -154,10 +154,10 @@ describe('Início', () => {
     expect(within(hoje).getByRole('link', { name: 'Começar treino de hoje' })).toHaveAttribute('href', '/sessao?hoje')
   })
 
-  it('sem treino planejado para hoje, sugere a rotina', async () => {
+  it('sem treino planejado para hoje, deixa só o link da rotina', async () => {
     abrirInicio(rotinaDe({ 4: [2] }))
 
-    expect(await screen.findByText(/Nenhum treino planejado para quarta\./)).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: 'Treino de hoje' })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Editar rotina' })).toHaveAttribute('href', '/rotina')
     expect(screen.queryByRole('link', { name: /Adicione à rotina/ })).toBeNull()
     expect(screen.queryByRole('link', { name: /Começar treino de hoje/ })).toBeNull()
