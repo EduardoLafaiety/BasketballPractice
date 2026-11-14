@@ -1628,12 +1628,18 @@ select.input:hover:not(:disabled) { border-color: var(--laranja); }
 .compartilhar-previa img { width: min(100%, 300px); aspect-ratio: 9 / 16; border-radius: 18px; box-shadow: var(--sombra); }
 
 /* Programas de 30 dias */
-.programas-grade { grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr)); }
-.programa-cartao { display: grid; gap: 0.75rem; align-content: start; color: inherit; text-decoration: none; }
-.programa-cartao h2 { font-size: clamp(1.8rem, 3vw, 2.4rem); }
-.programa-cartao p { margin: 0; }
-.programa-cartao .link-forte { justify-self: start; display: inline-flex; align-items: center; gap: 0.4rem; transition: color 0.15s; }
-.programa-cartao:hover .link-forte { color: var(--laranja-texto); }
+.programas-grade { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 1.1rem; margin-top: 2rem; }
+.programa-cartao { position: relative; display: flex; flex-direction: column; gap: 0.8rem; min-height: 25rem; padding: 1.5rem; border-radius: 26px; background: var(--c); color: #111; overflow: hidden; text-decoration: none; transition: transform 0.25s, box-shadow 0.25s; }
+.programa-cartao:hover { transform: translateY(-6px); box-shadow: 0 22px 40px -22px rgba(0, 0, 0, 0.55); }
+.programa-dias-gigante { position: absolute; right: 0.6rem; top: -1.6rem; font-family: var(--fonte-display); font-weight: var(--peso-display); font-size: 12rem; line-height: 1; color: rgba(255, 255, 255, 0.32); pointer-events: none; }
+.programa-foco { position: relative; font-size: 0.7rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; opacity: 0.8; }
+.programa-cartao h2 { position: relative; margin: auto 0 0; color: #111; font-size: clamp(2rem, 3vw, 2.4rem); line-height: 0.95; }
+.programa-cartao p { position: relative; margin: 0; font-size: 0.8rem; line-height: 1.5; font-weight: 600; color: #111; }
+.programa-rodape { position: relative; display: grid; gap: 0.6rem; padding-top: 0.9rem; border-top: 2px solid rgba(0, 0, 0, 0.35); }
+.programa-cartao .meta { color: #111; opacity: 0.8; }
+.programa-cartao .barra-progresso { background: rgba(0, 0, 0, 0.2); }
+.programa-cartao .barra-progresso > div { background: #111; }
+.programa-chamada { display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.7rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; }
 .programa-progresso { display: grid; gap: 0.35rem; }
 .programa-topo { display: grid; gap: 0.85rem; margin-bottom: 1.5rem; }
 .programa-dias { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.5rem; }
@@ -2119,10 +2125,6 @@ html::-webkit-scrollbar, .menu-tela::-webkit-scrollbar { display: none; }
 .placar-item.placar-previa { padding: 0.15rem 0.7rem; border: 1px solid var(--laranja); border-radius: 999px; color: var(--pl-acento); }
 
 
-.programa-semanas { list-style: none; margin: 0.25rem 0; padding: 0; display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; max-width: 150px; }
-.programa-semanas li { aspect-ratio: 1; border-radius: 4px; background: var(--superficie-2); }
-.programa-semanas li.feito { background: var(--laranja); }
-.programa-semanas li.proximo { box-shadow: inset 0 0 0 2px var(--laranja); }
 
 
 .jogue-filtros { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; }

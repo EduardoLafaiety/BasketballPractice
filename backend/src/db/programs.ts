@@ -1,6 +1,8 @@
 // Programas de várias semanas: um treino por dia, liberado um de cada vez. Os exercícios são nomes do
 // catálogo padrão (catalog.ts); o teste confere que todos existem.
 
+import { PROGRAMS_EXTRA } from './programs-extra.js'
+
 export type ProgramBlock = [exercise: string, minutes: number]
 
 export interface ProgramDefinition {
@@ -142,6 +144,7 @@ export const PROGRAMS: ProgramDefinition[] = [
     focus: 'Fundamentos',
     days: primeirosTrintaDias(),
   },
+  ...PROGRAMS_EXTRA,
 ]
 
 export const findProgram = (id: string) => PROGRAMS.find((p) => p.id === id)

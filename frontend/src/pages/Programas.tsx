@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, type CSSProperties } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import BarraProgresso from '../components/BarraProgresso'
 import { Carregando, ErroCarga } from '../components/Estado'
@@ -20,16 +20,15 @@ function Progresso({ p }: { p: ResumoPrograma }) {
   )
 }
 
-/** As quatro semanas do programa em quadradinhos: feitos, o próximo dia e os que faltam. */
-function Semanas({ p }: { p: ResumoPrograma }) {
-  const proximo = p.status.comecado && !p.status.concluido ? p.status.proximoDia : 0
-  return (
-    <ol className="programa-semanas" aria-hidden>
-      {Array.from({ length: p.totalDias }, (_, i) => (
-        <li key={i} className={i < p.status.feitos ? 'feito' : i + 1 === proximo ? 'proximo' : undefined} />
-      ))}
-    </ol>
-  )
+// Cada foco tem a sua cor; o cartão inteiro é pintado com ela.
+const COR_FOCO: Record<string, string> = {
+  Arremesso: '#ff8a3d',
+  Drible: '#c9a0ff',
+  Fundamentos: '#7db7ff',
+  Defesa: '#7ddc8c',
+  Finalização: '#ffd24a',
+  Passe: '#5fd6d0',
+  Condicionamento: '#ff8fb1',
 }
 
 const chamada = (p: ResumoPrograma) =>
@@ -44,15 +43,17 @@ export default function Programas() {
       {!programas ? (
         erro ? <ErroCarga erro={erro} tentarDeNovo={recarregar} /> : <Carregando texto="Carregando programas" />
       ) : (
-        <div className="grade programas-grade">
+        <div className="programas-grade">
           {programas.map((p) => (
-            <Link key={p.id} to={`/programas/${p.id}`} className="card programa-cartao">
-              <span className="rotulo-forte">{p.foco} · {ROTULO_NIVEL[p.nivel]}</span>
+            <Link key={p.id} to={`/programas/${p.id}`} className="programa-cartao" style={{ '--c': COR_FOCO[p.foco] ?? '#ff8a3d' } as CSSProperties}>
+              <span className="programa-dias-gigante" aria-hidden>{p.totalDias}</span>
+              <span className="programa-foco">{p.foco} · {ROTULO_NIVEL[p.nivel]}</span>
               <h2 className="sem-margem">{p.nome}</h2>
-              <p className="muted">{p.resumo}</p>
-              <Semanas p={p} />
-              <Progresso p={p} />
-              <span className="link-forte">{chamada(p)} <Icone nome="seta" /></span>
+              <p>{p.resumo}</p>
+              <div className="programa-rodape">
+                <Progresso p={p} />
+                <span className="programa-chamada">{chamada(p)} <Icone nome="seta" /></span>
+              </div>
             </Link>
           ))}
         </div>
