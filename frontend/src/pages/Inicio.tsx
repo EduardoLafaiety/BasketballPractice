@@ -5,13 +5,14 @@ import IconeRefeicao from '../alimentacao/icones'
 import { ARTIGOS, CATEGORIAS, categoria, minutosDeLeitura } from '../artigos/dados'
 import { api } from '../api'
 import { AvisoDesatualizado, Carregando, ErroCarga } from '../components/Estado'
+import CartaoDia from '../components/CartaoDia'
 import GradeJogadores from '../components/GradeJogadores'
 import Icone from '../components/Icone'
 import { ResumoSemana } from '../components/InicioDestaques'
 import { AberturaBola, EscadaRolagem, Figura, FraseRolagem, ListraBola, NomesRolagem } from '../components/rolagem'
 import { corDoJogador } from '../lib/cor-do-time'
 import { NIVEIS } from '../lib/niveis'
-import { DIAS, ROTULO_METRICA, aproveitamento, diasAtras, useDrills, useResumo, useRotina } from '../store'
+import { aproveitamento, diasAtras, useDrills, useResumo, useRotina } from '../store'
 import type { DiaSemana, Drill, EstiloResumo, Nivel } from '../types'
 
 const FIGURA_DO_NIVEL: Record<Nivel, string> = {
@@ -94,23 +95,11 @@ export default function Inicio() {
           ) : (
             <Carregando texto="Carregando treino de hoje" />
           )
-        ) : treinosHoje.length > 0 ? (
-          <ol className="lista-treino">
-            {treinosHoje.map((d, i) => (
-              <li key={`${d.id}-${i}`}>
-                <Link to={`/treinos/${d.id}`} className="treino-linha">
-                  <span className="treino-numero" aria-hidden>{String(i + 1).padStart(2, '0')}</span>
-                  <div className="treino-corpo">
-                    <span className={`tag tag-${d.categoria}`}>{d.categoria} · {ROTULO_METRICA[d.metrica]}</span>
-                    <h3>{d.nome}</h3>
-                    {d.descricao && <span className="muted">{d.descricao}</span>}
-                  </div>
-                  <Icone nome="seta" tamanho={22} />
-                </Link>
-              </li>
-            ))}
-          </ol>
-        ) : null}
+        ) : (
+          <div className="hoje-cartao">
+            <CartaoDia dia={hoje} treinos={treinosHoje} hoje />
+          </div>
+        )}
         <div className="hoje-rodape">
           <Link to="/rotina" className="link-forte">Editar rotina</Link>
         </div>
@@ -194,20 +183,10 @@ export default function Inicio() {
           <h2 className="titulo-gigante">Rotina</h2>
           <Link to="/rotina" className="link-forte">Montar rotina</Link>
         </div>
-        <div className="semana-grade">
-          {ORDEM_SEMANA.map((d) => {
-            const treinos = rotina.rotina[d].map(drills.drillPorId).filter((t): t is Drill => !!t)
-            return (
-              <article key={d} className={`semana-dia ${treinos.length ? '' : 'folga'} ${d === hoje ? 'hoje' : ''}`}>
-                <h3>{DIAS[d].slice(0, 3)}</h3>
-                {treinos.length ? (
-                  <ul>{treinos.map((t, i) => <li key={`${t.id}-${i}`}>{t.nome}</li>)}</ul>
-                ) : (
-                  <span>Descanso</span>
-                )}
-              </article>
-            )
-          })}
+        <div className="semana">
+          {ORDEM_SEMANA.map((d, posicao) => (
+            <CartaoDia key={d} dia={d} posicao={posicao} hoje={d === hoje} treinos={rotina.rotina[d].map(drills.drillPorId).filter((x): x is Drill => !!x)} />
+          ))}
         </div>
       </section>
 
