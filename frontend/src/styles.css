@@ -445,7 +445,6 @@ p { margin: 0 0 1rem; }
 }
 .auth-palco { position: relative; overflow: hidden; min-height: 100%; }
 .auth-palco .abertura-bola { width: min(68vh, 44vw); }
-.auth-palco .abertura-dentro { height: min(64vh, 41vw); }
 .auth-marca { position: absolute; top: 0.8rem; left: clamp(0.8rem, 2vw, 1.4rem); z-index: 1; display: flex; align-items: center; gap: 0.6rem; text-decoration: none; }
 .auth-titulo { position: absolute; inset: 0; margin: 0; font-size: min(11.5vw, 25vh); line-height: 0.84; pointer-events: none; }
 .auth-titulo > span { position: absolute; left: 0; right: 0; text-align: center; }
@@ -540,7 +539,6 @@ p { margin: 0 0 1rem; }
   .auth { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto 1fr; }
   .auth-palco { min-height: 52vh; }
   .auth-palco .abertura-bola { width: min(38vh, 72vw); }
-  .auth-palco .abertura-dentro { height: min(36vh, 68vw); }
   .auth-titulo { font-size: min(21vw, 13vh); }
   .auth-titulo-a { top: 4.2rem; }
   .auth-titulo-b { bottom: 0.8rem; }
@@ -1169,10 +1167,8 @@ section + section, .card + section { margin-top: 1.5rem; }
 .linhas-quadra { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; fill: none; stroke: var(--borda); stroke-width: 1.5; opacity: 0.8; }
 .abertura-palco { position: absolute; inset: 0; display: grid; place-items: center; }
 /* Sem will-change: com ele o navegador amplia o bitmap da escala 1 e a bola borra no zoom da rolagem. */
-.abertura-bola, .abertura-dentro { grid-area: 1 / 1; }
+.abertura-bola { grid-area: 1 / 1; }
 .abertura-bola { width: min(72vh, 66vw); aspect-ratio: 1; }
-.abertura-dentro { height: min(68vh, 62vw); aspect-ratio: 240 / 300; color: var(--texto); }
-.abertura-dentro .figura { width: 100%; height: 100%; }
 .bola-vazada { fill: rgba(255, 106, 19, 0.07); stroke: var(--laranja); stroke-width: 2; }
 .bola-grade { fill: none; stroke: var(--laranja); stroke-width: 1; }
 .bola-costura { fill: none; stroke: #1d0f05; stroke-width: 7; }
@@ -2082,7 +2078,6 @@ html::-webkit-scrollbar, .menu-tela::-webkit-scrollbar { display: none; }
   .abertura-fixa { height: 100svh; }
   .abertura-fixa { --bola: min(78vw, 44svh); --titulo: min(17vw, 9svh); }
   .abertura-fixa .abertura-bola { width: var(--bola); }
-  .abertura-fixa .abertura-dentro { height: calc(var(--bola) * 0.94); }
   .conteudo .abertura-titulo { font-size: var(--titulo); }
   .abertura-a { top: calc(50% - var(--bola) / 2 - 1em); }
   .abertura-b { top: calc(50% + var(--bola) / 2 + 0.12em); bottom: auto; }

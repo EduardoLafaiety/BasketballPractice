@@ -2,7 +2,7 @@ import { useRef, useState, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import Icone from './Icone'
 import { abrirPreferenciasCookies } from '../lib/cookies'
-import { BolaCouro, BolaVazada, Figura, LinhasQuadra, ListraBola, useFuroBola } from './rolagem'
+import { BolaCouro, BolaVazada, LinhasQuadra, ListraBola, useFuroBola } from './rolagem'
 
 /** A moldura das telas de conta: a quadra de um lado, o formulário do outro. */
 export default function TelaAuth({ children }: { children: ReactNode }) {
@@ -19,7 +19,6 @@ export default function TelaAuth({ children }: { children: ReactNode }) {
         <LinhasQuadra />
         <div className="abertura-palco">
           <BolaVazada />
-          <div className="abertura-dentro"><Figura nome="Mikan drill" viewBox="220 10 240 300" /></div>
         </div>
         <div className="abertura-palco abertura-furada" ref={camada}>
           <BolaCouro />

@@ -199,18 +199,16 @@ export function useFuroBola(camada: RefObject<HTMLElement>, aoTocar?: () => void
   }, [camada])
 }
 
-/** Abertura: a bola fica transparente sob o mouse e mostra o atleta dentro dela. */
+/** Abertura: a bola de couro fica transparente sob o mouse e deixa ver a bola de linhas por baixo. */
 export function AberturaBola({ titulo, children }: { titulo: ReactNode; children?: ReactNode }) {
   const secao = useRef<HTMLElement>(null)
   const camada = useRef<HTMLDivElement>(null)
   const bolas = useRef<(SVGSVGElement | null)[]>([])
-  const dentro = useRef<HTMLDivElement>(null)
 
   useRolagem(() => {
     if (!secao.current || menosMovimento()) return
     const p = progressoDoPino(secao.current)
     bolas.current.forEach((b) => { if (b) b.style.transform = `rotate(${p * 260}deg) scale(${1 + p * 1.7})` })
-    if (dentro.current) dentro.current.style.transform = `scale(${1 + p * 1.2})`
     secao.current.style.setProperty('--saida', String(p))
   })
 
@@ -224,7 +222,6 @@ export function AberturaBola({ titulo, children }: { titulo: ReactNode; children
         <LinhasQuadra />
         <div className="abertura-palco" aria-hidden>
           <BolaVazada ref={(el) => { bolas.current[0] = el }} />
-          <div className="abertura-dentro" ref={dentro}><Figura nome="Mikan drill" viewBox="220 10 240 300" /></div>
         </div>
         <div className="abertura-palco abertura-furada" ref={camada} aria-hidden>
           <BolaCouro ref={(el) => { bolas.current[1] = el }} />
