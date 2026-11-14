@@ -31,6 +31,15 @@ const FERRAMENTAS: { to: string; titulo: string; texto: string }[] = [
   { to: '/metas', titulo: 'Metas', texto: 'Objetivos com prazo, conquistas e sequência de dias treinando.' },
 ]
 
+// Onde cada posição joga na meia quadra do convite da Alimentação.
+const JOGADORES_QUADRA = [
+  { posicao: 'pivo', x: 200, y: 82 },
+  { posicao: 'ala', x: 98, y: 150 },
+  { posicao: 'ala', x: 302, y: 150 },
+  { posicao: 'armador', x: 150, y: 232 },
+  { posicao: 'armador', x: 250, y: 232 },
+] as const
+
 export default function Inicio() {
   const { resumo, erro: erroResumo } = useResumo(diasAtras(6))
   const rotina = useRotina()
@@ -151,20 +160,33 @@ export default function Inicio() {
           <div className="dieta-chamada-icones" aria-hidden>
             {REFEICOES.map((r) => <IconeRefeicao key={r.id} refeicao={r.id} tamanho={46} />)}
           </div>
-          <Link to="/alimentacao" className="link-forte">Ver alimentação</Link>
-        </div>
-        <div className="dieta-chamada-posicoes">
-          {POSICOES.map((p) => (
-            <Link key={p.id} to={`/alimentacao?aba=cardapio&posicao=${p.id}`} className="dieta-chamada-posicao" style={{ '--c': COR[p.id] } as CSSProperties}>
-              <span className="dieta-chamada-numeros" aria-hidden>{p.numeros}</span>
-              <span className="dieta-chamada-nome">
+          <div className="dieta-chamada-legenda">
+            {POSICOES.map((p) => (
+              <Link key={p.id} to={`/alimentacao?aba=cardapio&posicao=${p.id}`} style={{ '--c': COR[p.id] } as CSSProperties}>
+                <i aria-hidden />
                 <strong>{p.nome}</strong>
                 <span className="meta">{p.titulo}</span>
-              </span>
-              <Icone nome="seta" />
-            </Link>
-          ))}
+              </Link>
+            ))}
+          </div>
+          <Link to="/alimentacao" className="link-forte">Ver alimentação</Link>
         </div>
+        <svg className="dieta-quadra" viewBox="0 0 400 300" aria-hidden>
+          <rect className="linha" x="10" y="10" width="380" height="280" rx="4" />
+          <rect className="linha" x="140" y="10" width="120" height="130" />
+          <path className="linha" d="M140 140a60 60 0 0 0 120 0" />
+          <path className="linha" d="M50 10v70a150 150 0 0 0 300 0V10" />
+          <circle className="linha" cx="200" cy="34" r="9" />
+          {JOGADORES_QUADRA.map((j) => {
+            const p = POSICOES.find((x) => x.id === j.posicao)
+            return (
+              <g key={`${j.posicao}-${j.x}`} className="dieta-quadra-no" style={{ '--c': COR[j.posicao] } as CSSProperties}>
+                <circle cx={j.x} cy={j.y} r="24" />
+                <text x={j.x} y={j.y}>{p?.numeros}</text>
+              </g>
+            )
+          })}
+        </svg>
       </section>
 
       <section className="faixa-clara banda">
