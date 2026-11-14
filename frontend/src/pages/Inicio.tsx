@@ -67,10 +67,11 @@ export default function Inicio() {
 
       {segunda && <ResumoSemana />}
 
-      <section className="faixa-clara banda">
-        <div className="secao-topo secao-forte">
+      <section className="faixa-clara banda treino-hoje">
+        <div className="hoje-topo">
+          <span className="hoje-dia">{DIAS[hoje]}</span>
           <h2>Treino de hoje</h2>
-          <div className="acoes">
+          <div className="hoje-acoes">
             {prontoHoje && treinosHoje.length > 0 && (
               <Link to="/sessao?hoje" className="btn btn-primario">
                 Começar treino de hoje <Icone nome="seta" />
@@ -105,9 +106,14 @@ export default function Inicio() {
             ))}
           </ol>
         ) : (
-          <div className="vazio">
-            Nenhum treino planejado para {DIAS[hoje].toLowerCase()}.{' '}
-            <Link to="/rotina" className="link">Adicione à rotina</Link>
+          <div className="vazio hoje-vazio">
+            <svg className="hoje-quadra" viewBox="0 0 120 120" aria-hidden>
+              <circle cx="60" cy="60" r="52" />
+              <path d="M8 60h104M60 8v104" />
+              <circle cx="60" cy="60" r="16" />
+            </svg>
+            <p>Nenhum treino planejado para {DIAS[hoje].toLowerCase()}.</p>
+            <Link to="/rotina" className="btn btn-primario">Adicione à rotina <Icone nome="seta" /></Link>
           </div>
         )}
       </section>
