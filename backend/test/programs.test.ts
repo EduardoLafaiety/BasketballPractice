@@ -26,6 +26,14 @@ describe('Programas: definições', () => {
   })
 })
 
+describe('Programas: catálogo', () => {
+  it('tem 15 programas, com ids únicos e quatro semanas cada', () => {
+    assert.equal(PROGRAMS.length, 15)
+    assert.equal(new Set(PROGRAMS.map((p) => p.id)).size, 15)
+    for (const p of PROGRAMS) assert.ok(p.days.length === 28 || p.days.length === 30, p.id)
+  })
+})
+
 describe('Programas de 30 dias', () => {
   it('lista os programas sem nenhum começado', async () => {
     const { token } = await register()
