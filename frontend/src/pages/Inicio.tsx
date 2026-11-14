@@ -68,16 +68,13 @@ export default function Inicio() {
       {segunda && <ResumoSemana />}
 
       <section className="faixa-clara banda treino-hoje">
-        <div className="hoje-fundo" aria-hidden>{DIAS[hoje]}</div>
+        <div className="hoje-fundo" aria-hidden>{hoje === 0 || hoje === 6 ? DIAS[hoje] : `${DIAS[hoje]}-feira`}</div>
         <div className="hoje-frente">
           <h2>Treino de hoje</h2>
           {prontoHoje && treinosHoje.length === 0 && (
             <>
               <p className="hoje-aviso">Nenhum treino planejado para {DIAS[hoje].toLowerCase()}.</p>
-              <div className="hoje-acoes">
-                <Link to="/rotina" className="btn btn-primario">Adicione à rotina <Icone nome="seta" /></Link>
-                <Link to="/rotina" className="link-forte">Editar rotina</Link>
-              </div>
+              <Link to="/rotina" className="link-forte">Editar rotina</Link>
             </>
           )}
           {prontoHoje && treinosHoje.length > 0 && (

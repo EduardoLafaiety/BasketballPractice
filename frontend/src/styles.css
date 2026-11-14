@@ -2354,8 +2354,8 @@ html::-webkit-scrollbar, .menu-tela::-webkit-scrollbar { display: none; }
 
 /* Início: Treino de hoje, com o dia da semana vazado atrás do título */
 .treino-hoje { position: relative; overflow: hidden; }
-.hoje-fundo { margin: 0; font-family: var(--fonte-display); font-weight: var(--peso-display); text-transform: uppercase; font-size: clamp(7rem, 26vw, 19rem); line-height: 0.8; color: transparent; -webkit-text-stroke: 2px var(--borda); user-select: none; }
-.hoje-frente { position: relative; display: flex; flex-direction: column; align-items: flex-start; gap: 1rem; margin-top: calc(-1 * clamp(2.6rem, 10vw, 7rem)); margin-bottom: 2rem; }
+.hoje-fundo { margin: 0; font-family: var(--fonte-display); font-weight: var(--peso-display); text-transform: uppercase; font-size: clamp(3.2rem, 11vw, 9rem); line-height: 0.9; color: transparent; -webkit-text-stroke: 2px var(--borda); user-select: none; overflow-wrap: anywhere; }
+.hoje-frente { display: flex; flex-direction: column; align-items: flex-start; gap: 1rem; margin-top: 0.5rem; margin-bottom: 2rem; }
 .hoje-frente h2 { margin: 0; font-size: clamp(3rem, 8vw, 6rem); }
 .hoje-aviso { margin: 0; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
 .hoje-acoes { display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem 1.5rem; }
