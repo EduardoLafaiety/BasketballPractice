@@ -119,9 +119,9 @@ describe('Início', () => {
     expect(nomes).toHaveAttribute('aria-hidden', 'true')
     expect(nomes.querySelector('a')).toBeNull()
 
-    const segunda = (await screen.findByRole('heading', { name: 'Seg' })).closest('article') as HTMLElement
+    const segunda = (await screen.findByRole('heading', { name: 'Segunda' })).closest('article') as HTMLElement
     await within(segunda).findByText('Exercício 1')
-    expect(screen.getByRole('heading', { name: 'Ter' }).closest('article')).toHaveTextContent('Descanso')
+    expect(screen.getByRole('heading', { name: 'Terça' }).closest('article')).toHaveTextContent('Descanso')
   })
 
   it('chama para os artigos com as categorias e alguns em destaque', async () => {
@@ -149,7 +149,7 @@ describe('Início', () => {
 
     const hoje = (await screen.findByRole('heading', { name: 'Treino de hoje' })).closest('section') as HTMLElement
     const cartoes = await within(hoje).findAllByRole('link', { name: /Crossover|Lance livre|Suicídio/ })
-    expect(cartoes.map((c) => c.querySelector('h3')?.textContent)).toEqual(['Crossover', 'Lance livre'])
+    expect(cartoes.map((c) => c.textContent)).toEqual(['Crossover', 'Lance livre'])
     expect(cartoes[1]).toHaveAttribute('href', '/treinos/1')
     expect(within(hoje).getByRole('link', { name: 'Começar treino de hoje' })).toHaveAttribute('href', '/sessao?hoje')
   })
