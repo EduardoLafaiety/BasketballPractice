@@ -182,11 +182,9 @@ describe('Ferramentas na API', () => {
     assert.equal((await api('PUT', '/settings', { reminders: { time: '25:00' } })).status, 400)
   })
 
-  it('lista modelos de rotina e gera treinos', async () => {
-    const templates = (await api('GET', '/plans/templates')).body
-    assert.ok(templates.length >= 3)
-    assert.ok(templates.every((t: { days: Record<string, unknown[]> }) => Object.keys(t.days).length === 7))
-    assert.ok(templates[0].days['1'][0].exerciseId > 0)
+  it('gera treinos', async () => {
+    // Os modelos de rotina prontos saíram do app: a rota deixou de existir.
+    assert.equal((await api('GET', '/plans/templates')).status, 404)
 
     const plan = await api('POST', '/plans/generate', { minutes: 30, focus: ['drible'], seed: 1 })
     assert.equal(plan.status, 200)

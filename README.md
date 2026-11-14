@@ -29,7 +29,7 @@
 - ⚡ **Gerador De Treino**: Diga Quanto Tempo Tem, O Nível E O Foco, E A Sessão Sai Pronta.
 - 🌟 **Jogue Como**: Escolha Um Entre 28 Jogadores Da NBA E Treine Os Movimentos Que Definem O Estilo Dele.
 - ▶️ **Sessão Guiada**: Animação Ao Lado Do Cronômetro, Contador De Acertos E Registro Automático No Fim.
-- 🗓️ **Rotina Semanal**: Monte O Que Treinar Em Cada Dia Ou Comece De Um Modelo Pronto.
+- 🗓️ **Rotina Semanal**: Gere A Semana Inteira Pelo Tempo, Nível E Foco, Ou Monte O Que Treinar Em Cada Dia.
 - 📈 **Desempenho**: Comparativos, Gráficos E Mapa De Arremessos Por Zona Da Quadra.
 - 🏆 **Metas E Conquistas**: Barras De Progresso, Sequência De Dias Seguidos E Medalhas.
 - 🪪 **Cartão Do Atleta**: Bateria Mensal De Quatro Testes, Nota De 0 A 99, Radar E Evolução Mês A Mês.

@@ -715,12 +715,6 @@ section + section, .card + section { margin-top: 1.5rem; }
 .comparacao figure { margin: 0; display: grid; gap: 0.3rem; }
 .controles-video { flex-wrap: wrap; }
 
-/* Rotina: modelos */
-.modelos { margin: 1rem 0; }
-.modelos .grade { margin-top: 0.75rem; }
-.modelo { display: grid; gap: 0.5rem; align-content: start; }
-.modelo p { margin: 0; font-size: 0.9rem; }
-.modelo .btn { justify-self: start; }
 
 @media (max-width: 800px) {
   .testes { grid-template-columns: 1fr; }

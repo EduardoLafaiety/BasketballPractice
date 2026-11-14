@@ -7,60 +7,6 @@ import { parse } from '../lib/validate.js'
 import { currentUser } from '../middleware/auth.js'
 import { CATEGORIES } from './exercises.js'
 
-type Day = 0 | 1 | 2 | 3 | 4 | 5 | 6
-
-// Rotinas semanais prontas, montadas com os nomes do catálogo padrão (seed.ts).
-// Dias: 0 = domingo ... 6 = sábado; dia ausente = descanso.
-const TEMPLATES: { id: string; name: string; description: string; days: Partial<Record<Day, string[]>> }[] = [
-  {
-    id: 'iniciante-3x',
-    name: 'Iniciante — 3x por semana',
-    description: 'Fundamentos básicos em dias alternados, com descanso entre os treinos.',
-    days: {
-      1: ['Mikan drill', 'Drible estacionário', 'Lance livre'],
-      3: ['Passe na parede', 'Bandeja com a mão fraca', 'Arremesso de média distância'],
-      5: ['Mikan drill', 'Zigue-zague com mudança de direção', 'Lance livre'],
-    },
-  },
-  {
-    id: 'foco-arremesso',
-    name: 'Foco em arremesso — 4 semanas',
-    description: 'Volume alto de arremessos, do lance livre à linha de três, com finalização nos dias alternados.',
-    days: {
-      1: ['Lance livre', 'Arremesso de média distância', 'Arremesso de três'],
-      2: ['Arremesso após drible', 'Mikan drill', 'Lance livre'],
-      3: ['Lance livre', 'Arremesso de média distância', 'Arremesso de três'],
-      4: ['Arremesso após drible', 'Bandeja com a mão fraca', 'Lance livre'],
-      5: ['Lance livre', 'Arremesso de três', 'Arremesso após drible'],
-      6: ['Arremesso de três', 'Lance livre'],
-    },
-  },
-  {
-    id: 'pre-temporada',
-    name: 'Pré-temporada',
-    description: 'Condicionamento, defesa e fundamentos para chegar inteiro no início da temporada.',
-    days: {
-      1: ['Suicídio', 'Deslizamento defensivo', 'Mikan drill'],
-      2: ['Drible estacionário', 'Zigue-zague com mudança de direção', 'Lance livre'],
-      3: ['Saltos na caixa', 'Closeout', 'Arremesso de média distância'],
-      5: ['Suicídio', 'Drible com duas bolas', 'Arremesso após drible'],
-      6: ['Saltos na caixa', 'Arremesso de três', 'Passe na parede'],
-    },
-  },
-  {
-    id: 'manejo-de-bola',
-    name: 'Manejo de bola',
-    description: 'Drible e passe todos os dias úteis, para ganhar confiança com as duas mãos.',
-    days: {
-      1: ['Drible estacionário', 'Passe na parede'],
-      2: ['Drible com duas bolas', 'Zigue-zague com mudança de direção'],
-      3: ['Drible estacionário', 'Bandeja com a mão fraca'],
-      4: ['Drible com duas bolas', 'Passe na parede'],
-      5: ['Zigue-zague com mudança de direção', 'Arremesso após drible'],
-    },
-  },
-]
-
 const generateSchema = z.object({
   minutes: z.number().int().min(10).max(180),
   focus: z.array(z.enum(CATEGORIES)).max(CATEGORIES.length).default([]),
@@ -85,11 +31,11 @@ function random(seed: number) {
   }
 }
 
-const visibleExercises = (db: Queryable, userId: number, catalogFirst = false) =>
+const visibleExercises = (db: Queryable, userId: number) =>
   many<ExerciseRow>(
     db,
     `SELECT id, name, category, metric, level, warmup, position FROM exercises WHERE user_id IS NULL OR user_id = $1
-     ORDER BY ${catalogFirst ? 'user_id NULLS FIRST, ' : ''}id`,
+     ORDER BY id`,
     [userId],
   )
 
@@ -149,29 +95,6 @@ export function generatePlan(exercises: ExerciseRow[], input: z.infer<typeof gen
 
 export function plansRouter(db: Database) {
   const router = Router()
-
-  // Modelos com os ids dos exercícios já resolvidos; nomes que sumiram do catálogo são ignorados.
-  router.get('/templates', async (req, res) => {
-    // O catálogo vem antes: um exercício do atleta com o mesmo nome não o substitui, mesmo que seja mais
-    // antigo que um exercício acrescentado ao catálogo depois.
-    const exercises = await visibleExercises(db, currentUser(req), true)
-    const byName = new Map<string, ExerciseRow>()
-    for (const exercise of exercises) if (!byName.has(exercise.name)) byName.set(exercise.name, exercise)
-    res.json(
-      TEMPLATES.map(({ days, ...template }) => ({
-        ...template,
-        days: Object.fromEntries(
-          ([0, 1, 2, 3, 4, 5, 6] as Day[]).map((day) => [
-            day,
-            (days[day] ?? []).flatMap((name) => {
-              const exercise = byName.get(name)
-              return exercise ? [{ exerciseId: exercise.id, name: exercise.name }] : []
-            }),
-          ]),
-        ),
-      })),
-    )
-  })
 
   router.post('/generate', async (req, res) => {
     const body = parse(generateSchema, req.body)
