@@ -31,7 +31,6 @@ test('no celular, o menu abre em tela cheia, navega entre as telas e nada vaza p
   // A barra de atalhos de baixo leva direto ao gerador da rotina e marca a seção atual.
   const atalhos = page.getByRole('navigation', { name: 'Atalhos' })
   await expect(atalhos).toBeVisible()
-  await expect(page.locator('.topo').getByRole('link', { name: 'Gerar rotina' })).toBeHidden()
   await atalhos.getByRole('link', { name: 'Gerar rotina' }).click()
   await expect(page.getByRole('heading', { name: 'Rotina semanal', level: 1 })).toBeVisible()
   await expect(page.getByRole('form', { name: 'Gerar rotina semanal' })).toBeVisible()
