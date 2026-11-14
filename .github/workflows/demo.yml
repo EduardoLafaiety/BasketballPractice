@@ -5,7 +5,7 @@ name: Demonstração no GitHub Pages
 on:
   push:
     branches: [main]
-  # A demonstração não tem servidor: republicar é o que atualiza as notícias da barra (4 consultas por dia ao GNews).
+  # A demonstração não tem servidor: republicar é o que atualiza a classificação, os líderes e as notícias do NBB.
   schedule:
     - cron: '17 */6 * * *'
   workflow_dispatch:
@@ -56,13 +56,6 @@ jobs:
       - name: Fallback de rotas
         run: cp frontend/dist/index.html frontend/dist/404.html
 
-      # Sem o secret GNEWS_API_KEY, saem as manchetes escritas à mão (backend/src/lib/curated-news.ts).
-      - name: Notícias da barra
-        run: npx tsx src/scripts/export-news.ts ../frontend/dist/noticias.json
-        working-directory: backend
-        env:
-          GNEWS_API_KEY: ${{ secrets.GNEWS_API_KEY }}
-
       # A LNB não libera a leitura pelo navegador: a classificação do NBB é lida aqui e vira um JSON estático.
       # Se a LNB estiver fora do ar, o arquivo não é criado e a página da NBB mostra que está indisponível.
       - name: Classificação do NBB
@@ -79,7 +72,6 @@ jobs:
             (cd ../teste/backend && npm ci)
             (cd ../teste/frontend && npm ci && VITE_BASE=/${{ github.event.repository.name }}/teste/ npm run build:demo)
             cp -r ../teste/frontend/dist frontend/dist/teste
-            cp frontend/dist/noticias.json frontend/dist/teste/noticias.json
             cp frontend/dist/nbb.json frontend/dist/teste/nbb.json || true
           else
             echo "Sem branch teste: nada a publicar em /teste/."

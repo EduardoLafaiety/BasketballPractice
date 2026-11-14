@@ -40,7 +40,6 @@
 - 🗺️ **Quadras Perto De Você E Prancheta Tática**: Mapa Com Quadras Do OpenStreetMap E Jogadas Desenhadas Em Meia Ou Quadra Inteira.
 - 🖼️ **Imagem Da Semana**: PNG No Tamanho Dos Stories Com O Mapa De Arremessos E A Sequência.
 - 🧰 **Ferramentas**: Timer De Intervalos, Contador De Arremessos, Metrônomo De Drible E Calculadoras; O Vídeo Em Câmera Lenta Chega Em Breve.
-- 📰 **Barra De Notícias**: As Últimas Manchetes Do Basquete Correndo No Rodapé Do Site.
 - 🏀 **Visual De Quadra**: A Bola Da Abertura Amplia Sem Perder Nitidez Ao Rolar A Página, E Uma Listra Com As Costuras Dela Abre As Seções De Números E Ferramentas.
 - 📱 **PWA**: Instalável No Celular, Com Tema Claro/Escuro E Lembretes De Treino, Inclusive Com O App Fechado (Web Push).
 

@@ -105,24 +105,19 @@ test('excluir a conta em Configurações apaga os dados, sai e libera o e-mail',
   await esperarEmail(email, /Ative sua conta/, 2)
 })
 
-test('os documentos abrem do cadastro e do rodapé, marcados como rascunho, com o rodapé fora da barra de notícias', async ({ page, request }) => {
+test('os documentos abrem do cadastro e do rodapé, marcados como rascunho', async ({ page, request }) => {
   await page.goto('/cadastro')
   await page.getByRole('link', { name: 'Termos de Uso' }).first().click()
   await expect(page.getByRole('heading', { name: 'Termos de Uso', level: 1 })).toBeVisible()
   await expect(page.getByRole('note')).toContainText('revisado por um advogado')
 
-  // Com uma manchete, a barra de notícias aparece fixa no fim da tela, por cima do que não tiver folga.
-  await page.route('**/api/news', (rota) =>
-    rota.fulfill({ json: [{ id: 1, origin: 'admin', title: 'Manchete do teste', sourceName: null, url: null, publishedAt: new Date().toISOString(), expiresAt: null }] }),
-  )
   const { token } = await novaConta(request)
   await entrarCom(page, token)
   await page.goto('/configuracoes')
-  await expect(page.getByText('Manchete do teste').first()).toBeVisible()
   const link = page.getByRole('contentinfo').getByRole('link', { name: 'Política de Privacidade' })
   await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight))
   await expect(link).toBeInViewport({ ratio: 1 })
-  // Clica de verdade: se a barra fixa estivesse por cima, o clique não chegaria ao link.
+  // Clica de verdade: se algo fixo estivesse por cima do rodapé, o clique não chegaria ao link.
   await link.click({ timeout: 5_000 })
   await expect(page.getByRole('heading', { name: 'Política de Privacidade', level: 1 })).toBeVisible()
   await expect(page.getByRole('note')).toContainText('Rascunho')

@@ -36,12 +36,10 @@ export default defineConfig({
       // Banco limpo e a API real (a mesma de `npm run dev`, sem o modo watch).
       command: 'node preparar-banco.mjs && node ../backend/node_modules/tsx/dist/cli.mjs ../backend/src/server.ts',
       url: `http://localhost:${PORTA_API}/api/health`,
-      // Chave vazia: os testes não gastam a cota do GNews mesmo que o .env do backend tenha uma.
       env: {
         PORT: String(PORTA_API),
         DATABASE_URL: BANCO_E2E,
         JWT_SECRET: 'segredo-dos-testes-e2e',
-        GNEWS_API_KEY: '',
         EMAIL_PROVIDER: 'arquivo',
         EMAIL_OUTBOX_FILE: CAIXA_E2E,
         APP_URL: `http://localhost:${PORTA_SITE}`,

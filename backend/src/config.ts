@@ -58,10 +58,6 @@ export const config = {
   emailsPerAddressPerHour: Number(process.env.EMAILS_PER_ADDRESS_PER_HOUR ?? 5),
   /** Importações de backup ao mesmo tempo nesta instância. */
   maxImports: Number(process.env.MAX_IMPORTS ?? 2),
-  /** Chave do GNews; vazia, a barra de notícias mostra só as manchetes do admin. */
-  gnewsApiKey: process.env.GNEWS_API_KEY ?? '',
-  /** A cada 20 minutos são 72 das 100 consultas diárias do plano grátis; o resto fica para a demonstração. */
-  newsIntervalMinutes: Number(process.env.NEWS_INTERVAL_MINUTES ?? 20),
   /** Chaves VAPID do Web Push (gere com `npx web-push generate-vapid-keys`). Sem elas, os lembretes por push ficam desligados. */
   push: {
     publicKey: process.env.VAPID_PUBLIC_KEY ?? '',

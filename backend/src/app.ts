@@ -16,7 +16,6 @@ import { dataRouter } from './routes/data.js'
 import { exercisesRouter } from './routes/exercises.js'
 import { gamesRouter } from './routes/games.js'
 import { goalsRouter } from './routes/goals.js'
-import { newsRouter } from './routes/news.js'
 import { plansRouter } from './routes/plans.js'
 import { playsRouter } from './routes/plays.js'
 import { programsRouter } from './routes/programs.js'
@@ -135,7 +134,6 @@ export function createApp(
   app.use('/api/styles', auth, stylesRouter(db))
   app.use('/api/settings', auth, settingsRouter(db))
   app.use('/api/data', auth, dataRouter(db, { maxImports }))
-  app.use('/api/news', auth, newsRouter(db))
   app.use('/api/admin', auth, requireAdmin(db), adminRouter(db))
 
   app.use(notFoundHandler)
