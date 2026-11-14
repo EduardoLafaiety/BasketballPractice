@@ -1169,15 +1169,7 @@ section + section, .card + section { margin-top: 1.5rem; }
 /* Sem will-change: com ele o navegador amplia o bitmap da escala 1 e a bola borra no zoom da rolagem. */
 .abertura-bola { grid-area: 1 / 1; }
 .abertura-bola { width: min(72vh, 66vw); aspect-ratio: 1; }
-.bola-vazada { fill: rgba(255, 106, 19, 0.07); stroke: var(--laranja); stroke-width: 2; }
-.bola-grade { fill: none; stroke: var(--laranja); stroke-width: 1; }
 .bola-costura { fill: none; stroke: #1d0f05; stroke-width: 7; }
-.abertura-furada {
-  -webkit-mask-image: radial-gradient(circle var(--r, 0px) at var(--x, 50%) var(--y, 50%), transparent 62%, #000 100%), radial-gradient(circle calc(var(--r, 0px) * 0.6) at var(--x2, 50%) var(--y2, 50%), transparent 55%, #000 100%);
-  mask-image: radial-gradient(circle var(--r, 0px) at var(--x, 50%) var(--y, 50%), transparent 62%, #000 100%), radial-gradient(circle calc(var(--r, 0px) * 0.6) at var(--x2, 50%) var(--y2, 50%), transparent 55%, #000 100%);
-  -webkit-mask-composite: source-in;
-  mask-composite: intersect;
-}
 .abertura-conteudo { position: absolute; inset: 0; pointer-events: none; }
 .abertura-conteudo a, .abertura-conteudo button { pointer-events: auto; }
 .conteudo .abertura-titulo { position: absolute; inset: 0; margin: 0; font-size: clamp(4rem, 15vw, 15rem); line-height: 0.84; }
@@ -2073,7 +2065,6 @@ html::-webkit-scrollbar, .menu-tela::-webkit-scrollbar { display: none; }
 }
 
 /* Abertura no celular: a bola grande no meio da tela, "Bora pra" logo acima e "quadra." logo abaixo, sem encostar nela. */
-.abertura-dica { display: none; }
 @media (max-width: 860px) {
   .abertura-fixa { height: 100svh; }
   .abertura-fixa { --bola: min(78vw, 44svh); --titulo: min(17vw, 9svh); }
@@ -2082,29 +2073,6 @@ html::-webkit-scrollbar, .menu-tela::-webkit-scrollbar { display: none; }
   .abertura-a { top: calc(50% - var(--bola) / 2 - 1em); }
   .abertura-b { top: calc(50% + var(--bola) / 2 + 0.12em); bottom: auto; }
 }
-/* Dica de toque: só em tela de toque, some no primeiro toque e ao rolar. */
-@media (max-width: 860px) and (hover: none) {
-  .abertura-dica {
-    display: block;
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: calc(50% + var(--bola) / 2 + var(--titulo) * 1.08);
-    margin: 0;
-    text-align: center;
-    font-size: 0.7rem;
-    font-weight: 800;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--muted);
-    opacity: calc(1 - var(--saida) * 6);
-    transition: opacity 0.4s;
-    animation: abertura-dica 1.8s ease-in-out infinite;
-  }
-  .abertura.tocou .abertura-dica { opacity: 0; }
-  @keyframes abertura-dica { 50% { transform: translateY(-4px); } }
-}
-
 /* ==== Páginas internas no computador: aproveitam a largura. Topo, menu, barras fixas, cores e fontes não mudam. ==== */
 
 /* Peças novas, em qualquer tela */

@@ -1,14 +1,11 @@
-import { useRef, useState, type ReactNode } from 'react'
+import { useState, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import Icone from './Icone'
 import { abrirPreferenciasCookies } from '../lib/cookies'
-import { BolaCouro, BolaVazada, LinhasQuadra, ListraBola, useFuroBola } from './rolagem'
+import { BolaCouro, LinhasQuadra, ListraBola } from './rolagem'
 
 /** A moldura das telas de conta: a quadra de um lado, o formulário do outro. */
 export default function TelaAuth({ children }: { children: ReactNode }) {
-  const camada = useRef<HTMLDivElement>(null)
-  useFuroBola(camada)
-
   return (
     <div className="auth">
       <Link to="/entrar" className="auth-marca" aria-label="Basketball Practice">
@@ -18,9 +15,6 @@ export default function TelaAuth({ children }: { children: ReactNode }) {
       <section className="auth-palco" aria-hidden="true">
         <LinhasQuadra />
         <div className="abertura-palco">
-          <BolaVazada />
-        </div>
-        <div className="abertura-palco abertura-furada" ref={camada}>
           <BolaCouro />
         </div>
         <h2 className="auth-titulo">
