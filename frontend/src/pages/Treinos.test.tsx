@@ -108,48 +108,16 @@ describe('Biblioteca de treinos', () => {
     expect(within(screen.getByRole('link', { name: /Bandeja/ })).getByText('Finalização')).toBeInTheDocument()
   })
 
-  it('filtra por categoria e por forma de registro, e os filtros se somam', async () => {
-    const user = userEvent.setup()
+  it('não tem busca, filtros por categoria ou registro, nem o botão de novo exercício', async () => {
     abrir(servidorDeExercicios().rotas)
-    await screen.findByRole('heading', { name: 'Lance livre' })
+    await screen.findByRole('heading', { name: 'Treinos', level: 1 })
 
-    await user.click(screen.getByRole('button', { name: 'Arremesso' }))
-    expect(nomesNaTela()).toEqual(['Lance livre', 'Arremesso de média'])
-
-    await user.click(screen.getByRole('button', { name: 'Todas' }))
-    await user.selectOptions(screen.getByRole('combobox'), 'Acertos e tentativas')
-    expect(nomesNaTela()).toEqual(['Lance livre', 'Arremesso de média', 'Bandeja'])
-
-    await user.click(screen.getByRole('button', { name: 'Finalização' }))
-    expect(nomesNaTela()).toEqual(['Bandeja'])
-
-    await user.click(screen.getByRole('button', { name: 'Condicionamento' }))
-    expect(nomesNaTela()).toEqual([])
-    expect(screen.getByText('Nenhum treino encontrado com esses filtros.')).toBeInTheDocument()
-  })
-
-  it('busca no nome e na descrição sem diferenciar maiúsculas nem acentos', async () => {
-    const user = userEvent.setup()
-    abrir(servidorDeExercicios().rotas)
-    const busca = await screen.findByPlaceholderText('Buscar treino')
-
-    await user.type(busca, 'MEDIA')
-    expect(nomesNaTela()).toEqual(['Arremesso de média'])
-
-    await user.clear(busca)
-    await user.type(busca, 'garrafao')
-    expect(nomesNaTela()).toEqual(['Arremesso de média'])
-
-    await user.clear(busca)
-    await user.type(busca, '  suicidio ')
-    expect(nomesNaTela()).toEqual(['Suicídio'])
-
-    // A busca também respeita a categoria escolhida.
-    await user.clear(busca)
-    await user.type(busca, 'linha')
-    expect(nomesNaTela()).toEqual(['Lance livre', 'Suicídio'])
-    await user.click(screen.getByRole('button', { name: 'Arremesso' }))
-    expect(nomesNaTela()).toEqual(['Lance livre'])
+    expect(screen.queryByPlaceholderText('Buscar treino')).toBeNull()
+    expect(screen.queryByRole('combobox')).toBeNull()
+    for (const nome of ['Todas', 'Arremesso', 'Drible', 'Passe', 'Finalização', 'Defesa', 'Condicionamento']) {
+      expect(screen.queryByRole('button', { name: nome })).toBeNull()
+    }
+    expect(screen.queryByRole('button', { name: '+ Novo exercício' })).toBeNull()
   })
 
   it('mostra o erro e tenta de novo quando o catálogo não carrega', async () => {
@@ -162,85 +130,6 @@ describe('Biblioteca de treinos', () => {
     falhar = false
     await user.click(screen.getByRole('button', { name: 'Tentar de novo' }))
     expect(await screen.findByRole('heading', { name: 'Lance livre' })).toBeInTheDocument()
-  })
-})
-
-describe('Novo exercício', () => {
-  it('cria o exercício com os dados do formulário e abre a página dele', async () => {
-    const user = userEvent.setup()
-    const { lista, rotas } = servidorDeExercicios()
-    const { ultima } = abrir(rotas)
-
-    await user.click(await screen.findByRole('button', { name: '+ Novo exercício' }))
-    expect(screen.queryByRole('button', { name: '+ Novo exercício' })).toBeNull()
-    await user.type(screen.getByLabelText('Nome'), '  Floater  ')
-    await user.selectOptions(screen.getByLabelText('Categoria'), 'Finalização')
-    await user.selectOptions(screen.getByLabelText('Como medir'), 'Repetições')
-    await user.type(screen.getByLabelText('Descrição'), ' Bola alta por cima do pivô ')
-    await user.click(screen.getByRole('button', { name: 'Salvar' }))
-
-    await waitFor(() => expect(screen.getByTestId('caminho')).toHaveTextContent('/treinos/40'))
-    expect(ultima('POST', '/exercises')?.corpo).toEqual({
-      name: 'Floater',
-      category: 'finalizacao',
-      metric: 'repeticoes',
-      description: 'Bola alta por cima do pivô',
-    })
-    expect(lista[lista.length - 1].name).toBe('Floater')
-    expect(await screen.findByRole('heading', { level: 1, name: 'Floater' })).toBeInTheDocument()
-  })
-
-  it('manda descrição vazia como null e usa Arremesso / acertos como padrão', async () => {
-    const user = userEvent.setup()
-    const { ultima } = abrir(servidorDeExercicios().rotas)
-
-    await user.click(await screen.findByRole('button', { name: '+ Novo exercício' }))
-    await user.type(screen.getByLabelText('Nome'), 'Corner three')
-    await user.click(screen.getByRole('button', { name: 'Salvar' }))
-
-    await waitFor(() => expect(ultima('POST', '/exercises')).toBeDefined())
-    expect(ultima('POST', '/exercises')?.corpo).toEqual({ name: 'Corner three', category: 'arremesso', metric: 'acertos', description: null })
-  })
-
-  it('não envia nome com menos de 2 letras (sem contar espaços)', async () => {
-    const user = userEvent.setup()
-    const { chamadas } = abrir(servidorDeExercicios().rotas)
-
-    await user.click(await screen.findByRole('button', { name: '+ Novo exercício' }))
-    await user.type(screen.getByLabelText('Nome'), ' a ')
-    await user.click(screen.getByRole('button', { name: 'Salvar' }))
-
-    expect(screen.getByRole('alert')).toHaveTextContent('O nome precisa ter pelo menos 2 letras.')
-    expect(chamadas.some((c) => c.metodo === 'POST')).toBe(false)
-  })
-
-  it('mostra o erro do servidor e deixa tentar de novo sem perder o que foi digitado', async () => {
-    const user = userEvent.setup()
-    const { rotas } = servidorDeExercicios()
-    const { chamadas } = abrir({ ...rotas, 'POST /exercises': new Resposta(409, { error: 'Você já tem um exercício com esse nome' }) })
-
-    await user.click(await screen.findByRole('button', { name: '+ Novo exercício' }))
-    await user.type(screen.getByLabelText('Nome'), 'Lance livre')
-    await user.click(screen.getByRole('button', { name: 'Salvar' }))
-
-    expect(await screen.findByRole('alert')).toHaveTextContent('Você já tem um exercício com esse nome')
-    expect(screen.getByLabelText('Nome')).toHaveValue('Lance livre')
-    expect(screen.getByRole('button', { name: 'Salvar' })).toBeEnabled()
-    expect(screen.getByTestId('caminho')).toHaveTextContent(/^\/treinos$/)
-    expect(chamadas.filter((c) => c.metodo === 'POST')).toHaveLength(1)
-  })
-
-  it('cancelar fecha o formulário sem salvar', async () => {
-    const user = userEvent.setup()
-    const { chamadas } = abrir(servidorDeExercicios().rotas)
-
-    await user.click(await screen.findByRole('button', { name: '+ Novo exercício' }))
-    await user.type(screen.getByLabelText('Nome'), 'Rascunho')
-    await user.click(screen.getByRole('button', { name: 'Cancelar' }))
-
-    expect(screen.queryByLabelText('Nome')).toBeNull()
-    expect(screen.getByRole('button', { name: '+ Novo exercício' })).toBeInTheDocument()
-    expect(chamadas.some((c) => c.metodo === 'POST')).toBe(false)
   })
 })
 

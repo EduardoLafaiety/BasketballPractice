@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test'
 import { aceitarDialogos, entrarCom, novaConta } from './ajuda'
 
-test('exercício próprio: cria, registra uma sessão e só deixa excluir quando não está em uso', async ({
+test('exercício próprio: registra uma sessão e só deixa excluir quando não está em uso', async ({
   page,
   request,
 }) => {
@@ -9,12 +9,13 @@ test('exercício próprio: cria, registra uma sessão e só deixa excluir quando
   const { token } = await novaConta(request)
   await entrarCom(page, token)
 
-  await page.goto('/treinos')
-  await page.getByRole('button', { name: '+ Novo exercício' }).click()
-  await page.getByLabel('Nome').fill('Floater E2E')
-  await page.getByLabel('Categoria').selectOption('Finalização')
-  await page.getByRole('button', { name: 'Salvar' }).click()
-  await expect(page).toHaveURL(/\/treinos\/\d+$/)
+  // A lista de Treinos não tem mais o botão de novo exercício: o exercício é criado pela API e aberto pela página dele.
+  const criar = async (nome: string, categoria: string) => {
+    const resposta = await request.post('/api/exercises', { headers: { Authorization: `Bearer ${token}` }, data: { name: nome, category: categoria, metric: 'acertos' } })
+    expect(resposta.status()).toBe(201)
+    return (await resposta.json()).id as number
+  }
+  await page.goto(`/treinos/${await criar('Floater E2E', 'finalizacao')}`)
   await expect(page.getByRole('heading', { name: 'Floater E2E' })).toBeVisible()
   const paginaDoExercicio = page.url()
 
@@ -39,10 +40,7 @@ test('exercício próprio: cria, registra uma sessão e só deixa excluir quando
   await expect(page).toHaveURL(paginaDoExercicio)
 
   // Sem uso: exclui e some da biblioteca.
-  await page.goto('/treinos')
-  await page.getByRole('button', { name: '+ Novo exercício' }).click()
-  await page.getByLabel('Nome').fill('Exercício sem uso E2E')
-  await page.getByRole('button', { name: 'Salvar' }).click()
+  await page.goto(`/treinos/${await criar('Exercício sem uso E2E', 'arremesso')}`)
   await expect(page.getByRole('heading', { name: 'Exercício sem uso E2E' })).toBeVisible()
   await page.getByRole('button', { name: 'Excluir' }).click()
   await expect(page).toHaveURL(/\/treinos$/)
