@@ -158,7 +158,8 @@ describe('Início', () => {
     abrirInicio(rotinaDe({ 4: [2] }))
 
     expect(await screen.findByText(/Nenhum treino planejado para quarta\./)).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Adicione à rotina' })).toHaveAttribute('href', '/rotina')
+    expect(screen.getByRole('link', { name: 'Editar rotina' })).toHaveAttribute('href', '/rotina')
+    expect(screen.queryByRole('link', { name: /Adicione à rotina/ })).toBeNull()
     expect(screen.queryByRole('link', { name: /Começar treino de hoje/ })).toBeNull()
   })
 
