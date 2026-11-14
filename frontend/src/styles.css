@@ -2141,15 +2141,9 @@ html::-webkit-scrollbar, .menu-tela::-webkit-scrollbar { display: none; }
   .conteudo > h1 { font-size: clamp(3.6rem, 6.4vw, 6.6rem); margin-bottom: 0.8rem; }
   .conteudo > h1 + .muted { max-width: 46em; }
 
-  /* Treinos: filtros numa coluna fixa à esquerda. */
-  .treinos-corpo { display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 2rem; align-items: start; margin-top: 1.5rem; }
-  .treinos-corpo > .filtros { position: sticky; top: 92px; flex-direction: column; align-items: stretch; margin: 0; padding: 1.25rem; border-radius: 28px; background: var(--superficie); box-shadow: var(--sombra); }
-  .treinos-corpo > .filtros > .input[type='search'] { flex: none; max-width: none; }
-  .treinos-corpo .filtros .chips { flex-direction: column; align-items: stretch; }
-  .treinos-corpo .filtros .chip { justify-content: flex-start; }
-  .treinos-corpo .filtros .select { width: 100%; }
-  .treinos-lista > section:first-of-type > h2 { margin-top: 0; }
-  .treinos-lista .grade { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
+  /* Treinos: os cartões ficam em três colunas, uma sob cada nível, com o mesmo espaço entre elas. */
+  .treinos .niveis, .treinos .grade { gap: 1rem; }
+  .treinos .grade { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 
   /* Rotina: a página usa mais largura que as outras, para os dias caberem com os nomes inteiros. */
   .conteudo:has(.semana) { max-width: 1760px; }
