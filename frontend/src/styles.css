@@ -983,7 +983,7 @@ section + section, .card + section { margin-top: 1.5rem; }
 [data-surge='ok'] .foto-jogador { clip-path: inset(0); transition: clip-path 1s cubic-bezier(0.7, 0, 0.2, 1) var(--atraso, 0s); }
 
 /* Efeitos: o mouse troca a cor só onde há troca de verdade: títulos grandes e fotos dos jogadores. */
-.card, .nivel-cartao, .ferramenta-linha, .treino-linha { position: relative; isolation: isolate; }
+.card, .nivel-cartao, .ferramenta-linha, .treino-linha, .semana-dia { position: relative; isolation: isolate; }
 .conteudo h1, .conteudo h2 { position: relative; }
 .conteudo h1[data-texto]::after, .conteudo h2[data-texto]::after {
   content: attr(data-texto);
@@ -1078,6 +1078,19 @@ section + section, .card + section { margin-top: 1.5rem; }
 .pagina-larga.faixa-escura { min-height: 100vh; }
 
 /* Rotina da semana */
+.semana-grade { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 0.6rem; margin-top: 7vh; }
+.semana-dia { min-height: 260px; padding: 0.8rem; border: 1px solid var(--texto); background: var(--bg); }
+.semana-dia.folga { border-color: var(--borda); color: var(--muted); }
+.semana-dia.hoje { border-color: var(--laranja); box-shadow: inset 0 3px 0 var(--laranja); }
+.semana-dia:nth-child(2) { --atraso: 0.07s; }
+.semana-dia:nth-child(3) { --atraso: 0.14s; }
+.semana-dia:nth-child(4) { --atraso: 0.21s; }
+.semana-dia:nth-child(5) { --atraso: 0.28s; }
+.semana-dia:nth-child(6) { --atraso: 0.35s; }
+.semana-dia:nth-child(7) { --atraso: 0.42s; }
+.semana-dia h3 { margin-bottom: 0.7rem; font-size: 1.05rem; font-weight: 800; line-height: 1.1; }
+.semana-dia ul { margin: 0; padding: 0; list-style: none; }
+.semana-dia li { margin-bottom: 0.55rem; font-size: 0.82rem; line-height: 1.25; }
 
 /* Números */
 .faixa-laranja .stats.faixa { margin-top: 7vh; padding: 0; background: transparent; color: inherit; }
@@ -1105,18 +1118,21 @@ section + section, .card + section { margin-top: 1.5rem; }
 }
 :root[data-theme='light'] { --sombra: 0 10px 30px rgba(40, 34, 15, 0.1); --sombra-alta: 0 20px 44px rgba(40, 34, 15, 0.17); }
 .faixa-escura, .faixa-preta { --sombra: 0 10px 30px rgba(0, 0, 0, 0.45); --sombra-alta: 0 20px 44px rgba(0, 0, 0, 0.6); }
-.card, .drill-card, .cartao-jogador, .nivel-cartao, .nivel-opcao, .treino-linha, .plano-item, .vazio { border: 0; border-radius: 28px; background: var(--superficie); box-shadow: var(--sombra); }
+.card, .drill-card, .cartao-jogador, .nivel-cartao, .nivel-opcao, .semana-dia, .treino-linha, .plano-item, .vazio { border: 0; border-radius: 28px; background: var(--superficie); box-shadow: var(--sombra); }
 .treino-linha { margin-bottom: 0.7rem; padding-inline: 1.5rem; }
 .drill-card { padding: 1.5rem; transition: transform 0.25s, box-shadow 0.25s; }
 .drill-card:hover, .cartao-jogador:hover, .nivel-cartao:hover, .treino-linha:hover { transform: translateY(-6px); box-shadow: var(--sombra-alta); background: var(--superficie); }
 .cartao-jogador { overflow: hidden; transition: transform 0.25s, box-shadow 0.25s; }
 .treino-linha, .nivel-cartao { transition: transform 0.25s, box-shadow 0.25s; }
-.drill-card::after::after, .nivel-cartao::after, .ferramenta-linha::after, .treino-linha::after, .conteudo div.card::after { border-radius: inherit; }
+.drill-card::after, .semana-dia::after, .nivel-cartao::after, .ferramenta-linha::after, .treino-linha::after, .conteudo div.card::after { border-radius: inherit; }
 .drill-card::before, .cartao-jogador::before { display: none; }
 .nivel-opcao { padding: 0.9rem 1.4rem; }
 .nivel-opcao:hover { box-shadow: var(--sombra-alta); }
 .nivel-opcao.ativo { background: var(--laranja); color: #111111; }
 .nivel-opcao.ativo span { color: inherit; }
+.semana-dia, .semana-dia.hoje { min-height: 0; padding: 0.8rem 0 1.2rem; border: 0; border-bottom: 2px solid var(--texto); border-radius: 0; background: transparent; box-shadow: none; }
+.semana-dia.hoje { border-bottom-color: var(--laranja); }
+.semana-dia.folga { color: var(--muted); }
 .secao-forte ~ .vazio, .secao-forte ~ .lista-treino { margin-top: 1rem; padding-bottom: 1.5rem; border: 0; border-bottom: 2px solid var(--texto); border-radius: 0; }
 .secao-forte ~ .vazio { padding: 1rem 0 1.5rem; background: transparent; box-shadow: none; text-align: left; }
 .chip { border: 0; border-radius: 999px; background: var(--superficie); box-shadow: 0 3px 10px rgba(40, 34, 15, 0.08); }
@@ -1128,7 +1144,7 @@ section + section, .card + section { margin-top: 1.5rem; }
 
 /* Textos pequenos: todos em maiúsculas, um pouco menores que o botão Gerar treino. Títulos, números e campos ficam fora. */
 .conteudo p:not(.manifesto-frase), .conteudo .muted, .conteudo .meta, .conteudo .nivel, .conteudo .chip, .conteudo label, .conteudo legend,
-.conteudo h1 + .muted, .conteudo .secao-topo + .muted, .conteudo .nivel-opcao span, .conteudo .nivel-opcao strong,
+.conteudo h1 + .muted, .conteudo .secao-topo + .muted, .conteudo .semana-dia li, .conteudo .semana-dia span, .conteudo .nivel-opcao span, .conteudo .nivel-opcao strong,
 .conteudo .link, .conteudo dt, .conteudo dd:not(.resultados dd), .conteudo .estilo-divisao-linha span, .conteudo section.card li > span, .conteudo section.card li > strong, .conteudo .semana-dia h3, .conteudo .dia-topo h3, .conteudo .escada-fase strong, .conteudo .vazio, .conteudo .demo-passos span, .conteudo .demo-opcao, .conteudo .cartao-jogador-rodape, .auth-card .muted {
   font-size: 0.7rem;
   font-weight: 700;
@@ -1181,6 +1197,9 @@ select.input:hover:not(:disabled) { border-color: var(--laranja); }
   .escada-fixa { grid-template-columns: minmax(0, 1fr); align-content: center; gap: 1rem; padding-top: 60px; }
   .escada-fase { min-height: 9em; margin-top: 0.6rem; }
   .grade-jogadores { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.4rem 0.8rem; }
+  .semana-grade { grid-template-columns: minmax(0, 1fr); }
+  .semana-dia { min-height: 0; }
+  .semana-dia.folga { display: none; }
   .ferramenta-linha { flex-direction: column; }
   .ferramenta-linha p { text-align: left; }
 }
@@ -2340,6 +2359,5 @@ html::-webkit-scrollbar, .menu-tela::-webkit-scrollbar { display: none; }
 /* Início: Treino de hoje, centralizado, com o link da rotina embaixo */
 .hoje-frente { display: flex; flex-direction: column; align-items: center; gap: 1.5rem; margin-bottom: 2.5rem; text-align: center; }
 .hoje-frente h2 { margin: 0; font-size: clamp(3rem, 9vw, 7rem); }
-.hoje-cartao { max-width: 22rem; margin-inline: auto; }
-.hoje-cartao .dia { min-height: 0; }
+.treino-hoje .lista-treino { max-width: 52rem; margin-inline: auto; }
 .hoje-rodape { display: flex; justify-content: center; margin-top: 2.5rem; }
