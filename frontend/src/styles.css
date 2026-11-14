@@ -1961,6 +1961,10 @@ body:has(.noticias) .aviso-cookies { bottom: calc(44px + 1rem); }
 
 /* ==== Celular: atalhos embaixo, ao alcance do polegar, toque com resposta e alvos do tamanho do dedo ==== */
 html { -webkit-tap-highlight-color: transparent; }
+/* Sem a barra de rolagem lateral: a página e o menu em tela cheia continuam rolando (mouse, teclado e toque), e a barra fina
+   no alto da página já mostra o quanto falta. As listas com rolagem própria mantêm a barra delas. */
+html, .menu-tela { scrollbar-width: none; }
+html::-webkit-scrollbar, .menu-tela::-webkit-scrollbar { display: none; }
 .doca { display: none; }
 /* A bola da marca dá uma girada no toque. */
 .marca .icone-svg { transition: transform 0.5s cubic-bezier(0.3, 1.5, 0.5, 1); }
