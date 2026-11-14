@@ -1,7 +1,6 @@
 import { createApp } from './app.js'
 import { config } from './config.js'
 import { openDatabase } from './db/index.js'
-import { startNewsSync } from './lib/news.js'
 import { createPushSender, startReminderScheduler } from './lib/push.js'
 
 if (!config.email.provider) {
@@ -15,10 +14,8 @@ const stopReminders = pushSender ? startReminderScheduler(db, pushSender) : () =
 const server = createApp(db, { push: { publicKey: config.push.publicKey, send: pushSender, cronSecret: config.push.cronSecret } }).listen(config.port, () => {
   console.log(`API rodando em http://localhost:${config.port}/api`)
 })
-const stopNewsSync = startNewsSync(db, { apiKey: config.gnewsApiKey, intervalMinutes: config.newsIntervalMinutes })
 
 function shutdown() {
-  stopNewsSync()
   stopReminders()
   server.close(async () => {
     await db.close()

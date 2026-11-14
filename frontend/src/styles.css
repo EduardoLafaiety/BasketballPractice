@@ -739,144 +739,6 @@ section + section, .card + section { margin-top: 1.5rem; }
 .admin-tag { margin-left: 0.5rem; }
 .btn-perigo { color: var(--erro); }
 .btn-perigo:hover:not(:disabled) { border-color: var(--erro); }
-.admin-noticias { margin-top: 2.5rem; display: grid; gap: 1rem; }
-.admin-noticias h2, .admin-noticias p { margin: 0; }
-
-/* Barra de notícias: fica fora de .conteudo, cuja animação de entrada quebraria o position: fixed */
-.app:has(.noticias) .conteudo { padding-bottom: 6rem; }
-.noticias {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 9;
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  min-height: 44px;
-  padding: 0 0.25rem 0 0;
-  padding-bottom: env(safe-area-inset-bottom);
-  background: linear-gradient(#141414, #050505);
-  color: #ffffff;
-  /* Fio laranja no alto, como a faixa de um canal de esporte. */
-  border-top: 2px solid var(--laranja);
-  font-size: 0.85rem;
-}
-/* Peça da esquerda: selo "ao vivo" e o nome da faixa, cortados em diagonal. */
-.noticias-marca {
-  align-self: stretch;
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  gap: 0.7rem;
-  padding: 0 1.4rem 0 0.75rem;
-  background: linear-gradient(90deg, #1f1f1f, #2a2a2a);
-  clip-path: polygon(0 0, 100% 0, calc(100% - 14px) 100%, 0 100%);
-}
-/* Visor da câmera: os quatro cantos do enquadramento desenhados com bordas em L. */
-.noticias-visor {
-  --canto: linear-gradient(#ffffff, #ffffff);
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 0.3rem 0.55rem;
-  background:
-    var(--canto) top left / 7px 1.5px, var(--canto) top left / 1.5px 7px,
-    var(--canto) top right / 7px 1.5px, var(--canto) top right / 1.5px 7px,
-    var(--canto) bottom left / 7px 1.5px, var(--canto) bottom left / 1.5px 7px,
-    var(--canto) bottom right / 7px 1.5px, var(--canto) bottom right / 1.5px 7px;
-  background-repeat: no-repeat;
-  color: #f25f5c;
-  font-weight: 800;
-  font-size: 0.66rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
-.noticias-visor .icone-svg { color: #ffffff; }
-.noticias-rec-ponto { width: 8px; height: 8px; border-radius: 50%; background: #f25f5c; animation: noticias-rec 1s steps(1) infinite; }
-@keyframes noticias-rec { 50% { opacity: 0.15; } }
-.noticias-tempo {
-  color: var(--lateral-muted);
-  font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace;
-  font-size: 0.72rem;
-  font-variant-numeric: tabular-nums;
-  letter-spacing: 0.04em;
-}
-/* O flash do fotógrafo: um clarão branco rápido sobre a faixa inteira. */
-.noticias-flash {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  background: #ffffff;
-  opacity: 0;
-  pointer-events: none;
-  animation: noticias-flash 0.6s ease-out;
-}
-@keyframes noticias-flash { 8% { opacity: 0.2; } 100% { opacity: 0; } }
-.noticias-rotulo {
-  color: var(--laranja);
-  font-weight: 800;
-  font-size: 0.72rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
-/* Etiqueta do assunto antes de cada manchete. */
-.noticias-assunto {
-  --cor: #a3a3a3;
-  padding: 0.12rem 0.4rem;
-  border-radius: 2px;
-  background: var(--cor);
-  color: #0b0b0b;
-  font-weight: 800;
-  font-size: 0.62rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-.assunto-nba { --cor: #4da3ff; }
-.assunto-nbb { --cor: #2fbf71; }
-.assunto-mercado { --cor: #f5c542; }
-.assunto-lesao { --cor: #f25f5c; }
-.assunto-selecao { --cor: #43c59e; }
-.assunto-wnba { --cor: #ff7a1a; }
-.assunto-stats { --cor: #c084fc; }
-/* Entre uma manchete e outra, uma bolinha laranja. */
-.noticias-item::before { content: ''; width: 6px; height: 6px; margin-right: 0.9rem; border-radius: 50%; background: var(--laranja); }
-.noticias-janela { flex: 1; min-width: 0; overflow: hidden; }
-.noticias-trilha { display: flex; width: max-content; animation: noticias-correr var(--duracao, 60s) linear infinite; }
-/* Só o foco do teclado segura a faixa, para o link não fugir de quem navega com Tab; o mouse não trava. */
-.noticias-janela:has(:focus-visible) .noticias-trilha { animation-play-state: paused; }
-@keyframes noticias-correr { to { transform: translateX(-50%); } }
-/* Largura mínima: com poucas manchetes, a repetição não aparece colada na original */
-.noticias-lista { display: flex; align-items: center; min-width: 100vw; margin: 0; padding: 0; list-style: none; }
-.noticias-item { display: flex; align-items: center; gap: 0.5rem; padding: 0 1.5rem; white-space: nowrap; }
-/* Manchete e fonte no padrão do sistema: maiúsculas com fonte pequena (os selos de assunto têm tamanho próprio). */
-.noticias-item { text-transform: uppercase; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.06em; }
-.noticias-item a { color: inherit; text-decoration: none; }
-.noticias-item a:hover { color: var(--laranja); text-decoration: underline; }
-.noticias-fonte { color: var(--lateral-muted); }
-.noticias-selo {
-  padding: 0.1rem 0.4rem;
-  border-radius: 2px;
-  background: #c8102e;
-  color: #ffffff;
-  font-weight: 700;
-  font-size: 0.65rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-@media (max-width: 860px) {
-}
-@media (max-width: 560px) {
-  .noticias-rotulo, .noticias-tempo { display: none; }
-  .noticias-marca { padding-right: 1.1rem; }
-}
-:root[data-movimento='reduzido'] .noticias-rec-ponto { animation: none; }
-:root[data-movimento='reduzido'] .noticias-flash { display: none; }
-/* Sem animação: a faixa fica parada e rola com o dedo ou o mouse */
-:root[data-movimento='reduzido'] .noticias-janela { overflow-x: auto; }
-:root[data-movimento='reduzido'] .noticias-trilha { animation: none; }
-:root[data-movimento='reduzido'] .noticias-lista[aria-hidden='true'] { display: none; }
-:root[data-movimento='reduzido'] .noticias-lista { min-width: 0; }
 
 /* Ícones em linha de texto */
 .ponto { color: var(--laranja); }
@@ -1119,9 +981,6 @@ section + section, .card + section { margin-top: 1.5rem; }
 .grade-jogadores > :nth-child(4n + 2) { --atraso: 0.08s; }
 .grade-jogadores > :nth-child(4n + 3) { --atraso: 0.16s; }
 .grade-jogadores > :nth-child(4n) { --atraso: 0.24s; }
-
-/* Barra de notícias sem a lateral */
-.noticias { left: 0; }
 
 /* Efeitos: entrar na tela */
 [data-surge='espera'] { opacity: 0; transform: translateY(38px); }
@@ -1367,17 +1226,14 @@ select.input:hover:not(:disabled) { border-color: var(--laranja); }
 .links-legais button { padding: 0; border: 0; background: none; font: inherit; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: inherit; cursor: pointer; }
 .links-legais button:hover { color: var(--laranja-texto); text-decoration: underline; }
 
-/* Fica acima da barra de notícias e do menu até o visitante responder. */
+/* Fica acima do menu até o visitante responder. */
 .aviso-cookies { position: fixed; inset: auto 1rem 1rem; z-index: 50; display: grid; gap: 0.75rem; width: min(36rem, calc(100% - 2rem)); margin: 0 auto; padding: 1.1rem 1.25rem; border: 2px solid var(--laranja); border-radius: 14px; background: var(--superficie); color: var(--texto); box-shadow: 0 12px 32px rgb(0 0 0 / 0.35); }
-body:has(.noticias) .aviso-cookies { bottom: calc(44px + 1rem); }
 .aviso-cookies p { margin: 0; font-size: 0.85rem; line-height: 1.5; text-transform: none; }
 .aviso-cookies a { color: var(--laranja-texto); }
 .aviso-cookies-atual { color: var(--muted); }
 .aviso-cookies-botoes { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 0.5rem; }
 .aviso-cookies-botoes .btn { flex: 1 1 8rem; }
 .rodape { padding: 0 1.25rem 2rem; }
-/* A barra de notícias é fixa: sem esta folga, cobriria os links. */
-.app:has(.noticias) .rodape { padding-bottom: calc(44px + 1.25rem); }
 
 .legal { min-height: 100vh; min-height: 100dvh; display: grid; align-content: start; gap: 2.5rem; padding: 0.8rem clamp(1.25rem, 4vw, 4rem) 3rem; background: var(--bg); }
 .legal-marca { display: flex; align-items: center; gap: 0.6rem; text-decoration: none; }
@@ -2021,12 +1877,9 @@ html::-webkit-scrollbar, .menu-tela::-webkit-scrollbar { display: none; }
   .doca-gerar.active .icone-svg { animation: doca-gira 0.8s cubic-bezier(0.3, 1.3, 0.5, 1); }
   @keyframes doca-gira { from { transform: rotate(-200deg); } }
 
-  /* A barra de notícias sobe para cima dos atalhos, um pouco mais baixa. */
-  .noticias { bottom: var(--doca, 0px); min-height: 38px; padding-bottom: 0; }
-  .conteudo, .app:has(.noticias) .conteudo { padding-bottom: calc(6rem + var(--doca, 0px)); }
-  .rodape, .app:has(.noticias) .rodape { padding-bottom: calc(38px + 1.25rem + var(--doca, 0px)); }
+  .conteudo { padding-bottom: calc(6rem + var(--doca, 0px)); }
+  .rodape { padding-bottom: calc(2rem + var(--doca, 0px)); }
   .aviso-cookies { bottom: calc(1rem + var(--doca, 0px)); }
-  body:has(.noticias) .aviso-cookies { bottom: calc(38px + 1rem + var(--doca, 0px)); }
   .menu-tela { padding-bottom: calc(1.5rem + var(--doca, 0px)); overscroll-behavior: contain; }
   .nav-link:active { color: var(--laranja); }
 }
@@ -2362,7 +2215,7 @@ html::-webkit-scrollbar, .menu-tela::-webkit-scrollbar { display: none; }
  * e os títulos de cartão, um degrau acima (0,85rem), também em maiúsculas.
  */
 .meta, .link-forte, .faixa .stat span, .dieta-foco span, .dieta-quando .meta, .ranking-valor .meta,
-.artigo-destaque-resumo, .nba-sigla, .dia-hoje, .doca-item, .noticias-assunto, .noticias-selo, .noticias-visor,
+.artigo-destaque-resumo, .nba-sigla, .dia-hoje, .doca-item,
 .auth-troca, .aviso-cookies p, .campo .meta {
   font-size: 0.7rem;
   text-transform: uppercase;

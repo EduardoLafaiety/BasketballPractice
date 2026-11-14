@@ -12,7 +12,6 @@ backend/data/
 backend/admin-local.txt
 
 # Gerado ao rodar a demonstração (npm run dev:demo); ao publicar, sai do workflow.
-frontend/public/noticias.json
 frontend/public/nbb.json
 
 # Documentos internos: ficam só no computador, fora do repositório público.

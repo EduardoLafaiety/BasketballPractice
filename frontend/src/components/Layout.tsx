@@ -9,7 +9,6 @@ import { aplicarTema } from '../lib/tema'
 import { vibrar } from '../lib/audio'
 import { diasAtras, useConfig } from '../store'
 import type { Config } from '../types'
-import BarraNoticias from './BarraNoticias'
 import Icone from './Icone'
 import { LinksLegais } from './TelaAuth'
 
@@ -195,7 +194,6 @@ export default function Layout() {
         <Outlet />
       </main>
       <footer className="rodape"><LinksLegais /></footer>
-      <BarraNoticias />
 
       <nav className="doca" aria-label="Atalhos" onClick={() => vibrar(8)}>
         {DOCA_ESQUERDA.map((l) => <ItemDoca key={l.to} {...l} />)}
