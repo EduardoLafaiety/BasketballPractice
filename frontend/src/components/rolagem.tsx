@@ -1,5 +1,5 @@
 // Peças animadas pela rolagem: a bola da abertura, o boneco comandado pela rolagem e os nomes que correm.
-import { forwardRef, useEffect, useMemo, useRef, useState, type ReactNode, type RefObject } from 'react'
+import { forwardRef, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { COREOGRAFIAS } from '../demonstracoes/coreografias'
 import { menosMovimento } from '../lib/movimento'
 import { Atleta, Bola, novaBola, novoAtleta } from '../demonstracoes/Atleta'
@@ -106,17 +106,7 @@ export function Figura({ nome, viewBox = '0 0 680 330', className, apiRef }: { n
   )
 }
 
-/** A bola por dentro: a grade que aparece sob o furo. */
-export const BolaVazada = forwardRef<SVGSVGElement>(function BolaVazada(_, ref) {
-  return (
-    <svg ref={ref} className="abertura-bola" viewBox="0 0 400 400">
-      <circle cx="200" cy="200" r="190" className="bola-vazada" />
-      <path className="bola-grade" d="M10 200h380M200 10v380M64 68c70 62 70 202 0 264M336 68c-70 62-70 202 0 264M30 110h340M30 290h340M110 30v340M290 30v340M15 155h370M15 245h370M155 15v370M245 15v370" />
-    </svg>
-  )
-})
-
-/** A bola por fora: o couro que o furo deixa transparente. */
+/** A bola da abertura: o couro com as costuras. */
 export const BolaCouro = forwardRef<SVGSVGElement>(function BolaCouro(_, ref) {
   return (
     <svg ref={ref} className="abertura-bola" viewBox="0 0 400 400">
@@ -133,103 +123,28 @@ export const BolaCouro = forwardRef<SVGSVGElement>(function BolaCouro(_, ref) {
   )
 })
 
-// Depois que o dedo sai da tela, o furo ainda fica onde ele estava por um tempinho antes de voltar a passear.
-const DEDO_MS = 1600
-
-/**
- * Faz o furo da camada seguir o mouse ou o dedo; sem nenhum dos dois, ele passeia pela bola. O dedo vale até
- * rolando a tela: a rolagem dá o zoom na bola e o dedo escolhe onde ela fica transparente.
- */
-export function useFuroBola(camada: RefObject<HTMLElement>, aoTocar?: () => void) {
-  const tocou = useRef(aoTocar)
-  tocou.current = aoTocar
-  useEffect(() => {
-    if (menosMovimento() || !camada.current) return
-    const el = camada.current
-    const mouse = { x: 0, y: 0, usou: false, dedoAte: 0 }
-    const inicio = el.getBoundingClientRect()
-    const meioX = inicio.left + inicio.width / 2
-    const meioY = inicio.top + inicio.height / 2
-    const furo = { x: meioX, y: meioY, x2: meioX, y2: meioY, r: 0 }
-    const aoMover = (e: PointerEvent) => {
-      if (e.pointerType === 'touch') return
-      mouse.x = e.clientX
-      mouse.y = e.clientY
-      mouse.usou = true
-    }
-    const aoTocarTela = (e: TouchEvent) => {
-      const dedo = e.touches[0]
-      if (!dedo) return
-      mouse.x = dedo.clientX
-      mouse.y = dedo.clientY
-      mouse.dedoAte = performance.now() + DEDO_MS
-      tocou.current?.()
-    }
-    let quadro = 0
-    const passo = (t: number) => {
-      const caixa = el.getBoundingClientRect()
-      if (caixa.bottom > 0 && caixa.top < window.innerHeight) {
-        const menor = Math.min(caixa.width, caixa.height)
-        const segue = mouse.usou || t < mouse.dedoAte
-        const alvoX = segue ? mouse.x : caixa.left + caixa.width / 2 + Math.cos(t / 1400) * menor * 0.17
-        const alvoY = segue ? mouse.y : caixa.top + caixa.height / 2 + Math.sin(t / 1000) * menor * 0.15
-        furo.x += (alvoX - furo.x) * 0.16
-        furo.y += (alvoY - furo.y) * 0.16
-        furo.x2 += (alvoX - furo.x2) * 0.06
-        furo.y2 += (alvoY - furo.y2) * 0.06
-        furo.r += (menor * (segue ? 0.38 : 0.28) - furo.r) * 0.08
-        el.style.setProperty('--x', `${(furo.x - caixa.left).toFixed(1)}px`)
-        el.style.setProperty('--y', `${(furo.y - caixa.top).toFixed(1)}px`)
-        el.style.setProperty('--x2', `${(furo.x2 - caixa.left).toFixed(1)}px`)
-        el.style.setProperty('--y2', `${(furo.y2 - caixa.top).toFixed(1)}px`)
-        el.style.setProperty('--r', `${furo.r.toFixed(1)}px`)
-      }
-      quadro = requestAnimationFrame(passo)
-    }
-    window.addEventListener('pointermove', aoMover, { passive: true })
-    window.addEventListener('touchstart', aoTocarTela, { passive: true })
-    window.addEventListener('touchmove', aoTocarTela, { passive: true })
-    quadro = requestAnimationFrame(passo)
-    return () => {
-      window.removeEventListener('pointermove', aoMover)
-      window.removeEventListener('touchstart', aoTocarTela)
-      window.removeEventListener('touchmove', aoTocarTela)
-      cancelAnimationFrame(quadro)
-    }
-  }, [camada])
-}
-
-/** Abertura: a bola de couro fica transparente sob o mouse e deixa ver a bola de linhas por baixo. */
+/** Abertura: a bola gira e cresce com a rolagem, e "Bora pra quadra." abre para os lados. */
 export function AberturaBola({ titulo, children }: { titulo: ReactNode; children?: ReactNode }) {
   const secao = useRef<HTMLElement>(null)
-  const camada = useRef<HTMLDivElement>(null)
-  const bolas = useRef<(SVGSVGElement | null)[]>([])
+  const bola = useRef<SVGSVGElement>(null)
 
   useRolagem(() => {
     if (!secao.current || menosMovimento()) return
     const p = progressoDoPino(secao.current)
-    bolas.current.forEach((b) => { if (b) b.style.transform = `rotate(${p * 260}deg) scale(${1 + p * 1.7})` })
+    if (bola.current) bola.current.style.transform = `rotate(${p * 260}deg) scale(${1 + p * 1.7})`
     secao.current.style.setProperty('--saida', String(p))
   })
 
-  // No celular, a dica de passar o dedo some depois do primeiro toque.
-  const [tocou, setTocou] = useState(false)
-  useFuroBola(camada, () => setTocou(true))
-
   return (
-    <section className={`abertura${tocou ? ' tocou' : ''}`} ref={secao}>
+    <section className="abertura" ref={secao}>
       <div className="abertura-fixa">
         <LinhasQuadra />
         <div className="abertura-palco" aria-hidden>
-          <BolaVazada ref={(el) => { bolas.current[0] = el }} />
-        </div>
-        <div className="abertura-palco abertura-furada" ref={camada} aria-hidden>
-          <BolaCouro ref={(el) => { bolas.current[1] = el }} />
+          <BolaCouro ref={bola} />
         </div>
         <div className="abertura-conteudo">
           {titulo}
           {children}
-          {!menosMovimento() && <p className="abertura-dica" aria-hidden>Passe o dedo na bola</p>}
         </div>
       </div>
     </section>
