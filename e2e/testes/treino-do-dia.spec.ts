@@ -23,7 +23,7 @@ test('monta a rotina de hoje, faz a sessão guiada e vê o resultado em Desempen
 
   // Início mostra o treino do dia e leva à sessão guiada.
   await irPara(page, 'Início')
-  await expect(page.locator('.hoje-cartao').getByRole('link', { name: /Lance livre/ })).toBeVisible()
+  await expect(page.locator('.lista-treino').getByRole('link', { name: /Lance livre/ })).toBeVisible()
   await page.getByRole('link', { name: 'Começar treino de hoje' }).click()
   await page.getByRole('button', { name: 'Começar', exact: true }).click()
 
