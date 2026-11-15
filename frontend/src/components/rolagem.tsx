@@ -5,6 +5,7 @@ import { menosMovimento } from '../lib/movimento'
 import { Atleta, Bola, novaBola, novoAtleta } from '../demonstracoes/Atleta'
 import { pintar, posicionar } from '../demonstracoes/desenho'
 import { CHAO, instante, preparar } from '../demonstracoes/motor'
+import { FAIXAS_DA_BOLA, LADO } from './bolaPixel'
 
 const limite = (x: number) => Math.max(0, Math.min(1, x))
 
@@ -106,19 +107,13 @@ export function Figura({ nome, viewBox = '0 0 680 330', className, apiRef }: { n
   )
 }
 
-/** A bola da abertura: o couro com as costuras. */
+/** A bola da abertura, em pixel art: o couro em faixas de cor e as costuras, bloco a bloco. */
 export const BolaCouro = forwardRef<SVGSVGElement>(function BolaCouro(_, ref) {
   return (
-    <svg ref={ref} className="abertura-bola" viewBox="0 0 400 400">
-      <defs>
-        <radialGradient id="couro-bola" cx=".36" cy=".3" r=".8">
-          <stop offset="0" stopColor="#ff9a52" />
-          <stop offset=".62" stopColor="#ee6210" />
-          <stop offset="1" stopColor="#a83d05" />
-        </radialGradient>
-      </defs>
-      <circle cx="200" cy="200" r="190" fill="url(#couro-bola)" />
-      <path className="bola-costura" d="M10 200h380M200 10v380M64 68c70 62 70 202 0 264M336 68c-70 62-70 202 0 264" />
+    <svg ref={ref} className="abertura-bola" viewBox={`0 0 ${LADO} ${LADO}`} shapeRendering="crispEdges">
+      {FAIXAS_DA_BOLA.map((f) => (
+        <rect key={`${f.x}-${f.y}`} x={f.x} y={f.y} width={f.largura} height={1} fill={f.cor} />
+      ))}
     </svg>
   )
 })

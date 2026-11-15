@@ -27,8 +27,8 @@ export type Contexto = Pick<
 >
 
 const COR = { fundo: '#101010', texto: '#f4f2ea', muted: '#a3a3a3', laranja: '#ff6a13', linha: '#3a3a3a', vazia: '#202020' }
-const DISPLAY = "'Big Shoulders Display Variable', 'Arial Narrow', Impact, sans-serif"
-const TEXTO = "'Manrope Variable', system-ui, sans-serif"
+const DISPLAY = "'Jersey 10', 'Courier New', monospace"
+const TEXTO = "'Pixelify Sans Variable', 'Courier New', monospace"
 
 const pct = (acertos: number, tentativas: number) => (tentativas ? Math.round((acertos / tentativas) * 100) : null)
 
@@ -121,7 +121,7 @@ function desenharQuadra(ctx: Contexto, zonas: DadosZonas, x: number, y: number, 
     if (!d?.tentativas) continue
     const [tx, ty] = ROTULO[z]
     const pequeno = z === 'tres_canto_e' || z === 'tres_canto_d'
-    ctx.font = `800 ${pequeno ? 13 : 22}px ${TEXTO}`
+    ctx.font = `700 ${pequeno ? 13 : 22}px ${TEXTO}`
     ctx.fillText(`${pct(d.acertos, d.tentativas)}%`, tx, ty)
   }
   ctx.restore()
@@ -131,10 +131,10 @@ function numero(ctx: Contexto, valor: string, rotulo: string, x: number, y: numb
   ctx.textAlign = 'left'
   ctx.textBaseline = 'alphabetic'
   ctx.fillStyle = destaque ? COR.laranja : COR.texto
-  ctx.font = `900 150px ${DISPLAY}`
+  ctx.font = `400 150px ${DISPLAY}`
   ctx.fillText(valor, x, y)
   ctx.fillStyle = COR.muted
-  ctx.font = `800 26px ${TEXTO}`
+  ctx.font = `700 26px ${TEXTO}`
   ctx.fillText(rotulo.toUpperCase(), x, y + 46)
 }
 
@@ -148,14 +148,14 @@ export function desenharSemana(ctx: Contexto, d: DadosImagem) {
   ctx.textAlign = 'left'
   ctx.textBaseline = 'alphabetic'
   ctx.fillStyle = COR.laranja
-  ctx.font = `800 30px ${TEXTO}`
+  ctx.font = `700 30px ${TEXTO}`
   ctx.fillText('BASKETBALL PRACTICE', 80, 150)
   ctx.fillStyle = COR.texto
-  ctx.font = `900 190px ${DISPLAY}`
+  ctx.font = `400 190px ${DISPLAY}`
   ctx.fillText('MINHA', 72, 330)
   ctx.fillText('SEMANA', 72, 500)
   ctx.fillStyle = COR.muted
-  ctx.font = `800 32px ${TEXTO}`
+  ctx.font = `700 32px ${TEXTO}`
   ctx.fillText(d.periodo.toUpperCase(), 80, 570)
 
   desenharQuadra(ctx, d.zonas, 80, 640, 920 / 500)
@@ -165,7 +165,7 @@ export function desenharSemana(ctx: Contexto, d: DadosImagem) {
   numero(ctx, aproveitamento === null ? '—' : `${aproveitamento}%`, `${d.acertos}/${d.tentativas} arremessos`, 560, 1640)
 
   ctx.fillStyle = COR.texto
-  ctx.font = `800 30px ${TEXTO}`
+  ctx.font = `700 30px ${TEXTO}`
   ctx.fillText(`${d.treinos} ${d.treinos === 1 ? 'TREINO' : 'TREINOS'} · ${d.minutos} MIN`, 80, 1800)
   ctx.fillStyle = COR.muted
   ctx.font = `700 26px ${TEXTO}`
@@ -174,7 +174,7 @@ export function desenharSemana(ctx: Contexto, d: DadosImagem) {
 
 /** Gera o PNG. Espera as fontes do site carregarem para o canvas usar as mesmas letras. */
 export async function gerarPng(d: DadosImagem): Promise<Blob> {
-  await Promise.all([document.fonts?.load(`900 150px ${DISPLAY}`), document.fonts?.load(`800 30px ${TEXTO}`)]).catch(() => undefined)
+  await Promise.all([document.fonts?.load(`400 150px ${DISPLAY}`), document.fonts?.load(`700 30px ${TEXTO}`)]).catch(() => undefined)
   const canvas = document.createElement('canvas')
   canvas.width = LARGURA
   canvas.height = ALTURA

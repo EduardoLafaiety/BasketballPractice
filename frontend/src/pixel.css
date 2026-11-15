@@ -1,0 +1,159 @@
+/*
+ * Pixel art: o site inteiro como um jogo 8 bits. Esta folha vem depois de styles.css e só troca o
+ * acabamento (cantos, sombras, bordas, fotos, ícones e movimento); cores, grades e composição
+ * continuam as de styles.css. As fontes pixel entram pelas variáveis --fonte-display e --fonte-texto.
+ */
+:root {
+  /* O "pixel" do site: bordas, degraus dos cantos e sombras são múltiplos dele. */
+  --px: 2px;
+  --sombra: 4px 4px 0 rgba(0, 0, 0, 0.5);
+  --sombra-alta: 6px 6px 0 rgba(0, 0, 0, 0.6);
+  /* Canto em degrau de 1 pixel: com a borda da mesma espessura, as pontas se tocam na diagonal. */
+  --canto-pixel: polygon(
+    0 var(--px), var(--px) var(--px), var(--px) 0,
+    calc(100% - var(--px)) 0, calc(100% - var(--px)) var(--px), 100% var(--px),
+    100% calc(100% - var(--px)), calc(100% - var(--px)) calc(100% - var(--px)), calc(100% - var(--px)) 100%,
+    var(--px) 100%, var(--px) calc(100% - var(--px)), 0 calc(100% - var(--px))
+  );
+  /* Canto em dois degraus, para o que era pílula ou círculo. */
+  --canto-pixel-2: polygon(
+    0 calc(var(--px) * 2), var(--px) calc(var(--px) * 2), var(--px) var(--px), calc(var(--px) * 2) var(--px), calc(var(--px) * 2) 0,
+    calc(100% - var(--px) * 2) 0, calc(100% - var(--px) * 2) var(--px), calc(100% - var(--px)) var(--px), calc(100% - var(--px)) calc(var(--px) * 2), 100% calc(var(--px) * 2),
+    100% calc(100% - var(--px) * 2), calc(100% - var(--px)) calc(100% - var(--px) * 2), calc(100% - var(--px)) calc(100% - var(--px)), calc(100% - var(--px) * 2) calc(100% - var(--px)), calc(100% - var(--px) * 2) 100%,
+    calc(var(--px) * 2) 100%, calc(var(--px) * 2) calc(100% - var(--px)), var(--px) calc(100% - var(--px)), var(--px) calc(100% - var(--px) * 2), 0 calc(100% - var(--px) * 2)
+  );
+  /* Letras sem suavização nem negrito/itálico inventado pelo navegador: o pixel da fonte fica inteiro. */
+  font-synthesis: none;
+  -webkit-font-smoothing: none;
+  -moz-osx-font-smoothing: grayscale;
+  font-smooth: never;
+  text-rendering: optimizeSpeed;
+  image-rendering: pixelated;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme='dark']) { --sombra: 4px 4px 0 rgba(40, 34, 15, 0.28); --sombra-alta: 6px 6px 0 rgba(40, 34, 15, 0.36); }
+}
+:root[data-theme='light'] { --sombra: 4px 4px 0 rgba(40, 34, 15, 0.28); --sombra-alta: 6px 6px 0 rgba(40, 34, 15, 0.36); }
+.faixa-escura, .faixa-preta { --sombra: 4px 4px 0 rgba(0, 0, 0, 0.6); --sombra-alta: 6px 6px 0 rgba(0, 0, 0, 0.7); }
+
+/* Nada arredondado, nada desfocado, nada inclinado. */
+*, *::before, *::after {
+  border-radius: 0 !important;
+  backdrop-filter: none !important;
+  font-style: normal !important;
+  /* Trocas de cor e de posição em degraus, como quadros de um jogo. */
+  transition-timing-function: steps(3, end) !important;
+}
+
+/* Desenhos vetoriais (ícones, quadra, gráficos, ilustrações) sem suavização: a linha vira serrilhado. */
+svg { shape-rendering: crispEdges; text-rendering: optimizeSpeed; }
+
+/* Fotos: lib/pixelar.ts redesenha cada uma em blocos e com poucas cores; aqui a ampliação fica em blocos.
+   A foto só aparece depois de passar por lá (data-pixel), para não piscar a versão lisa antes. */
+img { image-rendering: pixelated; }
+img:not([data-pixel]) { opacity: 0; }
+
+/* Bordas com a espessura de um pixel do site. */
+.card, .btn, .input, .chip, .vazio { border-width: var(--px); }
+
+/* Botões, campos e etiquetas com o canto em degrau. O contorno de foco vai para dentro: fora ele seria cortado. */
+.btn, .topo-menu, .input, .chip, .gs-chip, .gs-botao, .ferr-aba, .dia-hoje, .dia-mix,
+.alimentos li, .dieta-foco span, .nba-coroa, .placar-item.placar-previa, .legenda-escala {
+  clip-path: var(--canto-pixel);
+}
+:is(.btn, .topo-menu, .input, .chip, .gs-chip, .gs-botao, .ferr-aba):focus-visible,
+.input:focus {
+  outline: var(--px) solid var(--laranja);
+  outline-offset: calc(var(--px) * -3);
+}
+/* O que era círculo vira um "círculo" de jogo 8 bits. */
+.avatar, .marca, .conquista-icone, .meta-check, .rota-no, .nba-time-cor, .spinner {
+  clip-path: var(--canto-pixel-2);
+}
+
+/* Botão principal: sombra dura embaixo, como tecla de fliperama (drop-shadow acompanha o recorte do canto). */
+.btn-primario { filter: drop-shadow(0 var(--px) 0 var(--laranja)); }
+.btn-primario:hover { filter: drop-shadow(0 var(--px) 0 var(--texto)); }
+.btn-primario:active { filter: none; transform: translateY(var(--px)); }
+
+/* Sombras que eram esfumaçadas: viram sombra dura, deslocada em pixels inteiros. */
+.chip { box-shadow: var(--px) var(--px) 0 var(--borda); }
+.programa-cartao:hover { box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.55); }
+.aviso-cookies { box-shadow: var(--sombra-alta); }
+.mapa-marcador span { box-shadow: var(--px) var(--px) 0 rgba(0, 0, 0, 0.5); }
+.mapa-voce span { box-shadow: 0 0 0 4px rgba(47, 124, 246, 0.35); }
+.dia.hoje { box-shadow: 0 0 0 var(--px) var(--laranja), 4px 4px 0 var(--laranja-escuro); }
+.nba-escudo.nba-escudo-lider { filter: drop-shadow(3px 3px 0 rgba(0, 0, 0, 0.35)); }
+.desempenho-fantasma { filter: grayscale(0.4); }
+
+/* Barras de progresso em blocos. */
+.barra-progresso { clip-path: none; }
+.barra-progresso > * {
+  -webkit-mask-image: repeating-linear-gradient(90deg, #000 0 6px, transparent 6px 8px);
+  mask-image: repeating-linear-gradient(90deg, #000 0 6px, transparent 6px 8px);
+}
+
+/* Carregando: gira em oito posições, sem deslizar. */
+.spinner { animation-timing-function: steps(8) !important; }
+
+/* Sublinhados e tracejados na medida do pixel. */
+a, .link { text-decoration-thickness: var(--px); text-underline-offset: 3px; }
+hr { border: 0; border-top: var(--px) solid var(--borda); }
+
+/* Rolagem com cara de janela antiga. */
+* { scrollbar-width: auto; scrollbar-color: var(--laranja) var(--superficie-2); }
+::-webkit-scrollbar { width: 12px; height: 12px; }
+::-webkit-scrollbar-track { background: var(--superficie-2); }
+::-webkit-scrollbar-thumb { background: var(--laranja); border: var(--px) solid var(--superficie-2); }
+::selection { background: var(--laranja); color: #0b0b0b; }
+
+
+/* Animações de entrada em poucos quadros; o relevo de Ferramentas anda devagar, em passos curtos. */
+*, *::before, *::after { animation-timing-function: steps(6, end) !important; }
+.ferramentas-palco::before { animation-timing-function: steps(76, end) !important; }
+/* Sem texto inclinado: jogo 8 bits não gira letra. */
+.ferr-aba:hover { transform: translateY(calc(var(--px) * -1)); }
+.ferr-aba.ativo { transform: none; }
+@keyframes ferr-pula { 0% { transform: translateY(8px); } }
+@keyframes ferr-relevo { to { transform: translate(-2.5%, 3%) scale(1.07); } }
+
+/* Caixas de seleção e opções desenhadas em pixel. */
+input[type='checkbox'], input[type='radio'] {
+  -webkit-appearance: none;
+  appearance: none;
+  flex-shrink: 0;
+  display: inline-grid;
+  place-content: center;
+  width: 18px;
+  height: 18px;
+  margin: 3px 3px 3px 4px;
+  border: var(--px) solid var(--texto);
+  background: var(--superficie);
+  vertical-align: middle;
+  cursor: pointer;
+}
+input[type='checkbox']:checked, input[type='radio']:checked { background: var(--laranja); border-color: var(--laranja); }
+input[type='checkbox']:checked::before {
+  content: '';
+  width: 14px;
+  height: 12px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 7 6' shape-rendering='crispEdges' fill='%230b0b0b'%3E%3Cpath d='M6 0h1v2h-1zM5 1h1v2h-1zM4 2h1v2h-1zM3 3h1v2h-1zM2 4h1v2h-1zM1 3h1v2h-1zM0 2h1v2h-1z'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+input[type='radio']:checked::before { content: ''; width: 6px; height: 6px; background: #0b0b0b; }
+input[type='checkbox']:disabled, input[type='radio']:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* Controle deslizante: trilho reto e botão em bloco. */
+input[type='range'] { -webkit-appearance: none; appearance: none; height: 24px; background: transparent; cursor: pointer; }
+input[type='range']::-webkit-slider-runnable-track { height: 6px; background: var(--borda); }
+input[type='range']::-moz-range-track { height: 6px; background: var(--borda); }
+input[type='range']::-moz-range-progress { height: 6px; background: var(--laranja); }
+input[type='range']::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px;
+  height: 22px;
+  margin-top: -8px;
+  border: var(--px) solid var(--texto);
+  background: var(--laranja);
+}
+input[type='range']::-moz-range-thumb { width: 10px; height: 18px; border: var(--px) solid var(--texto); background: var(--laranja); }
+
