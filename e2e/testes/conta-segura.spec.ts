@@ -115,8 +115,11 @@ test('os documentos abrem do cadastro e do rodapé, marcados como rascunho', asy
   await entrarCom(page, token)
   await page.goto('/configuracoes')
   const link = page.getByRole('contentinfo').getByRole('link', { name: 'Política de Privacidade' })
-  await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight))
-  await expect(link).toBeInViewport({ ratio: 1 })
+  // Rola de novo a cada tentativa: fontes e imagens que terminam de carregar depois aumentam a página.
+  await expect(async () => {
+    await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight))
+    await expect(link).toBeInViewport({ ratio: 1, timeout: 1_000 })
+  }).toPass({ timeout: 10_000 })
   // Clica de verdade: se algo fixo estivesse por cima do rodapé, o clique não chegaria ao link.
   await link.click({ timeout: 5_000 })
   await expect(page.getByRole('heading', { name: 'Política de Privacidade', level: 1 })).toBeVisible()

@@ -1,7 +1,9 @@
-// Pixel art das fotos: cada foto que termina de carregar é redesenhada pequena num canvas, com poucas
+// Pixel art das fotos: cada foto que termina de carregar é redesenhada pequena (num Web Worker), com poucas
 // cores, e volta para o mesmo <img>; o CSS (image-rendering: pixelated) amplia em blocos, como num jogo
 // 8 bits. Fica de fora o que não dá para ler (foto de outro site sem permissão de CORS), o que já é
 // desenho (SVG) e o que é pequeno demais para virar blocos.
+
+import type { Pedido, Resposta } from './pixelar.worker'
 
 /** Lado de cada bloco na tela, em px de CSS. */
 export const BLOCO = 4
@@ -37,6 +39,46 @@ export function reduzirCores(dados: Uint8ClampedArray, largura: number, niveis =
 // O endereço que cada <img> recebeu daqui: o "load" da versão pixelada não pode ser pixelado de novo.
 const feitas = new WeakMap<HTMLImageElement, string>()
 
+// A conversão (canvas, leitura de pixels, PNG) roda num Web Worker: na thread principal ela engasgava a
+// rolagem. Sem Worker/OffscreenCanvas (navegador antigo), as fotos aparecem como vieram.
+type Espera = { resolve: (png: Blob | null) => void }
+const pendentes = new Map<number, Espera>()
+let proximoId = 0
+let trabalhador: Worker | null | undefined
+
+function obterTrabalhador() {
+  if (trabalhador !== undefined) return trabalhador
+  trabalhador = null
+  if (typeof Worker === 'undefined' || typeof OffscreenCanvas === 'undefined') return trabalhador
+  try {
+    const w = new Worker(new URL('./pixelar.worker.ts', import.meta.url), { type: 'module' })
+    w.onmessage = ({ data }: MessageEvent<Resposta>) => {
+      pendentes.get(data.id)?.resolve('png' in data ? data.png : null)
+      pendentes.delete(data.id)
+    }
+    w.onerror = () => {
+      for (const p of pendentes.values()) p.resolve(null)
+      pendentes.clear()
+    }
+    trabalhador = w
+  } catch {
+    trabalhador = null
+  }
+  return trabalhador
+}
+
+/** Pede ao trabalhador o PNG em blocos da foto (ele mesmo baixa e decodifica); null se não deu. */
+function converter(url: string, largura: number, altura: number): Promise<Blob | null> {
+  const w = obterTrabalhador()
+  if (!w) return Promise.resolve(null)
+  return new Promise((resolve) => {
+    const id = proximoId++
+    pendentes.set(id, { resolve })
+    const pedido: Pedido = { id, url, largura, altura }
+    w.postMessage(pedido)
+  })
+}
+
 function ficaDeFora(img: HTMLImageElement) {
   const src = img.currentSrc || img.src
   if (img.closest('[data-sem-pixel]')) return true
@@ -46,22 +88,10 @@ function ficaDeFora(img: HTMLImageElement) {
   return img.naturalWidth < 16 || (lado > 0 && lado < LADO_MINIMO)
 }
 
-/** Desenha `fonte` em blocos e devolve o PNG; lança se o canvas não puder ler a imagem (outro site sem CORS). */
-function emBlocos(fonte: HTMLImageElement, lw: number, lh: number) {
-  const { largura, altura } = tamanhoPixelado(fonte.naturalWidth, fonte.naturalHeight, lw || fonte.naturalWidth, lh || fonte.naturalHeight)
-  const canvas = document.createElement('canvas')
-  canvas.width = largura
-  canvas.height = altura
-  const ctx = canvas.getContext('2d', { willReadFrequently: true })
-  if (!ctx) throw new Error('sem canvas')
-  ctx.drawImage(fonte, 0, 0, largura, altura)
-  const quadro = ctx.getImageData(0, 0, largura, altura)
-  reduzirCores(quadro.data, largura)
-  ctx.putImageData(quadro, 0, 0)
-  return canvas.toDataURL('image/png')
-}
-
-function trocar(img: HTMLImageElement, url: string) {
+function trocar(img: HTMLImageElement, png: Blob) {
+  const anterior = feitas.get(img)
+  if (anterior?.startsWith('blob:')) URL.revokeObjectURL(anterior)
+  const url = URL.createObjectURL(png)
   feitas.set(img, url)
   // Com srcset o navegador ignoraria o novo src.
   img.removeAttribute('srcset')
@@ -70,34 +100,26 @@ function trocar(img: HTMLImageElement, url: string) {
   img.dataset.pixel = 'sim'
 }
 
-function pixelar(img: HTMLImageElement) {
+async function pixelar(img: HTMLImageElement) {
   if (feitas.get(img) === img.src) return
-  // Marca sempre, mesmo quando fica como está: o CSS esconde a foto até ela ter essa marca.
-  img.dataset.pixel = 'fora'
-  if (ficaDeFora(img)) return
+  // Enquanto converte a foto fica escondida (CSS: sem data-pixel); onde não há conversão, aparece como veio.
+  delete img.dataset.pixel
+  const origem = img.currentSrc || img.src
   const caixa = img.clientWidth ? img : img.parentElement
   const lw = caixa?.clientWidth ?? 0
   const lh = caixa?.clientHeight ?? 0
-  try {
-    trocar(img, emBlocos(img, lw, lh))
-  } catch {
-    // Foto de outro site: o canvas só lê se ela for pedida de novo com CORS. Se o site de origem não
-    // liberar, a cópia nem carrega e a foto fica como veio.
-    const origem = img.currentSrc || img.src
-    if (!/^https?:/.test(origem) || img.crossOrigin !== null) return
-    const copia = new Image()
-    copia.crossOrigin = 'anonymous'
-    copia.referrerPolicy = img.referrerPolicy
-    copia.onload = () => {
-      if ((img.currentSrc || img.src) !== origem) return
-      try {
-        trocar(img, emBlocos(copia, lw, lh))
-      } catch {
-        // fica como veio
-      }
-    }
-    copia.src = origem
+  if (ficaDeFora(img) || !obterTrabalhador()) {
+    img.dataset.pixel = 'fora'
+    return
   }
+  // Rede de segurança: se a conversão demorar demais, mostra a foto original.
+  const limite = setTimeout(() => !img.dataset.pixel && (img.dataset.pixel = 'fora'), 4000)
+  const png = /^(https?|blob):/.test(origem) ? await converter(origem, lw, lh) : null
+  clearTimeout(limite)
+  // A foto pode ter mudado enquanto isso (lista que recarregou): vale só o que ainda é o mesmo endereço.
+  if ((img.currentSrc || img.src) !== origem) return
+  if (png) trocar(img, png)
+  else img.dataset.pixel = 'fora'
 }
 
 /** Liga o pixel art das fotos no site inteiro. "load" e "error" não sobem pela árvore, por isso a captura. */

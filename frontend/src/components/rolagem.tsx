@@ -5,7 +5,7 @@ import { menosMovimento } from '../lib/movimento'
 import { Atleta, Bola, novaBola, novoAtleta } from '../demonstracoes/Atleta'
 import { pintar, posicionar } from '../demonstracoes/desenho'
 import { CHAO, instante, preparar } from '../demonstracoes/motor'
-import { FAIXAS_DA_BOLA, LADO } from './bolaPixel'
+import { LADO, bolaPng } from './bolaPixel'
 
 const limite = (x: number) => Math.max(0, Math.min(1, x))
 
@@ -107,21 +107,15 @@ export function Figura({ nome, viewBox = '0 0 680 330', className, apiRef }: { n
   )
 }
 
-/** A bola da abertura, em pixel art: o couro em faixas de cor e as costuras, bloco a bloco. */
-export const BolaCouro = forwardRef<SVGSVGElement>(function BolaCouro(_, ref) {
-  return (
-    <svg ref={ref} className="abertura-bola" viewBox={`0 0 ${LADO} ${LADO}`} shapeRendering="crispEdges">
-      {FAIXAS_DA_BOLA.map((f) => (
-        <rect key={`${f.x}-${f.y}`} x={f.x} y={f.y} width={f.largura} height={1} fill={f.cor} />
-      ))}
-    </svg>
-  )
+/** A bola da abertura, em pixel art: um sprite 40 × 40 que o navegador amplia em blocos (sem redesenhar a cada quadro). */
+export const BolaCouro = forwardRef<HTMLImageElement>(function BolaCouro(_, ref) {
+  return <img ref={ref} className="abertura-bola" src={bolaPng()} alt="" width={LADO} height={LADO} aria-hidden decoding="sync" data-sem-pixel />
 })
 
 /** Abertura: a bola gira e cresce com a rolagem, e "Bora pra quadra." abre para os lados. */
 export function AberturaBola({ titulo, children }: { titulo: ReactNode; children?: ReactNode }) {
   const secao = useRef<HTMLElement>(null)
-  const bola = useRef<SVGSVGElement>(null)
+  const bola = useRef<HTMLImageElement>(null)
 
   useRolagem(() => {
     if (!secao.current || menosMovimento()) return

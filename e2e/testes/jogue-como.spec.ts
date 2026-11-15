@@ -42,7 +42,9 @@ test('escolhe um jogador pelo menu, vê o perfil e abre o exercício de um movim
   await irPara(page, 'Jogue como')
   await expect(page.getByRole('heading', { name: 'Jogue como', level: 1 })).toBeVisible()
   await expect(page.locator('.cartao-jogador')).toHaveCount(28)
-  expect(await fotosCarregadas(page)).toBe(28)
+  // As fotos viram pixel art num Web Worker e o <img> troca de endereço um instante depois de carregar:
+  // espera todas assentarem em vez de ler uma vez só.
+  await expect.poll(() => fotosCarregadas(page), { timeout: 15_000 }).toBe(28)
 
   // Filtro por posição.
   await page.getByRole('button', { name: 'Pivôs' }).click()
@@ -58,7 +60,7 @@ test('escolhe um jogador pelo menu, vê o perfil e abre o exercício de um movim
   await expect(page.locator('.estilo-divisao-linha')).toHaveCount(4)
   await expect(page.locator('.movimento')).toHaveCount(5)
   await expect(page.getByRole('link', { name: 'CC BY 4.0' })).toHaveAttribute('href', /commons\.wikimedia\.org/)
-  expect(await fotosCarregadas(page)).toBe(1)
+  await expect.poll(() => fotosCarregadas(page), { timeout: 15_000 }).toBe(1)
 
   // O exercício de um movimento abre na biblioteca de treinos.
   await page.locator('.movimento').filter({ hasText: 'Leitura do corta-luz' }).getByRole('link').click()
