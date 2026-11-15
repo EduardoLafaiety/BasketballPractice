@@ -1,4 +1,4 @@
-/* Duas fontes só: Manrope em quase tudo e Big Shoulders Display, sempre no mesmo peso, nos títulos e números grandes. */
+/* Tudo em pixel art, como um jogo 8 bits. Duas fontes só: Pixelify Sans em quase tudo e Jersey 10 nos títulos e números grandes. O resto do visual pixelado fica em pixel.css. */
 :root {
   /* Tema escuro (padrão) */
   --bg: #1f2019;
@@ -18,16 +18,17 @@
   --faixa-linha: #cfcfcf;
   --faixa-destaque: #b8400a;
   color-scheme: dark;
-  --fundo-quadra: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 620' preserveAspectRatio='xMidYMid slice'%3E%3Cg fill='none' stroke='%2345463a' stroke-width='1.5'%3E%3Ccircle cx='500' cy='310' r='110'/%3E%3Ccircle cx='500' cy='310' r='245'/%3E%3Crect x='-40' y='190' width='240' height='240'/%3E%3Crect x='800' y='190' width='240' height='240'/%3E%3Cpath d='M500 -20V640M-40 40C120 40 240 170 240 310S120 580-40 580M1040 40C880 40 760 170 760 310S880 580 1040 580'/%3E%3C/g%3E%3C/svg%3E");
+  --fundo-quadra: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 620' preserveAspectRatio='xMidYMid slice'%3E%3Cg shape-rendering='crispEdges' fill='none' stroke='%2345463a' stroke-width='2'%3E%3Ccircle cx='500' cy='310' r='110'/%3E%3Ccircle cx='500' cy='310' r='245'/%3E%3Crect x='-40' y='190' width='240' height='240'/%3E%3Crect x='800' y='190' width='240' height='240'/%3E%3Cpath d='M500 -20V640M-40 40C120 40 240 170 240 310S120 580-40 580M1040 40C880 40 760 170 760 310S880 580 1040 580'/%3E%3C/g%3E%3C/svg%3E");
 
   --laranja: #ff6a13;
   --laranja-escuro: #d9530a;
   --lateral: #0b0b0b;
   --lateral-2: #1f1f1f;
   --lateral-muted: #a3a3a3;
-  --raio: 4px;
-  --fonte-display: 'Big Shoulders Display Variable', 'Arial Narrow', Impact, sans-serif;
-  --peso-display: 900;
+  --raio: 0px;
+  --fonte-display: 'Jersey 10', 'Pixelify Sans Variable', 'Courier New', monospace;
+  --fonte-texto: 'Pixelify Sans Variable', 'Courier New', monospace;
+  --peso-display: 400;
 
   --c-arremesso: #ff7a1a;
   --c-drible: #4da3ff;
@@ -36,7 +37,7 @@
   --c-defesa: #f25f5c;
   --c-condicionamento: #f5c542;
 
-  font-family: 'Manrope Variable', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  font-family: var(--fonte-texto);
   line-height: 1.5;
 }
 
@@ -59,7 +60,7 @@
     --faixa-linha: #333333;
     --faixa-destaque: #ff7a1a;
     color-scheme: light;
-    --fundo-quadra: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 620' preserveAspectRatio='xMidYMid slice'%3E%3Cg fill='none' stroke='%23cfccbf' stroke-width='1.5'%3E%3Ccircle cx='500' cy='310' r='110'/%3E%3Ccircle cx='500' cy='310' r='245'/%3E%3Crect x='-40' y='190' width='240' height='240'/%3E%3Crect x='800' y='190' width='240' height='240'/%3E%3Cpath d='M500 -20V640M-40 40C120 40 240 170 240 310S120 580-40 580M1040 40C880 40 760 170 760 310S880 580 1040 580'/%3E%3C/g%3E%3C/svg%3E");
+    --fundo-quadra: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 620' preserveAspectRatio='xMidYMid slice'%3E%3Cg shape-rendering='crispEdges' fill='none' stroke='%23cfccbf' stroke-width='2'%3E%3Ccircle cx='500' cy='310' r='110'/%3E%3Ccircle cx='500' cy='310' r='245'/%3E%3Crect x='-40' y='190' width='240' height='240'/%3E%3Crect x='800' y='190' width='240' height='240'/%3E%3Cpath d='M500 -20V640M-40 40C120 40 240 170 240 310S120 580-40 580M1040 40C880 40 760 170 760 310S880 580 1040 580'/%3E%3C/g%3E%3C/svg%3E");
   }
 }
 :root[data-theme='light'] {
@@ -79,7 +80,7 @@
   --faixa-linha: #333333;
   --faixa-destaque: #ff7a1a;
   color-scheme: light;
-    --fundo-quadra: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 620' preserveAspectRatio='xMidYMid slice'%3E%3Cg fill='none' stroke='%23cfccbf' stroke-width='1.5'%3E%3Ccircle cx='500' cy='310' r='110'/%3E%3Ccircle cx='500' cy='310' r='245'/%3E%3Crect x='-40' y='190' width='240' height='240'/%3E%3Crect x='800' y='190' width='240' height='240'/%3E%3Cpath d='M500 -20V640M-40 40C120 40 240 170 240 310S120 580-40 580M1040 40C880 40 760 170 760 310S880 580 1040 580'/%3E%3C/g%3E%3C/svg%3E");
+    --fundo-quadra: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 620' preserveAspectRatio='xMidYMid slice'%3E%3Cg shape-rendering='crispEdges' fill='none' stroke='%23cfccbf' stroke-width='2'%3E%3Ccircle cx='500' cy='310' r='110'/%3E%3Ccircle cx='500' cy='310' r='245'/%3E%3Crect x='-40' y='190' width='240' height='240'/%3E%3Crect x='800' y='190' width='240' height='240'/%3E%3Cpath d='M500 -20V640M-40 40C120 40 240 170 240 310S120 580-40 580M1040 40C880 40 760 170 760 310S880 580 1040 580'/%3E%3C/g%3E%3C/svg%3E");
 }
 
 * { box-sizing: border-box; }
@@ -946,7 +947,7 @@ section + section, .card + section { margin-top: 1.5rem; }
 .menu-tela.aberto { visibility: visible; clip-path: inset(0); transition: clip-path 0.5s cubic-bezier(0.7, 0, 0.2, 1), visibility 0s; }
 .nav { display: flex; flex-direction: column; }
 .nav-link { display: flex; align-items: baseline; gap: 1.2rem; width: fit-content; color: #f4f2ea; text-decoration: none; font-family: var(--fonte-display); font-size: min(clamp(2.3rem, 8vh, 6rem), 12.5vw); font-weight: var(--peso-display); line-height: 1.04; text-transform: uppercase; transition: color 0.2s, transform 0.25s; }
-.nav-link span { font-family: 'Manrope Variable', system-ui, sans-serif; font-size: 0.8rem; font-weight: 800; letter-spacing: 0.1em; color: var(--laranja); }
+.nav-link span { font-family: var(--fonte-texto); font-size: 0.8rem; font-weight: 800; letter-spacing: 0.1em; color: var(--laranja); }
 .nav-link:hover, .nav-link:focus-visible { color: var(--laranja); transform: translateX(14px); }
 .nav-link.active { color: var(--laranja); }
 .conta { display: flex; align-items: center; gap: 0.3rem; padding-top: 1rem; border-top: 1px solid #333333; }
@@ -1022,7 +1023,6 @@ section + section, .card + section { margin-top: 1.5rem; }
 /* Sem will-change: com ele o navegador amplia o bitmap da escala 1 e a bola borra no zoom da rolagem. */
 .abertura-bola { grid-area: 1 / 1; }
 .abertura-bola { width: min(72vh, 66vw); aspect-ratio: 1; }
-.bola-costura { fill: none; stroke: #1d0f05; stroke-width: 7; }
 .abertura-conteudo { position: absolute; inset: 0; pointer-events: none; }
 .abertura-conteudo a, .abertura-conteudo button { pointer-events: auto; }
 .conteudo .abertura-titulo { position: absolute; inset: 0; margin: 0; font-size: clamp(4rem, 15vw, 15rem); line-height: 0.84; }
@@ -1282,7 +1282,7 @@ select.input:hover:not(:disabled) { border-color: var(--laranja); }
 .dieta-linha > li { position: relative; display: grid; grid-template-columns: 11rem 1fr; gap: 1.2rem; }
 .dieta-linha > li::before { content: ''; position: absolute; left: calc(-1.6rem - 8px); top: 1.5rem; width: 14px; height: 14px; border-radius: 50%; background: var(--c); box-shadow: 0 0 0 4px var(--bg); }
 .dieta-quando { display: grid; align-content: start; gap: 0.3rem; font-family: var(--fonte-display); font-weight: var(--peso-display); font-size: 1.8rem; line-height: 1; text-transform: uppercase; color: var(--c); }
-.dieta-quando .meta { font-family: 'Manrope Variable', system-ui, sans-serif; font-weight: 600; font-size: 0.78rem; text-transform: none; color: var(--muted); }
+.dieta-quando .meta { font-family: var(--fonte-texto); font-weight: 600; font-size: 0.78rem; text-transform: none; color: var(--muted); }
 .dieta-grupos { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .dieta-grupos .card { border-top: 5px solid var(--c); }
 .dieta-grupo { display: flex; align-items: center; gap: 0.6rem; }
@@ -1340,7 +1340,7 @@ select.input:hover:not(:disabled) { border-color: var(--laranja); }
 .produto .dieta-foco span:first-child { background: none; border-color: var(--borda); color: inherit; font-weight: 400; }
 @media (max-width: 860px) { .produtos-abas .nivel-opcao:last-child { grid-column: auto; } }
 .produto-vitrine { padding: 1.1rem 1rem 0.6rem; }
-.bola-nome { font-family: var(--fonte-display); font-weight: 800; letter-spacing: 0.04em; text-transform: none; }
+.bola-nome { font-family: var(--fonte-display); font-weight: 400; letter-spacing: 0.04em; text-transform: none; }
 
 /* Estatísticas da NBA: um cartão por categoria, com o líder na cor do time e o ranking em barras. */
 .nba-grade { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 1.25rem; }
@@ -1672,7 +1672,7 @@ select.input:hover:not(:disabled) { border-color: var(--laranja); }
 .peca-ataque circle { fill: var(--laranja); stroke: #111111; }
 .peca-defesa path { stroke: #111111; stroke-width: 5; stroke-linecap: round; }
 .peca-bola circle { fill: #f4f2ea; stroke: #111111; }
-.peca text { font: 800 15px 'Manrope Variable', system-ui, sans-serif; fill: #111111; pointer-events: none; }
+.peca text { font: 800 15px var(--fonte-texto); fill: #111111; pointer-events: none; }
 .ferramenta-mover .peca, .ferramenta-apagar .peca { cursor: pointer; }
 .prancheta-lado { display: grid; gap: 0.75rem; }
 .prancheta-lado .form { border-top: 0; padding-top: 0; }
@@ -1754,7 +1754,7 @@ select.input:hover:not(:disabled) { border-color: var(--laranja); }
 .ranking-posicao { font-family: var(--fonte-display); font-weight: var(--peso-display); font-size: 1.5rem; color: var(--muted); }
 .ranking-apelido { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; font-size: 0.85rem; font-weight: 800; }
 .ranking-valor { font-family: var(--fonte-display); font-weight: var(--peso-display); font-size: 1.6rem; font-variant-numeric: tabular-nums; }
-.ranking-valor .meta { font-family: 'Manrope Variable', system-ui, sans-serif; font-size: 0.65rem; font-weight: 800; letter-spacing: 0.08em; }
+.ranking-valor .meta { font-family: var(--fonte-texto); font-size: 0.65rem; font-weight: 800; letter-spacing: 0.08em; }
 .desafio-novo { border-top: 0; max-width: 720px; }
 .desafios-amigos { list-style: none; margin: 1rem 0 0; padding: 0; display: grid; gap: 0.6rem; }
 .desafio-amigo { display: grid; gap: 0.5rem; padding: 1rem 1.2rem; border-radius: 18px; background: var(--superficie); }
@@ -2281,7 +2281,7 @@ html::-webkit-scrollbar, .menu-tela::-webkit-scrollbar { display: none; }
 .ferramentas-palco {
   --realce: var(--laranja);
   --realce-texto: var(--laranja-texto);
-  --relevo: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 900 740' preserveAspectRatio='xMidYMid slice'%3E%3Cg fill='none' stroke='%23ff6a13' stroke-width='1.3'%3E%3Cpath transform='translate(0 0) scale(1.00) rotate(0 450 370)' d='M450 40C640 20 820 130 860 310C900 490 760 660 560 700C360 740 150 650 100 460C50 270 230 60 450 40Z'/%3E%3Cpath transform='translate(51 33) scale(0.90) rotate(2 450 370)' d='M450 40C640 20 820 130 860 310C900 490 760 660 560 700C360 740 150 650 100 460C50 270 230 60 450 40Z'/%3E%3Cpath transform='translate(102 66) scale(0.80) rotate(4 450 370)' d='M450 40C640 20 820 130 860 310C900 490 760 660 560 700C360 740 150 650 100 460C50 270 230 60 450 40Z'/%3E%3Cpath transform='translate(153 99) scale(0.70) rotate(6 450 370)' d='M450 40C640 20 820 130 860 310C900 490 760 660 560 700C360 740 150 650 100 460C50 270 230 60 450 40Z'/%3E%3Cpath transform='translate(204 132) scale(0.60) rotate(8 450 370)' d='M450 40C640 20 820 130 860 310C900 490 760 660 560 700C360 740 150 650 100 460C50 270 230 60 450 40Z'/%3E%3Cpath transform='translate(255 165) scale(0.50) rotate(10 450 370)' d='M450 40C640 20 820 130 860 310C900 490 760 660 560 700C360 740 150 650 100 460C50 270 230 60 450 40Z'/%3E%3Cpath transform='translate(306 198) scale(0.40) rotate(12 450 370)' d='M450 40C640 20 820 130 860 310C900 490 760 660 560 700C360 740 150 650 100 460C50 270 230 60 450 40Z'/%3E%3Cpath transform='translate(357 231) scale(0.30) rotate(14 450 370)' d='M450 40C640 20 820 130 860 310C900 490 760 660 560 700C360 740 150 650 100 460C50 270 230 60 450 40Z'/%3E%3Cpath transform='translate(408 264) scale(0.20) rotate(16 450 370)' d='M450 40C640 20 820 130 860 310C900 490 760 660 560 700C360 740 150 650 100 460C50 270 230 60 450 40Z'/%3E%3C/g%3E%3C/svg%3E");
+  --relevo: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 900 740' preserveAspectRatio='xMidYMid slice'%3E%3Cg shape-rendering='crispEdges' fill='none' stroke='%23ff6a13' stroke-width='2'%3E%3Cpath transform='translate(0 0) scale(1.00) rotate(0 450 370)' d='M450 40C640 20 820 130 860 310C900 490 760 660 560 700C360 740 150 650 100 460C50 270 230 60 450 40Z'/%3E%3Cpath transform='translate(51 33) scale(0.90) rotate(2 450 370)' d='M450 40C640 20 820 130 860 310C900 490 760 660 560 700C360 740 150 650 100 460C50 270 230 60 450 40Z'/%3E%3Cpath transform='translate(102 66) scale(0.80) rotate(4 450 370)' d='M450 40C640 20 820 130 860 310C900 490 760 660 560 700C360 740 150 650 100 460C50 270 230 60 450 40Z'/%3E%3Cpath transform='translate(153 99) scale(0.70) rotate(6 450 370)' d='M450 40C640 20 820 130 860 310C900 490 760 660 560 700C360 740 150 650 100 460C50 270 230 60 450 40Z'/%3E%3Cpath transform='translate(204 132) scale(0.60) rotate(8 450 370)' d='M450 40C640 20 820 130 860 310C900 490 760 660 560 700C360 740 150 650 100 460C50 270 230 60 450 40Z'/%3E%3Cpath transform='translate(255 165) scale(0.50) rotate(10 450 370)' d='M450 40C640 20 820 130 860 310C900 490 760 660 560 700C360 740 150 650 100 460C50 270 230 60 450 40Z'/%3E%3Cpath transform='translate(306 198) scale(0.40) rotate(12 450 370)' d='M450 40C640 20 820 130 860 310C900 490 760 660 560 700C360 740 150 650 100 460C50 270 230 60 450 40Z'/%3E%3Cpath transform='translate(357 231) scale(0.30) rotate(14 450 370)' d='M450 40C640 20 820 130 860 310C900 490 760 660 560 700C360 740 150 650 100 460C50 270 230 60 450 40Z'/%3E%3Cpath transform='translate(408 264) scale(0.20) rotate(16 450 370)' d='M450 40C640 20 820 130 860 310C900 490 760 660 560 700C360 740 150 650 100 460C50 270 230 60 450 40Z'/%3E%3C/g%3E%3C/svg%3E");
   position: relative;
   overflow: hidden;
   padding: 118px clamp(1.25rem, 5vw, 5rem) calc(7rem + var(--doca, 0px));
@@ -2291,7 +2291,7 @@ html::-webkit-scrollbar, .menu-tela::-webkit-scrollbar { display: none; }
 .ferr-cabeca, .ferr-abas, .ferr-descricao, .ferr-painel { max-width: 1240px; margin-inline: auto; }
 .ferr-cabeca { display: grid; gap: 0.35rem; }
 /* O lema em serifa itálica, como um sussurro acima do título gigante. */
-.conteudo p.ferr-lema { margin: 0; font-family: 'Instrument Serif', Georgia, 'Times New Roman', serif; font-size: clamp(1.7rem, 3.2vw, 2.8rem); font-style: italic; font-weight: 400; letter-spacing: 0; line-height: 1; text-transform: none; color: var(--realce-texto); }
+.conteudo p.ferr-lema { margin: 0; font-family: var(--fonte-display); font-size: clamp(1.7rem, 3.2vw, 2.8rem); font-style: italic; font-weight: 400; letter-spacing: 0; line-height: 1; text-transform: none; color: var(--realce-texto); }
 .conteudo .ferr-cabeca h1 { margin: 0; font-size: clamp(3rem, 13vw, 12rem); line-height: 0.84; }
 .ferr-abas { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 2.25rem; }
 .ferr-aba {

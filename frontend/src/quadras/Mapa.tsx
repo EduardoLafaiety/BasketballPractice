@@ -33,6 +33,8 @@ export default function Mapa({ centro, quadras, selecionada, aoSelecionar, panor
     const m = L.map(div.current!, { scrollWheelZoom: false }).setView([centroInicial.current.lat, centroInicial.current.lon], panorama ? ZOOM_PANORAMA : ZOOM_PERTO)
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
+      // Os blocos do mapa vêm com CORS liberado: assim lib/pixelar.ts consegue redesenhá-los em pixel art.
+      crossOrigin: true,
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">colaboradores do OpenStreetMap</a> (ODbL)',
     }).addTo(m)
     camada.current = L.layerGroup().addTo(m)

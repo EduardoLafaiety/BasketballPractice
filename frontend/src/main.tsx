@@ -6,11 +6,12 @@ import { AuthProvider } from './auth'
 import { iniciarPwa } from './lib/pwa'
 import { aplicarMovimento } from './lib/movimento'
 import { aplicarTema, temaSalvo } from './lib/tema'
+import { iniciarPixelArt } from './lib/pixelar'
 // Fontes servidas pelo próprio site: sem depender do Google Fonts e funcionando offline no PWA.
-import '@fontsource-variable/big-shoulders-display'
-import '@fontsource-variable/manrope'
-import '@fontsource/instrument-serif/400-italic.css'
+import '@fontsource/jersey-10'
+import '@fontsource-variable/pixelify-sans'
 import './styles.css'
+import './pixel.css'
 
 // Subpasta do site (VITE_BASE), ex.: /BasketballPractice no GitHub Pages; "/" no site normal.
 const BASE = import.meta.env.BASE_URL.replace(/\/$/, '') || '/'
@@ -18,6 +19,7 @@ const BASE = import.meta.env.BASE_URL.replace(/\/$/, '') || '/'
 // Tema da última visita, antes do primeiro render; o salvo na conta chega depois do login.
 aplicarTema(temaSalvo())
 aplicarMovimento()
+iniciarPixelArt()
 iniciarPwa()
 
 createRoot(document.getElementById('root')!).render(
