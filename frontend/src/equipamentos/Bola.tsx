@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { LADO, faixasDaBola } from '../components/bolaPixel'
+import { LADO, bolaPng } from '../components/bolaPixel'
 import { ICONES_TIMES, type IconeTime } from './icones-times'
 
 // Bola em pixel art (o mesmo sprite da abertura), pintada nas cores do produto, com sombra no chão e o
@@ -36,18 +36,16 @@ const DESLOCA = 60 - (LADO / 2) * ESCALA
 
 export default function Bola({ cor, costura, nome, icone }: { cor: string; costura: string; nome: string; icone?: IconeTime }) {
   const impressao = tinta(cor, costura)
-  const faixas = useMemo(() => faixasDaBola(TONS.map((t) => tom(cor, t)), '#141414'), [cor])
+  // Uma imagem por cor (e não centenas de retângulos de SVG por bola): a lista tem uma bola por time.
+  const sprite = useMemo(() => bolaPng(TONS.map((t) => tom(cor, t)), '#141414'), [cor])
 
   return (
     <svg className="bola-desenho" viewBox="0 0 120 126" width="132" height="139" aria-hidden>
       {/* Sombra no chão, em degraus. */}
       <path d="M30 114h60v3h-60zM24 117h72v3h-72zM30 120h60v3h-60z" fill="#000" opacity=".2" />
 
-      <g transform={`translate(${DESLOCA} ${DESLOCA}) scale(${ESCALA})`} shapeRendering="crispEdges">
-        {faixas.map((f) => (
-          <rect key={`${f.x}-${f.y}`} x={f.x} y={f.y} width={f.largura} height={1} fill={f.cor} />
-        ))}
-      </g>
+      <image href={sprite} x={DESLOCA} y={DESLOCA} width={LADO * ESCALA} height={LADO * ESCALA} style={{ imageRendering: 'pixelated' }} />
+
       {icone && (
         <g transform="translate(44 15) scale(1.3)" color={impressao} fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="square" strokeLinejoin="miter">
           {ICONES_TIMES[icone]}

@@ -36,17 +36,19 @@
 :root[data-theme='light'] { --sombra: 4px 4px 0 rgba(40, 34, 15, 0.28); --sombra-alta: 6px 6px 0 rgba(40, 34, 15, 0.36); }
 .faixa-escura, .faixa-preta { --sombra: 4px 4px 0 rgba(0, 0, 0, 0.6); --sombra-alta: 6px 6px 0 rgba(0, 0, 0, 0.7); }
 
-/* Nada arredondado, nada desfocado, nada inclinado. */
-*, *::before, *::after {
-  border-radius: 0 !important;
-  backdrop-filter: none !important;
-  font-style: normal !important;
-  /* Trocas de cor e de posição em degraus, como quadros de um jogo. */
-  transition-timing-function: steps(3, end) !important;
-}
+/*
+ * Nada arredondado, desfocado ou inclinado: isso vale na própria fonte (styles.css). De propósito NÃO há regra
+ * universal (*, *::before, *::after): ela obriga o navegador a calcular o estilo de todo elemento e de todo
+ * pseudo-elemento a cada recálculo (a cada quadro da rolagem), o que deixava o site pesado.
+ */
+/* Formulários e o mapa trazem cantos arredondados do próprio navegador ou do Leaflet. */
+button, input, select, textarea, dialog, .leaflet-bar, .leaflet-bar a, .leaflet-control-attribution, .leaflet-popup-content-wrapper, .leaflet-popup-tip { border-radius: 0; }
+/* Trocas de cor e de posição em degraus, como quadros de um jogo. */
+a, button, .btn, .chip, .card, .input, .drill-card, .treino-linha, .nav-link, .doca-item, .ferr-aba { transition-timing-function: steps(3, end); }
 
-/* Desenhos vetoriais (ícones, quadra, gráficos, ilustrações) sem suavização: a linha vira serrilhado. */
-svg { shape-rendering: crispEdges; text-rendering: optimizeSpeed; }
+/* Ícones sem suavização: a linha vira serrilhado. Só neles: em ilustrações grandes e em figuras animadas o
+   crispEdges deixa a rasterização várias vezes mais lenta (medido: quadros de 250 ms ao rolar Artigos). */
+.icone-svg { shape-rendering: crispEdges; }
 
 /* Fotos: lib/pixelar.ts redesenha cada uma em blocos e com poucas cores; aqui a ampliação fica em blocos.
    A foto só aparece depois de passar por lá (data-pixel), para não piscar a versão lisa antes. */
@@ -94,23 +96,21 @@ img:not([data-pixel]) { opacity: 0; }
 }
 
 /* Carregando: gira em oito posições, sem deslizar. */
-.spinner { animation-timing-function: steps(8) !important; }
+.spinner { animation-timing-function: steps(8); }
 
 /* Sublinhados e tracejados na medida do pixel. */
 a, .link { text-decoration-thickness: var(--px); text-underline-offset: 3px; }
 hr { border: 0; border-top: var(--px) solid var(--borda); }
 
 /* Rolagem com cara de janela antiga. */
-* { scrollbar-width: auto; scrollbar-color: var(--laranja) var(--superficie-2); }
+:root { scrollbar-color: var(--laranja) var(--superficie-2); }
 ::-webkit-scrollbar { width: 12px; height: 12px; }
 ::-webkit-scrollbar-track { background: var(--superficie-2); }
 ::-webkit-scrollbar-thumb { background: var(--laranja); border: var(--px) solid var(--superficie-2); }
 ::selection { background: var(--laranja); color: #0b0b0b; }
 
 
-/* Animações de entrada em poucos quadros; o relevo de Ferramentas anda devagar, em passos curtos. */
-*, *::before, *::after { animation-timing-function: steps(6, end) !important; }
-.ferramentas-palco::before { animation-timing-function: steps(76, end) !important; }
+/* As animações de entrada andam em poucos quadros (steps no próprio styles.css). */
 /* Sem texto inclinado: jogo 8 bits não gira letra. */
 .ferr-aba:hover { transform: translateY(calc(var(--px) * -1)); }
 .ferr-aba.ativo { transform: none; }
