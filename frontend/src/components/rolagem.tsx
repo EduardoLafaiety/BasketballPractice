@@ -1,11 +1,13 @@
 // Peças animadas pela rolagem: a bola da abertura, o boneco comandado pela rolagem e os nomes que correm.
-import { forwardRef, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { COREOGRAFIAS } from '../demonstracoes/coreografias'
 import { menosMovimento } from '../lib/movimento'
 import { Atleta, Bola, novaBola, novoAtleta } from '../demonstracoes/Atleta'
 import { pintar, posicionar } from '../demonstracoes/desenho'
 import { CHAO, instante, preparar } from '../demonstracoes/motor'
-import { LADO, bolaPng } from './bolaPixel'
+import { BolaCouro, LinhasQuadra } from './fundoQuadra'
+
+export { ListraBola } from './fundoQuadra'
 
 const limite = (x: number) => Math.max(0, Math.min(1, x))
 
@@ -107,21 +109,25 @@ export function Figura({ nome, viewBox = '0 0 680 330', className, apiRef }: { n
   )
 }
 
-/** A bola da abertura, em pixel art: um sprite 40 × 40 que o navegador amplia em blocos (sem redesenhar a cada quadro). */
-export const BolaCouro = forwardRef<HTMLImageElement>(function BolaCouro(_, ref) {
-  return <img ref={ref} className="abertura-bola" src={bolaPng()} alt="" width={LADO} height={LADO} aria-hidden decoding="sync" />
-})
-
 /** Abertura: a bola gira e cresce com a rolagem, e "Bora pra quadra." abre para os lados. */
 export function AberturaBola({ titulo, children }: { titulo: ReactNode; children?: ReactNode }) {
   const secao = useRef<HTMLElement>(null)
   const bola = useRef<HTMLImageElement>(null)
+  const ultimo = useRef(-1)
 
   useRolagem(() => {
     if (!secao.current || menosMovimento()) return
     const p = progressoDoPino(secao.current)
+    // Fora do trecho da abertura o progresso não muda: nada a redesenhar enquanto o resto da página rola.
+    if (p === ultimo.current) return
+    ultimo.current = p
     if (bola.current) bola.current.style.transform = `rotate(${p * 260}deg) scale(${1 + p * 1.7})`
-    secao.current.style.setProperty('--saida', String(p))
+    // Direto nas duas metades do título: uma variável de CSS na seção faria o navegador recalcular o
+    // estilo de tudo o que está dentro dela a cada quadro.
+    const a = secao.current.querySelector<HTMLElement>('.abertura-a')
+    const b = secao.current.querySelector<HTMLElement>('.abertura-b')
+    if (a) a.style.transform = `translateX(${p * -80}vw)`
+    if (b) b.style.transform = `translateX(${p * 80}vw)`
   })
 
   return (
@@ -137,28 +143,6 @@ export function AberturaBola({ titulo, children }: { titulo: ReactNode; children
         </div>
       </div>
     </section>
-  )
-}
-
-/** Linhas de quadra no fundo, no lugar das curvas de nível do estilo original. */
-export function LinhasQuadra() {
-  return (
-    <svg className="linhas-quadra" viewBox="0 0 1000 620" preserveAspectRatio="xMidYMid slice" aria-hidden>
-      <circle cx="500" cy="310" r="110" />
-      <circle cx="500" cy="310" r="245" />
-      <rect x="-40" y="190" width="240" height="240" />
-      <rect x="800" y="190" width="240" height="240" />
-      <path d="M500 -20V640M-40 40C120 40 240 170 240 310S120 580-40 580M1040 40C880 40 760 170 760 310S880 580 1040 580" />
-    </svg>
-  )
-}
-
-/** Listra no topo da seção: uma fatia da bola, com as costuras esticadas na largura da tela. */
-export function ListraBola() {
-  return (
-    <svg className="listra-bola" viewBox="0 120 400 160" preserveAspectRatio="none" aria-hidden>
-      <path vectorEffect="non-scaling-stroke" d="M10 200h380M200 10v380M64 68c70 62 70 202 0 264M336 68c-70 62-70 202 0 264" />
-    </svg>
   )
 }
 
@@ -188,9 +172,13 @@ export function EscadaRolagem({ nome, titulo, rotulo }: { nome: string; titulo: 
   const figura = useRef<FiguraApi | null>(null)
   const fases = COREOGRAFIAS[nome].fases
   const [fase, setFase] = useState(0)
+  const ultimo = useRef(-1)
   useRolagem(() => {
     if (!secao.current || !figura.current) return
     const p = progressoDoPino(secao.current)
+    // Fora do trecho o boneco está parado no começo ou no fim: não redesenha a cada quadro da rolagem.
+    if (p === ultimo.current) return
+    ultimo.current = p
     setFase(figura.current.desenhar(p * figura.current.total))
     if (regua.current) regua.current.style.transform = `scaleX(${p})`
   })

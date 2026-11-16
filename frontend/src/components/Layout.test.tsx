@@ -49,7 +49,7 @@ describe('Menu em tela cheia', () => {
     await user.click(await botaoMenu())
     await user.click(within(document.querySelector('.topo') as HTMLElement).getByRole('link', { name: /início/i }))
     await waitFor(() => expect(screen.getByTestId('caminho')).toHaveTextContent(/^\/$/))
-    expect(tela()).not.toHaveClass('aberto')
+    await waitFor(() => expect(tela()).not.toHaveClass('aberto'))
   })
 
   it('o topo não tem mais o botão Gerar rotina: sobram a marca e o menu', async () => {

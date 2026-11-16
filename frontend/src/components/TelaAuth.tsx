@@ -2,7 +2,7 @@ import { useState, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import Icone from './Icone'
 import { abrirPreferenciasCookies } from '../lib/cookies'
-import { BolaCouro, LinhasQuadra, ListraBola } from './rolagem'
+import { BolaCouro, LinhasQuadra, ListraBola } from './fundoQuadra'
 
 /** A moldura das telas de conta: a quadra de um lado, o formulário do outro. */
 export default function TelaAuth({ children }: { children: ReactNode }) {

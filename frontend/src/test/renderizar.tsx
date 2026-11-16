@@ -3,6 +3,9 @@ import type { ComponentProps } from 'react'
 import { MemoryRouter, useLocation } from 'react-router-dom'
 import App from '../App'
 import { AuthProvider } from '../auth'
+// No site o Início é baixado à parte, em paralelo com a entrada. Aqui ele já vem carregado, para o primeiro
+// teste de cada arquivo não depender do tempo de leitura do módulo.
+import '../pages/Inicio'
 
 type Rota = NonNullable<ComponentProps<typeof MemoryRouter>['initialEntries']>[number]
 
