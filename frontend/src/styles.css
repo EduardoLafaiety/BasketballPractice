@@ -467,7 +467,7 @@ p { margin: 0 0 1rem; }
   width: min(400px, 100%);
   display: grid;
   gap: 1.4rem;
-  animation: aparecer-baixo 0.8s 0.2s steps(6, end) both;
+  animation: aparecer-baixo 0.8s 0.2s cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
 @keyframes aparecer-baixo { from { opacity: 0; transform: translateY(18px); } }
 .auth-sobretitulo { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--laranja-texto); }
@@ -1815,7 +1815,7 @@ html::-webkit-scrollbar, .menu-tela::-webkit-scrollbar { display: none; }
 .marca .icone-svg { transition: transform 0.5s cubic-bezier(0.3, 1.5, 0.5, 1); }
 .marca:active .icone-svg { transform: rotate(-120deg) scale(0.9); }
 /* Ao abrir, as seções do menu entram uma atrás da outra. */
-.menu-tela.aberto .nav-link { animation: menu-entra 0.5s steps(6, end) backwards; animation-delay: calc(0.15s + var(--i, 0) * 0.03s); }
+.menu-tela.aberto .nav-link { animation: menu-entra 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) backwards; animation-delay: calc(0.15s + var(--i, 0) * 0.03s); }
 @keyframes menu-entra { from { opacity: 0; transform: translateY(26px); } }
 :root[data-movimento='reduzido'] .menu-tela.aberto .nav-link { animation: none; }
 
@@ -1864,7 +1864,7 @@ html::-webkit-scrollbar, .menu-tela::-webkit-scrollbar { display: none; }
   .doca-item .topo-tracos { width: 22px; height: 10px; margin-block: 6px; }
   .doca-item[aria-expanded='true'] .topo-tracos { height: 2px; margin-block: 10px; border-bottom: 0; }
   /* A bolinha laranja cai e quica em cima da aba atual. */
-  .doca-item.active::before { content: ''; position: absolute; top: 5px; width: 6px; height: 6px; border-radius: 0; background: var(--laranja); animation: doca-quique 0.7s steps(6, end) both; }
+  .doca-item.active::before { content: ''; position: absolute; top: 5px; width: 6px; height: 6px; border-radius: 0; background: var(--laranja); animation: doca-quique 0.7s cubic-bezier(0.3, 0.7, 0.4, 1) both; }
   @keyframes doca-quique {
     0% { opacity: 0; transform: translateY(-16px); }
     40% { opacity: 1; transform: translateY(0) scale(1.5, 0.6); }
@@ -1875,7 +1875,7 @@ html::-webkit-scrollbar, .menu-tela::-webkit-scrollbar { display: none; }
   /* Gerar treino: do tamanho das outras abas, com a bola sempre laranja, que gira no toque. */
   .doca-gerar .icone-svg { color: var(--laranja); transition: transform 0.5s cubic-bezier(0.3, 1.6, 0.5, 1); }
   .doca-gerar:active .icone-svg { transform: rotate(-90deg); transition-duration: 0.12s; }
-  .doca-gerar.active .icone-svg { animation: doca-gira 0.8s steps(6, end); }
+  .doca-gerar.active .icone-svg { animation: doca-gira 0.8s cubic-bezier(0.3, 1.3, 0.5, 1); }
   @keyframes doca-gira { from { transform: rotate(-200deg); } }
 
   .conteudo { padding-bottom: calc(6rem + var(--doca, 0px)); }
@@ -1940,7 +1940,7 @@ html::-webkit-scrollbar, .menu-tela::-webkit-scrollbar { display: none; }
  */
 .dia {
   --quadra: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 94' fill='none' stroke='%23808080' stroke-width='1.3'%3E%3Crect x='2' y='2' width='96' height='90' rx='2'/%3E%3Crect x='34' y='2' width='32' height='38'/%3E%3Ccircle cx='50' cy='40' r='12'/%3E%3Ccircle cx='50' cy='10' r='3'/%3E%3Cpath d='M42 5h16M10 2v22a40 40 0 0 0 80 0V2'/%3E%3C/svg%3E");
-  animation: aparecer-baixo 0.5s steps(6, end) both;
+  animation: aparecer-baixo 0.5s both;
   animation-delay: calc(var(--i, 0) * 55ms);
   transition: box-shadow 0.25s, transform 0.25s;
 }
@@ -2313,7 +2313,7 @@ html::-webkit-scrollbar, .menu-tela::-webkit-scrollbar { display: none; }
 }
 .ferr-aba-num { font-size: 0.6rem; letter-spacing: 0.1em; color: var(--realce-texto); }
 .ferr-aba:hover { border-color: var(--realce); color: var(--realce-texto); transform: translateY(-3px) rotate(1deg); }
-.ferr-aba.ativo { background: var(--realce); border-color: var(--realce); color: #111111; transform: rotate(-1.5deg); animation: ferr-pula 0.55s steps(6, end); }
+.ferr-aba.ativo { background: var(--realce); border-color: var(--realce); color: #111111; transform: rotate(-1.5deg); animation: ferr-pula 0.55s cubic-bezier(0.3, 1.6, 0.5, 1); }
 .ferr-aba.ativo .ferr-aba-num { color: #111111; }
 .ferr-aba-selo { padding: 0.15rem 0.5rem; border-radius: 0; background: var(--realce); color: #111111; font-size: 0.58rem; letter-spacing: 0.1em; }
 .ferr-aba.ativo .ferr-aba-selo { background: #111111; color: var(--realce-texto); }
@@ -2344,15 +2344,15 @@ html::-webkit-scrollbar, .menu-tela::-webkit-scrollbar { display: none; }
 .ferramentas-palco .chip:hover:not(.ativo) { border-color: var(--realce); color: var(--realce-texto); }
 
 /* Movimento: o relevo deriva devagar, o título e as abas sobem em sequência e a aba escolhida dá um pulinho. */
-.ferramentas-palco::before { inset: -8%; animation: ferr-relevo 38s steps(76, end) infinite alternate; }
+.ferramentas-palco::before { inset: -8%; animation: ferr-relevo 38s ease-in-out infinite alternate; }
 @keyframes ferr-relevo { to { transform: translate(-2.5%, 3%) scale(1.07) rotate(2.5deg); } }
 @keyframes ferr-sobe { from { opacity: 0; transform: translateY(38px); } }
 @keyframes ferr-pula { 0% { transform: translateY(8px) rotate(-6deg) scale(0.92); } }
-.ferr-lema { animation: ferr-sobe 0.8s 0.05s steps(6, end) backwards; }
-.ferr-cabeca h1 { animation: ferr-sobe 0.9s 0.15s steps(6, end) backwards; }
-.ferr-aba { animation: ferr-sobe 0.6s steps(6, end) backwards; animation-delay: calc(0.3s + var(--i, 0) * 0.05s); }
-.ferr-aba.ativo { animation: ferr-pula 0.55s steps(6, end); }
-.ferr-descricao, .ferr-painel { animation: ferr-sobe 0.8s 0.55s steps(6, end) backwards; }
+.ferr-lema { animation: ferr-sobe 0.8s 0.05s cubic-bezier(0.2, 0.8, 0.2, 1) backwards; }
+.ferr-cabeca h1 { animation: ferr-sobe 0.9s 0.15s cubic-bezier(0.2, 0.8, 0.2, 1) backwards; }
+.ferr-aba { animation: ferr-sobe 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) backwards; animation-delay: calc(0.3s + var(--i, 0) * 0.05s); }
+.ferr-aba.ativo { animation: ferr-pula 0.55s cubic-bezier(0.3, 1.6, 0.5, 1); }
+.ferr-descricao, .ferr-painel { animation: ferr-sobe 0.8s 0.55s cubic-bezier(0.2, 0.8, 0.2, 1) backwards; }
 :root[data-movimento='reduzido'] .ferramentas-palco::before, :root[data-movimento='reduzido'] .ferr-lema, :root[data-movimento='reduzido'] .ferr-cabeca h1, :root[data-movimento='reduzido'] .ferr-aba, :root[data-movimento='reduzido'] .ferr-descricao, :root[data-movimento='reduzido'] .ferr-painel { animation: none; }
 
 /* Início: Treino de hoje, centralizado, com o link da rotina embaixo */
