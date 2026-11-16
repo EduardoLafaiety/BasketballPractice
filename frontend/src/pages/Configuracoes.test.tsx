@@ -121,7 +121,7 @@ describe('Backup', () => {
     await user.upload(await waitFor(() => seletorDeArquivo()), arquivoJson('{"format":"basketball-practice","version":1}'))
     await screen.findByRole('status')
 
-    await user.click(screen.getByRole('link', { name: /Metas/ }))
+    await user.click(screen.getByRole('link', { name: /Conquistas/ }))
     expect(await screen.findByText('Carregando metas')).toBeInTheDocument()
     expect(screen.queryByText(/Nenhuma meta ainda/)).toBeNull()
 

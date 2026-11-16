@@ -61,8 +61,8 @@ test('trocar a senha em Configurações mantém este aparelho e derruba os outro
   // Este aparelho guardou o token novo e segue navegando com ele.
   expect(await page.evaluate(() => localStorage.getItem('bp.token'))).not.toBe(token)
   await page.getByRole('button', { name: 'Menu', exact: true }).click()
-  await page.getByRole('navigation', { name: 'Principal' }).getByRole('link', { name: 'Metas' }).click()
-  await expect(page.getByRole('heading', { name: 'Metas e conquistas' })).toBeVisible()
+  await page.getByRole('navigation', { name: 'Principal' }).getByRole('link', { name: 'Conquistas' }).click()
+  await expect(page.getByRole('heading', { name: 'Conquistas', level: 1 })).toBeVisible()
 })
 
 test('sair revoga o token de verdade', async ({ page, request }) => {

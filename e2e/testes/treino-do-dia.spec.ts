@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test'
 import { entrarCom, novaConta, numero, irPara } from './ajuda'
 
 // A jornada principal: montar o treino de hoje, fazer a sessão guiada e ver a evolução em todas as telas.
-test('monta a rotina de hoje, faz a sessão guiada e vê o resultado em Desempenho, Metas e Início', async ({
+test('monta a rotina de hoje, faz a sessão guiada e vê o resultado em Desempenho, Conquistas e Início', async ({
   page,
   request,
 }) => {
@@ -49,8 +49,8 @@ test('monta a rotina de hoje, faz a sessão guiada e vê o resultado em Desempen
   await expect(page.locator('.historico > li')).toHaveCount(1)
   await expect(page.locator('.historico > li')).toContainText('3/4 (75%)')
 
-  // Metas: primeiro dia da sequência e a conquista do primeiro treino.
-  await irPara(page, 'Metas')
+  // Conquistas: primeiro dia da sequência e a conquista do primeiro treino.
+  await irPara(page, 'Conquistas')
   await expect(page.locator('.sequencia strong').first()).toHaveText('1')
   await expect(page.locator('.conquista.desbloqueada')).toHaveCount(1)
   await expect(page.locator('.conquista.desbloqueada')).toContainText('Primeiro treino')

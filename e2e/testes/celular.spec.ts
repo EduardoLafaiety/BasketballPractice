@@ -21,7 +21,7 @@ test('no celular, o menu abre em tela cheia, navega entre as telas e nada vaza p
   for (const [link, titulo] of [
     ['Desempenho', 'Desempenho'],
     ['Ferramentas', 'Ferramentas'],
-    ['Metas', 'Metas e conquistas'],
+    ['Conquistas', 'Conquistas'],
   ]) {
     await irPara(page, link)
     await expect(page.getByRole('heading', { name: titulo, level: 1 })).toBeVisible()

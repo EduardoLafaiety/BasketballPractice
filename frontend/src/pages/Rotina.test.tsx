@@ -54,7 +54,7 @@ describe('Rotina semanal', () => {
     })
     abrirRotina(rotas)
 
-    await screen.findByRole('heading', { name: 'Quarta' })
+    await screen.findByRole('heading', { name: /^Quarta/ })
     const quarta = cartaoDoDia('Quarta')
     expect(within(quarta).getAllByRole('link').map((l) => l.textContent)).toEqual(['Suicídio', 'Lance livre'])
     expect(within(quarta).getByText('2 treinos')).toBeInTheDocument()
@@ -91,7 +91,7 @@ describe('Rotina semanal', () => {
       1: { id: 1, name: 'Rotina de segunda', description: 'bp-rotina:1', exercises: [{ exerciseId: 1 }, { exerciseId: 2 }, { exerciseId: 1 }] },
     })
     abrirRotina(rotas)
-    await screen.findByRole('heading', { name: 'Segunda' })
+    await screen.findByRole('heading', { name: /^Segunda/ })
 
     await user.click(within(cartaoDoDia('Segunda')).getAllByRole('button', { name: 'Remover Lance livre' })[1])
     await waitFor(() => expect(treinos.get(1)?.exercises).toEqual([{ exerciseId: 1 }, { exerciseId: 2 }]))
@@ -123,7 +123,7 @@ describe('Rotina semanal', () => {
       5: { id: 5, name: 'Rotina de sexta', description: 'bp-rotina:5', exercises: [{ exerciseId: 1 }] },
     })
     abrirRotina(rotas)
-    await screen.findByRole('heading', { name: 'Quarta' })
+    await screen.findByRole('heading', { name: /^Quarta/ })
 
     const placar = screen.getByRole('region', { name: 'Resumo da semana' })
     expect(placar).toHaveTextContent('3 treinos')
@@ -145,7 +145,7 @@ describe('Rotina semanal', () => {
 
   it('sem treino nenhum, o placar diz que a semana está em branco e os dias convidam a arrastar', async () => {
     abrirRotina(servidorDeRotina().rotas)
-    await screen.findByRole('heading', { name: 'Quarta' })
+    await screen.findByRole('heading', { name: /^Quarta/ })
 
     const placar = screen.getByRole('region', { name: 'Resumo da semana' })
     expect(placar).toHaveTextContent('0 treinos')
@@ -161,7 +161,7 @@ describe('Rotina semanal', () => {
       3: { id: 3, name: 'Rotina de quarta', description: 'bp-rotina:3', exercises: [{ exerciseId: 2 }] },
     })
     abrirRotina(rotas)
-    await screen.findByRole('heading', { name: 'Quarta' })
+    await screen.findByRole('heading', { name: /^Quarta/ })
     const semana = cartaoDoDia('Quarta').closest('.semana')!
     const dataTransfer = { effectAllowed: 'none' }
 

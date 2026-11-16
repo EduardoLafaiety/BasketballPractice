@@ -28,7 +28,7 @@ const tiposTeste = [
   { kind: 'sprint', name: 'Sprint de quadra inteira', unit: 's', better: 'lower' },
 ]
 
-function abrirMetas(rotas: Parameters<typeof apiFalsa>[0] = {}) {
+function abrirMetas(rotas: Parameters<typeof apiFalsa>[0] = {}, caminho = '/conquistas') {
   definirToken('tk')
   const api = apiFalsa({
     'GET /auth/me': usuarioFalso(),
@@ -40,7 +40,7 @@ function abrirMetas(rotas: Parameters<typeof apiFalsa>[0] = {}) {
     'GET /tests': [],
     ...rotas,
   })
-  abrirApp('/metas')
+  abrirApp(caminho)
   return api
 }
 
@@ -50,7 +50,86 @@ const ecoarMeta = (corpo: unknown) => {
   return meta({ id: 9, title: c.title, kind: c.kind, target: c.target, current: 0, exerciseId: c.exerciseId, deadline: c.deadline })
 }
 
-describe('Metas', () => {
+const conquista = (id: string, title: string, target: number, progress: number) => ({
+  id,
+  title,
+  description: `Descrição de ${title}.`,
+  target,
+  progress,
+  unlocked: progress >= target,
+})
+
+const progressoCom = (achievements: ReturnType<typeof conquista>[]) => ({ streak: { current: 2, best: 5 }, achievements })
+
+describe('Lista de conquistas (estilo Steam)', () => {
+  const catalogoDeConquistas = [
+    conquista('100-sessoes', 'Centenário', 100, 40),
+    conquista('primeira-sessao', 'Primeiro treino', 1, 1),
+    conquista('10-sessoes', 'Constância', 10, 9),
+    conquista('3-dias', 'Embalado', 3, 3),
+  ]
+
+  it('a aba se chama Conquistas e o endereço antigo (/metas) leva até ela', async () => {
+    abrirMetas({ 'GET /stats/progress': progressoCom(catalogoDeConquistas) }, '/metas')
+    expect(await screen.findByRole('heading', { name: 'Conquistas', level: 1 })).toBeInTheDocument()
+    expect(screen.getByTestId('caminho').textContent).toBe('/conquistas')
+    const nav = screen.getByRole('navigation', { name: 'Principal' })
+    expect(within(nav).getByRole('link', { name: /Conquistas/ })).toHaveAttribute('href', '/conquistas')
+  })
+
+  it('mostra quantas foram desbloqueadas, com a porcentagem e a barra', async () => {
+    abrirMetas({ 'GET /stats/progress': progressoCom(catalogoDeConquistas) })
+    expect(await screen.findByText(/Descrição|desbloqueadas/, { selector: '.conquistas-resumo p' })).toHaveTextContent('2 de 4 desbloqueadas (50%)')
+    const barra = screen.getByRole('progressbar', { name: 'Conquistas desbloqueadas' })
+    expect(barra).toHaveAttribute('aria-valuenow', '2')
+    expect(barra).toHaveAttribute('aria-valuemax', '4')
+  })
+
+  it('lista as desbloqueadas primeiro e, depois, as bloqueadas da mais perto para a mais longe', async () => {
+    abrirMetas({ 'GET /stats/progress': progressoCom(catalogoDeConquistas) })
+    await screen.findByText('Primeiro treino')
+    const titulos = [...document.querySelectorAll('.conquista .conquista-texto strong')].map((e) => e.textContent)
+    expect(titulos).toEqual(['Primeiro treino', 'Embalado', 'Constância', 'Centenário'])
+    expect(document.querySelectorAll('.conquista.desbloqueada')).toHaveLength(2)
+  })
+
+  it('cada conquista tem ícone; a bloqueada mostra o progresso e a desbloqueada, o selo', async () => {
+    abrirMetas({ 'GET /stats/progress': progressoCom(catalogoDeConquistas) })
+    await screen.findByText('Centenário')
+    const bloqueada = screen.getByText('Centenário').closest('li')!
+    expect(bloqueada).not.toHaveClass('desbloqueada')
+    expect(bloqueada.querySelector('.conquista-icone svg')).not.toBeNull()
+    expect(within(bloqueada).getByText('40/100')).toBeInTheDocument()
+    expect(within(bloqueada).getByRole('progressbar', { name: 'Progresso: Centenário' })).toHaveAttribute('aria-valuenow', '40')
+
+    const feita = screen.getByText('Primeiro treino').closest('li')!
+    expect(feita).toHaveClass('desbloqueada')
+    expect(within(feita).getByText('Desbloqueada')).toBeInTheDocument()
+    expect(within(feita).queryByRole('progressbar')).toBeNull()
+  })
+
+  it('filtra por desbloqueadas e bloqueadas', async () => {
+    const user = userEvent.setup()
+    abrirMetas({ 'GET /stats/progress': progressoCom(catalogoDeConquistas) })
+    await screen.findByText('Primeiro treino')
+    expect(screen.getByRole('button', { name: 'Todas (4)' })).toHaveAttribute('aria-pressed', 'true')
+
+    await user.click(screen.getByRole('button', { name: 'Bloqueadas (2)' }))
+    expect([...document.querySelectorAll('.conquista .conquista-texto strong')].map((e) => e.textContent)).toEqual(['Constância', 'Centenário'])
+
+    await user.click(screen.getByRole('button', { name: 'Desbloqueadas (2)' }))
+    expect([...document.querySelectorAll('.conquista .conquista-texto strong')].map((e) => e.textContent)).toEqual(['Primeiro treino', 'Embalado'])
+  })
+
+  it('toda conquista do catálogo do servidor tem um ícone próprio', async () => {
+    const { ICONE_CONQUISTA } = await import('./ListaConquistas')
+    const ids = ['primeira-sessao', '10-sessoes', '50-sessoes', '100-sessoes', '3-dias', '7-dias', '30-dias', '10-horas', '100-num-dia', '1000-cestas', 'sequencia-10', 'sequencia-25', 'teste-fisico']
+    for (const id of ids) expect(ICONE_CONQUISTA[id], id).toBeDefined()
+    expect(new Set(ids.map((id) => ICONE_CONQUISTA[id])).size).toBe(ids.length)
+  })
+})
+
+describe('Conquistas', () => {
   it('cria meta de aproveitamento de um exercício com título automático', async () => {
     const user = userEvent.setup()
     const { ultima } = abrirMetas({ 'POST /goals': ecoarMeta })
