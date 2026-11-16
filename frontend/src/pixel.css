@@ -1,7 +1,9 @@
 /*
  * Pixel art: o site inteiro como um jogo 8 bits. Esta folha vem depois de styles.css e só troca o
- * acabamento (cantos, sombras, bordas, fotos, ícones e movimento); cores, grades e composição
+ * acabamento (cantos, sombras, bordas e ícones); cores, grades e composição
  * continuam as de styles.css. As fontes pixel entram pelas variáveis --fonte-display e --fonte-texto.
+ * O movimento NÃO entra nisso: transições e animações seguem suaves, como antes do pixel art. Só a aparência é de
+ * jogo antigo; nada de animação em degraus (steps).
  */
 :root {
   /* O "pixel" do site: bordas, degraus dos cantos e sombras são múltiplos dele. */
@@ -42,8 +44,6 @@
  */
 /* Formulários e o mapa trazem cantos arredondados do próprio navegador ou do Leaflet. */
 button, input, select, textarea, dialog, .leaflet-bar, .leaflet-bar a, .leaflet-control-attribution, .leaflet-popup-content-wrapper, .leaflet-popup-tip { border-radius: 0; }
-/* Trocas de cor e de posição em degraus, como quadros de um jogo. */
-a, button, .btn, .chip, .card, .input, .drill-card, .treino-linha, .nav-link, .doca-item, .ferr-aba { transition-timing-function: steps(3, end); }
 
 /* Ícones sem suavização: a linha vira serrilhado. Só neles: em ilustrações grandes e em figuras animadas o
    crispEdges deixa a rasterização várias vezes mais lenta (medido: quadros de 250 ms ao rolar Artigos). */
@@ -92,9 +92,6 @@ a, button, .btn, .chip, .card, .input, .drill-card, .treino-linha, .nav-link, .d
   mask-image: repeating-linear-gradient(90deg, #000 0 6px, transparent 6px 8px);
 }
 
-/* Carregando: gira em oito posições, sem deslizar. */
-.spinner { animation-timing-function: steps(8); }
-
 /* Sublinhados e tracejados na medida do pixel. */
 a, .link { text-decoration-thickness: var(--px); text-underline-offset: 3px; }
 hr { border: 0; border-top: var(--px) solid var(--borda); }
@@ -107,7 +104,6 @@ hr { border: 0; border-top: var(--px) solid var(--borda); }
 ::selection { background: var(--laranja); color: #0b0b0b; }
 
 
-/* As animações de entrada andam em poucos quadros (steps no próprio styles.css). */
 /* Sem texto inclinado: jogo 8 bits não gira letra. */
 .ferr-aba:hover { transform: translateY(calc(var(--px) * -1)); }
 .ferr-aba.ativo { transform: none; }
