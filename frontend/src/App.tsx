@@ -2,7 +2,6 @@ import { lazy, type ComponentType } from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
 import { RequerAdmin, RequerLogin } from './auth'
 import Layout from './components/Layout'
-import Inicio from './pages/Inicio'
 import Entrar from './pages/Entrar'
 import NaoEncontrada from './pages/NaoEncontrada'
 // Páginas soltas e pequenas (chegam por link de e-mail ou do rodapé): vêm junto, sem espera.
@@ -24,6 +23,11 @@ export function precarregarPaginas() {
   for (const carregar of carregadores.splice(0)) carregar().catch(() => {})
 }
 
+// O Início é a página mais pesada (bonecos animados, artigos): fica fora do arquivo de entrada, mas começa
+// a ser baixado na hora, em paralelo, para estar pronto quando a sessão for conferida.
+const carregarInicio = () => import('./pages/Inicio')
+const Inicio = pagina(carregarInicio, 'default')
+carregarInicio().catch(() => {})
 const Treinos = pagina(() => import('./pages/Treinos'), 'default')
 const TreinoDetalhe = pagina(() => import('./pages/TreinoDetalhe'), 'default')
 const JogueComo = pagina(() => import('./pages/JogueComo'), 'default')
