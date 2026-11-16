@@ -18,6 +18,13 @@ const url = (siglaEspn: string, variante: '500' | '500-dark') =>
 
 export const escudos = (siglaEspn: string): Escudos => ({ escudo: url(siglaEspn, '500'), escudoEscuro: url(siglaEspn, '500-dark') })
 
+/** Logo do time (pela sigla do site) bem pequeno, para ser ampliado em blocos na bola de Equipamentos. */
+export const logoPequeno = (sigla: string, lado: number) => {
+  const espn = (DO_SITE_PARA_ESPN[sigla] ?? sigla).toLowerCase()
+  const em = (variante: string) => `https://a.espncdn.com/combiner/i?img=/i/teamlogos/nba/${variante}/${espn}.png&h=${lado}&w=${lado}`
+  return { claro: em('500'), escuro: em('500-dark') }
+}
+
 export interface TimeCitado extends Escudos {
   sigla: string
   nome: string

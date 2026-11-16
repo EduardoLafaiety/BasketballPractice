@@ -91,21 +91,25 @@ describe('bolas de vitrine, por modelo', () => {
     }
   })
 
-  it('alterna os gomos: o da frente é o primeiro, e os vizinhos (lados e embaixo) são o segundo', () => {
-    expect(parteDoBloco(20, 12)).toMatchObject({ gomo: 0 })
-    expect(parteDoBloco(20, 33)).toMatchObject({ gomo: 1 })
-    expect(parteDoBloco(4, 15)).toMatchObject({ gomo: 1 })
-    expect(parteDoBloco(35, 15)).toMatchObject({ gomo: 1 })
-    // A costura do meio cai em arco, abaixo do centro, e deixa o gomo da frente maior.
-    expect(parteDoBloco(20, 26)).toBe('costura')
-    expect(parteDoBloco(20, 20)).not.toBe('costura')
+  it('tem quatro faixas alternadas: calota de cima e faixa do logo numa cor, faixa da marca e calota de baixo na outra', () => {
+    expect(parteDoBloco(20, 3)).toMatchObject({ gomo: 0 })
+    expect(parteDoBloco(20, 13)).toMatchObject({ gomo: 1 })
+    expect(parteDoBloco(20, 26)).toMatchObject({ gomo: 0 })
+    expect(parteDoBloco(20, 36)).toMatchObject({ gomo: 1 })
+    // Três canais; os de cima e de baixo acompanham a curva da bola (descem e sobem nas pontas).
+    for (const linha of [6, 18, 33]) expect(parteDoBloco(20, linha)).toBe('costura')
+    expect(parteDoBloco(4, 9)).toBe('costura')
+    expect(parteDoBloco(4, 30)).toBe('costura')
   })
 
-  it('pinta a bola de time nas duas cores, com seis tons de cada, e a costura', () => {
+  it('pinta a bola de time só com os tons das duas cores e a cor do canal', () => {
     const vistas = cores(pixelsDoModelo({ gomos: ['#552583', '#fdb927'], costura: '#141414' }))
-    for (const tom of [...tonsDoCouro('#552583'), ...tonsDoCouro('#fdb927')]) expect(vistas.has(tom), tom).toBe(true)
+    const roxos = tonsDoCouro('#552583')
+    const amarelos = tonsDoCouro('#fdb927')
+    expect([...vistas].every((c) => c === '#141414' || roxos.includes(c) || amarelos.includes(c))).toBe(true)
+    expect(roxos.filter((t) => vistas.has(t)).length).toBeGreaterThanOrEqual(4)
+    expect(amarelos.filter((t) => vistas.has(t)).length).toBeGreaterThanOrEqual(4)
     expect(vistas.has('#141414')).toBe(true)
-    expect(vistas.size).toBe(13)
   })
 
   it('o canal largo tem mais blocos de costura que o normal', () => {
@@ -117,13 +121,15 @@ describe('bolas de vitrine, por modelo', () => {
     expect(costuras(true)).toBeGreaterThan(costuras(false) * 1.2)
   })
 
-  it('a faixa acompanha as costuras curvas por dentro, com uma segunda costura a fechando', () => {
+  it('a faixa clara acompanha os canais de cima e de baixo por dentro, com um segundo canal a fechando', () => {
     const vistas = cores(pixelsDoModelo({ gomos: ['#d9661f', '#d9661f'], costura: '#1b1b1b', faixa: '#f1e6d2' }))
     expect(tonsDoCouro('#f1e6d2').some((t) => vistas.has(t))).toBe(true)
-    expect(parteDoBloco(15, 18, { faixa: '#f1e6d2' })).toMatchObject({ faixa: true })
-    expect(parteDoBloco(15, 18)).toMatchObject({ gomo: 0 })
-    // Sem faixa, a bola não muda nos lados de fora das curvas.
-    expect(parteDoBloco(4, 15, { faixa: '#f1e6d2' })).toEqual(parteDoBloco(4, 15))
+    expect(parteDoBloco(20, 8, { faixa: '#f1e6d2' })).toMatchObject({ faixa: true })
+    expect(parteDoBloco(20, 31, { faixa: '#f1e6d2' })).toMatchObject({ faixa: true })
+    expect(parteDoBloco(20, 8)).toMatchObject({ gomo: 1 })
+    // As calotas e o meio da bola não mudam.
+    expect(parteDoBloco(20, 3, { faixa: '#f1e6d2' })).toEqual(parteDoBloco(20, 3))
+    expect(parteDoBloco(20, 14, { faixa: '#f1e6d2' })).toEqual(parteDoBloco(20, 14))
   })
 
   it('o grão mistura os tons em pontilhado, sem sair da paleta', () => {

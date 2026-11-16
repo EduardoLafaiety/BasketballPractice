@@ -1,7 +1,7 @@
 // Conteúdo da aba Equipamentos: bolas de exemplo com link de afiliado da Amazon.
 // Os botões abrem a busca do produto na Amazon, onde ficam o preço, as fotos e a compra.
 // A Amazon não permite copiar preço nem imagem para cá; por isso cada bola é redesenhada em pixel art
-// (equipamentos/Bola.tsx), seguindo o modelo de verdade: cores, gomos, faixas e canais.
+// (equipamentos/Bola.tsx), como réplica do modelo de verdade: faixas, canais, marca e o logo do time.
 
 /** Tag do Programa de Associados da Amazon. Troque pela sua quando a conta for aprovada. */
 export const TAG_AFILIADO = 'seutag-20'
@@ -18,9 +18,11 @@ export interface Time {
   cidade: string
   nome: string
   conferencia: Conferencia
-  /** As duas cores do time: os gomos da bola se alternam entre elas (cor é a do gomo da frente). */
+  /** As duas cores do time (usadas no site todo). Na bola: cor é a faixa do logo e costura, o canal. */
   cor: string
   costura: string
+  /** O que a bola de verdade (Wilson NBA Team Tribute) tem de diferente do padrão "cor do time + faixa preta + canal na segunda cor". */
+  bola?: { frente?: string; faixa?: string; canal?: string }
   /** Ícone próprio inspirado no nome do time (nunca o logo). */
   icone: IconeTime
 }
@@ -38,43 +40,45 @@ export interface BolaMarca {
   canalLargo?: boolean
   faixa?: string
   grao?: boolean
+  /** O que vem impresso na faixa de baixo, onde as bolas de time levam o logo. */
+  modelo: string
   busca: string
 }
 
 export const TIMES: Time[] = [
-  { sigla: 'ATL', cidade: 'Atlanta', nome: 'Hawks', conferencia: 'leste', cor: '#E03A3E', costura: '#C1D32F', icone: 'pena' },
-  { sigla: 'BOS', cidade: 'Boston', nome: 'Celtics', conferencia: 'leste', cor: '#007A33', costura: '#BA9653', icone: 'trevo' },
-  { sigla: 'BKN', cidade: 'Brooklyn', nome: 'Nets', conferencia: 'leste', cor: '#111111', costura: '#FFFFFF', icone: 'rede' },
+  { sigla: 'ATL', cidade: 'Atlanta', nome: 'Hawks', conferencia: 'leste', cor: '#E03A3E', costura: '#C1D32F', icone: 'pena', bola: { canal: '#FDB927' } },
+  { sigla: 'BOS', cidade: 'Boston', nome: 'Celtics', conferencia: 'leste', cor: '#007A33', costura: '#BA9653', icone: 'trevo', bola: { canal: '#F1E6D2' } },
+  { sigla: 'BKN', cidade: 'Brooklyn', nome: 'Nets', conferencia: 'leste', cor: '#111111', costura: '#FFFFFF', icone: 'rede', bola: { frente: '#9EA2A2', canal: '#FFFFFF' } },
   { sigla: 'CHA', cidade: 'Charlotte', nome: 'Hornets', conferencia: 'leste', cor: '#1D1160', costura: '#1BA9BE', icone: 'vespa' },
-  { sigla: 'CHI', cidade: 'Chicago', nome: 'Bulls', conferencia: 'leste', cor: '#CE1141', costura: '#111111', icone: 'chifres' },
-  { sigla: 'CLE', cidade: 'Cleveland', nome: 'Cavaliers', conferencia: 'leste', cor: '#860038', costura: '#FDBB30', icone: 'espada' },
+  { sigla: 'CHI', cidade: 'Chicago', nome: 'Bulls', conferencia: 'leste', cor: '#CE1141', costura: '#111111', icone: 'chifres', bola: { canal: '#5A5A5A' } },
+  { sigla: 'CLE', cidade: 'Cleveland', nome: 'Cavaliers', conferencia: 'leste', cor: '#860038', costura: '#FDBB30', icone: 'espada', bola: { frente: '#FDBB30', faixa: '#860038', canal: '#041E42' } },
   { sigla: 'DET', cidade: 'Detroit', nome: 'Pistons', conferencia: 'leste', cor: '#C8102E', costura: '#1D42BA', icone: 'pistao' },
   { sigla: 'IND', cidade: 'Indiana', nome: 'Pacers', conferencia: 'leste', cor: '#002D62', costura: '#FDBB30', icone: 'bandeira' },
   { sigla: 'MIA', cidade: 'Miami', nome: 'Heat', conferencia: 'leste', cor: '#98002E', costura: '#F9A01B', icone: 'chama' },
   { sigla: 'MIL', cidade: 'Milwaukee', nome: 'Bucks', conferencia: 'leste', cor: '#00471B', costura: '#EEE1C6', icone: 'galhada' },
   { sigla: 'NYK', cidade: 'Nova York', nome: 'Knicks', conferencia: 'leste', cor: '#006BB6', costura: '#F58426', icone: 'predios' },
   { sigla: 'ORL', cidade: 'Orlando', nome: 'Magic', conferencia: 'leste', cor: '#0077C0', costura: '#C4CED4', icone: 'estrela' },
-  { sigla: 'PHI', cidade: 'Filadélfia', nome: '76ers', conferencia: 'leste', cor: '#006BB6', costura: '#ED174C', icone: 'sino' },
+  { sigla: 'PHI', cidade: 'Filadélfia', nome: '76ers', conferencia: 'leste', cor: '#006BB6', costura: '#ED174C', icone: 'sino', bola: { faixa: '#002B5C' } },
   { sigla: 'TOR', cidade: 'Toronto', nome: 'Raptors', conferencia: 'leste', cor: '#CE1141', costura: '#A1A1A4', icone: 'garras' },
   { sigla: 'WAS', cidade: 'Washington', nome: 'Wizards', conferencia: 'leste', cor: '#002B5C', costura: '#E31837', icone: 'chapeu-mago' },
   { sigla: 'DAL', cidade: 'Dallas', nome: 'Mavericks', conferencia: 'oeste', cor: '#00538C', costura: '#B8C4CA', icone: 'chapeu' },
   { sigla: 'DEN', cidade: 'Denver', nome: 'Nuggets', conferencia: 'oeste', cor: '#0E2240', costura: '#FEC524', icone: 'pepita' },
-  { sigla: 'GSW', cidade: 'Golden State', nome: 'Warriors', conferencia: 'oeste', cor: '#1D428A', costura: '#FFC72C', icone: 'escudo' },
+  { sigla: 'GSW', cidade: 'Golden State', nome: 'Warriors', conferencia: 'oeste', cor: '#1D428A', costura: '#FFC72C', icone: 'escudo', bola: { faixa: '#FFC72C', canal: '#141414' } },
   { sigla: 'HOU', cidade: 'Houston', nome: 'Rockets', conferencia: 'oeste', cor: '#CE1141', costura: '#C4CED4', icone: 'foguete' },
   { sigla: 'LAC', cidade: 'Los Angeles', nome: 'Clippers', conferencia: 'oeste', cor: '#C8102E', costura: '#1D428A', icone: 'veleiro' },
   { sigla: 'LAL', cidade: 'Los Angeles', nome: 'Lakers', conferencia: 'oeste', cor: '#552583', costura: '#FDB927', icone: 'ondas' },
-  { sigla: 'MEM', cidade: 'Memphis', nome: 'Grizzlies', conferencia: 'oeste', cor: '#5D76A9', costura: '#12173F', icone: 'pegada-urso' },
+  { sigla: 'MEM', cidade: 'Memphis', nome: 'Grizzlies', conferencia: 'oeste', cor: '#5D76A9', costura: '#12173F', icone: 'pegada-urso', bola: { canal: '#F5B112' } },
   { sigla: 'MIN', cidade: 'Minnesota', nome: 'Timberwolves', conferencia: 'oeste', cor: '#0C2340', costura: '#78BE20', icone: 'pegada-lobo' },
   { sigla: 'NOP', cidade: 'Nova Orleans', nome: 'Pelicans', conferencia: 'oeste', cor: '#0C2340', costura: '#B4975A', icone: 'pelicano' },
   { sigla: 'OKC', cidade: 'Oklahoma City', nome: 'Thunder', conferencia: 'oeste', cor: '#007AC1', costura: '#EF3B24', icone: 'raio' },
-  { sigla: 'PHX', cidade: 'Phoenix', nome: 'Suns', conferencia: 'oeste', cor: '#1D1160', costura: '#E56020', icone: 'sol' },
-  { sigla: 'POR', cidade: 'Portland', nome: 'Trail Blazers', conferencia: 'oeste', cor: '#E03A3E', costura: '#111111', icone: 'pinheiros' },
+  { sigla: 'PHX', cidade: 'Phoenix', nome: 'Suns', conferencia: 'oeste', cor: '#1D1160', costura: '#E56020', icone: 'sol', bola: { faixa: '#E56020', canal: '#141414' } },
+  { sigla: 'POR', cidade: 'Portland', nome: 'Trail Blazers', conferencia: 'oeste', cor: '#E03A3E', costura: '#111111', icone: 'pinheiros', bola: { canal: '#5A5A5A' } },
   { sigla: 'SAC', cidade: 'Sacramento', nome: 'Kings', conferencia: 'oeste', cor: '#5A2D81', costura: '#C4CED4', icone: 'coroa' },
-  { sigla: 'SAS', cidade: 'San Antonio', nome: 'Spurs', conferencia: 'oeste', cor: '#C4CED4', costura: '#111111', icone: 'espora' },
+  { sigla: 'SAS', cidade: 'San Antonio', nome: 'Spurs', conferencia: 'oeste', cor: '#C4CED4', costura: '#111111', icone: 'espora', bola: { canal: '#5A5A5A' } },
   { sigla: 'UTA', cidade: 'Utah', nome: 'Jazz', conferencia: 'oeste', cor: '#002B5C', costura: '#F9A01B', icone: 'nota' },
 ]
 
-export const buscaTime = (t: Time) => `bola basquete ${t.cidade} ${t.nome} NBA`
+export const buscaTime = (t: Time) => `bola basquete Wilson NBA Team Tribute ${t.cidade} ${t.nome}`
 
 const LARANJA = '#D9661F'
 const COURO = '#A8521E'
@@ -93,6 +97,7 @@ export const MARCAS: BolaMarca[] = [
     cor: COURO,
     costura: ESCURO,
     grao: true,
+    modelo: 'NBA',
     busca: 'bola Wilson NBA Official Game Ball',
   },
   {
@@ -105,6 +110,7 @@ export const MARCAS: BolaMarca[] = [
     cor: '#7A3B1E',
     costura: ESCURO,
     grao: true,
+    modelo: 'EVOLUTION',
     busca: 'bola basquete Wilson Evolution',
   },
   {
@@ -116,6 +122,7 @@ export const MARCAS: BolaMarca[] = [
     material: 'Composto',
     cor: LARANJA,
     costura: ESCURO,
+    modelo: 'NBA',
     busca: 'bola basquete Wilson NBA Authentic indoor outdoor',
   },
   {
@@ -128,6 +135,7 @@ export const MARCAS: BolaMarca[] = [
     cor: '#E2752B',
     costura: ESCURO,
     canalLargo: true,
+    modelo: 'DRV PRO',
     busca: 'bola basquete Wilson DRV Pro',
   },
   {
@@ -140,6 +148,7 @@ export const MARCAS: BolaMarca[] = [
     cor: COURO,
     costura: ESCURO,
     grao: true,
+    modelo: 'TF-1000',
     busca: 'bola basquete Spalding TF-1000 Legacy',
   },
   {
@@ -151,6 +160,7 @@ export const MARCAS: BolaMarca[] = [
     material: 'Composto',
     cor: LARANJA,
     costura: ESCURO,
+    modelo: 'TF-250',
     busca: 'bola basquete Spalding React TF-250',
   },
   {
@@ -163,6 +173,7 @@ export const MARCAS: BolaMarca[] = [
     cor: '#E2752B',
     costura: ESCURO,
     canalLargo: true,
+    modelo: 'STREET',
     busca: 'bola basquete Spalding Street borracha',
   },
   {
@@ -176,6 +187,7 @@ export const MARCAS: BolaMarca[] = [
     costura: ESCURO,
     faixa: CREME,
     grao: true,
+    modelo: 'BG4500',
     busca: 'bola basquete Molten BG4500',
   },
   {
@@ -188,6 +200,7 @@ export const MARCAS: BolaMarca[] = [
     cor: LARANJA,
     costura: ESCURO,
     faixa: CREME,
+    modelo: 'GG7X',
     busca: 'bola basquete Molten GG7X',
   },
 ]
