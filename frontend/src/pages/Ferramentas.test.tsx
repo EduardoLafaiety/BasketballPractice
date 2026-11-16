@@ -69,6 +69,21 @@ describe('Ferramentas: abas', () => {
     expect(screen.queryByRole('button', { name: 'Iniciar' })).toBeNull()
   })
 
+  it('a janela mostra o nome, a posição da ferramenta aberta e pertence à aba escolhida', async () => {
+    const user = userEvent.setup()
+    abrirFerramentas(null)
+    await screen.findByRole('button', { name: 'Iniciar' })
+
+    expect(screen.getByRole('img', { name: 'Ferramenta 1 de 7' })).toHaveTextContent('01/07')
+    expect(screen.getByRole('tabpanel', { name: /Timer de intervalos/ })).toBeInTheDocument()
+    expect(aba(/Timer de intervalos/)).toHaveTextContent('Trabalho e descanso')
+
+    await user.click(aba(/Prancheta tática/))
+    expect(screen.getByRole('img', { name: 'Ferramenta 4 de 7' })).toHaveTextContent('04/07')
+    expect(screen.getByRole('tabpanel', { name: /Prancheta tática/ })).toBeInTheDocument()
+    expect(document.querySelector('.ferr-janela-texto strong')).toHaveTextContent('Prancheta tática')
+  })
+
   it('abre direto na aba do endereço, e uma aba desconhecida cai no timer', async () => {
     abrirFerramentas('metronomo')
     expect(await screen.findByRole('button', { name: 'Tocar' })).toBeInTheDocument()
