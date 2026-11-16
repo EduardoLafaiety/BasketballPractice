@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { LADO, bolaPng, codificarPng, pixelsDaBola, tomDoBloco } from './bolaPixel'
+import { LADO, bolaModeloPng, bolaPng, codificarPng, parteDoBloco, pixelsDaBola, pixelsDoModelo, tomDoBloco, tonsDoCouro } from './bolaPixel'
 
 describe('bola em pixel art', () => {
   it('é redonda: os cantos da grade ficam vazios e o miolo, preenchido', () => {
@@ -72,5 +72,72 @@ describe('PNG do sprite', () => {
     expect(bolaPng()).toMatch(/^data:image\/png;base64,/)
     expect(bolaPng()).toBe(bolaPng())
     expect(bolaPng(['#111111', '#222222', '#333333', '#444444', '#555555', '#666666'], '#000000')).not.toBe(bolaPng())
+  })
+})
+
+describe('bolas de vitrine, por modelo', () => {
+  const cores = (dados: Uint8Array) => {
+    const vistas = new Set<string>()
+    for (let i = 0; i < dados.length; i += 4) if (dados[i + 3]) vistas.add(`#${[...dados.subarray(i, i + 3)].map((v) => v.toString(16).padStart(2, '0')).join('')}`)
+    return vistas
+  }
+
+  it('é redonda e simétrica: o que é costura de um lado é costura do outro', () => {
+    for (const [x, y] of [[0, 0], [LADO - 1, 0], [0, LADO - 1], [LADO - 1, LADO - 1]]) expect(parteDoBloco(x, y)).toBeNull()
+    for (let y = 0; y < LADO; y++) {
+      for (let x = 0; x < LADO / 2; x++) {
+        expect(parteDoBloco(x, y) === 'costura').toBe(parteDoBloco(LADO - 1 - x, y) === 'costura')
+      }
+    }
+  })
+
+  it('alterna os gomos: o da frente é o primeiro, e os vizinhos (lados e embaixo) são o segundo', () => {
+    expect(parteDoBloco(20, 12)).toMatchObject({ gomo: 0 })
+    expect(parteDoBloco(20, 33)).toMatchObject({ gomo: 1 })
+    expect(parteDoBloco(4, 15)).toMatchObject({ gomo: 1 })
+    expect(parteDoBloco(35, 15)).toMatchObject({ gomo: 1 })
+    // A costura do meio cai em arco, abaixo do centro, e deixa o gomo da frente maior.
+    expect(parteDoBloco(20, 26)).toBe('costura')
+    expect(parteDoBloco(20, 20)).not.toBe('costura')
+  })
+
+  it('pinta a bola de time nas duas cores, com seis tons de cada, e a costura', () => {
+    const vistas = cores(pixelsDoModelo({ gomos: ['#552583', '#fdb927'], costura: '#141414' }))
+    for (const tom of [...tonsDoCouro('#552583'), ...tonsDoCouro('#fdb927')]) expect(vistas.has(tom), tom).toBe(true)
+    expect(vistas.has('#141414')).toBe(true)
+    expect(vistas.size).toBe(13)
+  })
+
+  it('o canal largo tem mais blocos de costura que o normal', () => {
+    const costuras = (canalLargo: boolean) => {
+      let n = 0
+      for (let y = 0; y < LADO; y++) for (let x = 0; x < LADO; x++) if (parteDoBloco(x, y, { canalLargo }) === 'costura') n++
+      return n
+    }
+    expect(costuras(true)).toBeGreaterThan(costuras(false) * 1.2)
+  })
+
+  it('a faixa acompanha as costuras curvas por dentro, com uma segunda costura a fechando', () => {
+    const vistas = cores(pixelsDoModelo({ gomos: ['#d9661f', '#d9661f'], costura: '#1b1b1b', faixa: '#f1e6d2' }))
+    expect(tonsDoCouro('#f1e6d2').some((t) => vistas.has(t))).toBe(true)
+    expect(parteDoBloco(15, 18, { faixa: '#f1e6d2' })).toMatchObject({ faixa: true })
+    expect(parteDoBloco(15, 18)).toMatchObject({ gomo: 0 })
+    // Sem faixa, a bola não muda nos lados de fora das curvas.
+    expect(parteDoBloco(4, 15, { faixa: '#f1e6d2' })).toEqual(parteDoBloco(4, 15))
+  })
+
+  it('o grão mistura os tons em pontilhado, sem sair da paleta', () => {
+    const liso = pixelsDoModelo({ gomos: ['#a8521e', '#a8521e'], costura: '#1b1b1b' })
+    const grao = pixelsDoModelo({ gomos: ['#a8521e', '#a8521e'], costura: '#1b1b1b', grao: true })
+    expect(grao).not.toEqual(liso)
+    expect(cores(grao)).toEqual(cores(liso))
+  })
+
+  it('gera uma imagem por modelo e a guarda', () => {
+    const lakers = { gomos: ['#552583', '#fdb927'], costura: '#141414' } as const
+    expect(bolaModeloPng(lakers)).toMatch(/^data:image\/png;base64,/)
+    expect(bolaModeloPng(lakers)).toBe(bolaModeloPng({ ...lakers }))
+    expect(bolaModeloPng({ ...lakers, grao: true })).not.toBe(bolaModeloPng(lakers))
+    expect(bolaModeloPng(lakers)).not.toBe(bolaPng())
   })
 })

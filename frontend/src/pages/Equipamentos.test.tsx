@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import { definirToken } from '../api'
 import { TAG_AFILIADO, TIMES } from '../equipamentos/dados'
+import { corDoCanal } from '../equipamentos/Bola'
 import { ICONES_TIMES } from '../equipamentos/icones-times'
 import { apiFalsa, configFalsa, usuarioFalso } from '../test/api-falsa'
 import { abrirApp } from '../test/renderizar'
@@ -63,5 +64,13 @@ describe('Ícones dos times', () => {
   it('cada time tem um ícone próprio, diferente dos outros', () => {
     for (const t of TIMES) expect(ICONES_TIMES[t.icone], t.nome).toBeDefined()
     expect(new Set(TIMES.map((t) => t.icone)).size).toBe(TIMES.length)
+  })
+})
+
+describe('cor do canal das bolas de time', () => {
+  it('é preta, a não ser que um dos gomos já seja quase preto', () => {
+    expect(corDoCanal(['#552583', '#FDB927'])).toBe('#141414')
+    expect(corDoCanal(['#CE1141', '#111111'])).not.toBe('#141414')
+    for (const t of TIMES) expect(corDoCanal([t.cor, t.costura])).toMatch(/^#[0-9a-f]{6}$/)
   })
 })

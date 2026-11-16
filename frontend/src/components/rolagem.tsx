@@ -109,7 +109,7 @@ export function Figura({ nome, viewBox = '0 0 680 330', className, apiRef }: { n
 
 /** A bola da abertura, em pixel art: um sprite 40 × 40 que o navegador amplia em blocos (sem redesenhar a cada quadro). */
 export const BolaCouro = forwardRef<HTMLImageElement>(function BolaCouro(_, ref) {
-  return <img ref={ref} className="abertura-bola" src={bolaPng()} alt="" width={LADO} height={LADO} aria-hidden decoding="sync" data-sem-pixel />
+  return <img ref={ref} className="abertura-bola" src={bolaPng()} alt="" width={LADO} height={LADO} aria-hidden decoding="sync" />
 })
 
 /** Abertura: a bola gira e cresce com a rolagem, e "Bora pra quadra." abre para os lados. */

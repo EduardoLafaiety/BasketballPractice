@@ -16,7 +16,7 @@ describe('sessão do usuário', () => {
 
     expect(screen.getByRole('status')).toHaveTextContent('Conferindo sua sessão')
     expect(await screen.findByText('Marina')).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: 'Configurações' })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: 'Configurações' })).toBeInTheDocument()
     expect(ultima('GET', '/auth/me')?.headers.Authorization).toBe('Bearer tk-salvo')
   })
 

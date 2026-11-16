@@ -64,6 +64,97 @@ export function pixelsDaBola(couro: readonly string[] = COURO, costura = COSTURA
   return dados
 }
 
+// --- Bolas de vitrine (Equipamentos): a mesma grade, vista como nas fotos de produto. A bola está virada de
+// modo que um gomo largo fica de frente (onde vão o nome e o símbolo), com a costura do meio caindo em arco
+// e as duas costuras curvas dos lados. Cada modelo guarda o que o distingue de verdade: gomos alternados em
+// duas cores (as bolas de time), a faixa clara ao longo das costuras (Molten), o canal largo (bola de rua) e
+// o grão do couro.
+
+export interface ModeloBola {
+  /** Cor dos gomos: eles se alternam, como nas bolas de time em duas cores. Iguais = bola de uma cor só. */
+  gomos: readonly [string, string]
+  /** Cor do canal entre os gomos. */
+  costura: string
+  /** Canal largo e fundo, das bolas de borracha para quadra de rua. */
+  canalLargo?: boolean
+  /** Cor da faixa que acompanha as costuras curvas (o desenho de 12 gomos da Molten). */
+  faixa?: string
+  /** Grão do couro: os tons se misturam em pontilhado, em vez de faixas lisas. */
+  grao?: boolean
+}
+
+// Matriz de Bayer 4 × 4: o pontilhado ordenado dos jogos antigos.
+const BAYER = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5]
+// Do brilho à sombra: quanto de branco (+) ou de preto (−) entra na cor do gomo.
+const MISTURAS = [0.5, 0.3, 0.12, 0, -0.28, -0.5]
+
+/** Os seis tons (do brilho à sombra) de um gomo, a partir da cor dele. */
+export function tonsDoCouro(cor: string): string[] {
+  const [r, g, b] = rgb(cor)
+  return MISTURAS.map((m) => {
+    const alvo = m > 0 ? 255 : 0
+    const canal = (c: number) => Math.round(c + (alvo - c) * Math.abs(m))
+    return `#${((canal(r) << 16) | (canal(g) << 8) | canal(b)).toString(16).padStart(6, '0')}`
+  })
+}
+
+/** Linha (em blocos) da costura do meio na coluna x: um arco, porque a bola está inclinada para a frente. */
+const arcoDoMeio = (x: number) => 22 + 4 * Math.sqrt(Math.max(0, 1 - ((x - CENTRO) / RAIO) ** 2))
+
+export type ParteDaBola = { gomo: 0 | 1; tom: number } | { faixa: true; tom: number } | 'costura' | null
+
+/** O que há no bloco (coluna, linha) de uma bola de vitrine. */
+export function parteDoBloco(coluna: number, linha: number, modelo: Pick<ModeloBola, 'canalLargo' | 'faixa' | 'grao'> = {}): ParteDaBola {
+  const x = coluna + 0.5
+  const y = linha + 0.5
+  if (Math.hypot(x - CENTRO, y - CENTRO) > RAIO) return null
+  const largura = modelo.canalLargo ? 1.5 : 1
+  const meio = arcoDoMeio(x)
+  if (Math.abs(y - meio) < largura) return 'costura'
+  // As curvas são espelhadas: mede no lado esquerdo.
+  const xe = x < CENTRO ? x : LADO - x
+  let perto = Infinity
+  let xDaCurva = -Infinity
+  let dy = Infinity
+  for (const [cx, cy] of pontosDaCurva) {
+    perto = Math.min(perto, Math.hypot(xe - cx, y - cy))
+    if (Math.abs(y - cy) < dy) {
+      dy = Math.abs(y - cy)
+      xDaCurva = cx
+    }
+  }
+  if (perto < 0.95 * largura) return 'costura'
+  const fora = dy < 1 && xe < xDaCurva
+
+  const sombra = Math.hypot(x - LUZ.x, y - LUZ.y) / (0.8 * LADO)
+  const pontilhado = modelo.grao ? (BAYER[((linha & 3) << 2) | (coluna & 3)] / 16 - 0.5) * 0.9 : 0
+  const tom = Math.max(0, Math.min(TONS - 1, Math.floor(sombra * TONS + pontilhado)))
+
+  if (modelo.faixa && !fora) {
+    if (perto < 4) return { faixa: true, tom }
+    if (perto < 4.9) return 'costura'
+  }
+  const embaixo = y > meio
+  return { gomo: fora === embaixo ? 0 : 1, tom }
+}
+
+/** Os pixels RGBA (LADO × LADO) da bola de vitrine do modelo. */
+export function pixelsDoModelo(modelo: ModeloBola): Uint8Array {
+  const gomos = modelo.gomos.map((c) => tonsDoCouro(c).map(rgb))
+  const faixa = modelo.faixa ? tonsDoCouro(modelo.faixa).map(rgb) : null
+  const costura = rgb(modelo.costura)
+  const dados = new Uint8Array(LADO * LADO * 4)
+  for (let y = 0; y < LADO; y++) {
+    for (let x = 0; x < LADO; x++) {
+      const parte = parteDoBloco(x, y, modelo)
+      if (parte === null) continue
+      const [r, g, b] = parte === 'costura' ? costura : 'faixa' in parte ? faixa![parte.tom] : gomos[parte.gomo][parte.tom]
+      dados.set([r, g, b, 255], (y * LADO + x) * 4)
+    }
+  }
+  return dados
+}
+
 // --- PNG sem compressão (blocos "stored" do zlib): para um sprite de 40 × 40 dispensa canvas e biblioteca,
 // e funciona igual no navegador e nos testes.
 const TABELA_CRC = Array.from({ length: 256 }, (_, n) => {
@@ -105,14 +196,23 @@ export function codificarPng(rgba: Uint8Array, largura: number, altura: number):
 
 const guardadas = new Map<string, string>()
 
-/** A bola como imagem (data URL de um PNG 40 × 40), na paleta pedida; a mesma paleta só é gerada uma vez. */
-export function bolaPng(couro?: readonly string[], costura?: string): string {
-  const chave = `${couro?.join() ?? ''}|${costura ?? ''}`
+function png(chave: string, pixels: () => Uint8Array): string {
   let url = guardadas.get(chave)
   if (!url) {
-    const bytes = codificarPng(pixelsDaBola(couro, costura), LADO, LADO)
+    const bytes = codificarPng(pixels(), LADO, LADO)
     url = `data:image/png;base64,${btoa(String.fromCharCode(...bytes))}`
     guardadas.set(chave, url)
   }
   return url
+}
+
+/** A bola como imagem (data URL de um PNG 40 × 40), na paleta pedida; a mesma paleta só é gerada uma vez. */
+export function bolaPng(couro?: readonly string[], costura?: string): string {
+  return png(`${couro?.join() ?? ''}|${costura ?? ''}`, () => pixelsDaBola(couro, costura))
+}
+
+/** A bola de vitrine do modelo como imagem (data URL de um PNG 40 × 40); cada modelo só é gerado uma vez. */
+export function bolaModeloPng(modelo: ModeloBola): string {
+  const { gomos, costura, canalLargo, faixa, grao } = modelo
+  return png(`modelo|${gomos.join()}|${costura}|${!!canalLargo}|${faixa ?? ''}|${!!grao}`, () => pixelsDoModelo(modelo))
 }

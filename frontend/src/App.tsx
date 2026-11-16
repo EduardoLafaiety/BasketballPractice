@@ -1,35 +1,55 @@
+import { lazy, type ComponentType } from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
 import { RequerAdmin, RequerLogin } from './auth'
 import Layout from './components/Layout'
 import Inicio from './pages/Inicio'
 import Entrar from './pages/Entrar'
-import Treinos from './pages/Treinos'
-import TreinoDetalhe from './pages/TreinoDetalhe'
-import JogueComo from './pages/JogueComo'
-import EstatisticasNba from './nba/EstatisticasNba'
-import ClassificacaoNbb from './nbb/ClassificacaoNbb'
-import EstiloDetalhe from './pages/EstiloDetalhe'
-import Rotina from './pages/Rotina'
-import Alimentacao from './pages/Alimentacao'
-import Equipamentos from './pages/Equipamentos'
-import Artigos, { ArtigoDetalhe } from './pages/Artigos'
-import Desempenho from './pages/Desempenho'
-import CartaoDoAtleta from './pages/Cartao'
-import Programas, { ProgramaDetalhe } from './pages/Programas'
-import Jogos from './pages/Jogos'
-import RankingPagina from './pages/Ranking'
-import Convite from './pages/Convite'
-import Times, { EntrarNoTime, TimeDetalhe } from './pages/Time'
-import Metas from './pages/Metas'
-import Ferramentas from './pages/Ferramentas'
-import SessaoGuiada from './pages/SessaoGuiada'
-import Configuracoes from './pages/Configuracoes'
 import NaoEncontrada from './pages/NaoEncontrada'
+// Páginas soltas e pequenas (chegam por link de e-mail ou do rodapé): vêm junto, sem espera.
 import RecuperarSenha from './pages/RecuperarSenha'
 import { ConfirmarConta, RedefinirSenha } from './pages/LinkDeConta'
 import { PoliticaPrivacidade, TermosDeUso } from './pages/Legal'
-import Admin from './pages/Admin'
 import AvisoCookies from './components/AvisoCookies'
+
+// Só a entrada e o Início vêm no primeiro arquivo: cada outra página é baixada quando é aberta. Para a
+// navegação continuar instantânea, todas são buscadas em segundo plano assim que o navegador fica ocioso.
+const carregadores: (() => Promise<unknown>)[] = []
+function pagina<M, K extends keyof M>(carregar: () => Promise<M>, nome: K) {
+  carregadores.push(carregar)
+  return lazy(async () => ({ default: (await carregar())[nome] as ComponentType }))
+}
+
+/** Busca o código de todas as páginas (uma vez só), sem atrapalhar o que está na tela. */
+export function precarregarPaginas() {
+  for (const carregar of carregadores.splice(0)) carregar().catch(() => {})
+}
+
+const Treinos = pagina(() => import('./pages/Treinos'), 'default')
+const TreinoDetalhe = pagina(() => import('./pages/TreinoDetalhe'), 'default')
+const JogueComo = pagina(() => import('./pages/JogueComo'), 'default')
+const EstatisticasNba = pagina(() => import('./nba/EstatisticasNba'), 'default')
+const ClassificacaoNbb = pagina(() => import('./nbb/ClassificacaoNbb'), 'default')
+const EstiloDetalhe = pagina(() => import('./pages/EstiloDetalhe'), 'default')
+const Rotina = pagina(() => import('./pages/Rotina'), 'default')
+const Alimentacao = pagina(() => import('./pages/Alimentacao'), 'default')
+const Equipamentos = pagina(() => import('./pages/Equipamentos'), 'default')
+const Artigos = pagina(() => import('./pages/Artigos'), 'default')
+const ArtigoDetalhe = pagina(() => import('./pages/Artigos'), 'ArtigoDetalhe')
+const Desempenho = pagina(() => import('./pages/Desempenho'), 'default')
+const CartaoDoAtleta = pagina(() => import('./pages/Cartao'), 'default')
+const Programas = pagina(() => import('./pages/Programas'), 'default')
+const ProgramaDetalhe = pagina(() => import('./pages/Programas'), 'ProgramaDetalhe')
+const Jogos = pagina(() => import('./pages/Jogos'), 'default')
+const RankingPagina = pagina(() => import('./pages/Ranking'), 'default')
+const Convite = pagina(() => import('./pages/Convite'), 'default')
+const Times = pagina(() => import('./pages/Time'), 'default')
+const EntrarNoTime = pagina(() => import('./pages/Time'), 'EntrarNoTime')
+const TimeDetalhe = pagina(() => import('./pages/Time'), 'TimeDetalhe')
+const Metas = pagina(() => import('./pages/Metas'), 'default')
+const Ferramentas = pagina(() => import('./pages/Ferramentas'), 'default')
+const SessaoGuiada = pagina(() => import('./pages/SessaoGuiada'), 'default')
+const Configuracoes = pagina(() => import('./pages/Configuracoes'), 'default')
+const Admin = pagina(() => import('./pages/Admin'), 'default')
 
 export default function App() {
   return (
