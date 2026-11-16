@@ -1,5 +1,4 @@
 import { useState, type FormEvent } from 'react'
-import { Link } from 'react-router-dom'
 import { dataLocal } from '../api'
 import { useAuth } from '../auth'
 import { nomeMes, useCartao, type CartaoMes, type Habilidade, type IdHabilidade } from '../cartao/api'
@@ -169,8 +168,7 @@ function Bateria({ habilidades, mes }: { habilidades: Habilidade[]; mes?: Cartao
     <section>
       <h2>Bateria do mês</h2>
       <p className="muted">
-        Faça os quatro testes no mesmo mês, descansado e depois do aquecimento. Vale o melhor resultado de cada um. Os resultados também aparecem nos{' '}
-        <Link to="/conquistas" className="link">testes físicos de Conquistas</Link>.
+        Faça os quatro testes no mesmo mês, descansado e depois do aquecimento. Vale o melhor resultado de cada um. Registrar um teste também desbloqueia a conquista Laboratório.
       </p>
       <div className="grade cartao-bateria">
         {habilidades.map((h) => <TesteDaBateria key={h.id} habilidade={h} feito={mes?.notas[h.id] ?? null} />)}

@@ -28,7 +28,7 @@ const FERRAMENTAS: { to: string; titulo: string; texto: string }[] = [
   { to: '/rotina', titulo: 'Rotina semanal', texto: 'Escolha os dias, o tempo, o nível e o foco: o app monta a semana inteira, do aquecimento ao mais difícil.' },
   { to: '/ferramentas', titulo: 'Ferramentas de quadra', texto: 'Cronômetro, metrônomo, contador ao vivo, calculadoras e testes físicos.' },
   { to: '/desempenho', titulo: 'Desempenho', texto: 'Gráficos, mapa de arremessos e a sua evolução ao longo do tempo.' },
-  { to: '/conquistas', titulo: 'Conquistas', texto: 'Desbloqueie conquistas, cumpra metas com prazo e mantenha a sequência de dias treinando.' },
+  { to: '/conquistas', titulo: 'Conquistas', texto: 'Desbloqueie conquistas e mantenha a sequência de dias treinando.' },
 ]
 
 // Onde cada posição joga na meia quadra do convite da Alimentação.

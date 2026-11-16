@@ -1,26 +1,11 @@
-import { useState } from 'react'
+import { useState, type CSSProperties } from 'react'
 import BarraProgresso from '../components/BarraProgresso'
-import Icone, { type NomeIcone } from '../components/Icone'
+import Icone from '../components/Icone'
+import IconeConquista, { fundoDaConquista, temSprite } from './IconeConquista'
 import type { Conquista } from '../types'
 
 // A lista de conquistas, no estilo da Steam: um ícone grande, o nome, a descrição e o estado de cada uma.
-
-/** Ícone de cada conquista, pelo que ela mede; as que não estão aqui usam a medalha. Trancada, aparece o cadeado. */
-export const ICONE_CONQUISTA: Record<string, NomeIcone> = {
-  'primeira-sessao': 'estrela',
-  '10-sessoes': 'rotina',
-  '50-sessoes': 'mapa',
-  '100-sessoes': 'coroa',
-  '3-dias': 'raio',
-  '7-dias': 'diamante',
-  '30-dias': 'foguete',
-  '10-horas': 'relogio',
-  '100-num-dia': 'fogo',
-  '1000-cestas': 'bola',
-  'sequencia-10': 'floco',
-  'sequencia-25': 'metas',
-  'teste-fisico': 'frasco',
-}
+// Desbloqueada, a conquista ganha um sprite colorido só dela (IconeConquista); bloqueada, o cadeado.
 
 type Filtro = 'todas' | 'desbloqueadas' | 'bloqueadas'
 const FILTROS: { id: Filtro; rotulo: string }[] = [
@@ -71,8 +56,8 @@ export default function ListaConquistas({ conquistas }: { conquistas: Conquista[
       <ul className="conquistas">
         {visiveis.map((c) => (
           <li key={c.id} className={`conquista ${c.desbloqueada ? 'desbloqueada' : ''}`}>
-            <span className="conquista-icone">
-              <Icone nome={c.desbloqueada ? (ICONE_CONQUISTA[c.id] ?? 'medalha') : 'cadeado'} tamanho={34} />
+            <span className="conquista-icone" style={c.desbloqueada ? ({ '--fundo': fundoDaConquista(c.id) } as CSSProperties) : undefined}>
+              {!c.desbloqueada ? <Icone nome="cadeado" tamanho={34} /> : temSprite(c.id) ? <IconeConquista id={c.id} /> : <Icone nome="medalha" tamanho={34} />}
             </span>
             <div className="conquista-texto">
               <strong>{c.titulo}</strong>
