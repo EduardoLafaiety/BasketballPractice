@@ -1,18 +1,11 @@
 import { useMemo } from 'react'
-import { LADO, bolaPng } from '../components/bolaPixel'
+import { LADO, bolaModeloPng, type ModeloBola } from '../components/bolaPixel'
 import { ICONES_TIMES, type IconeTime } from './icones-times'
 
-// Bola em pixel art (o mesmo sprite da abertura), pintada nas cores do produto, com sombra no chão e o
-// nome impresso por cima. Não usa logos nem fotos da Amazon.
-
-/** Mistura a cor com branco (quanto > 0) ou preto (quanto < 0). */
-function tom(hex: string, quanto: number) {
-  const n = parseInt(hex.slice(1), 16)
-  const alvo = quanto > 0 ? 255 : 0
-  const canal = (c: number) => Math.round(c + (alvo - c) * Math.abs(quanto))
-  const r = canal(n >> 16), g = canal((n >> 8) & 255), b = canal(n & 255)
-  return `#${((r << 16) | (g << 8) | b).toString(16).padStart(6, '0')}`
-}
+// Bola em pixel art, redesenhada a partir do modelo de verdade: as bolas de time têm os gomos alternados nas
+// duas cores do time (como a Wilson NBA Team Tribute), as Molten têm a faixa clara ao longo das costuras, as
+// de rua têm o canal largo e as de couro, o grão. Nome e símbolo vão impressos no gomo da frente. Não usa
+// logos nem fotos da Amazon.
 
 /** Luminância relativa (WCAG) de uma cor #rrggbb. */
 function luminancia(hex: string) {
@@ -28,16 +21,43 @@ function tinta(cor: string, costura: string) {
   return luminancia(cor) > 0.3 ? '#111111' : '#FFFFFF'
 }
 
-// Do brilho à sombra: os seis tons do couro, a partir da cor do produto.
-const TONS = [0.5, 0.3, 0.12, 0, -0.28, -0.5]
+const ESCURA = '#141414'
+const CANAIS = [ESCURA, '#f4f2ea', '#8c8c8c']
+const contraste = (a: string, b: string) => {
+  const [x, y] = [luminancia(a), luminancia(b)].sort((m, n) => n - m)
+  return (x + 0.05) / (y + 0.05)
+}
+/** A cor do canal que aparece nos dois gomos: preto, a não ser que um deles já seja quase preto. */
+export function corDoCanal(gomos: readonly [string, string]) {
+  const pior = (canal: string) => Math.min(contraste(canal, gomos[0]), contraste(canal, gomos[1]))
+  return CANAIS.find((c) => pior(c) >= 1.6) ?? [...CANAIS].sort((a, b) => pior(b) - pior(a))[0]
+}
+
 // O sprite (40 × 40, raio 19) ocupa o círculo de centro (60, 60) e raio 52 do desenho.
 const ESCALA = 52 / 19
 const DESLOCA = 60 - (LADO / 2) * ESCALA
 
-export default function Bola({ cor, costura, nome, icone }: { cor: string; costura: string; nome: string; icone?: IconeTime }) {
+interface Props {
+  /** Cor principal e segunda cor: nas bolas de time, os gomos se alternam entre as duas. */
+  cor: string
+  costura: string
+  nome: string
+  icone?: IconeTime
+  /** Bola de time: gomos alternados em duas cores. */
+  duasCores?: boolean
+  canalLargo?: boolean
+  faixa?: string
+  grao?: boolean
+}
+
+export default function Bola({ cor, costura, nome, icone, duasCores, canalLargo, faixa, grao }: Props) {
   const impressao = tinta(cor, costura)
-  // Uma imagem por cor (e não centenas de retângulos de SVG por bola): a lista tem uma bola por time.
-  const sprite = useMemo(() => bolaPng(TONS.map((t) => tom(cor, t)), '#141414'), [cor])
+  // Uma imagem por modelo (e não centenas de retângulos de SVG por bola): a lista tem uma bola por time.
+  const sprite = useMemo(() => {
+    const gomos = [cor, duasCores ? costura : cor] as const
+    const modelo: ModeloBola = { gomos, costura: duasCores ? corDoCanal(gomos) : costura, canalLargo, faixa, grao }
+    return bolaModeloPng(modelo)
+  }, [cor, costura, duasCores, canalLargo, faixa, grao])
 
   return (
     <svg className="bola-desenho" viewBox="0 0 120 126" width="132" height="139" aria-hidden>

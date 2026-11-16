@@ -23,6 +23,10 @@ function CartaoProduto(p: {
   costura: string
   impresso: string
   icone?: IconeTime
+  duasCores?: boolean
+  canalLargo?: boolean
+  faixa?: string
+  grao?: boolean
   tag: string
   nome: string
   meta: string
@@ -39,7 +43,7 @@ function CartaoProduto(p: {
       rel="sponsored noopener noreferrer"
     >
       <span className="produto-vitrine">
-        <Bola cor={p.cor} costura={p.costura} nome={p.impresso} icone={p.icone} />
+        <Bola cor={p.cor} costura={p.costura} nome={p.impresso} icone={p.icone} duasCores={p.duasCores} canalLargo={p.canalLargo} faixa={p.faixa} grao={p.grao} />
       </span>
       <span className="tag">{p.tag}</span>
       <h3>{p.nome}</h3>
@@ -93,9 +97,10 @@ function Times() {
               costura={t.costura}
               impresso={t.nome}
               icone={t.icone}
+              duasCores
               tag={`${t.sigla} · ${t.conferencia === 'leste' ? 'Leste' : 'Oeste'}`}
               nome={`${t.cidade} ${t.nome}`}
-              meta="Bola nas cores do time"
+              meta="Gomos nas duas cores do time"
               detalhes={['Tamanho 7', 'Coleção NBA']}
               busca={buscaTime(t)}
             />
@@ -115,6 +120,9 @@ function Marcas() {
           cor={b.cor}
           costura={b.costura}
           impresso={b.marca}
+          canalLargo={b.canalLargo}
+          faixa={b.faixa}
+          grao={b.grao}
           tag={b.marca}
           nome={b.nome}
           meta={b.material}

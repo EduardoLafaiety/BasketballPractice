@@ -1,12 +1,11 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
-import App from './App'
+import App, { precarregarPaginas } from './App'
 import { AuthProvider } from './auth'
 import { iniciarPwa } from './lib/pwa'
 import { aplicarMovimento } from './lib/movimento'
 import { aplicarTema, temaSalvo } from './lib/tema'
-import { iniciarPixelArt } from './lib/pixelar'
 // Fontes servidas pelo próprio site: sem depender do Google Fonts e funcionando offline no PWA.
 import '@fontsource/jersey-10'
 import '@fontsource-variable/pixelify-sans'
@@ -19,8 +18,10 @@ const BASE = import.meta.env.BASE_URL.replace(/\/$/, '') || '/'
 // Tema da última visita, antes do primeiro render; o salvo na conta chega depois do login.
 aplicarTema(temaSalvo())
 aplicarMovimento()
-iniciarPixelArt()
 iniciarPwa()
+// Depois que a primeira tela está pronta e o navegador ocioso, busca o código das outras páginas.
+const quandoOcioso = window.requestIdleCallback ?? ((f: () => void) => setTimeout(f, 1500))
+window.addEventListener('load', () => quandoOcioso(precarregarPaginas), { once: true })
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

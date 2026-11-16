@@ -1,6 +1,7 @@
 // Conteúdo da aba Equipamentos: bolas de exemplo com link de afiliado da Amazon.
 // Os botões abrem a busca do produto na Amazon, onde ficam o preço, as fotos e a compra.
-// A Amazon não permite copiar preço nem imagem para cá; por isso a bola é desenhada nas cores do time.
+// A Amazon não permite copiar preço nem imagem para cá; por isso cada bola é redesenhada em pixel art
+// (equipamentos/Bola.tsx), seguindo o modelo de verdade: cores, gomos, faixas e canais.
 
 /** Tag do Programa de Associados da Amazon. Troque pela sua quando a conta for aprovada. */
 export const TAG_AFILIADO = 'seutag-20'
@@ -17,7 +18,7 @@ export interface Time {
   cidade: string
   nome: string
   conferencia: Conferencia
-  /** Cor da bola e cor das costuras. */
+  /** As duas cores do time: os gomos da bola se alternam entre elas (cor é a do gomo da frente). */
   cor: string
   costura: string
   /** Ícone próprio inspirado no nome do time (nunca o logo). */
@@ -33,6 +34,10 @@ export interface BolaMarca {
   material: string
   cor: string
   costura: string
+  /** O que distingue o modelo no desenho: canal largo (bola de rua), faixa clara nas costuras (Molten), grão do couro. */
+  canalLargo?: boolean
+  faixa?: string
+  grao?: boolean
   busca: string
 }
 
@@ -74,6 +79,8 @@ export const buscaTime = (t: Time) => `bola basquete ${t.cidade} ${t.nome} NBA`
 const LARANJA = '#D9661F'
 const COURO = '#A8521E'
 const ESCURO = '#1B1B1B'
+// A faixa clara que acompanha as costuras nas Molten (o desenho de 12 gomos).
+const CREME = '#F1E6D2'
 
 export const MARCAS: BolaMarca[] = [
   {
@@ -85,6 +92,7 @@ export const MARCAS: BolaMarca[] = [
     material: 'Couro',
     cor: COURO,
     costura: ESCURO,
+    grao: true,
     busca: 'bola Wilson NBA Official Game Ball',
   },
   {
@@ -96,6 +104,7 @@ export const MARCAS: BolaMarca[] = [
     material: 'Couro sintético',
     cor: '#7A3B1E',
     costura: ESCURO,
+    grao: true,
     busca: 'bola basquete Wilson Evolution',
   },
   {
@@ -118,6 +127,7 @@ export const MARCAS: BolaMarca[] = [
     material: 'Borracha',
     cor: '#E2752B',
     costura: ESCURO,
+    canalLargo: true,
     busca: 'bola basquete Wilson DRV Pro',
   },
   {
@@ -129,6 +139,7 @@ export const MARCAS: BolaMarca[] = [
     material: 'Couro sintético',
     cor: COURO,
     costura: ESCURO,
+    grao: true,
     busca: 'bola basquete Spalding TF-1000 Legacy',
   },
   {
@@ -151,6 +162,7 @@ export const MARCAS: BolaMarca[] = [
     material: 'Borracha',
     cor: '#E2752B',
     costura: ESCURO,
+    canalLargo: true,
     busca: 'bola basquete Spalding Street borracha',
   },
   {
@@ -161,7 +173,9 @@ export const MARCAS: BolaMarca[] = [
     uso: 'Quadra coberta',
     material: 'Couro sintético',
     cor: '#C9551D',
-    costura: '#F1E6D2',
+    costura: ESCURO,
+    faixa: CREME,
+    grao: true,
     busca: 'bola basquete Molten BG4500',
   },
   {
@@ -173,6 +187,7 @@ export const MARCAS: BolaMarca[] = [
     material: 'Borracha',
     cor: LARANJA,
     costura: ESCURO,
+    faixa: CREME,
     busca: 'bola basquete Molten GG7X',
   },
 ]

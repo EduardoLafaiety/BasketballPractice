@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type CSSProperties, type MouseEvent } from 'react'
+import { Suspense, useEffect, useRef, useState, type CSSProperties, type MouseEvent } from 'react'
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
 import { api, dataLocal } from '../api'
 import { useAuth } from '../auth'
@@ -10,6 +10,7 @@ import { vibrar } from '../lib/audio'
 import { diasAtras, useConfig } from '../store'
 import type { Config } from '../types'
 import Icone from './Icone'
+import { Carregando } from './Estado'
 import { LinksLegais } from './TelaAuth'
 
 const LINKS: { to: string; rotulo: string; fim?: boolean }[] = [
@@ -191,7 +192,9 @@ export default function Layout() {
       </div>
 
       <main className="conteudo" ref={conteudo}>
-        <Outlet />
+        <Suspense fallback={<Carregando />}>
+          <Outlet />
+        </Suspense>
       </main>
       <footer className="rodape"><LinksLegais /></footer>
 

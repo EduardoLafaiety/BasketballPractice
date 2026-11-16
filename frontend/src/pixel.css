@@ -28,7 +28,6 @@
   -moz-osx-font-smoothing: grayscale;
   font-smooth: never;
   text-rendering: optimizeSpeed;
-  image-rendering: pixelated;
 }
 @media (prefers-color-scheme: light) {
   :root:not([data-theme='dark']) { --sombra: 4px 4px 0 rgba(40, 34, 15, 0.28); --sombra-alta: 6px 6px 0 rgba(40, 34, 15, 0.36); }
@@ -50,10 +49,8 @@ a, button, .btn, .chip, .card, .input, .drill-card, .treino-linha, .nav-link, .d
    crispEdges deixa a rasterização várias vezes mais lenta (medido: quadros de 250 ms ao rolar Artigos). */
 .icone-svg { shape-rendering: crispEdges; }
 
-/* Fotos: lib/pixelar.ts redesenha cada uma em blocos e com poucas cores; aqui a ampliação fica em blocos.
-   A foto só aparece depois de passar por lá (data-pixel), para não piscar a versão lisa antes. */
-img { image-rendering: pixelated; }
-img:not([data-pixel]) { opacity: 0; }
+/* Fotos (jogadores, artigos, notícias, mapa) aparecem como são. Só os sprites desenhados em pixel (as bolas)
+   são ampliados em blocos, e cada um pede isso no próprio elemento. */
 
 /* Bordas com a espessura de um pixel do site. */
 .card, .btn, .input, .chip, .vazio { border-width: var(--px); }

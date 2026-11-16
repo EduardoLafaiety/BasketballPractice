@@ -42,8 +42,7 @@ test('escolhe um jogador pelo menu, vê o perfil e abre o exercício de um movim
   await irPara(page, 'Jogue como')
   await expect(page.getByRole('heading', { name: 'Jogue como', level: 1 })).toBeVisible()
   await expect(page.locator('.cartao-jogador')).toHaveCount(28)
-  // As fotos viram pixel art num Web Worker e o <img> troca de endereço um instante depois de carregar:
-  // espera todas assentarem em vez de ler uma vez só.
+  // As fotos carregam aos poucos: espera todas assentarem em vez de ler uma vez só.
   await expect.poll(() => fotosCarregadas(page), { timeout: 15_000 }).toBe(28)
 
   // Filtro por posição.

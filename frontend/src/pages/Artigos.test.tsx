@@ -48,7 +48,7 @@ describe('Artigos', () => {
     abrir('/artigos?categoria=sono')
     await userEvent.click(await screen.findByRole('link', { name: /Dormir mais acerta mais arremessos/ }))
 
-    expect(screen.getByRole('heading', { name: 'Dormir mais acerta mais arremessos', level: 1 })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: 'Dormir mais acerta mais arremessos', level: 1 })).toBeInTheDocument()
     const ciencia = screen.getByRole('complementary', { name: 'O que a ciência diz' })
     const estudo = within(ciencia).getByRole('link', { name: /Mah CD, Mah KE, Kezirian EJ, Dement WC\. Sleep, 2011/ })
     expect(estudo).toHaveAttribute('href', 'https://doi.org/10.5665/sleep.1132')
