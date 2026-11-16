@@ -97,37 +97,38 @@ describe('Backup', () => {
 
   it('depois de importar, as outras telas não mostram os dados antigos enquanto buscam os novos', async () => {
     const user = userEvent.setup()
-    let metas: object[] = []
-    let responderMetas: (() => void) | null = null
+    const conquista = (progress: number) => ({ id: 'primeira-sessao', title: 'Primeiro treino', description: 'Registre sua primeira sessão.', target: 1, progress, unlocked: progress >= 1 })
+    let importou = false
+    let responderProgresso: (() => void) | null = null
     definirToken('tk')
     apiFalsa({
       'GET /auth/me': usuarioFalso(),
       'GET /settings': configFalsa,
       'GET /exercises': [],
-      'GET /stats/progress': { streak: { current: 0, best: 0 }, achievements: [] },
-      'GET /tests/kinds': [],
-      'GET /tests': [],
-      // Depois da importação, a busca das metas espera o teste liberar.
-      'GET /goals': () => (metas.length ? new Promise((pronto) => (responderMetas = () => pronto(metas))) : metas),
+      // Depois da importação, a busca do progresso espera o teste liberar.
+      'GET /stats/progress': () =>
+        importou
+          ? new Promise((pronto) => (responderProgresso = () => pronto({ streak: { current: 1, best: 1 }, achievements: [conquista(1)] })))
+          : { streak: { current: 0, best: 0 }, achievements: [conquista(0)] },
       'POST /data/import': () => {
-        metas = [{ id: 1, title: 'Meta importada', kind: 'sessoes_total', target: 5, current: 0, achieved: false, exerciseId: null, exerciseName: null, deadline: null }]
-        return { created: { exercises: 0, workouts: 0, sessions: 0, goals: 1, physicalTests: 0 }, skipped: { sessions: 0, goals: 0, physicalTests: 0 } }
+        importou = true
+        return { created: { exercises: 0, workouts: 0, sessions: 1, goals: 0, physicalTests: 0 }, skipped: { sessions: 0, goals: 0, physicalTests: 0 } }
       },
     })
-    abrirApp('/metas')
-    expect(await screen.findByText(/Nenhuma meta ainda/)).toBeInTheDocument()
+    abrirApp('/conquistas')
+    expect(await screen.findByText('0/1')).toBeInTheDocument()
 
     await user.click(screen.getByRole('link', { name: 'Configurações' }))
     await user.upload(await waitFor(() => seletorDeArquivo()), arquivoJson('{"format":"basketball-practice","version":1}'))
     await screen.findByRole('status')
 
     await user.click(screen.getByRole('link', { name: /Conquistas/ }))
-    expect(await screen.findByText('Carregando metas')).toBeInTheDocument()
-    expect(screen.queryByText(/Nenhuma meta ainda/)).toBeNull()
+    expect(await screen.findByText('Calculando sua sequência')).toBeInTheDocument()
+    expect(screen.queryByText('0/1')).toBeNull()
 
-    await waitFor(() => expect(responderMetas).not.toBeNull())
-    responderMetas!()
-    expect(await screen.findByText('Meta importada')).toBeInTheDocument()
+    await waitFor(() => expect(responderProgresso).not.toBeNull())
+    responderProgresso!()
+    expect(await screen.findByText('Desbloqueada')).toBeInTheDocument()
   })
 
   it('recusa arquivo que não é JSON sem chamar a API', async () => {
