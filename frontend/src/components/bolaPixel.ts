@@ -64,20 +64,20 @@ export function pixelsDaBola(couro: readonly string[] = COURO, costura = COSTURA
   return dados
 }
 
-// --- Bolas de vitrine (Equipamentos): a mesma grade, vista como nas fotos de produto. A bola está virada de
-// modo que um gomo largo fica de frente (onde vão o nome e o símbolo), com a costura do meio caindo em arco
-// e as duas costuras curvas dos lados. Cada modelo guarda o que o distingue de verdade: gomos alternados em
-// duas cores (as bolas de time), a faixa clara ao longo das costuras (Molten), o canal largo (bola de rua) e
-// o grão do couro.
+// --- Bolas de vitrine (Equipamentos): a mesma grade, vista como nas fotos de produto das bolas de verdade
+// (Wilson NBA Team Tribute e as de marca). De frente, a bola aparece em quatro faixas separadas por três
+// canais: a calota de cima, a faixa da marca (onde vai "Wilson"), a faixa do logo e a calota de baixo. Nas
+// bolas de time as faixas se alternam em duas cores e o canal leva a cor de destaque. Cada modelo guarda
+// ainda o que o distingue: a faixa clara junto aos canais (Molten), o canal largo (bola de rua) e o grão.
 
 export interface ModeloBola {
-  /** Cor dos gomos: eles se alternam, como nas bolas de time em duas cores. Iguais = bola de uma cor só. */
+  /** Cor das faixas, que se alternam: [faixa do logo e calota de cima, faixa da marca e calota de baixo]. Iguais = bola de uma cor só. */
   gomos: readonly [string, string]
   /** Cor do canal entre os gomos. */
   costura: string
   /** Canal largo e fundo, das bolas de borracha para quadra de rua. */
   canalLargo?: boolean
-  /** Cor da faixa que acompanha as costuras curvas (o desenho de 12 gomos da Molten). */
+  /** Cor da faixa fina que acompanha os canais de cima e de baixo (o desenho de 12 gomos da Molten). */
   faixa?: string
   /** Grão do couro: os tons se misturam em pontilhado, em vez de faixas lisas. */
   grao?: boolean
@@ -98,44 +98,36 @@ export function tonsDoCouro(cor: string): string[] {
   })
 }
 
-/** Linha (em blocos) da costura do meio na coluna x: um arco, porque a bola está inclinada para a frente. */
-const arcoDoMeio = (x: number) => 22 + 4 * Math.sqrt(Math.max(0, 1 - ((x - CENTRO) / RAIO) ** 2))
+/** Linha (em blocos) de cada canal na coluna x: o de cima e o de baixo acompanham a curva da bola. */
+export const CANAL_DO_MEIO = 19
+const canais = (x: number) => {
+  const u = ((x - CENTRO) / RAIO) ** 2
+  return { cima: 6 + 5.5 * u, meio: CANAL_DO_MEIO, baixo: 34 - 5.5 * u }
+}
 
 export type ParteDaBola = { gomo: 0 | 1; tom: number } | { faixa: true; tom: number } | 'costura' | null
 
-/** O que há no bloco (coluna, linha) de uma bola de vitrine. */
+/** O que há no bloco (coluna, linha) de uma bola de vitrine. Gomo 0: faixa do logo e calota de cima; 1: as outras duas. */
 export function parteDoBloco(coluna: number, linha: number, modelo: Pick<ModeloBola, 'canalLargo' | 'faixa' | 'grao'> = {}): ParteDaBola {
   const x = coluna + 0.5
   const y = linha + 0.5
   if (Math.hypot(x - CENTRO, y - CENTRO) > RAIO) return null
-  const largura = modelo.canalLargo ? 1.5 : 1
-  const meio = arcoDoMeio(x)
-  if (Math.abs(y - meio) < largura) return 'costura'
-  // As curvas são espelhadas: mede no lado esquerdo.
-  const xe = x < CENTRO ? x : LADO - x
-  let perto = Infinity
-  let xDaCurva = -Infinity
-  let dy = Infinity
-  for (const [cx, cy] of pontosDaCurva) {
-    perto = Math.min(perto, Math.hypot(xe - cx, y - cy))
-    if (Math.abs(y - cy) < dy) {
-      dy = Math.abs(y - cy)
-      xDaCurva = cx
-    }
-  }
-  if (perto < 0.95 * largura) return 'costura'
-  const fora = dy < 1 && xe < xDaCurva
+  const largura = modelo.canalLargo ? 1.3 : 0.75
+  const { cima, meio, baixo } = canais(x)
+  if (Math.abs(y - cima) < largura || Math.abs(y - meio) < largura || Math.abs(y - baixo) < largura) return 'costura'
 
   const sombra = Math.hypot(x - LUZ.x, y - LUZ.y) / (0.8 * LADO)
   const pontilhado = modelo.grao ? (BAYER[((linha & 3) << 2) | (coluna & 3)] / 16 - 0.5) * 0.9 : 0
   const tom = Math.max(0, Math.min(TONS - 1, Math.floor(sombra * TONS + pontilhado)))
 
-  if (modelo.faixa && !fora) {
-    if (perto < 4) return { faixa: true, tom }
-    if (perto < 4.9) return 'costura'
+  if (modelo.faixa) {
+    // Por dentro dos canais de cima e de baixo: a faixa clara e um segundo canal fechando.
+    const dentro = Math.min(y - cima, baixo - y)
+    if (dentro > 0 && dentro < 2.6) return { faixa: true, tom }
+    if (dentro > 0 && dentro < 2.6 + largura * 1.4) return 'costura'
   }
-  const embaixo = y > meio
-  return { gomo: fora === embaixo ? 0 : 1, tom }
+  const gomo = y < cima ? 0 : y < meio ? 1 : y < baixo ? 0 : 1
+  return { gomo, tom }
 }
 
 /** Os pixels RGBA (LADO × LADO) da bola de vitrine do modelo. */

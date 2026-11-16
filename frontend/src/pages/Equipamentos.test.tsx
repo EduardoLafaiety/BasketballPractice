@@ -1,9 +1,8 @@
-import { screen, within } from '@testing-library/react'
+import { fireEvent, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import { definirToken } from '../api'
 import { TAG_AFILIADO, TIMES } from '../equipamentos/dados'
-import { corDoCanal } from '../equipamentos/Bola'
 import { ICONES_TIMES } from '../equipamentos/icones-times'
 import { apiFalsa, configFalsa, usuarioFalso } from '../test/api-falsa'
 import { abrirApp } from '../test/renderizar'
@@ -67,10 +66,33 @@ describe('Ícones dos times', () => {
   })
 })
 
-describe('cor do canal das bolas de time', () => {
-  it('é preta, a não ser que um dos gomos já seja quase preto', () => {
-    expect(corDoCanal(['#552583', '#FDB927'])).toBe('#141414')
-    expect(corDoCanal(['#CE1141', '#111111'])).not.toBe('#141414')
-    for (const t of TIMES) expect(corDoCanal([t.cor, t.costura])).toMatch(/^#[0-9a-f]{6}$/)
+describe('bolas de time: réplica da Wilson NBA Team Tribute', () => {
+  it('cada bola leva a marca e o logo do time, pequeno, para ser ampliado em blocos', async () => {
+    abrir('/equipamentos')
+    const lakers = await screen.findByRole('link', { name: /Los Angeles Lakers/ })
+    expect(lakers.querySelector('.bola-nome')).toHaveTextContent('Wilson')
+    const logo = lakers.querySelector('.bola-logo')!
+    // Faixa roxa (escura): logo na versão para fundo escuro.
+    expect(logo.getAttribute('href')).toBe('https://a.espncdn.com/combiner/i?img=/i/teamlogos/nba/500-dark/lal.png&h=22&w=22')
+    expect(logo).toHaveStyle({ imageRendering: 'pixelated' })
+    // A ESPN abrevia alguns times de outro jeito.
+    const jazz = screen.getByRole('link', { name: /Utah Jazz/ })
+    expect(jazz.querySelector('.bola-logo')!.getAttribute('href')).toContain('/utah.png')
+    expect(document.querySelectorAll('.bola-logo')).toHaveLength(TIMES.length)
+  })
+
+  it('se o logo não carregar, entra o ícone próprio do time', async () => {
+    abrir('/equipamentos')
+    const bulls = await screen.findByRole('link', { name: /Chicago Bulls/ })
+    fireEvent.error(bulls.querySelector('.bola-logo')!)
+    expect(bulls.querySelector('.bola-logo')).toBeNull()
+    expect(bulls.querySelector('svg g')).not.toBeNull()
+  })
+
+  it('as bolas de marca levam a marca e o nome do modelo, sem logo', async () => {
+    abrir('/equipamentos?aba=marcas')
+    const drv = await screen.findByRole('link', { name: /NBA DRV Pro/ })
+    expect([...drv.querySelectorAll('.bola-nome')].map((t) => t.textContent)).toEqual(['Wilson', 'DRV PRO'])
+    expect(document.querySelector('.bola-logo')).toBeNull()
   })
 })

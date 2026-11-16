@@ -1,14 +1,17 @@
-import { useState, type CSSProperties } from 'react'
+import { useState, type ComponentProps, type CSSProperties } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { buscaTime, linkAmazon, MARCAS, TIMES, type Conferencia } from '../equipamentos/dados'
-import Bola from '../equipamentos/Bola'
-import type { IconeTime } from '../equipamentos/icones-times'
+import Bola, { LADO_DO_LOGO } from '../equipamentos/Bola'
+import { logoPequeno } from '../nba/escudos'
 import Icone from '../components/Icone'
 
 const ABAS = [
   { id: 'times', rotulo: 'Times da NBA', resumo: `${TIMES.length} bolas nas cores de cada time` },
   { id: 'marcas', rotulo: 'Marcas', resumo: 'Wilson, Spalding e Molten' },
 ] as const
+
+// A faixa da marca é preta em quase todas as bolas de time.
+const FAIXA_PRETA = '#141414'
 
 type Aba = (typeof ABAS)[number]['id']
 
@@ -19,14 +22,9 @@ const CONFERENCIAS: { id: Conferencia | 'todas'; rotulo: string }[] = [
 ]
 
 function CartaoProduto(p: {
+  /** A cor do cartão e as da bola. */
   cor: string
-  costura: string
-  impresso: string
-  icone?: IconeTime
-  duasCores?: boolean
-  canalLargo?: boolean
-  faixa?: string
-  grao?: boolean
+  bola: ComponentProps<typeof Bola>
   tag: string
   nome: string
   meta: string
@@ -43,7 +41,7 @@ function CartaoProduto(p: {
       rel="sponsored noopener noreferrer"
     >
       <span className="produto-vitrine">
-        <Bola cor={p.cor} costura={p.costura} nome={p.impresso} icone={p.icone} duasCores={p.duasCores} canalLargo={p.canalLargo} faixa={p.faixa} grao={p.grao} />
+        <Bola {...p.bola} />
       </span>
       <span className="tag">{p.tag}</span>
       <h3>{p.nome}</h3>
@@ -94,13 +92,17 @@ function Times() {
             <CartaoProduto
               key={t.sigla}
               cor={t.cor}
-              costura={t.costura}
-              impresso={t.nome}
-              icone={t.icone}
-              duasCores
+              bola={{
+                frente: t.bola?.frente ?? t.cor,
+                faixa: t.bola?.faixa ?? FAIXA_PRETA,
+                canal: t.bola?.canal ?? t.costura,
+                marca: 'Wilson',
+                logo: logoPequeno(t.sigla, LADO_DO_LOGO),
+                icone: t.icone,
+              }}
               tag={`${t.sigla} · ${t.conferencia === 'leste' ? 'Leste' : 'Oeste'}`}
               nome={`${t.cidade} ${t.nome}`}
-              meta="Gomos nas duas cores do time"
+              meta="Wilson NBA Team Tribute"
               detalhes={['Tamanho 7', 'Coleção NBA']}
               busca={buscaTime(t)}
             />
@@ -118,11 +120,7 @@ function Marcas() {
         <CartaoProduto
           key={b.id}
           cor={b.cor}
-          costura={b.costura}
-          impresso={b.marca}
-          canalLargo={b.canalLargo}
-          faixa={b.faixa}
-          grao={b.grao}
+          bola={{ frente: b.cor, faixa: b.cor, canal: b.costura, marca: b.marca, modelo: b.modelo, canalLargo: b.canalLargo, faixaClara: b.faixa, grao: b.grao }}
           tag={b.marca}
           nome={b.nome}
           meta={b.material}
