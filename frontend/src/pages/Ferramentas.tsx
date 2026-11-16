@@ -1,4 +1,4 @@
-import type { CSSProperties } from 'react'
+import { useEffect, useRef, type CSSProperties } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import Calculadoras from '../ferramentas/Calculadoras'
 import Prancheta from '../ferramentas/Prancheta'
@@ -39,6 +39,17 @@ export default function Ferramentas() {
   const aba = (ABAS.find((a) => a.id === params.get('aba'))?.id ?? 'timer') as Aba
   const atual = ABAS.find((a) => a.id === aba)!
   const { config, salvar } = useConfig()
+  const posicao = ABAS.indexOf(atual) + 1
+  const dois = (n: number) => String(n).padStart(2, '0')
+
+  // No celular o inventário rola de lado: o espaço escolhido vem para a vista, sem mexer na rolagem da página.
+  const lista = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    const escolhida = lista.current?.querySelector<HTMLElement>('.ferr-aba.ativo')
+    if (!escolhida) return
+    const suave = document.documentElement.dataset.movimento !== 'reduzido'
+    lista.current?.scrollTo?.({ left: escolhida.offsetLeft - 20, behavior: suave ? 'smooth' : 'auto' })
+  }, [aba])
 
   return (
     <div className="pagina-larga faixa-escura ferramentas-palco">
@@ -47,39 +58,54 @@ export default function Ferramentas() {
         <h1>Ferramentas</h1>
       </header>
 
-      <div className="ferr-abas" role="tablist" aria-label="Ferramentas">
+      {/* A escolha é um inventário de jogo: um espaço por ferramenta, e o escolhido fica aceso. */}
+      <div className="ferr-abas" role="tablist" aria-label="Ferramentas" ref={lista}>
         {ABAS.map((a, i) => (
           <button
             key={a.id}
+            id={`ferr-aba-${a.id}`}
             role="tab"
             aria-selected={a.id === aba}
+            aria-controls="ferr-painel"
             className={`ferr-aba ${a.id === aba ? 'ativo' : ''}`}
             style={{ '--i': i } as CSSProperties}
             onClick={() => setParams({ aba: a.id }, { replace: true })}
           >
-            <span className="ferr-aba-num" aria-hidden>{String(i + 1).padStart(2, '0')}</span>
-            <Icone nome={a.icone} tamanho={16} />
-            {a.rotulo}
-            {a.id === 'video' && <span className="ferr-aba-selo">{a.resumo}</span>}
+            <span className="ferr-aba-num" aria-hidden>{dois(i + 1)}</span>
+            <span className="ferr-aba-icone" aria-hidden><Icone nome={a.icone} tamanho={24} /></span>
+            <span className="ferr-aba-nome">{a.rotulo}</span>
+            <span className={a.id === 'video' ? 'ferr-aba-selo' : 'ferr-aba-resumo'}>{a.resumo}</span>
           </button>
         ))}
       </div>
 
-      <p className="muted ferr-descricao">{atual.descricao}</p>
+      {/* A ferramenta abre numa janela: a barra de cima diz qual é, e o painel embaixo é ela. */}
+      <section className="ferr-janela" key={aba}>
+        <header className="ferr-janela-topo">
+          <span className="ferr-janela-icone" aria-hidden><Icone nome={atual.icone} tamanho={34} /></span>
+          <div className="ferr-janela-texto">
+            <strong>{atual.rotulo}</strong>
+            <p className="ferr-descricao">{atual.descricao}</p>
+          </div>
+          <span className="ferr-janela-conta" role="img" aria-label={`Ferramenta ${posicao} de ${ABAS.length}`}>
+            {dois(posicao)}<small>/{dois(ABAS.length)}</small>
+          </span>
+        </header>
 
-      <section className={`ferr-painel ${SEM_CARTAO.includes(aba) ? '' : 'card'}`} role="tabpanel">
-        {aba === 'timer' && <TimerIntervalos />}
-        {aba === 'arremessos' && <LancesLivres />}
-        {aba === 'metronomo' && (
-          <Metronomo
-            bpmInicial={config.metronomoBpm}
-            aoSalvarBpm={(bpm) => void salvar({ ...config, metronomoBpm: bpm }).catch((e: Error) => window.alert(e.message))}
-          />
-        )}
-        {aba === 'prancheta' && <Prancheta />}
-        {aba === 'quadras' && <Quadras />}
-        {aba === 'video' && <VideoIndisponivel />}
-        {aba === 'calculadoras' && <Calculadoras />}
+        <div id="ferr-painel" className={`ferr-painel ${SEM_CARTAO.includes(aba) ? '' : 'card'}`} role="tabpanel" aria-labelledby={`ferr-aba-${aba}`}>
+          {aba === 'timer' && <TimerIntervalos />}
+          {aba === 'arremessos' && <LancesLivres />}
+          {aba === 'metronomo' && (
+            <Metronomo
+              bpmInicial={config.metronomoBpm}
+              aoSalvarBpm={(bpm) => void salvar({ ...config, metronomoBpm: bpm }).catch((e: Error) => window.alert(e.message))}
+            />
+          )}
+          {aba === 'prancheta' && <Prancheta />}
+          {aba === 'quadras' && <Quadras />}
+          {aba === 'video' && <VideoIndisponivel />}
+          {aba === 'calculadoras' && <Calculadoras />}
+        </div>
       </section>
     </div>
   )

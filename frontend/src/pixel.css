@@ -104,12 +104,6 @@ hr { border: 0; border-top: var(--px) solid var(--borda); }
 ::selection { background: var(--laranja); color: #0b0b0b; }
 
 
-/* Sem texto inclinado: jogo 8 bits não gira letra. */
-.ferr-aba:hover { transform: translateY(calc(var(--px) * -1)); }
-.ferr-aba.ativo { transform: none; }
-@keyframes ferr-pula { 0% { transform: translateY(8px); } }
-@keyframes ferr-relevo { to { transform: translate(-2.5%, 3%) scale(1.07); } }
-
 /* Caixas de seleção e opções desenhadas em pixel. */
 input[type='checkbox'], input[type='radio'] {
   -webkit-appearance: none;
