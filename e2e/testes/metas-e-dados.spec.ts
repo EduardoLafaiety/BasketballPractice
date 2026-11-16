@@ -8,7 +8,7 @@ test('meta semanal criada na tela fica cumprida com a sessão de hoje (semana no
   const { token } = await novaConta(request)
   await entrarCom(page, token)
 
-  await page.goto('/metas')
+  await page.goto('/conquistas')
   await page.getByRole('button', { name: '+ Nova meta' }).click()
   await page.getByLabel('Tipo').selectOption({ label: 'Sessões por semana' })
   await page.getByLabel(/^Alvo/).fill('1')

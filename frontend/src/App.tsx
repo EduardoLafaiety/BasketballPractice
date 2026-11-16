@@ -49,7 +49,7 @@ const Convite = pagina(() => import('./pages/Convite'), 'default')
 const Times = pagina(() => import('./pages/Time'), 'default')
 const EntrarNoTime = pagina(() => import('./pages/Time'), 'EntrarNoTime')
 const TimeDetalhe = pagina(() => import('./pages/Time'), 'TimeDetalhe')
-const Metas = pagina(() => import('./pages/Metas'), 'default')
+const Conquistas = pagina(() => import('./pages/Conquistas'), 'default')
 const Ferramentas = pagina(() => import('./pages/Ferramentas'), 'default')
 const SessaoGuiada = pagina(() => import('./pages/SessaoGuiada'), 'default')
 const Configuracoes = pagina(() => import('./pages/Configuracoes'), 'default')
@@ -110,7 +110,9 @@ function Rotas() {
         <Route path="artigos" element={<Artigos />} />
         <Route path="artigos/:id" element={<ArtigoDetalhe />} />
         <Route path="desempenho" element={<Desempenho />} />
-        <Route path="metas" element={<Metas />} />
+        <Route path="conquistas" element={<Conquistas />} />
+        {/* A aba se chamava Metas: os links e favoritos antigos continuam funcionando. */}
+        <Route path="metas" element={<Navigate to="/conquistas" replace />} />
         <Route path="ferramentas" element={<Ferramentas />} />
         <Route path="configuracoes" element={<Configuracoes />} />
         <Route path="admin" element={<RequerAdmin senao={<NaoEncontrada />}><Admin /></RequerAdmin>} />

@@ -48,8 +48,9 @@ test('cadastro pelo formulário, ativação pelo e-mail, sair e entrar de novo v
 
   await page.getByLabel('Senha').fill(SENHA)
   await page.getByRole('button', { name: 'Entrar' }).click()
-  await expect(page).toHaveURL(/\/metas$/)
-  await expect(page.getByRole('heading', { name: 'Metas e conquistas' })).toBeVisible()
+  // O endereço antigo (/metas) leva para a aba Conquistas.
+  await expect(page).toHaveURL(/conquistas$/)
+  await expect(page.getByRole('heading', { name: 'Conquistas', level: 1 })).toBeVisible()
 })
 
 test('cadastrar um e-mail que já tem conta não revela isso na tela: o aviso vai para o dono', async ({ page, request }) => {

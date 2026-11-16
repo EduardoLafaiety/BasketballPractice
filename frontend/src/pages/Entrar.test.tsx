@@ -51,7 +51,7 @@ describe('Entrar', () => {
     await user.type(campo(/senha/i), 'senha-segura')
     await user.click(entrar)
 
-    expect(await screen.findByRole('heading', { name: 'Metas e conquistas' })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: 'Conquistas' })).toBeInTheDocument()
     expect(ultima('POST', '/auth/login')?.corpo).toEqual({ email: 'marina@example.com', password: 'senha-segura' })
     expect(tokenAtual()).toBe('tk-1')
     expect(screen.getByText('Marina')).toBeInTheDocument()

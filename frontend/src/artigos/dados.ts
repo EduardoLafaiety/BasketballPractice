@@ -355,7 +355,7 @@ export const ARTIGOS: Artigo[] = [
       },
     ],
     fontes: ['Dweck CS. Mindset: The New Psychology of Success. Random House, 2006.', 'Sisk VF, Burgoyne AP, Sun J, Butler JL, Macnamara BN. To what extent and under which circumstances are growth mind-sets important to academic achievement? Psychological Science, 2018.'],
-    noApp: { to: '/metas', rotulo: 'Criar uma meta' },
+    noApp: { to: '/conquistas', rotulo: 'Criar uma meta' },
   },
   {
     id: 'treino-deliberado',
@@ -481,7 +481,7 @@ export const ARTIGOS: Artigo[] = [
       'Locke EA, Latham GP. Building a practically useful theory of goal setting and task motivation: a 35-year odyssey. American Psychologist, 2002.',
       'Kingston KM, Hardy L. Effects of different types of goals on processes that support performance. The Sport Psychologist, 1997.',
     ],
-    noApp: { to: '/metas', rotulo: 'Criar uma meta' },
+    noApp: { to: '/conquistas', rotulo: 'Criar uma meta' },
   },
   {
     id: 'olhar-quieto',
