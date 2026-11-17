@@ -21,6 +21,8 @@ export default function Conquistas() {
   const total = lista.length
   const feitas = lista.filter((c) => c.desbloqueada).length
   const pct = total ? Math.round((feitas / total) * 100) : 0
+  const pontosTotal = lista.reduce((t, c) => t + c.pontos, 0)
+  const pontosFeitos = lista.filter((c) => c.desbloqueada).reduce((t, c) => t + c.pontos, 0)
   const contagem: Record<Filtro, number> = { todas: total, desbloqueadas: feitas, bloqueadas: total - feitas }
   const visiveis = ordenarConquistas(lista).filter((c) => filtro === 'todas' || (filtro === 'desbloqueadas') === c.desbloqueada)
 
@@ -42,6 +44,9 @@ export default function Conquistas() {
               <p className="muted">
                 <strong>{feitas}</strong> de <strong>{total}</strong> desbloqueadas ({pct}%)
               </p>
+              <p className="muted conquistas-pontos-total">
+                <strong>{pontosFeitos.toLocaleString('pt-BR')}</strong> de {pontosTotal.toLocaleString('pt-BR')} pontos
+              </p>
               <BarraProgresso valor={feitas} alvo={Math.max(1, total)} rotulo="Conquistas desbloqueadas" />
             </div>
           </div>
@@ -57,8 +62,9 @@ export default function Conquistas() {
           <ul className="conquistas">
             {visiveis.map((c) => (
               <li key={c.id} className={`conquista ${c.desbloqueada ? 'desbloqueada' : ''}`}>
-                <span className="conquista-icone" style={c.desbloqueada ? ({ '--fundo': fundoDaConquista(c.id) } as CSSProperties) : undefined}>
-                  {!c.desbloqueada ? <Icone nome="cadeado" tamanho={34} /> : temSprite(c.id) ? <IconeConquista id={c.id} /> : <Icone nome="medalha" tamanho={34} />}
+                {/* O ícone aparece sempre; bloqueada, fica apagado (cinza) e o cadeado vai ao lado. */}
+                <span className="conquista-icone" style={{ '--fundo': fundoDaConquista(c.id) } as CSSProperties}>
+                  {temSprite(c.id) ? <IconeConquista id={c.id} /> : <Icone nome="medalha" tamanho={34} />}
                 </span>
                 <div className="conquista-texto">
                   <strong>{c.titulo}</strong>
@@ -72,10 +78,14 @@ export default function Conquistas() {
                       Desbloqueada
                     </>
                   ) : (
-                    <span className="conquista-contagem">
-                      {c.progresso.toLocaleString('pt-BR')}/{c.alvo.toLocaleString('pt-BR')}
-                    </span>
+                    <>
+                      <Icone nome="cadeado" tamanho={18} />
+                      <span className="conquista-contagem">
+                        {c.progresso.toLocaleString('pt-BR')}/{c.alvo.toLocaleString('pt-BR')}
+                      </span>
+                    </>
                   )}
+                  <span className="conquista-pontos">{c.pontos} pts</span>
                 </span>
               </li>
             ))}

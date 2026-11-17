@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import type { Drill, Sessao } from '../types'
-import { atributos, conquistas, estatisticas, faixaDoOverall, ordenarConquistas, overall, pontosParaNota } from './calculos'
+import { atributos, conquistas, estatisticas, estiloDeJogador, faixaDaNota, faixaDoOverall, ordenarConquistas, overall, pontosParaNota } from './calculos'
+import { JOGADOR } from './JogadorPixel'
 
 const sessao = (dia: string, extra: Partial<Sessao> = {}): Sessao => ({
   id: dia + Math.random(),
@@ -116,5 +117,32 @@ describe('overall', () => {
     expect(faixaDoOverall(40)).toBe('Novato')
     expect(faixaDoOverall(66)).toBe('Rotação')
     expect(faixaDoOverall(99)).toBe('Superestrela')
+  })
+})
+
+describe('visual do overall', () => {
+  it('a cor da nota segue as faixas do jogo', () => {
+    expect([40, 50, 60, 70, 80, 90, 95, 99].map((n) => faixaDaNota(n).id)).toEqual(['novato', 'bronze', 'prata', 'ouro', 'esmeralda', 'ametista', 'diamante', 'rosa'])
+    expect(faixaDaNota(49).id).toBe('novato')
+    expect(faixaDaNota(94).id).toBe('ametista')
+  })
+
+  it('o estilo de jogador vem do atributo mais alto; sem destaque, fica em aberto', () => {
+    const base = atributos([], porId)
+    expect(estiloDeJogador(base)).toEqual({ build: 'Estilo em aberto', forte: undefined, fraco: undefined })
+    const treinado = atributos([sessao('2026-11-01', { entradas: [{ drillId: '2' }] })], porId)
+    const e = estiloDeJogador(treinado)
+    expect(e.build).toBe('Maratonista')
+    expect(e.forte?.id).toBe('condicionamento')
+    expect(e.fraco?.valor).toBe(40)
+  })
+
+  it('cada conquista rende pontos', () => {
+    expect(conquistas([]).every((c) => c.pontos > 0)).toBe(true)
+  })
+
+  it('o jogador em pixel tem todas as linhas do mesmo tamanho', () => {
+    expect(JOGADOR.every((l) => l.length === 16)).toBe(true)
+    expect(JOGADOR.length).toBe(20)
   })
 })
