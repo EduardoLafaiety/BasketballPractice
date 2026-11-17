@@ -27,6 +27,8 @@ const MEIO = DESLOCA + CANAL_DO_MEIO * ESCALA
 /** Lado do logo no desenho. Na tela são 44 px: o dobro dos 22 px pedidos, para cada ponto virar um bloco 2 × 2. */
 const LOGO = 30
 export const LADO_DO_LOGO = 22
+/** Contorno de um pixel do logo (1,4 do desenho = meio bloco do sprite), nos quatro lados. */
+const CONTORNO = ['1.4px 0', '-1.4px 0', '0 1.4px', '0 -1.4px'].map((d) => `drop-shadow(${d} 0 #fff)`).join(' ')
 
 interface Props {
   /** Cor da faixa do logo (e da calota de cima) e da faixa da marca (e da calota de baixo). */
@@ -42,12 +44,12 @@ interface Props {
   modelo?: string
   canalLargo?: boolean
   faixaClara?: string
-  /** Logo em uma cor só (silhueta na cor da tinta), para quando o logo do time se perde na cor da faixa. */
-  logoMono?: boolean
+  /** Contorno branco em volta do logo, para quando ele se perde na cor da faixa (logo vermelho em faixa vermelha). */
+  logoContorno?: boolean
   grao?: boolean
 }
 
-export default function Bola({ frente, faixa, canal, marca, logo, icone, modelo, canalLargo, faixaClara, grao, logoMono }: Props) {
+export default function Bola({ frente, faixa, canal, marca, logo, icone, modelo, canalLargo, faixaClara, grao, logoContorno }: Props) {
   const [semLogo, setSemLogo] = useState(false)
   // Uma imagem por modelo (e não centenas de retângulos de SVG por bola): a lista tem uma bola por time.
   const sprite = useMemo(
@@ -75,7 +77,7 @@ export default function Bola({ frente, faixa, canal, marca, logo, icone, modelo,
           y={centroDoLogo - LOGO / 2}
           width={LOGO}
           height={LOGO}
-          style={{ imageRendering: 'pixelated', filter: logoMono ? (tinta(frente) === '#141414' ? 'brightness(0)' : 'brightness(0) invert(1)') : undefined }}
+          style={{ imageRendering: 'pixelated', filter: logoContorno ? CONTORNO : undefined }}
           onError={() => setSemLogo(true)}
         />
       )}
