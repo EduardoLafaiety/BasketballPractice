@@ -24,6 +24,8 @@ const LINKS: { to: string; rotulo: string; fim?: boolean }[] = [
   { to: '/alimentacao', rotulo: 'Alimentação' },
   { to: '/equipamentos', rotulo: 'Equipamentos' },
   { to: '/artigos', rotulo: 'Artigos' },
+  { to: '/conquistas', rotulo: 'Conquistas' },
+  { to: '/overall', rotulo: 'Overall' },
 ]
 
 // Barra de baixo do celular: os atalhos ao alcance do polegar, com a bola de gerar treino no meio.
