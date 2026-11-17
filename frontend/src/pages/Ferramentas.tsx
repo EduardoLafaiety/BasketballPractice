@@ -1,4 +1,4 @@
-import { useEffect, useRef, type CSSProperties } from 'react'
+import { useEffect, useRef, type CSSProperties, type KeyboardEvent } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import Calculadoras from '../ferramentas/Calculadoras'
 import Prancheta from '../ferramentas/Prancheta'
@@ -51,6 +51,23 @@ export default function Ferramentas() {
     lista.current?.scrollTo?.({ left: escolhida.offsetLeft - 20, behavior: suave ? 'smooth' : 'auto' })
   }, [aba])
 
+  const abrir = (id: Aba) => setParams({ aba: id }, { replace: true })
+
+  // Setas, Home e End trocam de ferramenta, como numa lista de abas.
+  function teclar(e: KeyboardEvent<HTMLButtonElement>) {
+    const i = ABAS.indexOf(atual)
+    const destino =
+      e.key === 'ArrowRight' || e.key === 'ArrowDown' ? (i + 1) % ABAS.length
+      : e.key === 'ArrowLeft' || e.key === 'ArrowUp' ? (i - 1 + ABAS.length) % ABAS.length
+      : e.key === 'Home' ? 0
+      : e.key === 'End' ? ABAS.length - 1
+      : -1
+    if (destino < 0) return
+    e.preventDefault()
+    abrir(ABAS[destino].id)
+    document.getElementById(`ferr-aba-${ABAS[destino].id}`)?.focus()
+  }
+
   return (
     <div className="pagina-larga faixa-escura ferramentas-palco">
       <header className="ferr-cabeca">
@@ -67,9 +84,11 @@ export default function Ferramentas() {
             role="tab"
             aria-selected={a.id === aba}
             aria-controls="ferr-painel"
+            tabIndex={a.id === aba ? 0 : -1}
+            onKeyDown={teclar}
             className={`ferr-aba ${a.id === aba ? 'ativo' : ''}`}
             style={{ '--i': i } as CSSProperties}
-            onClick={() => setParams({ aba: a.id }, { replace: true })}
+            onClick={() => abrir(a.id)}
           >
             <span className="ferr-aba-num" aria-hidden>{dois(i + 1)}</span>
             <span className="ferr-aba-icone" aria-hidden><Icone nome={a.icone} tamanho={24} /></span>

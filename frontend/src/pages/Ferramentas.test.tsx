@@ -107,6 +107,25 @@ describe('Ferramentas: abas', () => {
     expect(screen.getByRole('tabpanel')).not.toHaveClass('card')
   })
 
+  it('troca de ferramenta pelas setas, Home e End, e só a aba atual entra na ordem do Tab', async () => {
+    const user = userEvent.setup()
+    abrirFerramentas(null)
+    await screen.findByRole('button', { name: 'Iniciar' })
+    expect(aba(/Timer de intervalos/)).toHaveAttribute('tabindex', '0')
+    expect(aba(/Metrônomo/)).toHaveAttribute('tabindex', '-1')
+
+    aba(/Timer de intervalos/).focus()
+    await user.keyboard('{ArrowRight}')
+    expect(aba(/Contador de arremessos/)).toHaveAttribute('aria-selected', 'true')
+    expect(aba(/Contador de arremessos/)).toHaveFocus()
+    await user.keyboard('{End}')
+    expect(aba(/Calculadoras/)).toHaveAttribute('aria-selected', 'true')
+    await user.keyboard('{ArrowRight}')
+    expect(aba(/Timer de intervalos/)).toHaveAttribute('aria-selected', 'true')
+    await user.keyboard('{ArrowLeft}')
+    expect(aba(/Calculadoras/)).toHaveFocus()
+  })
+
   it('aba desconhecida mostra o timer', async () => {
     abrirFerramentas('nada')
     expect(await screen.findByRole('button', { name: 'Iniciar' })).toBeInTheDocument()
