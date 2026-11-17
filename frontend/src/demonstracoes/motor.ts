@@ -445,6 +445,12 @@ export interface Instante {
   bola2: PontoBola | null
   px?: number
   solo: number
+  /** Giro do corpo de -1 a 1 (cosseno do ângulo de virada): o visualizador 3D desfaz o espelho e gira de verdade. */
+  giro: number
+  /** Faixa lateral do atleta na cena, de -1 a 1 (a mesma das pegadas). */
+  prof: number
+  /** A pose interpolada (ângulos) neste instante. */
+  pose: Pose
 }
 
 /** O índice do quadro "de verdade" (não de passagem) mais próximo, para trás ou para a frente. */
@@ -559,6 +565,9 @@ export function instante(anim: Animacao, t: number): Instante {
     bola2: bolaEm('bola2'),
     px: a.px !== undefined && b.px !== undefined ? lerp(a.px, b.px) : undefined,
     solo,
+    giro,
+    prof: lerp(a.prof, b.prof),
+    pose,
   }
 }
 
