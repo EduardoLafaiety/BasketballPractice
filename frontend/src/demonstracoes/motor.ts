@@ -36,6 +36,14 @@ export type Bola =
 
 export type Musculo = 'pF' | 'pT' | 'bP' | 'bL'
 
+/**
+ * Profundidade em 3D (metros) do que a vista plana não mostra: de lado, o eixo para quem assiste (+ = lado perto,
+ * o das mãos/pernas P e F); de frente, o eixo para a frente do atleta (+ = à frente do corpo, − = atrás das costas).
+ * Vale da pose em diante, até outra pose mudar; null volta ao padrão (o 3D decide sozinho).
+ */
+export type CanalZ = 'bola' | 'bola2' | 'maoP' | 'maoL'
+export type Z3 = Partial<Record<CanalZ, number>>
+
 export interface Quadro extends Partial<Pose> {
   /** Duração (ms) para chegar nesta pose a partir da anterior. */
   d: number
@@ -61,6 +69,13 @@ export interface Quadro extends Partial<Pose> {
   chave?: boolean
   /** Pose de passagem só do corpo (o meio de uma passada): a bola, os músculos e as pegadas a ignoram. */
   entre?: boolean
+  /** Profundidade 3D da bola e das mãos (ver CanalZ). */
+  z3?: Partial<Record<CanalZ, number | null>>
+  /**
+   * Quem segura a bola (a primeira) no 3D, quando o desenho plano não deixa saber (por trás das costas, entre as
+   * pernas): a mão vai até a bola mesmo longe dela no desenho. Vale até outra pose mudar; null volta ao padrão.
+   */
+  segura?: 'P' | 'L' | 'PL' | 'nenhuma' | { P: number; L: number } | null
 }
 
 export interface Fase {
@@ -204,6 +219,15 @@ export interface Chave {
   vooBola?: { inicio: number; fim: number }
   vooBola2?: { inicio: number; fim: number }
   entre: boolean
+  /** Profundidade 3D já herdada das poses anteriores. */
+  z3: Z3
+  /** Peso de cada mão segurando a bola (herdado), quando a coreografia diz. */
+  segura?: { P: number; L: number }
+  /**
+   * Ângulo acumulado da virada (rad): cada troca de lado soma meia volta, sempre no mesmo sentido. Assim um giro
+   * (vira e volta) dá a volta inteira, em vez de "desvirar" pelo mesmo caminho.
+   */
+  angulo: number
   /** Inclinação da curva em cada canal (por ms), para atravessar a pose sem frear. */
   tan: Record<Canal, number>
   /** Tornozelos plantados no chão nesta pose (posição na cena), para travar o pé de apoio. */
@@ -255,6 +279,13 @@ export function preparar(c: Coreografia): Animacao {
       hl: q.hl ?? [],
       px: q.px ?? chaves.at(-1)?.px ?? c.cena.parceiro?.x,
       entre: !!q.entre,
+      z3: herdarZ3(chaves.at(-1)?.z3, q.z3),
+      angulo: (() => {
+        const antes = chaves.at(-1)
+        if (!antes) return dir === 1 ? 0 : Math.PI
+        return antes.dir === dir ? antes.angulo : antes.angulo + Math.PI
+      })(),
+      segura: q.segura === null ? undefined : typeof q.segura === 'object' ? q.segura : q.segura ? { P: q.segura.includes('P') ? 1 : 0, L: q.segura.includes('L') ? 1 : 0 } : chaves.at(-1)?.segura,
       tan: {} as Record<Canal, number>,
       apoio: { F: null, T: null },
     })
@@ -336,6 +367,30 @@ function hermite(a: Chave, b: Chave, c: Canal, u: number) {
   const u2 = u * u
   const u3 = u2 * u
   return (2 * u3 - 3 * u2 + 1) * valor(a, c) + (u3 - 2 * u2 + u) * b.d * a.tan[c] + (-2 * u3 + 3 * u2) * valor(b, c) + (u3 - u2) * b.d * b.tan[c]
+}
+
+function herdarZ3(antes: Z3 | undefined, agora: Quadro['z3']): Z3 {
+  const z: Z3 = { ...(antes ?? {}) }
+  for (const [k, v] of Object.entries(agora ?? {}) as [CanalZ, number | null][]) {
+    if (v === null) delete z[k]
+    else z[k] = v
+  }
+  return z
+}
+
+/** Curva de Catmull-Rom: passa por p1 em u = 0 e por p2 em u = 1 sem frear, com a direção dada pelos vizinhos. */
+export function catmull(p0: number, p1: number, p2: number, p3: number, u: number) {
+  const u2 = u * u
+  const u3 = u2 * u
+  return 0.5 * (2 * p1 + (-p0 + p2) * u + (2 * p0 - 5 * p1 + 4 * p2 - p3) * u2 + (-p0 + 3 * p1 - 3 * p2 + p3) * u3)
+}
+
+/** Parâmetro com arranque e chegada suaves só nas pontas de uma sequência (no meio, tempo uniforme). */
+function pontas(u: number, comeca: boolean, termina: boolean) {
+  if (comeca && termina) return u * u * (3 - 2 * u)
+  if (comeca) return u * u * (2 - u)
+  if (termina) return 1 - (1 - u) * (1 - u) * (1 + u)
+  return u
 }
 
 function pick(q: Quadro): Partial<Pose> {
@@ -430,6 +485,8 @@ export function quedaComQuiques(tau: number, altura: number) {
 }
 
 export interface PontoBola extends Ponto {
+  /** Bola em voo (arremesso, passe, caindo da rede): nenhuma mão a segura, mesmo passando perto. */
+  voando?: boolean
   /** Giro (graus): a bola rola conforme anda, com efeito para trás no arremesso. */
   giro: number
   /** Achatamento ao bater no chão: 1 = redonda. */
@@ -445,6 +502,21 @@ export interface Instante {
   bola2: PontoBola | null
   px?: number
   solo: number
+  /** Virada contínua de -1 a 1 (sem o limite de 0,3 do desenho plano). */
+  virada: number
+  /** Ângulo acumulado da virada (rad): o 3D gira o corpo por ele (0 = olhando para a direita da cena). */
+  angulo: number
+  /** Profundidade 3D da bola e das mãos neste instante (só os canais definidos na coreografia). */
+  z3: Z3
+  /**
+   * Quanto vale a profundidade da coreografia (0 a 1) contra a padrão: quando só uma das poses vizinhas define o
+   * canal, a passagem é gradual, sem salto.
+   */
+  z3peso: Z3
+  /** Peso de cada mão segurando a bola, quando a coreografia diz (senão o 3D decide pela distância). */
+  segura?: { P: number; L: number }
+  /** Quanto vale o "segura" da coreografia (0 a 1) contra a distância, na passagem entre poses com e sem ele. */
+  seguraPeso: number
   /** Giro do corpo de -1 a 1 (cosseno do ângulo de virada): o visualizador 3D desfaz o espelho e gira de verdade. */
   giro: number
   /** Faixa lateral do atleta na cena, de -1 a 1 (a mesma das pegadas). */
@@ -479,8 +551,10 @@ export function instante(anim: Animacao, t: number): Instante {
   const ar = Math.max(0, hermite(a, b, 'ar', u))
   // Virada: o corpo afina na horizontal enquanto gira, em vez de espelhar de repente.
   let giro: number = b.dir
+  let virada: number = b.dir
   if (a.dir !== b.dir && !anim.frente) {
     const s = lerp(a.dir, b.dir)
+    virada = s
     giro = Math.sign(s || b.dir) * Math.max(0.3, Math.abs(s))
   }
   const dir = (giro < 0 ? -1 : 1) as 1 | -1
@@ -539,6 +613,7 @@ export function instante(anim: Animacao, t: number): Instante {
       return pronta(p, q.d > 0.97 ? 0.82 : 1)
     }
     if (y?.m === 'voo') {
+      const voando = (p: PontoBola | null) => (p ? { ...p, voando: true } : null)
       // Em voo o tempo corre uniforme: a parábola sai sem frear e chega sem frear.
       const voo = qual === 'bola' ? bb.vooBola : bb.vooBola2
       const pa = x?.m === 'voo' && mesmoVoo(x, y) ? x.p : 0
@@ -547,18 +622,71 @@ export function instante(anim: Animacao, t: number): Instante {
         const aro = ARO[anim.frente ? 'frente' : 'lado']
         const topo = aro.y + 6
         const queda = quedaComQuiques(t - voo.fim, chao - topo)
-        return pronta({ x: aro.x, y: topo + queda.caiu }, queda.noChao ? 0.85 : 1)
+        return voando(pronta({ x: aro.x, y: topo + queda.caiu }, queda.noChao ? 0.85 : 1))
       }
-      return pronta(posicaoBola(anim, { ...y, p: Math.max(0, Math.min(1, p)) }, e, ctx, qual))
+      // Chegando à mão (recepção), a bola volta a poder ser segurada no fim do voo.
+      // Na recepção, as mãos vão ao encontro da bola no último trecho do voo (pela distância no desenho).
+      const noAr = y.para === 'mao' || y.para === 'maoCima' ? p < 0.6 : true
+      const ponto = pronta(posicaoBola(anim, { ...y, p: Math.max(0, Math.min(1, p)) }, e, ctx, qual))
+      return noAr ? voando(ponto) : ponto
+    }
+    // Bola passando de ponto em ponto (em volta do corpo, entre as pernas...): curva contínua, sem parar em cada ponto.
+    if (x?.m === 'em' && y?.m === 'em') {
+      const antes = ks[vizinho(ks, Math.max(0, ia - 1), -1)]
+      const depois = ks[vizinho(ks, Math.min(ks.length - 1, ib + 1), 1)]
+      const p0 = antes !== ba && antes[qual]?.m === 'em' ? (antes[qual] as { x: number; y: number }) : null
+      const p3 = depois !== bb && depois[qual]?.m === 'em' ? (depois[qual] as { x: number; y: number }) : null
+      const w = pontas(ub, !p0, !p3)
+      // A curva não passa do chão (a curva de Catmull-Rom pode passar um pouco dos pontos).
+      return pronta({
+        x: catmull(p0?.x ?? x.x, x.x, y.x, p3?.x ?? y.x, w),
+        y: Math.min(chao, catmull(p0?.y ?? x.y, x.y, y.y, p3?.y ?? y.y, w)),
+      })
     }
     const pa = posicaoBola(anim, x, e, { ...ctx, inicioBola: ba.inicioBola, inicioBola2: ba.inicioBola2 }, qual)
     const pb = posicaoBola(anim, y, e, ctx, qual)
     if (!pa || !pb) return pronta(kb < 0.5 ? pa : pb)
     return pronta({ x: lerp(pa.x, pb.x, kb), y: lerp(pa.y, pb.y, kb) })
   }
+  // Profundidade 3D: a da bola segue os quadros de verdade (como a bola); a das mãos, todas as poses.
+  const z3: Z3 = {}
+  const z3peso: Z3 = {}
+  const canalZ = (c: CanalZ, i0: number, i1: number, uu: number, real: boolean) => {
+    const A = ks[i0].z3[c]
+    const B = ks[i1].z3[c]
+    if (A === undefined && B === undefined) return
+    if (A === undefined || B === undefined) {
+      z3[c] = (A ?? B)!
+      const s = uu * uu * (3 - 2 * uu)
+      z3peso[c] = A === undefined ? s : 1 - s
+      return
+    }
+    z3peso[c] = 1
+    const ant = real ? ks[vizinho(ks, Math.max(0, i0 - 1), -1)] : ks[Math.max(0, i0 - 1)]
+    const dep = real ? ks[vizinho(ks, Math.min(ks.length - 1, i1 + 1), 1)] : ks[Math.min(ks.length - 1, i1 + 1)]
+    const p0 = ant !== ks[i0] ? ant.z3[c] : undefined
+    const p3 = dep !== ks[i1] ? dep.z3[c] : undefined
+    z3[c] = catmull(p0 ?? A, A, B, p3 ?? B, pontas(uu, p0 === undefined, p3 === undefined))
+  }
+  canalZ('bola', ia, ib, ub, true)
+  canalZ('bola2', ia, ib, ub, true)
+  canalZ('maoP', i, Math.min(i + 1, ks.length - 1), u, false)
+  canalZ('maoL', i, Math.min(i + 1, ks.length - 1), u, false)
+
+  const sa = ba.segura
+  const sb = bb.segura
+  const segura = sa && sb ? { P: lerp(sa.P, sb.P, kb), L: lerp(sa.L, sb.L, kb) } : (sa ?? sb)
+  const seguraPeso = sa && sb ? 1 : sb ? kb : sa ? 1 - kb : 0
+
   return {
     e,
     dir,
+    virada,
+    angulo: anim.frente ? 0 : a.angulo + (b.angulo - a.angulo) * k,
+    z3,
+    z3peso,
+    segura,
+    seguraPeso,
     fase: faseEm(anim, t),
     hl: ub > 0 ? bb.hl : ba.hl,
     bola: bolaEm('bola'),

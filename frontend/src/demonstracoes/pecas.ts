@@ -258,15 +258,74 @@ export function trocar(para: Lado, { x = 340, y = 293 } = {}): Q[] {
   ]
 }
 
-/** Bola em volta do corpo: direita, frente, esquerda e de volta ao centro, na altura y. */
-export function emVolta(y: number, raio: number, { vezes = 2, x = 340, d = 240, baixo = false, alto = false }: { vezes?: number; x?: number; d?: number; baixo?: boolean; alto?: boolean } = {}): Q[] {
+/**
+ * Bola em volta do corpo (cintura, cabeça ou joelhos), passando de verdade por trás. Oito pontos por volta, cada um
+ * com a profundidade 3D (z3: + à frente, − atrás) e a mão que segura: no sentido 1, a mão direita (da tela) leva a
+ * bola pela frente e pelo lado até as costas; ali a outra pega e a traz de volta pela frente. A bola não para em cada
+ * ponto: o motor passa por eles numa curva contínua (um círculo de verdade, visto de cima).
+ */
+export function emVolta(
+  y: number,
+  raio: number,
+  { vezes = 2, x = 340, d = 240, baixo = false, alto = false, sentido = 1 }: { vezes?: number; x?: number; d?: number; baixo?: boolean; alto?: boolean; sentido?: 1 | -1 } = {},
+): Q[] {
   const dir: P = alto ? { bP: 140, aP: 170, bL: -165, aL: -100 } : baixo ? { bP: 15, aP: 25, bL: 5, aL: 40 } : { bP: 40, aP: 75, bL: 15, aL: 75 }
   const esq: P = alto ? { bP: 165, aP: 100, bL: -140, aL: -170 } : baixo ? { bP: -5, aP: -40, bL: -15, aL: -25 } : { bP: -15, aP: -75, bL: -40, aL: -75 }
   const meio: P = alto ? { bP: 170, aP: 200, bL: -170, aL: -200 } : baixo ? { bP: 10, aP: -10, bL: -10, aL: 10 } : { bP: 25, aP: -40, bL: -25, aL: 40 }
-  return ciclo([
-    { x, pe: 'M', ...dir, bola: em(x + raio, y) },
-    { x, pe: 'M', ...meio, bola: em(x, y + 3) },
-    { x, pe: 'M', ...esq, bola: em(x - raio, y) },
-    { x, pe: 'M', ...meio, bola: em(x, y - 3) },
-  ], vezes, d)
+  // Distância da bola ao eixo do corpo, para a frente e para trás: tronco (ou cabeça, ou joelhos) + raio da bola + folga.
+  // Nos joelhos, o círculo fica em volta deles (que vão à frente do quadril no agachamento), não em volta da cintura.
+  const fundo = alto ? 0.27 : baixo ? 0.22 : 0.31
+  const centro = baixo ? 0.07 : 0
+  // 90 = frente, 0 = lado direito da tela, -90 = costas.
+  const angulos = [90, 45, 0, -45, -90, -135, 180, 135].map((a) => (sentido === 1 ? a : 180 - a))
+  const ponto = (a: number): Q => {
+    const r = (a * Math.PI) / 180
+    const lat = Math.cos(r)
+    const lado = lat > 0.25 ? 'P' : lat < -0.25 ? 'L' : 'PL'
+    // As duas mãos dividem a bola na frente e nas costas; a que vai receber já se aproxima no caminho.
+    const peso = (v: number) => Math.round(Math.max(0, Math.min(1, (v + 0.85) / 1.2)) * 100) / 100
+    return {
+      d: d / 2,
+      x,
+      pe: 'M',
+      ...(lado === 'P' ? dir : lado === 'L' ? esq : meio),
+      bola: em(Math.round(x + raio * lat), y),
+      z3: { bola: Math.round((centro + Math.sin(r) * fundo) * 1000) / 1000 },
+      segura: { P: peso(lat), L: peso(-lat) },
+    }
+  }
+  const quadros: Q[] = []
+  for (let v = 0; v < vezes; v++) for (const a of angulos) quadros.push(ponto(a))
+  quadros.push(ponto(90))
+  return quadros
+}
+
+/**
+ * Oito entre as pernas: a bola contorna uma perna, passa por entre elas, contorna a outra e volta a passar por entre
+ * elas. É uma lemniscata vista de cima (lado = sen s, profundidade = sen 2s): no meio ela está entre os joelhos, nos
+ * lados, por fora das pernas, à frente e atrás. A mão direita leva a volta da direita; a esquerda, a da esquerda.
+ */
+export function oito(y: number, { vezes = 3, x = 340, largura = 44, fundo = 0.3, d = 170 }: { vezes?: number; x?: number; largura?: number; fundo?: number; d?: number } = {}): Q[] {
+  const centro: P = { bP: 8, aP: -15, bL: -8, aL: 15 }
+  const direita: P = { bP: 28, aP: 10, bL: -8, aL: 0 }
+  const esquerda: P = { bP: 8, aP: 0, bL: -28, aL: -10 }
+  const ponto = (k: number): Q => {
+    const s = (k * Math.PI) / 4
+    const lat = Math.sin(s)
+    const lado = k % 4 === 0 ? 'PL' : k % 8 < 4 ? 'P' : 'L'
+    const peso = (v: number) => Math.round(Math.max(0, Math.min(1, (v + 0.85) / 1.2)) * 100) / 100
+    return {
+      d,
+      x,
+      pe: 'M',
+      ...(lado === 'P' ? direita : lado === 'L' ? esquerda : centro),
+      bola: em(Math.round(x + largura * lat), y + (k % 4 === 0 ? 3 : 0)),
+      z3: { bola: Math.round((0.17 + Math.sin(2 * s) * fundo) * 1000) / 1000 },
+      segura: { P: peso(lat), L: peso(-lat) },
+    }
+  }
+  const quadros: Q[] = []
+  for (let v = 0; v < vezes; v++) for (let k = 0; k < 8; k++) quadros.push(ponto(k))
+  quadros.push(ponto(0))
+  return quadros
 }

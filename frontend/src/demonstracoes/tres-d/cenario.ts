@@ -3,8 +3,8 @@ import * as THREE from 'three'
 import { Line2 } from 'three/examples/jsm/lines/Line2.js'
 import { LineGeometry } from 'three/examples/jsm/lines/LineGeometry.js'
 import { LineMaterial } from 'three/examples/jsm/lines/LineMaterial.js'
-import { ESCALA, MEDIDAS, corpoNoInstante, type V3 } from '../corpo3d'
-import { ARO, instante, pegadas, type Animacao } from '../motor'
+import { ESCALA, MEDIDAS, corpoNoTempo, type V3 } from '../corpo3d'
+import { ARO, pegadas, type Animacao } from '../motor'
 
 const DEG = Math.PI / 180
 
@@ -330,8 +330,7 @@ export class Cenario {
       { cor: 0xa8f0b8, pontos: [] },
     ]
     for (let t = 0; t <= this.anim.total; t += 30) {
-      const inst = instante(this.anim, t)
-      const c = corpoNoInstante(inst, this.anim.frente, this.anim.coreografia.cena)
+      const c = corpoNoTempo(this.anim, t, this.anim.coreografia.cena)
       const add = (i: number, p: V3 | undefined) => p && series[i].pontos.push(p.x, p.y, p.z)
       add(0, c.braco.P.ponta)
       add(1, c.braco.L.ponta)

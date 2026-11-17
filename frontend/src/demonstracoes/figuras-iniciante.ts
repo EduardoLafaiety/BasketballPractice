@@ -1,7 +1,7 @@
 // Figuras do nível iniciante: controle de bola e a forma certa de arremessar.
 import type { Coreografia } from './motor'
 import {
-  AGACHA, ANDA_A, armar, ARMAR, arremessoParado, ATERRISSA, BASE, CARGA, carga, ciclo, DEFESA, em, emVolta, EM_PE, ex, F_BASE, F_DEFESA, F_PE, F_SOLTOS,
+  AGACHA, ANDA_A, armar, ARMAR, arremessoParado, ATERRISSA, BASE, CARGA, carga, ciclo, DEFESA, em, emVolta, oito, EM_PE, ex, F_BASE, F_DEFESA, F_PE, F_SOLTOS,
   FINAL, mao, MAO_LIVRE, passadas, passe, passoDois, passoUm, PEITO, PERNAS, PRONTO, quiques, receber, SALTO, SOLTAR, SOLTOS, soltura, subidaBandeja, trecho, trocar, voo,
 } from './pecas'
 
@@ -24,25 +24,20 @@ export const FIGURAS_INICIANTE: Record<string, Coreografia> = {
   'Bola ao redor da cintura': ex('frente', {}, [
     ['Postura', 'Em pé, joelhos levemente flexionados e olhar para a frente.', [{ x: 340, pe: 'M', ...F_PE, cF: 12, cT: -12, bP: 25, aP: -40, bL: -25, aL: 40, bola: em(340, 228) }]],
     ['Em volta', 'Passe a bola de uma mão para a outra pelas costas, sem deixar cair.', emVolta(228, 30)],
-    ['Inverta', 'Depois de algumas voltas, gire no sentido contrário e acelere aos poucos.', emVolta(228, 30, { d: 180 })],
+    ['Inverta', 'Depois de algumas voltas, gire no sentido contrário e acelere aos poucos.', emVolta(228, 30, { d: 180, sentido: -1 })],
   ]),
   'Bola ao redor da cabeça': ex('frente', {}, [
     ['Bola no alto', 'Leve a bola acima da testa, com as duas mãos.', [{ x: 340, pe: 'M', ...F_PE, cF: 12, cT: -12, bP: 170, aP: 200, bL: -170, aL: -200, bola: em(340, 142) }]],
     ['Em volta da cabeça', 'Passe a bola por trás da nuca, de uma mão para a outra, com o queixo reto.', emVolta(150, 28, { alto: true, d: 280 })],
-    ['Inverta', 'Troque o sentido, sem abaixar a cabeça.', emVolta(150, 28, { alto: true, d: 220 })],
+    ['Inverta', 'Troque o sentido, sem abaixar a cabeça.', emVolta(150, 28, { alto: true, d: 220, sentido: -1 })],
   ]),
   'Bola ao redor dos joelhos': ex('frente', {}, [
-    ['Abaixe', 'Flexione os joelhos, com o tronco inclinado e as costas retas.', [{ x: 340, pe: 'M', t: 0, cF: 25, kF: -15, cT: -25, kT: 15, eF: 0.75, eT: 0.75, bP: 10, aP: -10, bL: -10, aL: 10, bola: em(340, 262) }]],
+    ['Abaixe', 'Flexione os joelhos, com o tronco inclinado e as costas retas.', [{ x: 340, pe: 'M', t: 0, cF: 25, kF: -15, cT: -25, kT: 15, eF: 0.55, eT: 0.55, bP: 10, aP: -10, bL: -10, aL: 10, bola: em(340, 262) }]],
     ['Em volta das pernas', 'Passe a bola pela frente e por trás dos joelhos, sem levantar o quadril.', emVolta(262, 26, { baixo: true, d: 260 })],
   ]),
   'Oito entre as pernas': ex('frente', {}, [
-    ['Base larga', 'Abra bem as pernas, abaixe o quadril e segure a bola com uma mão.', [{ x: 340, pe: 'M', t: 0, cF: 34, kF: -14, cT: -34, kT: 14, eF: 0.8, eT: 0.8, bP: 20, aP: 0, bL: -20, aL: 0, bola: em(368, 265) }]],
-    ['Passe por dentro', 'Leve a bola por entre as pernas, de trás para a frente, para a outra mão.', ciclo([
-      { x: 340, pe: 'M', bP: 8, aP: -15, bL: -8, aL: 15, bola: em(340, 268) },
-      { x: 340, pe: 'M', bP: 8, aP: 0, bL: -28, aL: -10, bola: em(310, 265) },
-      { x: 340, pe: 'M', bP: 8, aP: -15, bL: -8, aL: 15, bola: em(340, 268) },
-      { x: 340, pe: 'M', bP: 28, aP: 10, bL: -8, aL: 0, bola: em(370, 265) },
-    ], 3, 260)],
+    ['Base larga', 'Abra bem as pernas, abaixe o quadril e segure a bola com uma mão.', [{ x: 340, pe: 'M', t: 0, cF: 34, kF: -14, cT: -34, kT: 14, eF: 0.6, eT: 0.6, bP: 20, aP: 0, bL: -20, aL: 0, bola: em(368, 265) }]],
+    ['Passe por dentro', 'Leve a bola por entre as pernas, de trás para a frente, para a outra mão.', oito(266)],
   ]),
   'Drible parado com a mão direita': ex('frente', {}, [
     ['Base', 'Pés afastados, joelhos flexionados e a outra mão à frente.', [{ x: 340, pe: 'M', ...F_BASE, bP: 20, aP: 0, bL: -45, aL: -100, bola: mao(0) }]],
