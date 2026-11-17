@@ -4,8 +4,7 @@ import { ICONES_TIMES, type IconeTime } from './icones-times'
 
 // Bola em pixel art, réplica da bola de verdade vista de frente, como na foto do produto: a marca na faixa
 // de cima, o logo do time (ou o nome do modelo) na faixa de baixo, e os canais na cor de destaque. O sprite
-// das faixas é desenhado aqui; o logo vem pequeno do mesmo lugar dos escudos da aba NBA e é ampliado em
-// blocos. Não usa fotos da Amazon.
+// das faixas é desenhado aqui, com 3 pixels por bloco; o logo vem do mesmo lugar dos escudos da aba NBA, em alta resolução. Não usa fotos da Amazon.
 
 /** Luminância relativa (WCAG) de uma cor #rrggbb. */
 function luminancia(hex: string) {
@@ -22,13 +21,15 @@ const tinta = (fundo: string) => ((luminancia(fundo) + 0.05) / (luminancia('#141
 // O sprite (40 × 40, raio 19) ocupa o círculo de centro (60, 60) e raio 52 do desenho.
 const ESCALA = 52 / 19
 const DESLOCA = 60 - (LADO / 2) * ESCALA
+/** O sprite tem vários pixels por bloco (RESOLUCAO_VITRINE): o desenho cobre o mesmo espaço, com mais detalhe. */
+const LADO_DO_SPRITE = LADO * ESCALA
 /** Linha do desenho onde passa o canal do meio: a marca fica acima, o logo abaixo. */
 const MEIO = DESLOCA + CANAL_DO_MEIO * ESCALA
-/** Lado do logo no desenho. Na tela são 44 px: o dobro dos 22 px pedidos, para cada ponto virar um bloco 2 × 2. */
+/** Lado do logo no desenho (cerca de 44 px na tela). */
 const LOGO = 30
-export const LADO_DO_LOGO = 22
-/** Contorno de um pixel do logo (1,4 do desenho = meio bloco do sprite), nos quatro lados. */
-const CONTORNO = ['1.4px 0', '-1.4px 0', '0 1.4px', '0 -1.4px'].map((d) => `drop-shadow(${d} 0 #fff)`).join(' ')
+export const LADO_DO_LOGO = 90
+/** Contorno branco fino em volta do logo, nos quatro lados. */
+const CONTORNO = ['0.8px 0', '-0.8px 0', '0 0.8px', '0 -0.8px'].map((d) => `drop-shadow(${d} 0 #fff)`).join(' ')
 
 interface Props {
   /** Cor da faixa do logo (e da calota de cima) e da faixa da marca (e da calota de baixo). */
@@ -63,7 +64,7 @@ export default function Bola({ frente, faixa, canal, marca, logo, icone, modelo,
       {/* Sombra no chão, em degraus. */}
       <path d="M30 114h60v3h-60zM24 117h72v3h-72zM30 120h60v3h-60z" fill="#000" opacity=".2" />
 
-      <image href={sprite} x={DESLOCA} y={DESLOCA} width={LADO * ESCALA} height={LADO * ESCALA} style={{ imageRendering: 'pixelated' }} />
+      <image href={sprite} x={DESLOCA} y={DESLOCA} width={LADO_DO_SPRITE} height={LADO_DO_SPRITE} style={{ imageRendering: 'pixelated' }} />
 
       <text className="bola-nome" x="60" y={MEIO - 8} textAnchor="middle" fill={tinta(faixa)} fontSize="19" textLength={Math.min(64, marca.length * 9.5)} lengthAdjust="spacingAndGlyphs">
         {marca}
@@ -77,7 +78,7 @@ export default function Bola({ frente, faixa, canal, marca, logo, icone, modelo,
           y={centroDoLogo - LOGO / 2}
           width={LOGO}
           height={LOGO}
-          style={{ imageRendering: 'pixelated', filter: logoContorno ? CONTORNO : undefined }}
+          style={{ filter: logoContorno ? CONTORNO : undefined }}
           onError={() => setSemLogo(true)}
         />
       )}

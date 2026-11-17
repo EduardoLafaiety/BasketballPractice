@@ -108,9 +108,10 @@ const canais = (x: number) => {
 export type ParteDaBola = { gomo: 0 | 1; tom: number } | { faixa: true; tom: number } | 'costura' | null
 
 /** O que há no bloco (coluna, linha) de uma bola de vitrine. Gomo 0: faixa do logo e calota de cima; 1: as outras duas. */
-export function parteDoBloco(coluna: number, linha: number, modelo: Pick<ModeloBola, 'canalLargo' | 'faixa' | 'grao'> = {}): ParteDaBola {
-  const x = coluna + 0.5
-  const y = linha + 0.5
+export function parteDoBloco(coluna: number, linha: number, modelo: Pick<ModeloBola, 'canalLargo' | 'faixa' | 'grao'> = {}, resolucao = 1): ParteDaBola {
+  // Com resolução maior, (coluna, linha) é um pixel menor: as medidas continuam em blocos da grade de 40 × 40.
+  const x = (coluna + 0.5) / resolucao
+  const y = (linha + 0.5) / resolucao
   if (Math.hypot(x - CENTRO, y - CENTRO) > RAIO) return null
   const largura = modelo.canalLargo ? 1.3 : 0.75
   const { cima, meio, baixo } = canais(x)
@@ -130,18 +131,22 @@ export function parteDoBloco(coluna: number, linha: number, modelo: Pick<ModeloB
   return { gomo, tom }
 }
 
-/** Os pixels RGBA (LADO × LADO) da bola de vitrine do modelo. */
-export function pixelsDoModelo(modelo: ModeloBola): Uint8Array {
+/** Quantos pixels cada bloco da bola de vitrine tem de lado: a bola é desenhada na mesma forma, só com mais detalhe. */
+export const RESOLUCAO_VITRINE = 3
+
+/** Os pixels RGBA da bola de vitrine do modelo, com (LADO × resolução) pixels de lado. */
+export function pixelsDoModelo(modelo: ModeloBola, resolucao = RESOLUCAO_VITRINE): Uint8Array {
   const gomos = modelo.gomos.map((c) => tonsDoCouro(c).map(rgb))
   const faixa = modelo.faixa ? tonsDoCouro(modelo.faixa).map(rgb) : null
   const costura = rgb(modelo.costura)
-  const dados = new Uint8Array(LADO * LADO * 4)
-  for (let y = 0; y < LADO; y++) {
-    for (let x = 0; x < LADO; x++) {
-      const parte = parteDoBloco(x, y, modelo)
+  const lado = LADO * resolucao
+  const dados = new Uint8Array(lado * lado * 4)
+  for (let y = 0; y < lado; y++) {
+    for (let x = 0; x < lado; x++) {
+      const parte = parteDoBloco(x, y, modelo, resolucao)
       if (parte === null) continue
       const [r, g, b] = parte === 'costura' ? costura : 'faixa' in parte ? faixa![parte.tom] : gomos[parte.gomo][parte.tom]
-      dados.set([r, g, b, 255], (y * LADO + x) * 4)
+      dados.set([r, g, b, 255], (y * lado + x) * 4)
     }
   }
   return dados
@@ -188,10 +193,10 @@ export function codificarPng(rgba: Uint8Array, largura: number, altura: number):
 
 const guardadas = new Map<string, string>()
 
-function png(chave: string, pixels: () => Uint8Array): string {
+function png(chave: string, pixels: () => Uint8Array, lado = LADO): string {
   let url = guardadas.get(chave)
   if (!url) {
-    const bytes = codificarPng(pixels(), LADO, LADO)
+    const bytes = codificarPng(pixels(), lado, lado)
     url = `data:image/png;base64,${btoa(String.fromCharCode(...bytes))}`
     guardadas.set(chave, url)
   }
@@ -203,8 +208,8 @@ export function bolaPng(couro?: readonly string[], costura?: string): string {
   return png(`${couro?.join() ?? ''}|${costura ?? ''}`, () => pixelsDaBola(couro, costura))
 }
 
-/** A bola de vitrine do modelo como imagem (data URL de um PNG 40 × 40); cada modelo só é gerado uma vez. */
+/** A bola de vitrine do modelo como imagem (data URL de um PNG de LADO × RESOLUCAO_VITRINE pixels); cada modelo só é gerado uma vez. */
 export function bolaModeloPng(modelo: ModeloBola): string {
   const { gomos, costura, canalLargo, faixa, grao } = modelo
-  return png(`modelo|${gomos.join()}|${costura}|${!!canalLargo}|${faixa ?? ''}|${!!grao}`, () => pixelsDoModelo(modelo))
+  return png(`modelo|${gomos.join()}|${costura}|${!!canalLargo}|${faixa ?? ''}|${!!grao}`, () => pixelsDoModelo(modelo), LADO * RESOLUCAO_VITRINE)
 }
