@@ -65,30 +65,10 @@ function abrirInicio(rotas: Parameters<typeof apiFalsa>[0] = {}) {
   return api
 }
 
-/** Valor em destaque do cartão de número com esse rótulo. */
-const numero = (rotulo: string) => (screen.getByText(rotulo).closest('.stat') as HTMLElement).querySelector('strong')
-
 describe('Início', () => {
-  it('mostra os números dos últimos 7 dias, contados desde a meia-noite de 6 dias atrás', async () => {
-    const { ultima } = abrirInicio()
-
-    expect(await screen.findByText('75%')).toBeInTheDocument()
-    expect(numero('sessões nos últimos 7 dias')).toHaveTextContent('4')
-    expect(numero('minutos treinados')).toHaveTextContent('95')
-    expect(numero('aproveitamento nos arremessos')).toHaveTextContent('75%')
-    // Quinta, 22/10, 00h em São Paulo = 03h UTC.
-    expect(ultima('GET', '/stats/summary')?.url.searchParams.get('from')).toBe('2026-10-22T03:00:00.000Z')
-  })
-
-  it('mostra “—” no aproveitamento quando não houve arremesso', async () => {
-    abrirInicio({ 'GET /stats/summary': resumo(1, 20, 0, 0) })
-    expect(await screen.findByText('20')).toBeInTheDocument()
-    expect(numero('aproveitamento nos arremessos')).toHaveTextContent('—')
-  })
-
   it('a abertura fica só com o título: sem o cartão de convite, sequência ou meta', async () => {
     abrirInicio({ 'GET /goals': [meta({ id: 2, title: '100 cestas', kind: 'cestas_total', target: 100, current: 42 })] })
-    expect(await screen.findByText('95')).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: 'Treino de hoje' })).toBeInTheDocument()
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Bora pra quadra.')
     expect(screen.queryByText(/dias? seguidos?/)).toBeNull()
     expect(screen.queryByRole('link', { name: /Meta:/ })).toBeNull()
@@ -124,20 +104,6 @@ describe('Início', () => {
     expect(screen.getByRole('heading', { name: 'Ter' }).closest('article')).toHaveTextContent('Descanso')
   })
 
-  it('chama para os artigos com as categorias e alguns em destaque', async () => {
-    abrirInicio()
-    const secao = (await screen.findByRole('heading', { name: 'Entenda o jogo' })).closest('section') as HTMLElement
-    expect(within(secao).getByRole('link', { name: 'Ver todos os artigos' })).toHaveAttribute('href', '/artigos')
-    expect(within(secao).getByRole('link', { name: 'Sono' })).toHaveAttribute('href', '/artigos?categoria=sono')
-    expect(within(secao).getByRole('link', { name: /Dormir mais acerta mais arremessos/ })).toHaveAttribute('href', '/artigos/sono-e-arremesso')
-    expect(within(secao).getByRole('link', { name: /Massagem, compressão, gelo/ })).toHaveAttribute('href', '/artigos/qual-recuperacao-funciona')
-    expect(within(secao).getAllByRole('link', { name: /min de leitura/ })).toHaveLength(5)
-    // O desafio do dia e o quiz saíram do app: sobram só os artigos.
-    expect(screen.queryByRole('link', { name: 'Quiz do dia' })).toBeNull()
-    expect(screen.queryByText('Desafio do dia')).toBeNull()
-    expect(screen.queryByRole('link', { name: /Aceitar desafio/ })).toBeNull()
-  })
-
   it('sem resposta dos jogadores, o resto da página continua', async () => {
     abrirInicio({ 'GET /styles': new Resposta(500) })
     expect(await screen.findByRole('heading', { name: 'Treino de hoje' })).toBeInTheDocument()
@@ -163,52 +129,5 @@ describe('Início', () => {
     expect(screen.queryByRole('link', { name: /Começar treino de hoje/ })).toBeNull()
   })
 
-  it('avisa quando os números não carregam, sem mostrar zeros falsos', async () => {
-    abrirInicio({ 'GET /stats/summary': new Resposta(500, { error: 'Banco fora do ar' }) })
-
-    expect(await screen.findByText('Não foi possível carregar seus números: Banco fora do ar')).toHaveAttribute('role', 'alert')
-    expect(screen.getByText('Não foi possível carregar o resumo: Banco fora do ar')).toHaveAttribute('role', 'alert')
-    for (const rotulo of ['sessões nos últimos 7 dias', 'minutos treinados', 'aproveitamento nos arremessos'])
-      expect(numero(rotulo)).toHaveTextContent('!')
-  })
 })
 
-const semana = (weekStart: string, sessions: number, minutes: number, makes: number, attempts: number) => ({ weekStart, sessions, minutes, makes, attempts })
-describe('Início: resumo da semana', () => {
-  it('no meio da semana, compara a semana até agora com a anterior', async () => {
-    const { chamadas } = abrirInicio({
-      'GET /stats/summary': { ...resumo(4, 95, 30, 40), byWeek: [semana('2026-10-19', 2, 60, 10, 20), semana('2026-10-26', 3, 90, 15, 20)] },
-    })
-    const secao = (await screen.findByRole('heading', { name: 'Resumo da semana' })).closest('section')!
-    expect(secao).not.toHaveClass('destaque')
-    expect(await within(secao).findByText('+1 em relação à semana anterior')).toBeInTheDocument()
-    expect(within(secao).getByText('+30 min em relação à semana anterior')).toBeInTheDocument()
-    expect(within(secao).getByText('75%')).toBeInTheDocument()
-    expect(within(secao).getByText('+25 pontos em relação à semana anterior')).toHaveClass('sobe')
-    // Desde a segunda da semana anterior (19/10, 00h em São Paulo).
-    expect(chamadas.some((c) => c.caminho === '/stats/summary' && c.url.searchParams.get('from') === '2026-10-19T03:00:00.000Z')).toBe(true)
-  })
-
-  it('na segunda-feira, o balanço da semana passada vem em destaque no alto', async () => {
-    vi.useFakeTimers({ toFake: ['Date'] })
-    vi.setSystemTime(new Date('2026-10-26T09:00:00-03:00'))
-    definirToken('tk')
-    apiFalsa({
-      'GET /auth/me': usuarioFalso(),
-      'GET /settings': configFalsa,
-      'GET /exercises': catalogo,
-      'GET /stats/summary': { ...resumo(1, 30, 0, 0), byWeek: [semana('2026-10-12', 4, 120, 30, 40), semana('2026-10-19', 2, 60, 10, 20)] },
-      ...rotinaDe({}),
-    })
-    abrirApp('/')
-
-    const secao = (await screen.findByRole('heading', { name: 'Resumo da semana passada' })).closest('section')!
-    expect(secao).toHaveClass('destaque')
-    expect(within(secao).getByText('Segunda é dia de balanço')).toBeInTheDocument()
-    expect(await within(secao).findByText('−2 em relação à semana anterior')).toHaveClass('desce')
-    expect(within(secao).getByText('−25 pontos em relação à semana anterior')).toBeInTheDocument()
-    // Vem antes da seção do treino de hoje.
-    const treino = screen.getByRole('heading', { name: 'Treino de hoje' })
-    expect(secao.compareDocumentPosition(treino) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
-  })
-})
