@@ -9,6 +9,8 @@ export interface Conquista {
   id: string
   titulo: string
   descricao: string
+  /** Pontos que a conquista rende, como a pontuação dos jogos antigos. */
+  pontos: number
   alvo: number
   progresso: number
   desbloqueada: boolean
@@ -63,19 +65,19 @@ export function estatisticas(sessoes: Sessao[]): Estatisticas {
   }
 }
 
-const DEFINICOES: { id: string; titulo: string; descricao: string; alvo: number; valor: (e: Estatisticas) => number }[] = [
-  { id: 'primeira-sessao', titulo: 'Primeiro treino', descricao: 'Registre sua primeira sessão de treino', alvo: 1, valor: (e) => e.sessoes },
-  { id: '10-sessoes', titulo: 'Pegando o ritmo', descricao: 'Registre 10 sessões de treino', alvo: 10, valor: (e) => e.sessoes },
-  { id: '50-sessoes', titulo: 'Rato de quadra', descricao: 'Registre 50 sessões de treino', alvo: 50, valor: (e) => e.sessoes },
-  { id: '100-sessoes', titulo: 'Lenda da quadra', descricao: 'Registre 100 sessões de treino', alvo: 100, valor: (e) => e.sessoes },
-  { id: '3-dias', titulo: 'Aquecendo', descricao: 'Treine 3 dias seguidos', alvo: 3, valor: (e) => e.melhorSequenciaDeDias },
-  { id: '7-dias', titulo: 'Semana perfeita', descricao: 'Treine 7 dias seguidos', alvo: 7, valor: (e) => e.melhorSequenciaDeDias },
-  { id: '30-dias', titulo: 'Mês de ferro', descricao: 'Treine 30 dias seguidos', alvo: 30, valor: (e) => e.melhorSequenciaDeDias },
-  { id: '10-horas', titulo: 'Dez horas de quadra', descricao: 'Some 10 horas de treino', alvo: 600, valor: (e) => e.minutos },
-  { id: '100-num-dia', titulo: 'Maratona', descricao: 'Acerte 100 arremessos em um único dia', alvo: 100, valor: (e) => e.acertosNoMelhorDia },
-  { id: '1000-cestas', titulo: 'Mil cestas', descricao: 'Acumule 1.000 arremessos certos', alvo: 1000, valor: (e) => e.acertos },
-  { id: 'sequencia-10', titulo: 'Mão quente', descricao: 'Acerte 10 arremessos seguidos', alvo: 10, valor: (e) => e.melhorSequenciaDeAcertos },
-  { id: 'sequencia-25', titulo: 'Sniper', descricao: 'Acerte 25 arremessos seguidos', alvo: 25, valor: (e) => e.melhorSequenciaDeAcertos },
+const DEFINICOES: { id: string; pontos: number; titulo: string; descricao: string; alvo: number; valor: (e: Estatisticas) => number }[] = [
+  { id: 'primeira-sessao', pontos: 10, titulo: 'Primeiro treino', descricao: 'Registre sua primeira sessão de treino', alvo: 1, valor: (e) => e.sessoes },
+  { id: '10-sessoes', pontos: 20, titulo: 'Pegando o ritmo', descricao: 'Registre 10 sessões de treino', alvo: 10, valor: (e) => e.sessoes },
+  { id: '50-sessoes', pontos: 40, titulo: 'Rato de quadra', descricao: 'Registre 50 sessões de treino', alvo: 50, valor: (e) => e.sessoes },
+  { id: '100-sessoes', pontos: 80, titulo: 'Lenda da quadra', descricao: 'Registre 100 sessões de treino', alvo: 100, valor: (e) => e.sessoes },
+  { id: '3-dias', pontos: 10, titulo: 'Aquecendo', descricao: 'Treine 3 dias seguidos', alvo: 3, valor: (e) => e.melhorSequenciaDeDias },
+  { id: '7-dias', pontos: 30, titulo: 'Semana perfeita', descricao: 'Treine 7 dias seguidos', alvo: 7, valor: (e) => e.melhorSequenciaDeDias },
+  { id: '30-dias', pontos: 80, titulo: 'Mês de ferro', descricao: 'Treine 30 dias seguidos', alvo: 30, valor: (e) => e.melhorSequenciaDeDias },
+  { id: '10-horas', pontos: 30, titulo: 'Dez horas de quadra', descricao: 'Some 10 horas de treino', alvo: 600, valor: (e) => e.minutos },
+  { id: '100-num-dia', pontos: 40, titulo: 'Maratona', descricao: 'Acerte 100 arremessos em um único dia', alvo: 100, valor: (e) => e.acertosNoMelhorDia },
+  { id: '1000-cestas', pontos: 60, titulo: 'Mil cestas', descricao: 'Acumule 1.000 arremessos certos', alvo: 1000, valor: (e) => e.acertos },
+  { id: 'sequencia-10', pontos: 20, titulo: 'Mão quente', descricao: 'Acerte 10 arremessos seguidos', alvo: 10, valor: (e) => e.melhorSequenciaDeAcertos },
+  { id: 'sequencia-25', pontos: 50, titulo: 'Sniper', descricao: 'Acerte 25 arremessos seguidos', alvo: 25, valor: (e) => e.melhorSequenciaDeAcertos },
 ]
 
 export function conquistas(sessoes: Sessao[]): Conquista[] {
@@ -135,7 +137,7 @@ const META: Record<IdAtributo, { rotulo: string; cor: string; dica: string }> = 
 
 /**
  * Pontos de treino de cada atributo.
- * - Arremesso de 3: cada tentativa de 3 vale 1 ponto, mais 1 por acerto (arremessar bem rende o dobro).
+ * - Arremesso de 3: cada tentativa de 3 e cada acerto valem 1/3 de ponto (arremessar bem rende o dobro).
  * - Os outros: cada exercício da categoria vale 4 pontos, mais 1 por minuto da sessão (dividido entre os exercícios dela).
  */
 export function pontosPorAtributo(sessoes: Sessao[], drillPorId: (id: string) => Drill | undefined): Record<IdAtributo, number> {
@@ -143,7 +145,7 @@ export function pontosPorAtributo(sessoes: Sessao[], drillPorId: (id: string) =>
   const ids = Object.keys(CATEGORIA_DO_ATRIBUTO) as Exclude<IdAtributo, 'arremesso3'>[]
   for (const s of sessoes) {
     for (const z of s.zonas) {
-      if (z.zona.startsWith('tres_')) pontos.arremesso3 += num(z.tentativas) + num(z.acertos)
+      if (z.zona.startsWith('tres_')) pontos.arremesso3 += (num(z.tentativas) + num(z.acertos)) / 3
     }
     const n = s.entradas.length || 1
     for (const e of s.entradas) {
@@ -172,4 +174,41 @@ export function faixaDoOverall(ovr: number) {
   if (ovr >= 60) return 'Rotação'
   if (ovr >= 50) return 'Reserva'
   return 'Novato'
+}
+
+// ---------- Visual do Overall (estilo NBA 2K) ----------
+
+export interface Faixa {
+  id: 'novato' | 'bronze' | 'prata' | 'ouro' | 'esmeralda' | 'ametista' | 'diamante' | 'rosa'
+  nome: string
+  cor: string
+}
+
+/** A cor da nota, como nos jogos de basquete: quanto mais alta, mais rara a cor. */
+export function faixaDaNota(nota: number): Faixa {
+  if (nota >= 99) return { id: 'rosa', nome: 'Diamante rosa', cor: '#ff7aa2' }
+  if (nota >= 95) return { id: 'diamante', nome: 'Diamante', cor: '#4cc9f0' }
+  if (nota >= 90) return { id: 'ametista', nome: 'Ametista', cor: '#b86cff' }
+  if (nota >= 80) return { id: 'esmeralda', nome: 'Esmeralda', cor: '#2fbf71' }
+  if (nota >= 70) return { id: 'ouro', nome: 'Ouro', cor: '#ffd23f' }
+  if (nota >= 60) return { id: 'prata', nome: 'Prata', cor: '#d3d6dc' }
+  if (nota >= 50) return { id: 'bronze', nome: 'Bronze', cor: '#d9894a' }
+  return { id: 'novato', nome: 'Novato', cor: '#9a988c' }
+}
+
+const BUILDS: Record<IdAtributo, string> = {
+  arremesso3: 'Atirador',
+  condicionamento: 'Maratonista',
+  defesa: 'Cão de guarda',
+  drible: 'Craque do drible',
+  passe: 'Armador',
+}
+
+/** O estilo de jogador, pelo atributo mais alto (como o "build" do jogo). Sem destaque, fica em aberto. */
+export function estiloDeJogador(lista: Atributo[]) {
+  const ordenados = [...lista].sort((a, b) => b.valor - a.valor)
+  const forte = ordenados[0]
+  const fraco = ordenados[ordenados.length - 1]
+  if (!forte || forte.valor === fraco.valor) return { build: 'Estilo em aberto', forte: undefined, fraco: undefined }
+  return { build: BUILDS[forte.id], forte, fraco }
 }

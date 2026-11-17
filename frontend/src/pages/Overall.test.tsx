@@ -28,7 +28,8 @@ describe('aba Overall', () => {
     expect(await screen.findByRole('heading', { name: 'Overall' })).toBeInTheDocument()
     expect(within(screen.getByRole('navigation', { name: 'Principal' })).getByRole('link', { name: /Overall/ })).toHaveAttribute('href', '/overall')
     expect(await screen.findByLabelText('Overall 40')).toBeInTheDocument()
-    expect(screen.getByText('Novato')).toBeInTheDocument()
+    expect(screen.getAllByText('Novato').length).toBe(2)
+    expect(screen.getByText('Estilo em aberto')).toBeInTheDocument()
     for (const nome of ['Arremesso de 3', 'Condicionamento', 'Defesa', 'Drible', 'Passe']) {
       expect(screen.getByRole('meter', { name: nome })).toHaveAttribute('aria-valuenow', '40')
     }
@@ -45,5 +46,17 @@ describe('aba Overall', () => {
     const subiu = Number(drible.getAttribute('aria-valuenow'))
     expect(screen.getByLabelText(`Overall ${Math.round((subiu + 160) / 5)}`)).toBeInTheDocument()
     expect(screen.getByText('Maria Souza')).toBeInTheDocument()
+  })
+})
+
+describe('ficha estilo 2K', () => {
+  it('mostra o estilo de jogador, o ponto forte e o que melhorar depois de treinar', async () => {
+    abrir([
+      { id: 1, performedAt: '2026-11-10T15:00:00', durationMinutes: 60, rating: null, notes: null, shots: [],
+        entries: [{ exerciseId: 1, exerciseName: 'Drible cruzado', makes: null, attempts: null, reps: 50, seconds: null }] },
+    ])
+    expect(await screen.findByText('Craque do drible')).toBeInTheDocument()
+    expect(screen.getByText('Ponto forte').nextSibling).toHaveTextContent(/^Drible \d+$/)
+    expect(screen.getByRole('img', { name: 'Gráfico dos atributos' })).toBeInTheDocument()
   })
 })

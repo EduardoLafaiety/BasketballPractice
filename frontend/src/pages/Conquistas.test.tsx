@@ -63,3 +63,19 @@ describe('aba Conquistas', () => {
     expect(api.chamadas.some((c) => c.caminho === '/sessions' && c.url.searchParams.get('limit') === '200')).toBe(true)
   })
 })
+
+describe('ícones das conquistas', () => {
+  it('mostra o ícone de todas, também das bloqueadas, com o cadeado ao lado', async () => {
+    abrir([])
+    await resumo(/de 12 desbloqueadas/)
+    const item = screen.getByText('Sniper').closest('li')!
+    expect(item.querySelector('svg.conquista-sprite')).not.toBeNull()
+    expect(item.querySelector('.conquista-estado svg')).not.toBeNull()
+    expect(document.querySelectorAll('li.conquista svg.conquista-sprite').length).toBe(12)
+  })
+
+  it('soma os pontos das desbloqueadas', async () => {
+    abrir([sessao(1, '2026-11-10T15:00:00')])
+    expect(await screen.findByText((_, el) => el?.tagName === 'P' && /de \d+ pontos/.test(el.textContent ?? ''))).toHaveTextContent(/^30 de 0?\d+/)
+  })
+})
