@@ -99,6 +99,7 @@ function Times() {
                 marca: 'Wilson',
                 logo: logoPequeno(t.sigla, LADO_DO_LOGO),
                 icone: t.icone,
+                logoMono: t.bola?.logoMono,
               }}
               tag={`${t.sigla} · ${t.conferencia === 'leste' ? 'Leste' : 'Oeste'}`}
               nome={`${t.cidade} ${t.nome}`}
