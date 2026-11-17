@@ -39,6 +39,8 @@ export default defineConfig(({ mode }) => {
         { find: /^\.\.\/lib\/token\.js$/, replacement: local('./src/demo/stubs.ts') },
       ],
     },
+    // O 3D das demonstrações (three.js) é um arquivo à parte, baixado só quando uma demonstração aparece.
+    build: { chunkSizeWarningLimit: 700 },
     // O PGlite carrega o próprio WebAssembly; o pré-empacotamento do Vite em dev quebraria isso.
     optimizeDeps: { exclude: ['@electric-sql/pglite'] },
     server: {
