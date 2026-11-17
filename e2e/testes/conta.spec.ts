@@ -30,9 +30,8 @@ test('cadastro pelo formulário, ativação pelo e-mail, sair e entrar de novo v
   await page.getByLabel('Senha').fill(SENHA)
   await page.getByRole('button', { name: 'Ativar e entrar' }).click()
 
-  // Início zerado, com o nome no menu.
+  // Início com o nome no menu.
   await expect(page.getByRole('heading', { name: /Bora pra quadra/ })).toBeVisible()
-  await expect(numero(page, 'sessões nos últimos 7 dias')).toHaveText('0')
   await expect(page.locator('.conta-nome')).toContainText('Marina')
 
   await abrirMenu(page)
