@@ -102,7 +102,7 @@ describe('Sessão guiada', () => {
     await clicar(user, 'Salvar sessão')
 
     // Salvar navega depois da resposta da API: espera a troca de página em vez de olhar uma vez só.
-    await waitFor(() => expect(screen.getByTestId('caminho')).toHaveTextContent('/desempenho'))
+    await waitFor(() => expect(screen.getByTestId('caminho')).toHaveTextContent('/'))
     expect(ultima('POST', '/sessions')?.corpo).toMatchObject({
       workoutId: 7,
       durationMinutes: 1,
@@ -127,7 +127,7 @@ describe('Sessão guiada', () => {
     await clicar(user, 'Concluir treino')
     await clicar(user, 'Salvar sessão')
 
-    await screen.findByText('/desempenho')
+    await screen.findByText('/')
     expect(ultima('POST', '/sessions')?.corpo).toMatchObject({
       workoutId: null,
       entries: [{ exerciseId: 1, makes: null, attempts: null }],
@@ -153,7 +153,7 @@ describe('Sessão guiada', () => {
 
     falhar = false
     await clicar(user, 'Salvar sessão')
-    expect(await screen.findByText('/desempenho')).toBeInTheDocument()
+    expect(await screen.findByText('/')).toBeInTheDocument()
     const envios = chamadas.filter((c) => c.metodo === 'POST' && c.caminho === '/sessions')
     expect(envios).toHaveLength(2)
     expect(envios[1].corpo).toEqual(envios[0].corpo)
@@ -184,7 +184,7 @@ describe('Sessão guiada', () => {
     await clicar(user, 'Concluir treino')
     await clicar(user, 'Salvar sessão')
 
-    await screen.findByText('/desempenho')
+    await screen.findByText('/')
     expect(ultima('POST', '/sessions')?.corpo).toMatchObject({ entries: [{ exerciseId: 4, seconds: 60 }] })
   })
 

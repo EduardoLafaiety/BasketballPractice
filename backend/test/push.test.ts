@@ -110,25 +110,6 @@ describe('Web Push: agendador de lembretes', () => {
   })
 })
 
-describe('Web Push: desafios entre amigos', () => {
-  it('avisa quem foi desafiado e quem desafiou quando o outro aceita', async () => {
-    const a = await register()
-    const b = await register()
-    const pa = (await api('PUT', '/social/profile', { nickname: `push_a${n}` }, a.token)).body
-    await api('PUT', '/social/profile', { nickname: `push_b${n}` }, b.token)
-    await api('POST', '/social/friends', { code: pa.inviteCode }, b.token)
-    const ea = inscricao()
-    const eb = inscricao()
-    await api('POST', '/push/subscriptions', ea, a.token)
-    await api('POST', '/push/subscriptions', eb, b.token)
-
-    const desafio = (await api('POST', '/social/challenges', { opponentId: b.id, metric: 'lances_livres' }, a.token)).body
-    await esperar(() => falso.enviados.some((e) => e.endpoint === eb.endpoint && /te desafiou/.test(e.message.title)))
-    await api('POST', `/social/challenges/${desafio.id}/accept`, undefined, b.token)
-    await esperar(() => falso.enviados.some((e) => e.endpoint === ea.endpoint && /aceitou o desafio/.test(e.message.title)))
-  })
-})
-
 describe('Web Push desligado', () => {
   it('sem chaves VAPID, a configuração avisa e as rotas recusam', async () => {
     const desligado = await startApi({ push: { publicKey: '', send: null } })

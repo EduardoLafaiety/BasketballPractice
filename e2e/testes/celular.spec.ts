@@ -19,9 +19,8 @@ test('no celular, o menu abre em tela cheia, navega entre as telas e nada vaza p
   expect(await semRolagemLateral()).toBe(true)
 
   for (const [link, titulo] of [
-    ['Desempenho', 'Desempenho'],
-    ['Ferramentas', 'Ferramentas'],
-    ['Conquistas', 'Conquistas'],
+    ['Treinos', 'Treinos'],
+    ['Artigos', 'Artigos'],
   ]) {
     await irPara(page, link)
     await expect(page.getByRole('heading', { name: titulo, level: 1 })).toBeVisible()

@@ -1,27 +1,18 @@
 import type {
-  ArremessosZona,
   BlocoPlano,
   Categoria,
   Config,
-  Conquista,
   DiaSemana,
   Drill,
   Nivel,
   Estilo,
   EstiloResumo,
   FatiaEstilo,
-  InfoTeste,
-  Meta,
   Metrica,
   Posicao,
   NovaSessao,
-  Progresso,
-  Resumo,
   Rotina,
   Sessao,
-  TesteFisico,
-  TipoMeta,
-  TipoTeste,
   Zona,
 } from './types'
 
@@ -180,37 +171,6 @@ interface WorkoutApi extends WorkoutResumoApi {
   exercises: { exerciseId: number }[]
 }
 
-interface StatsApi {
-  totals: { sessions: Num; minutes: Num; averageRating: Num; averageFatigue?: Num }
-  shooting: { makes: Num; attempts: Num; percentage: Num }
-  byWeek?: { weekStart: string; sessions: Num; minutes: Num; makes: Num; attempts: Num }[]
-}
-
-interface GoalApi {
-  id: number
-  title: string
-  kind: TipoMeta
-  target: number
-  current: number
-  achieved: boolean
-  exerciseId: number | null
-  exerciseName: string | null
-  deadline: string | null
-}
-
-interface ProgressApi {
-  streak: { current: number; best: number }
-  achievements: { id: string; title: string; description: string; target: number; progress: number; unlocked: boolean }[]
-}
-
-interface TestApi {
-  id: number
-  kind: TipoTeste
-  value: number
-  performedAt: string
-  notes: string | null
-}
-
 interface SettingsApi {
   theme: Config['tema']
   reminders: { enabled: boolean; time: string; days: number[] }
@@ -218,8 +178,8 @@ interface SettingsApi {
 }
 
 export interface ResultadoImportacao {
-  created: Record<'exercises' | 'workouts' | 'sessions' | 'goals' | 'physicalTests', number>
-  skipped: Record<'sessions' | 'goals' | 'physicalTests', number>
+  created: Record<'exercises' | 'workouts' | 'sessions', number>
+  skipped: Record<'sessions', number>
 }
 
 // ---------- Mapeamento backend → frontend ----------
@@ -287,26 +247,6 @@ function paraSessao(s: SessionApi): Sessao {
   }
 }
 
-const paraMeta = (g: GoalApi): Meta => ({
-  id: String(g.id),
-  titulo: g.title,
-  tipo: g.kind,
-  alvo: g.target,
-  atual: g.current,
-  concluida: g.achieved,
-  drillId: g.exerciseId === null ? undefined : String(g.exerciseId),
-  drillNome: g.exerciseName ?? undefined,
-  prazo: g.deadline ?? undefined,
-})
-
-const paraTeste = (t: TestApi): TesteFisico => ({
-  id: String(t.id),
-  tipo: t.kind,
-  valor: Number(t.value),
-  data: t.performedAt,
-  notas: t.notes ?? undefined,
-})
-
 const paraConfig = (s: SettingsApi): Config => ({
   tema: s.theme,
   lembretes: { ativo: s.reminders.enabled, horario: s.reminders.time, dias: s.reminders.days as DiaSemana[] },
@@ -321,15 +261,6 @@ export function dataLocal(d: Date) {
 
 // Fuso do navegador, para o backend contar dias e semanas no horário local do atleta.
 export const fuso = () => `tzOffset=${new Date().getTimezoneOffset()}`
-
-// Instante exato (ex.: meia-noite local) para o período, e o fuso para as semanas do resumo.
-function filtroPeriodo(desde?: Date, ate?: Date) {
-  const params = new URLSearchParams({ tzOffset: String(new Date().getTimezoneOffset()) })
-  if (desde) params.set('from', desde.toISOString())
-  // "ate" é exclusivo no app (início do dia seguinte); o backend inclui o instante, então tira 1 ms.
-  if (ate) params.set('to', new Date(ate.getTime() - 1).toISOString())
-  return `?${params}`
-}
 
 // ---------- Endpoints ----------
 
@@ -411,87 +342,6 @@ export const api = {
   },
 
   removerSessao: (id: string) => request<null>('DELETE', `/sessions/${id}`),
-
-  /** Totais de [desde, ate); sem datas, todo o histórico. */
-  async resumo(desde?: Date, ate?: Date): Promise<Resumo> {
-    const r = await request<StatsApi>('GET', `/stats/summary${filtroPeriodo(desde, ate)}`)
-    return {
-      sessoes: num(r.totals.sessions) ?? 0,
-      minutos: num(r.totals.minutes) ?? 0,
-      acertos: num(r.shooting.makes) ?? 0,
-      tentativas: num(r.shooting.attempts) ?? 0,
-      esforcoMedio: num(r.totals.averageRating),
-      cansacoMedio: num(r.totals.averageFatigue),
-      semanas: (r.byWeek ?? []).map((w) => ({
-        inicio: w.weekStart,
-        sessoes: num(w.sessions) ?? 0,
-        minutos: num(w.minutes) ?? 0,
-        acertos: num(w.makes) ?? 0,
-        tentativas: num(w.attempts) ?? 0,
-      })),
-    }
-  },
-
-  async zonas(desde?: Date): Promise<ArremessosZona[]> {
-    const r = await request<ShotApi[]>('GET', `/stats/zones${filtroPeriodo(desde)}`)
-    return r.map((z) => ({ zona: z.zone, acertos: z.makes, tentativas: z.attempts }))
-  },
-
-  async progresso(): Promise<Progresso> {
-    const r = await request<ProgressApi>('GET', `/stats/progress?${fuso()}`)
-    return {
-      sequenciaAtual: r.streak.current,
-      melhorSequencia: r.streak.best,
-      conquistas: r.achievements.map(
-        (a): Conquista => ({
-          id: a.id,
-          titulo: a.title,
-          descricao: a.description,
-          alvo: a.target,
-          progresso: a.progress,
-          desbloqueada: a.unlocked,
-        }),
-      ),
-    }
-  },
-
-  async metas() {
-    return (await request<GoalApi[]>('GET', `/goals?${fuso()}`)).map(paraMeta)
-  },
-
-  async salvarMeta(m: Pick<Meta, 'titulo' | 'tipo' | 'alvo' | 'drillId' | 'prazo'>) {
-    const criada = await request<GoalApi>('POST', `/goals?${fuso()}`, {
-      title: m.titulo,
-      kind: m.tipo,
-      target: m.alvo,
-      exerciseId: m.drillId ? Number(m.drillId) : null,
-      deadline: m.prazo || null,
-    })
-    return paraMeta(criada)
-  },
-
-  removerMeta: (id: string) => request<null>('DELETE', `/goals/${id}`),
-
-  async tiposTeste(): Promise<InfoTeste[]> {
-    const r = await request<{ kind: TipoTeste; name: string; unit: string; better: InfoTeste['melhor'] }[]>('GET', '/tests/kinds')
-    return r.map((t) => ({ tipo: t.kind, nome: t.name, unidade: t.unit, melhor: t.better }))
-  },
-
-  async testes() {
-    return (await request<TestApi[]>('GET', '/tests')).map(paraTeste)
-  },
-
-  async registrarTeste(t: Omit<TesteFisico, 'id'>) {
-    const criado = await request<TestApi>('POST', '/tests', {
-      kind: t.tipo,
-      value: t.valor,
-      performedAt: t.data,
-      notes: t.notas ?? null,
-    })
-    return paraTeste(criado)
-  },
-
-  removerTeste: (id: string) => request<null>('DELETE', `/tests/${id}`),
 
   async config() {
     return paraConfig(await request<SettingsApi>('GET', '/settings'))

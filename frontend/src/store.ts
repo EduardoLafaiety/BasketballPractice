@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { api, dataLocal } from './api'
-import type { Config, DiaSemana, Drill, Meta, NovaSessao, Rotina, Sessao, TesteFisico } from './types'
+import { api } from './api'
+import type { Config, DiaSemana, Drill, NovaSessao, Rotina, Sessao } from './types'
 
 // Cache em memória por recurso: ao voltar a uma página os dados aparecem na hora
 // e são recarregados em segundo plano. É limpo no logout.
@@ -139,74 +139,6 @@ export function useSessoes() {
   )
 
   return { sessoes: dados ?? [], carregado: dados !== undefined, adicionar, remover, ...resto }
-}
-
-/** Totais de [desde, ate); sem datas, todo o histórico. */
-export function useResumo(desde?: Date, ate?: Date) {
-  const chave = `resumo:${desde ? dataLocal(desde) : 'tudo'}:${ate ? dataLocal(ate) : 'hoje'}`
-  const { dados, ...resto } = useRecurso(chave, () => api.resumo(desde, ate))
-  return { resumo: dados, ...resto }
-}
-
-export function useZonas(desde?: Date) {
-  const { dados, ...resto } = useRecurso(`zonas:${desde ? dataLocal(desde) : 'tudo'}`, () => api.zonas(desde))
-  return { zonas: dados, ...resto }
-}
-
-export function useProgresso() {
-  const { dados, ...resto } = useRecurso('progresso', api.progresso)
-  return { progresso: dados, ...resto }
-}
-
-export function useMetas() {
-  const { dados, setDados, ...resto } = useRecurso('metas', api.metas)
-
-  const adicionar = useCallback(
-    async (m: Pick<Meta, 'titulo' | 'tipo' | 'alvo' | 'drillId' | 'prazo'>) => {
-      const criada = await api.salvarMeta(m)
-      setDados((atual = []) => [criada, ...atual])
-    },
-    [setDados],
-  )
-
-  const remover = useCallback(
-    async (id: string) => {
-      await api.removerMeta(id)
-      setDados((atual = []) => atual.filter((m) => m.id !== id))
-    },
-    [setDados],
-  )
-
-  return { metas: dados ?? [], carregado: dados !== undefined, adicionar, remover, ...resto }
-}
-
-export function useTiposTeste() {
-  const { dados, ...resto } = useRecurso('tipos-teste', api.tiposTeste)
-  return { tipos: dados ?? [], ...resto }
-}
-
-export function useTestes() {
-  const { dados, setDados, ...resto } = useRecurso('testes', api.testes)
-
-  const adicionar = useCallback(
-    async (t: Omit<TesteFisico, 'id'>) => {
-      const criado = await api.registrarTeste(t)
-      invalidar('progresso', 'cartao')
-      setDados((atual = []) => [criado, ...atual].sort((a, b) => b.data.localeCompare(a.data)))
-    },
-    [setDados],
-  )
-
-  const remover = useCallback(
-    async (id: string) => {
-      await api.removerTeste(id)
-      invalidar('progresso', 'cartao')
-      setDados((atual = []) => atual.filter((t) => t.id !== id))
-    },
-    [setDados],
-  )
-
-  return { testes: dados ?? [], carregado: dados !== undefined, adicionar, remover, ...resto }
 }
 
 export const CONFIG_PADRAO: Config = {

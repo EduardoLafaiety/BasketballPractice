@@ -258,8 +258,7 @@ function Dados() {
       {erro && <p className="erro" role="alert">{erro}</p>}
       {resultado && (
         <p className="sucesso" role="status">
-          Importado: {resultado.created.sessions} sessões, {resultado.created.exercises} exercícios, {resultado.created.workouts} treinos,{' '}
-          {resultado.created.goals} metas e {resultado.created.physicalTests} testes.
+          Importado: {resultado.created.sessions} sessões, {resultado.created.exercises} exercícios, {resultado.created.workouts} treinos.
           {resultado.skipped.sessions > 0 && ` ${resultado.skipped.sessions} sessões já existiam.`}
         </p>
       )}
@@ -364,7 +363,7 @@ function ExcluirConta() {
     <form className="form" onSubmit={enviar} noValidate>
       <h3 className="sem-margem">Excluir minha conta</h3>
       <p className="muted">
-        Isto apaga sua conta, sessões, treinos, metas e testes, e não pode ser desfeito. Se quiser guardar uma cópia, baixe o backup antes.
+        Isto apaga sua conta, sessões e treinos, e não pode ser desfeito. Se quiser guardar uma cópia, baixe o backup antes.
       </p>
       <label>
         Confirme com sua senha

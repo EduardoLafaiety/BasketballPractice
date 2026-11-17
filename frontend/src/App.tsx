@@ -39,18 +39,8 @@ const Alimentacao = pagina(() => import('./pages/Alimentacao'), 'default')
 const Equipamentos = pagina(() => import('./pages/Equipamentos'), 'default')
 const Artigos = pagina(() => import('./pages/Artigos'), 'default')
 const ArtigoDetalhe = pagina(() => import('./pages/Artigos'), 'ArtigoDetalhe')
-const Desempenho = pagina(() => import('./pages/Desempenho'), 'default')
-const CartaoDoAtleta = pagina(() => import('./pages/Cartao'), 'default')
 const Programas = pagina(() => import('./pages/Programas'), 'default')
 const ProgramaDetalhe = pagina(() => import('./pages/Programas'), 'ProgramaDetalhe')
-const Jogos = pagina(() => import('./pages/Jogos'), 'default')
-const RankingPagina = pagina(() => import('./pages/Ranking'), 'default')
-const Convite = pagina(() => import('./pages/Convite'), 'default')
-const Times = pagina(() => import('./pages/Time'), 'default')
-const EntrarNoTime = pagina(() => import('./pages/Time'), 'EntrarNoTime')
-const TimeDetalhe = pagina(() => import('./pages/Time'), 'TimeDetalhe')
-const Conquistas = pagina(() => import('./pages/Conquistas'), 'default')
-const Ferramentas = pagina(() => import('./pages/Ferramentas'), 'default')
 const SessaoGuiada = pagina(() => import('./pages/SessaoGuiada'), 'default')
 const Configuracoes = pagina(() => import('./pages/Configuracoes'), 'default')
 const Admin = pagina(() => import('./pages/Admin'), 'default')
@@ -90,15 +80,8 @@ function Rotas() {
         {/* O desafio do dia e o quiz saíram do app: os links antigos levam aos artigos. */}
         <Route path="desafio" element={<Navigate to="/artigos" replace />} />
         <Route path="quiz" element={<Navigate to="/artigos" replace />} />
-        <Route path="cartao" element={<CartaoDoAtleta />} />
         <Route path="programas" element={<Programas />} />
         <Route path="programas/:id" element={<ProgramaDetalhe />} />
-        <Route path="jogos" element={<Jogos />} />
-        <Route path="ranking" element={<RankingPagina />} />
-        <Route path="convite/:codigo" element={<Convite />} />
-        <Route path="time" element={<Times />} />
-        <Route path="time/entrar/:codigo" element={<EntrarNoTime />} />
-        <Route path="time/:id" element={<TimeDetalhe />} />
         <Route path="sessao" element={<SessaoGuiada />} />
         <Route path="jogue-como" element={<JogueComo />} />
         <Route path="jogue-como/:id" element={<EstiloDetalhe />} />
@@ -109,11 +92,6 @@ function Rotas() {
         <Route path="equipamentos" element={<Equipamentos />} />
         <Route path="artigos" element={<Artigos />} />
         <Route path="artigos/:id" element={<ArtigoDetalhe />} />
-        <Route path="desempenho" element={<Desempenho />} />
-        <Route path="conquistas" element={<Conquistas />} />
-        {/* A aba se chamava Metas: os links e favoritos antigos continuam funcionando. */}
-        <Route path="metas" element={<Navigate to="/conquistas" replace />} />
-        <Route path="ferramentas" element={<Ferramentas />} />
         <Route path="configuracoes" element={<Configuracoes />} />
         <Route path="admin" element={<RequerAdmin senao={<NaoEncontrada />}><Admin /></RequerAdmin>} />
         <Route path="*" element={<NaoEncontrada />} />

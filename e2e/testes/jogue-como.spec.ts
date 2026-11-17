@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test'
-import { autorizacao, entrarCom, novaConta, numero, irPara } from './ajuda'
+import { autorizacao, entrarCom, novaConta, irPara } from './ajuda'
 
 const DIAS = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado']
 
@@ -112,11 +112,9 @@ test('faz o treino do estilo na sessão guiada e a sessão é salva no banco', a
   await expect(page.getByRole('heading', { name: /Treino concluído/ })).toBeVisible()
   await page.getByRole('button', { name: 'Salvar sessão' }).click()
 
-  // Desempenho lê do banco: a sessão está lá com os dois exercícios registrados.
-  await expect(page).toHaveURL(/\/desempenho$/)
+  // A sessão está no banco com os dois exercícios registrados.
+  await expect.poll(async () => ((await (await request.get('/api/sessions', { headers: autorizacao(token) })).json()) as unknown[]).length).toBe(1)
   await page.reload()
-  await expect(numero(page, 'sessões no total')).toHaveText('1')
-  await expect(numero(page, 'aproveitamento')).toHaveText('67%')
   const sessoes = (await (await request.get('/api/sessions', { headers: autorizacao(token) })).json()) as {
     entries: { exerciseName?: string; name?: string; makes: number | null; attempts: number | null; reps: number | null }[]
   }[]

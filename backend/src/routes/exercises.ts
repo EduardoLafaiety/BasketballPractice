@@ -121,8 +121,7 @@ export function exercisesRouter(db: Database) {
       await db.query('DELETE FROM exercises WHERE id = $1', [id])
     } catch (error) {
       if (isStillReferenced(error)) {
-        const goal = await one(db, 'SELECT 1 FROM goals WHERE exercise_id = $1 LIMIT 1', [id])
-        throw new HttpError(409, goal ? 'Exercício está em uso por uma meta' : 'Exercício está em uso por treinos ou registros')
+        throw new HttpError(409, 'Exercício está em uso por treinos ou registros')
       }
       throw error
     }

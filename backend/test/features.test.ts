@@ -4,7 +4,6 @@ import { after, before, describe, it } from 'node:test'
 import { createApp } from '../src/app.js'
 import { caixaDeEmails, criarConta } from './caixa.js'
 import { generatePlan } from '../src/routes/plans.js'
-import { streaks } from '../src/routes/stats.js'
 import { openTestDatabase } from './pglite.js'
 
 const db = await openTestDatabase()
@@ -37,18 +36,6 @@ before(async () => {
 after(async () => {
   server.close()
   await db.close()
-})
-
-describe('Sequência de dias', () => {
-  it('conta a sequência atual até ontem e guarda a melhor', () => {
-    assert.deepEqual(streaks([], '2026-10-24'), { current: 0, best: 0 })
-    assert.deepEqual(streaks(['2026-10-22', '2026-10-23'], '2026-10-24'), { current: 2, best: 2 })
-    assert.deepEqual(streaks(['2026-10-01', '2026-10-02', '2026-10-03', '2026-10-20'], '2026-10-24'), {
-      current: 0,
-      best: 3,
-    })
-    assert.deepEqual(streaks(['2026-10-24', '2026-10-23', '2026-10-23'], '2026-10-24'), { current: 2, best: 2 })
-  })
 })
 
 describe('Gerador de treino', () => {
@@ -102,71 +89,6 @@ describe('Ferramentas na API', () => {
     })
     assert.equal(repeatedZone.status, 400)
 
-    const zones = (await api('GET', '/stats/zones')).body
-    assert.equal(zones.length, 12)
-    assert.deepEqual(
-      zones.find((z: { zone: string }) => z.zone === 'lance_livre'),
-      { zone: 'lance_livre', makes: 8, attempts: 10, percentage: 80 },
-    )
-    assert.equal(zones.find((z: { zone: string }) => z.zone === 'garrafao').percentage, null)
-
-    const summary = (await api('GET', '/stats/summary')).body
-    assert.equal(summary.totals.averageFatigue, 4)
-    assert.equal(summary.byExercise[0].bestStreak, 6)
-    assert.equal(summary.byWeek[0].percentage, 60)
-  })
-
-  it('calcula sequência e conquistas no fuso do atleta', async () => {
-    // 22h em Brasília de 20/10 já é 21/10 em UTC: com tzOffset=180 conta como um dia só.
-    await api('POST', '/sessions', { performedAt: '2026-10-20T22:00:00-03:00', durationMinutes: 10 })
-    const progress = (await api('GET', '/stats/progress?tzOffset=180')).body
-    assert.equal(progress.streak.best, 1)
-    assert.equal(progress.totals.sessions, 2)
-    const first = progress.achievements.find((a: { id: string }) => a.id === 'primeira-sessao')
-    assert.equal(first.unlocked, true)
-    assert.equal(progress.achievements.find((a: { id: string }) => a.id === '7-dias').unlocked, false)
-    assert.equal((await api('GET', '/stats/progress?tzOffset=9999')).status, 400)
-  })
-
-  it('cria metas e calcula o progresso', async () => {
-    const freeThrow = await exercise('Lance livre')
-    const pct = await api('POST', '/goals', {
-      title: '70% nos lances livres',
-      kind: 'aproveitamento',
-      target: 70,
-      exerciseId: freeThrow.id,
-    })
-    assert.equal(pct.status, 201)
-    assert.equal(pct.body.exerciseName, 'Lance livre')
-    assert.equal(typeof pct.body.current, 'number')
-
-    assert.equal((await api('POST', '/goals', { title: 'Demais', kind: 'aproveitamento', target: 120 })).status, 400)
-    assert.equal(
-      (await api('POST', '/goals', { title: 'Errado', kind: 'sessoes_semana', target: 3, exerciseId: freeThrow.id })).status,
-      400,
-    )
-
-    const total = await api('POST', '/goals', { title: '2 sessões', kind: 'sessoes_total', target: 2, deadline: '2026-12-31' })
-    assert.equal(total.body.current, 0)
-    assert.equal(total.body.deadline, '2026-12-31')
-    await api('POST', '/sessions', { performedAt: new Date().toISOString(), durationMinutes: 20 })
-    await api('POST', '/sessions', { performedAt: new Date().toISOString(), durationMinutes: 20 })
-    const goals = (await api('GET', '/goals?tzOffset=180')).body
-    const updated = goals.find((g: { id: number }) => g.id === total.body.id)
-    assert.equal(updated.current, 2)
-    assert.equal(updated.achieved, true)
-
-    assert.equal((await api('DELETE', `/goals/${pct.body.id}`)).status, 204)
-    assert.equal((await api('DELETE', `/goals/${pct.body.id}`)).status, 404)
-  })
-
-  it('registra testes físicos', async () => {
-    assert.ok((await api('GET', '/tests/kinds')).body.some((k: { kind: string }) => k.kind === 'impulsao'))
-    const created = await api('POST', '/tests', { kind: 'impulsao', value: 55.5, performedAt: '2026-10-01' })
-    assert.equal(created.status, 201)
-    assert.equal(created.body.value, 55.5)
-    assert.equal((await api('POST', '/tests', { kind: 'voo', value: 1, performedAt: '2026-10-01' })).status, 400)
-    assert.equal((await api('GET', '/tests?kind=impulsao')).body.length, 1)
   })
 
   it('salva preferências com padrões', async () => {
@@ -248,7 +170,6 @@ describe('Ferramentas na API', () => {
     assert.equal(imported.status, 200)
     assert.equal(imported.body.created.exercises, 1)
     assert.equal(imported.body.created.sessions, exported.sessions.length)
-    assert.equal(imported.body.created.goals, exported.goals.length)
     const otherSessions = (await api('GET', '/sessions?limit=200', undefined, other.token)).body
     const floater = otherSessions.find((s: { entries: { exerciseName: string }[] }) => s.entries[0]?.exerciseName === 'Floater')
     assert.ok(floater)

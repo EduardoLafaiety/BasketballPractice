@@ -81,12 +81,9 @@ describe('Sessões', () => {
     )
     assert.deepEqual(updated.body.shots, [{ zone: 'tres_topo', makes: 2, attempts: 6 }])
 
-    const summary = (await api('GET', '/stats/summary', undefined, token)).body
-    assert.deepEqual(summary.shooting, { makes: 18, attempts: 20, percentage: 90 })
 
     assert.equal((await api('DELETE', `/sessions/${created.body.id}`, undefined, token)).status, 204)
     assert.equal((await api('GET', `/sessions/${created.body.id}`, undefined, token)).status, 404)
-    assert.equal((await api('GET', '/stats/summary', undefined, token)).body.totals.sessions, 0)
   })
 
   it('pagina a lista da mais recente para a mais antiga', async () => {
@@ -142,38 +139,7 @@ describe('Treinos e exercícios', () => {
   })
 })
 
-describe('Metas, testes e preferências', () => {
-  it('valida as regras de cada tipo de meta', async () => {
-    const goal = (extra: Record<string, unknown>) => api('POST', '/goals', { title: 'Meta', kind: 'cestas_total', target: 10, ...extra }, token)
-    assert.equal((await goal({ kind: 'aproveitamento', target: 101 })).status, 400)
-    assert.equal((await goal({ kind: 'aproveitamento', target: 100 })).status, 201)
-    assert.equal((await goal({ kind: 'sessoes_semana', exerciseId: freeThrow })).status, 400)
-    assert.equal((await goal({ target: 0 })).status, 400)
-    assert.equal((await goal({ deadline: '2026-02-30' })).status, 400)
-    assert.equal((await goal({ deadline: '2026-12-31', exerciseId: freeThrow })).body.deadline, '2026-12-31')
-  })
-
-  it('a meta de cestas conta só o que foi feito depois de criada', async () => {
-    const { token: own } = await register()
-    await api('POST', '/sessions', { performedAt: '2020-01-01', entries: [{ exerciseId: freeThrow, attempts: 50, makes: 50 }] }, own)
-    const goal = (await api('POST', '/goals', { title: 'Cem cestas', kind: 'cestas_total', target: 100 }, own)).body
-    assert.deepEqual([goal.current, goal.achieved], [0, false])
-
-    await api('POST', '/sessions', { performedAt: new Date().toISOString(), entries: [{ exerciseId: freeThrow, attempts: 120, makes: 100 }] }, own)
-    const [updated] = (await api('GET', '/goals', undefined, own)).body
-    assert.deepEqual([updated.current, updated.achieved], [100, true])
-  })
-
-  it('recusa teste físico com valor zero ou tipo desconhecido e filtra por tipo', async () => {
-    const { token: own } = await register()
-    assert.equal((await api('POST', '/tests', { kind: 'impulsao', value: 0, performedAt: '2026-10-20' }, own)).status, 400)
-    assert.equal((await api('POST', '/tests', { kind: 'supino', value: 10, performedAt: '2026-10-20' }, own)).status, 400)
-    await api('POST', '/tests', { kind: 'impulsao', value: 55.5, performedAt: '2026-10-20' }, own)
-    await api('POST', '/tests', { kind: 'sprint', value: 4.2, performedAt: '2026-10-20' }, own)
-    const jumps = (await api('GET', '/tests?kind=impulsao', undefined, own)).body
-    assert.deepEqual(jumps.map((t: { value: number }) => t.value), [55.5])
-  })
-
+describe('Preferências', () => {
   it('recusa horário de lembrete e dias da semana inválidos', async () => {
     for (const reminders of [{ time: '24:00' }, { time: '7:00' }, { days: [7] }]) {
       assert.equal((await api('PUT', '/settings', { reminders }, token)).status, 400, JSON.stringify(reminders))
@@ -229,18 +195,6 @@ describe('Importação de backup', () => {
     assert.match(result.body.error, /Inventado/)
   })
 
-  it('aplica nas metas importadas as mesmas regras da tela de metas', async () => {
-    const { token: own } = await register()
-    const result = await api(
-      'POST',
-      '/data/import',
-      backup({ goals: [{ title: 'Meta inválida', kind: 'sessoes_semana', target: 3, exerciseName: 'Lance livre' }] }),
-      own,
-    )
-    assert.equal(result.status, 400)
-    assert.deepEqual((await api('GET', '/goals', undefined, own)).body, [])
-  })
-
   it('recusa séries e repetições negativas nos treinos importados', async () => {
     const { token: own } = await register()
     const result = await api(
@@ -267,14 +221,13 @@ describe('Exclusão de conta pelo admin', () => {
       { workoutId: workout.id, performedAt: '2026-10-20', entries: [{ exerciseId: own.id, attempts: 5, makes: 3 }] },
       athlete.token,
     )
-    await api('POST', '/goals', { title: 'Meta', kind: 'cestas_total', target: 10, exerciseId: own.id }, athlete.token)
 
     assert.equal((await api('DELETE', `/admin/users/${athlete.id}`, undefined, admin.token)).status, 204)
     const left = await db.query<{ n: number }>(
       `SELECT (SELECT count(*) FROM exercises WHERE user_id = $1)
             + (SELECT count(*) FROM workouts WHERE user_id = $1)
             + (SELECT count(*) FROM practice_sessions WHERE user_id = $1)
-            + (SELECT count(*) FROM goals WHERE user_id = $1) AS n`,
+            AS n`,
       [athlete.id],
     )
     assert.equal(Number(left.rows[0].n), 0)

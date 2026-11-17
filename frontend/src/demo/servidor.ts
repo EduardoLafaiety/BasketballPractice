@@ -3,19 +3,13 @@
 import { PGlite, type Transaction } from '@electric-sql/pglite'
 import { one, prepareDatabase, type Database, type Queryable } from '../../../backend/src/db/index'
 import { errorHandler, notFoundHandler } from '../../../backend/src/middleware/errors'
-import { cardRouter } from '../../../backend/src/routes/card'
 import { dataRouter } from '../../../backend/src/routes/data'
 import { exercisesRouter } from '../../../backend/src/routes/exercises'
-import { gamesRouter } from '../../../backend/src/routes/games'
-import { goalsRouter } from '../../../backend/src/routes/goals'
 import { plansRouter } from '../../../backend/src/routes/plans'
-import { playsRouter } from '../../../backend/src/routes/plays'
 import { programsRouter } from '../../../backend/src/routes/programs'
 import { sessionsRouter } from '../../../backend/src/routes/sessions'
 import { settingsRouter } from '../../../backend/src/routes/settings'
-import { statsRouter } from '../../../backend/src/routes/stats'
 import { stylesRouter } from '../../../backend/src/routes/styles'
-import { testsRouter } from '../../../backend/src/routes/tests'
 import { workoutsRouter } from '../../../backend/src/routes/workouts'
 import { RespostaDemo, type PedidoDemo, type RouterDemo } from './express'
 
@@ -81,14 +75,8 @@ export async function criarServidor({ dados }: { dados?: string } = {}) {
     ['/exercises', montar(exercisesRouter(db))],
     ['/workouts', montar(workoutsRouter(db))],
     ['/sessions', montar(sessionsRouter(db))],
-    ['/stats', montar(statsRouter(db))],
-    ['/goals', montar(goalsRouter(db))],
-    ['/card', montar(cardRouter(db))],
-    ['/tests', montar(testsRouter(db))],
     ['/plans', montar(plansRouter(db))],
     ['/programs', montar(programsRouter(db))],
-    ['/plays', montar(playsRouter(db))],
-    ['/games', montar(gamesRouter(db))],
     ['/styles', montar(stylesRouter(db))],
     ['/settings', montar(settingsRouter(db))],
     ['/data', montar(dataRouter(db))],

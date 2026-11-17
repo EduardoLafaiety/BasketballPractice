@@ -49,34 +49,13 @@ export function PoliticaPrivacidade() {
       <h2>O que guardamos</h2>
       <ul>
         <li><strong>Conta:</strong> nome, e-mail e a senha em forma de hash, nunca o texto dela.</li>
-        <li><strong>Treino:</strong> exercícios, treinos, sessões, arremessos por zona, notas, metas e preferências que você registra.</li>
-        <li><strong>Testes físicos:</strong> os resultados que você registra, como impulsão e sprint, que também formam o cartão do atleta.</li>
+        <li><strong>Treino:</strong> exercícios, treinos, sessões, arremessos por zona, notas e preferências que você registra.</li>
         <li><strong>Programas:</strong> os programas que você começou e os dias concluídos. O desafio do dia e o quiz saíram do app, mas os resultados que você já tinha neles continuam guardados na sua conta até você excluí-la.</li>
-        <li><strong>Prancheta:</strong> as jogadas que você desenha e salva.</li>
-        <li><strong>Diário de jogos:</strong> data, adversário, placar e os seus números em cada partida que você anota.</li>
         <li><strong>Notificações, se você ligar:</strong> o endereço de entrega que o navegador cria para o aparelho, as chaves dele e o fuso horário, para o lembrete chegar na hora certa. Desligar a opção apaga esses dados.</li>
-        <li>
-          <strong>Times, se você entrar em um:</strong> o time, o técnico e as tarefas que ele passou. O técnico do time vê o seu nome, quantos
-          treinos e minutos você registrou nos últimos 7 dias, a data do último treino, a sequência de dias, a nota do cartão e as
-          tarefas que você cumpriu. Ele não vê o seu e-mail, as notas das sessões nem o resto do histórico. Ao sair do time, ele deixa de ver.
-        </li>
-        <li><strong>Ranking, se você entrar nele:</strong> o apelido, se ele aparece no ranking aberto, o código do seu link de convite, a lista de amigos e os desafios entre amigos.</li>
         <li><strong>Segurança:</strong> o endereço IP é usado para limitar tentativas de acesso. A contagem fica na memória do servidor e não é gravada no banco.</li>
         <li><strong>Pedidos de cadastro:</strong> o nome, o e-mail e o hash da senha ficam à espera da ativação por até 24 horas e são descartados quando um novo cadastro é feito depois desse prazo.</li>
       </ul>
       <p>A aba Alimentação só mostra sugestões: ela não pede nem guarda nada sobre o que você come, seu peso ou sua saúde.</p>
-
-      <h2 id="ranking">O que fica visível no ranking</h2>
-      <p>
-        O ranking é opcional: sem criar um perfil, nada seu aparece para outras pessoas. Ao criar o perfil, os outros atletas passam a
-        ver o seu <strong>apelido</strong> e os seus <strong>números em cada lista</strong> (lances livres,
-        dias de treino e nota do cartão), além da sua posição. Nome, e-mail, notas e o restante dos treinos nunca aparecem.
-      </p>
-      <ul>
-        <li>Com a opção de ranking aberto desmarcada, só os seus amigos veem o seu apelido e os seus números.</li>
-        <li>Amigos são as pessoas que aceitaram o seu link de convite ou cujo convite você aceitou. Nos desafios entre amigos, os dois veem o placar da semana.</li>
-        <li>Você pode trocar o apelido, sair do ranking aberto ou sair do ranking de vez a qualquer momento. Sair apaga o perfil, as amizades e os desafios; os treinos continuam.</li>
-      </ul>
 
       <h2 id="cookies">Cookies e armazenamento no navegador</h2>
       <p>Cookies e o armazenamento local são pequenos dados que um site guarda no seu navegador. O Basketball Practice usa dois tipos:</p>
@@ -185,7 +164,6 @@ export function PoliticaPrivacidade() {
 
       <h2>Pontos para a revisão jurídica</h2>
       <ul>
-        <li><strong>Testes físicos:</strong> [a revisar: se esses dados têm tratamento especial, por serem ligados ao corpo e ao desempenho].</li>
         <li><strong>Base legal:</strong> [a revisar: as bases para cada uso e as obrigações aplicáveis, como as da LGPD, incluindo a transferência para os Estados Unidos].</li>
       </ul>
     </PaginaLegal>
@@ -226,14 +204,6 @@ export function TermosDeUso() {
       <p>
         Não tente acessar dados de outras pessoas, atrapalhar o serviço ou automatizar o cadastro e o login. Contas que fizerem isso
         podem ser suspensas ou apagadas.
-      </p>
-
-      <h2>Ranking e desafios entre amigos</h2>
-      <p>
-        Participar do ranking é opcional. O apelido não pode ofender, enganar se passando por outra pessoa nem trazer dados pessoais
-        de ninguém. Registre só treinos, testes e jogos que você fez de verdade: os números têm limites e conferências no servidor,
-        e perfis com apelido impróprio ou números forjados podem ser tirados do ranking ou apagados, sem aviso. O que fica visível
-        está descrito na <Link className="link" to="/privacidade#ranking">Política de Privacidade</Link>.
       </p>
 
       <h2>Jogadores e notícias</h2>

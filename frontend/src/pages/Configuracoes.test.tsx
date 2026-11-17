@@ -81,8 +81,8 @@ describe('Backup', () => {
     const backup = { format: 'basketball-practice', version: 1, sessions: [] }
     const { ultima } = abrirConfiguracoes({
       'POST /data/import': {
-        created: { exercises: 1, workouts: 2, sessions: 3, goals: 0, physicalTests: 4 },
-        skipped: { sessions: 2, goals: 0, physicalTests: 0 },
+        created: { exercises: 1, workouts: 2, sessions: 3 },
+        skipped: { sessions: 2 },
       },
     })
     await screen.findByRole('button', { name: 'Importar backup' })
@@ -90,45 +90,40 @@ describe('Backup', () => {
     await user.upload(seletorDeArquivo(), arquivoJson(JSON.stringify(backup)))
 
     expect(await screen.findByRole('status')).toHaveTextContent(
-      'Importado: 3 sessões, 1 exercícios, 2 treinos, 0 metas e 4 testes. 2 sessões já existiam.',
+      'Importado: 3 sessões, 1 exercícios, 2 treinos. 2 sessões já existiam.',
     )
     expect(ultima('POST', '/data/import')?.corpo).toEqual(backup)
   })
 
   it('depois de importar, as outras telas não mostram os dados antigos enquanto buscam os novos', async () => {
     const user = userEvent.setup()
-    const conquista = (progress: number) => ({ id: 'primeira-sessao', title: 'Primeiro treino', description: 'Registre sua primeira sessão.', target: 1, progress, unlocked: progress >= 1 })
     let importou = false
-    let responderProgresso: (() => void) | null = null
+    let responderExercicios: (() => void) | null = null
     definirToken('tk')
     apiFalsa({
       'GET /auth/me': usuarioFalso(),
       'GET /settings': configFalsa,
-      'GET /exercises': [],
-      // Depois da importação, a busca do progresso espera o teste liberar.
-      'GET /stats/progress': () =>
-        importou
-          ? new Promise((pronto) => (responderProgresso = () => pronto({ streak: { current: 1, best: 1 }, achievements: [conquista(1)] })))
-          : { streak: { current: 0, best: 0 }, achievements: [conquista(0)] },
+      // Depois da importação, a busca dos exercícios espera o teste liberar.
+      'GET /exercises': () => (importou ? new Promise((pronto) => (responderExercicios = () => pronto([]))) : []),
       'POST /data/import': () => {
         importou = true
-        return { created: { exercises: 0, workouts: 0, sessions: 1, goals: 0, physicalTests: 0 }, skipped: { sessions: 0, goals: 0, physicalTests: 0 } }
+        return { created: { exercises: 0, workouts: 0, sessions: 1 }, skipped: { sessions: 0 } }
       },
     })
-    abrirApp('/conquistas')
-    expect(await screen.findByText('0/1')).toBeInTheDocument()
+    abrirApp('/treinos')
+    await screen.findByRole('heading', { name: 'Treinos' })
+    await waitFor(() => expect(screen.queryByText('Carregando treinos')).toBeNull())
 
     await user.click(screen.getByRole('link', { name: 'Configurações' }))
     await user.upload(await waitFor(() => seletorDeArquivo()), arquivoJson('{"format":"basketball-practice","version":1}'))
     await screen.findByRole('status')
 
-    await user.click(screen.getByRole('link', { name: /Conquistas/ }))
-    expect(await screen.findByText('Calculando sua sequência')).toBeInTheDocument()
-    expect(screen.queryByText('0/1')).toBeNull()
+    await user.click(screen.getAllByRole('link', { name: /Treinos/ })[0])
+    expect(await screen.findByText('Carregando treinos')).toBeInTheDocument()
 
-    await waitFor(() => expect(responderProgresso).not.toBeNull())
-    responderProgresso!()
-    expect(await screen.findByText('Desbloqueada')).toBeInTheDocument()
+    await waitFor(() => expect(responderExercicios).not.toBeNull())
+    responderExercicios!()
+    await waitFor(() => expect(screen.queryByText('Carregando treinos')).toBeNull())
   })
 
   it('recusa arquivo que não é JSON sem chamar a API', async () => {
