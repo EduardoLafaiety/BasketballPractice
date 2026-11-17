@@ -144,3 +144,46 @@ input[type='range']::-webkit-slider-thumb {
 }
 input[type='range']::-moz-range-thumb { width: 10px; height: 18px; border: var(--px) solid var(--texto); background: var(--laranja); }
 
+
+/* ---------- Retrô: acabamento de fliperama ---------- */
+
+/* Tela de tubo: linhas finas e fixas por cima de tudo (não pegam o clique) e um leve escurecer nas bordas. */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 2147483000;
+  pointer-events: none;
+  background:
+    repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.1) 0 1px, transparent 1px 3px),
+    radial-gradient(ellipse at center, transparent 62%, rgba(0, 0, 0, 0.22) 100%);
+}
+:root[data-theme='light'] body::after { opacity: 0.45; }
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme='dark']) body::after { opacity: 0.45; }
+}
+@media print { body::after { display: none; } }
+
+/* Cartões com o mesmo canto em degrau dos botões e uma sombra dura embaixo, como caixa de diálogo de RPG. */
+.card { clip-path: var(--canto-pixel); border-bottom-width: calc(var(--px) * 2); }
+
+/* Títulos de página como letreiro: sombra dura laranja deslocada em um pixel inteiro. */
+h1 { text-shadow: var(--px) var(--px) 0 var(--laranja-escuro); }
+
+/* Números grandes como placar de ginásio. */
+.stat strong, .contador-placar strong, .resultados dd { text-shadow: var(--px) var(--px) 0 rgba(255, 106, 19, 0.45); letter-spacing: 0.04em; }
+
+/* Seleção de texto e foco com o mesmo laranja; cursores desenhados em pixel (seta e mãozinha). */
+html {
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' shape-rendering='crispEdges'%3E%3Cpath fill='%230b0b0b' d='M2 2h2v18h-2zM4 4h2v14h-2zM6 6h2v12h-2zM8 8h2v10h-2zM10 10h2v8h-2zM12 12h2v6h-2zM6 16h2v4h-2zM8 18h2v4h-2z'/%3E%3Cpath fill='%23ff6a13' d='M4 6h2v10h-2zM6 8h2v8h-2zM8 10h2v6h-2zM10 12h2v4h-2z'/%3E%3C/svg%3E") 2 2, auto;
+}
+a, button, summary, select, [role='button'], input[type='checkbox'], input[type='radio'], input[type='range'] {
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' shape-rendering='crispEdges'%3E%3Cpath fill='%230b0b0b' d='M8 2h4v2h-4zM6 4h2v10h-2zM12 4h2v8h-2zM14 8h2v8h-2zM16 10h2v8h-2zM4 12h2v4h-2zM6 14h2v2h-2zM6 18h12v2h-12zM8 20h8v2h-8zM4 14h2v2h-2z'/%3E%3Cpath fill='%23ffd9bf' d='M8 4h4v14h-4zM12 12h2v6h-2zM14 14h2v4h-2zM6 14h2v4h-2z'/%3E%3C/svg%3E") 9 3, pointer;
+}
+
+/* Divisores e faixas com padrão de pontinhos (dither) em vez de linha lisa. */
+hr {
+  height: calc(var(--px) * 2);
+  border: 0;
+  background: repeating-linear-gradient(90deg, var(--borda) 0 var(--px), transparent var(--px) calc(var(--px) * 2));
+}
