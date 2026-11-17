@@ -166,9 +166,20 @@ const crc32 = (bytes: Uint8Array) => {
 }
 const u32 = (n: number) => [(n >>> 24) & 255, (n >>> 16) & 255, (n >>> 8) & 255, n & 255]
 
+/** Junta pedaços de bytes num só Uint8Array (sem espalhar dezenas de milhares de números em argumentos). */
+function juntar(...partes: ArrayLike<number>[]) {
+  const saida = new Uint8Array(partes.reduce((n, p) => n + p.length, 0))
+  let em = 0
+  for (const p of partes) {
+    saida.set(p, em)
+    em += p.length
+  }
+  return saida
+}
+
 function bloco(tipo: string, dados: Uint8Array | number[]) {
-  const corpo = new Uint8Array([...Array.from(tipo, (c) => c.charCodeAt(0)), ...dados])
-  return [...u32(dados.length), ...corpo, ...u32(crc32(corpo))]
+  const corpo = juntar(Array.from(tipo, (c) => c.charCodeAt(0)), dados)
+  return juntar(u32(dados.length), corpo, u32(crc32(corpo)))
 }
 
 /** Codifica pixels RGBA (largura × altura) como PNG. */
@@ -182,13 +193,13 @@ export function codificarPng(rgba: Uint8Array, largura: number, altura: number):
     b = (b + a) % 65521
   }
   const n = linhas.length // cabe num único bloco "stored" (até 65535 bytes)
-  const zlib = [0x78, 0x01, 0x01, n & 255, n >> 8, ~n & 255, (~n >> 8) & 255, ...linhas, ...u32(((b << 16) | a) >>> 0)]
-  return new Uint8Array([
-    137, 80, 78, 71, 13, 10, 26, 10,
-    ...bloco('IHDR', [...u32(largura), ...u32(altura), 8, 6, 0, 0, 0]),
-    ...bloco('IDAT', zlib),
-    ...bloco('IEND', []),
-  ])
+  const zlib = juntar([0x78, 0x01, 0x01, n & 255, n >> 8, ~n & 255, (~n >> 8) & 255], linhas, u32(((b << 16) | a) >>> 0))
+  return juntar(
+    [137, 80, 78, 71, 13, 10, 26, 10],
+    bloco('IHDR', [...u32(largura), ...u32(altura), 8, 6, 0, 0, 0]),
+    bloco('IDAT', zlib),
+    bloco('IEND', []),
+  )
 }
 
 const guardadas = new Map<string, string>()
@@ -197,7 +208,7 @@ function png(chave: string, pixels: () => Uint8Array, lado = LADO): string {
   let url = guardadas.get(chave)
   if (!url) {
     const bytes = codificarPng(pixels(), lado, lado)
-    url = `data:image/png;base64,${btoa(String.fromCharCode(...bytes))}`
+    url = `data:image/png;base64,${btoa(Array.from({ length: Math.ceil(bytes.length / 8192) }, (_, i) => String.fromCharCode(...bytes.subarray(i * 8192, (i + 1) * 8192))).join(''))}`
     guardadas.set(chave, url)
   }
   return url
