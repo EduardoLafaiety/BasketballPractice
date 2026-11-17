@@ -646,7 +646,17 @@ export class Boneco {
     const X = new THREE.Vector3().crossVectors(dir, Z).normalize()
     const Zc = new THREE.Vector3().crossVectors(X, dir)
     mao.quaternion.setFromRotationMatrix(new THREE.Matrix4().makeBasis(X, dir, Zc))
-    this.maos[qual].ajustar(abraco)
+    // Punho: logo depois de soltar a bola (arremesso, passe), a mão dobra para baixo e os dedos seguem a bola
+    // (o "pescoço de ganso" do arremesso); relaxada, o punho fica levemente estendido.
+    let solta = 0
+    for (const b of c.bolas) {
+      if (b.presa > 0.3) continue
+      const d = vec(b.centro).distanceTo(punho)
+      if (d < 0.7) solta = Math.max(solta, 1 - d / 0.7)
+    }
+    const flexao = abraco > 0.3 ? 0 : solta * 0.9 - 0.08
+    mao.rotateX(-flexao)
+    this.maos[qual].ajustar(Math.max(abraco, solta * 0.6))
   }
 
   private atualizarEsqueleto() {
