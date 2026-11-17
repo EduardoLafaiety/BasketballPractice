@@ -145,8 +145,9 @@ let servidor: Promise<ServidorDemo> | null = null
 
 /** O servidor do navegador, criado no primeiro pedido. */
 export function servidorDoNavegador() {
-  // "-v2": a primeira versão vinha com dados de exemplo; quem já tinha aberto também começa do zero.
-  servidor ??= criarServidor({ dados: 'idb://basketball-practice-demo-v2' })
+  // O número no fim do nome é a "safra" do visitante: subir o número faz quem já tinha aberto a demonstração
+  // (v1 vinha com dados de exemplo; v2 guardava os testes de quem usou) começar de novo, com as estatísticas zeradas.
+  servidor ??= criarServidor({ dados: 'idb://basketball-practice-demo-v3' })
   return servidor
 }
 
