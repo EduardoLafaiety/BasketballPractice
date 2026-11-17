@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { menosMovimento } from '../lib/movimento'
-import { corpoDoParceiro, corpoNoInstante, ESCALA, type Corpo3D } from './corpo3d'
+import { corpoDoParceiro, corpoNoTempo, ESCALA, type Corpo3D } from './corpo3d'
 import { instante, preparar, type Coreografia } from './motor'
 import { Boneco, CORES_ATLETA, CORES_PARCEIRO } from './tres-d/boneco'
 import { Cenario } from './tres-d/cenario'
@@ -49,7 +49,7 @@ const FOCOS: { id: Foco; rotulo: string; distancia: number }[] = [
 
 const ROTULOS_ANGULOS = (frente: boolean) =>
   frente
-    ? ([['joelhoF', 'Joelho direito'], ['joelhoT', 'Joelho esquerdo'], ['quadrilF', 'Quadril direito'], ['quadrilT', 'Quadril esquerdo'], ['cotoveloP', 'Cotovelo direito'], ['cotoveloL', 'Cotovelo esquerdo'], ['tronco', 'Inclinação do tronco']] as const)
+    ? ([['joelhoF', 'Joelho esquerdo'], ['joelhoT', 'Joelho direito'], ['quadrilF', 'Quadril esquerdo'], ['quadrilT', 'Quadril direito'], ['cotoveloP', 'Cotovelo esquerdo'], ['cotoveloL', 'Cotovelo direito'], ['tronco', 'Inclinação do tronco']] as const)
     : ([['joelhoF', 'Joelho (perto)'], ['joelhoT', 'Joelho (longe)'], ['quadrilF', 'Quadril (perto)'], ['quadrilT', 'Quadril (longe)'], ['cotoveloP', 'Cotovelo (perto)'], ['cotoveloL', 'Cotovelo (longe)'], ['tronco', 'Inclinação do tronco']] as const)
 
 interface Props {
@@ -170,7 +170,7 @@ export default function Demonstracao3D({ coreografia, nome, aoFalhar, aoVer2D }:
     camera.position.copy(controles.target).add(posicaoPadrao())
 
     let sujo = true
-    let corpo: Corpo3D = corpoNoInstante(instante(anim, 0), anim.frente, coreografia.cena)
+    let corpo: Corpo3D = corpoNoTempo(anim, 0, coreografia.cena)
     const alvoVisto = new THREE.Vector3().copy(controles.target)
     let distanciaAlvo: number | null = null
     let tweenCamera: { de: THREE.Vector3; para: THREE.Vector3; t: number } | null = null
@@ -191,7 +191,7 @@ export default function Demonstracao3D({ coreografia, nome, aoFalhar, aoVer2D }:
 
     const desenhar = (t: number, dt = 0) => {
       const inst = instante(anim, t)
-      corpo = corpoNoInstante(inst, anim.frente, coreografia.cena)
+      corpo = corpoNoTempo(anim, t, coreografia.cena)
       atleta.atualizar(corpo, t)
       cenario.pousarBola(0, corpo.bolas[0])
       cenario.pousarBola(1, corpo.bolas[1])

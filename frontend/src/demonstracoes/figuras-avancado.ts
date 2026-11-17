@@ -41,7 +41,7 @@ export const FIGURAS_AVANCADO: Record<string, Coreografia> = {
   'Sequência de três trocas': ex('frente', {}, [
     ['Cruzado', 'Base larga, drible baixo e troca pela frente.', [{ x: 340, pe: 'M', ...F_BASE }, ...quiques('P', 1, { d: 180 }), ...trocar('L')]],
     ['Entre as pernas', 'Abra mais a base e passe por baixo.', [{ d: 200, x: 340, pe: 'M', cF: 32, kF: -10, cT: -32, kT: 10, eF: 0.8, eT: 0.8, bL: -15, aL: 10, bola: mao(0, 'L') }, { d: 190, x: 340, pe: 'M', bP: 15, aP: -10, bola: em(340, 280) }, { d: 190, x: 340, pe: 'M', bP: 20, aP: 0, bL: -45, aL: -100, bola: mao(0) }]],
-    ['Por trás', 'Leve a bola por trás das costas para a outra mão.', [{ d: 200, x: 340, pe: 'M', bP: -20, aP: -30, bL: -20, aL: 20, bola: em(340, 240) }, { d: 200, x: 340, pe: 'M', bL: -20, aL: 0, bP: 45, aP: 100, bola: mao(0, 'L') }]],
+    ['Por trás', 'Leve a bola por trás das costas para a outra mão.', [{ d: 200, x: 340, pe: 'M', bP: -20, aP: -30, bL: -20, aL: 20, bola: em(366, 240), z3: { bola: -0.16 }, segura: 'P' }, { d: 160, x: 340, pe: 'M', bP: -15, aP: -25, bL: -20, aL: -15, bola: em(340, 242), z3: { bola: -0.3 }, segura: 'PL' }, { d: 160, x: 340, pe: 'M', bP: -10, aP: -20, bL: -25, aL: -20, bola: em(312, 244), z3: { bola: -0.16 }, segura: 'L' }, { d: 200, x: 340, pe: 'M', bL: -20, aL: 0, bP: 45, aP: 100, bola: mao(0, 'L'), z3: { bola: null }, segura: null }]],
     ['Repita sem olhar', 'Faça a sequência toda sem baixar os olhos e cada vez mais rápido.', [...quiques('L', 1, { d: 170 }), ...trocar('P'), ...quiques('P', 1, { d: 170 }), ...trocar('L')]],
   ]),
   'Recuo e cruzado': ex('lado', { parceiro: { dir: -1, x: 400, pose: DEFENSOR } }, [
@@ -174,8 +174,8 @@ export const FIGURAS_AVANCADO: Record<string, Coreografia> = {
   ]),
   'Passe por trás das costas': ex('lado', { parceiro: { dir: -1, x: 540, pose: PARCEIRO } }, [
     ['Ataque', 'Dois dribles em direção ao defensor imaginário.', [{ x: 170, ...ATAQUE }, ...passadas(trecho(170, 290, 3), { d: 190 })]],
-    ['Leve por trás', 'Pegue a bola com uma mão e leve-a por trás do quadril.', [{ d: 240, x: 320, t: 15, bP: -45, aP: -20, bL: 40, aL: 90, bola: em(292, 245), hl: ['bP'] }]],
-    ['Solte com o punho', 'Um giro de punho manda a bola para a frente, passando pelo corpo.', [{ d: 280, x: 340, bP: -15, aP: 35, bola: { m: 'voo', para: { x: 525, y: 225 }, p: 1, alt: 12 }, hl: ['bP'] }, { d: 500, ...BASE, ...SOLTOS }]],
+    ['Leve por trás', 'Pegue a bola com uma mão e leve-a por trás do quadril.', [{ d: 240, x: 320, t: 15, bP: -45, aP: -20, bL: 40, aL: 90, bola: em(292, 245), z3: { bola: 0, maoP: 0.05 }, hl: ['bP'] }]],
+    ['Solte com o punho', 'Um giro de punho manda a bola para a frente, passando pelo corpo.', [{ d: 280, x: 340, bP: -15, aP: 35, bola: { m: 'voo', para: { x: 525, y: 225 }, p: 1, alt: 12 }, z3: { bola: null, maoP: null }, hl: ['bP'] }, { d: 500, ...BASE, ...SOLTOS }]],
   ]),
   'Passe curto no bloqueio': ex('lado', { cesta: 'lado', cadeira: 300, parceiro: { dir: 1, x: 470, pose: { t: 8, cF: 18, kF: 0, cT: -8, kT: -20, bP: 55, aP: 100, bL: 55, aL: 100 } } }, [
     ['Saia do bloqueio', 'Saia raspando a cadeira, em drible.', [{ x: 160, ...ATAQUE }, ...passadas(trecho(160, 360, 5), { d: 180 })]],

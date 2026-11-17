@@ -42,7 +42,7 @@ export const FIGURAS_INTERMEDIARIO: Record<string, Coreografia> = {
   ]),
   'Por trás das costas em movimento': ex('lado', {}, [
     ['Ataque', 'Drible forte com a mão de fora, ao lado do corpo.', [{ x: 80, ...ATAQUE }, ...passadas(trecho(80, 260, 5))]],
-    ['Bola por trás', 'Empurre a bola por trás do quadril, com o punho, para a outra mão.', [{ d: 240, x: 290, t: 20, cF: 40, kF: 5, cT: -30, kT: -60, bP: -40, aP: -20, bL: -20, aL: 10, bola: em(262, 268), hl: ['bP'] }, { d: 220, x: 320, ...CORRE_B, bL: 30, aL: 75, bP: 35, aP: 100, bola: mao(0, 'L') }]],
+    ['Bola por trás', 'Empurre a bola por trás do quadril, com o punho, para a outra mão.', [{ d: 240, x: 290, t: 20, cF: 40, kF: 5, cT: -30, kT: -60, bP: -40, aP: -20, bL: -20, aL: 10, bola: em(262, 268), z3: { bola: 0, maoP: 0.05 }, hl: ['bP'] }, { d: 220, x: 320, ...CORRE_B, bL: 30, aL: 75, bP: 35, aP: 100, bola: mao(0, 'L'), z3: { bola: null, maoP: null } }]],
     ['Saída', 'Saia no mesmo ritmo, com a bola já à frente na nova mão.', passadas(trecho(320, 580, 6), { bola: 'L' })],
   ]),
   'Drible de recuo': ex('lado', {}, [

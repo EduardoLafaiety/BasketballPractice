@@ -18,12 +18,15 @@ import {
   espelhar,
   POSE_NEUTRA,
   RAIO_BOLA,
+  type Animacao,
   type Cena,
   type Esqueleto,
   type Instante,
   type Musculo,
   type Pose,
   type PontoBola,
+  type Z3,
+  instante,
 } from './motor'
 
 export interface V3 {
@@ -160,6 +163,19 @@ export interface Contexto {
   hl?: Musculo[]
   /** Bolas da cena, em pixels (como o motor entrega). */
   bolas?: (PontoBola | null)[]
+  /** Profundidade 3D (m) da bola e das mãos, quando a coreografia diz (ver CanalZ em motor.ts). */
+  z3?: Z3
+  /** Peso (0 a 1) de cada canal de z3 contra a profundidade padrão. */
+  z3peso?: Z3
+  /** Correção suave da altura do corpo (m), tirada de uma média no tempo: sem trancos na troca de pé. */
+  ajusteY?: number
+  /** Peso sobre o pé de apoio (m de deslocamento lateral da pelve), já suavizado no tempo. */
+  peso?: number
+  /** Quem segura a primeira bola, quando a coreografia diz, e quanto isso vale contra a distância (0 a 1). */
+  segura?: { P: number; L: number }
+  seguraPeso?: number
+  /** Peso de cada mão em cada bola, pela distância no desenho, já suavizado no tempo (para a pegada não dar trancos). */
+  perto?: ({ P: number; L: number } | undefined)[]
 }
 
 const SOBE = 0.035
@@ -174,6 +190,88 @@ function desespelhar(e: Esqueleto, giro: number, frente: boolean): Esqueleto {
   return out
 }
 
+/** O ponto mais perto de P no segmento AB. */
+function noSegmento(p: V3, a: V3, b: V3): V3 {
+  const ab = sub(b, a)
+  const t = limitar(dot(sub(p, a), ab) / Math.max(1e-9, dot(ab, ab)), 0, 1)
+  return soma(a, mul(ab, t))
+}
+
+/**
+ * Tira a mão de dentro do tronco. Ela sai pelo lado dela (P para +Z, L para −Z), mantendo a frente/trás: assim, com
+ * a mão passando bem perto da coluna (por trás das costas), ela não troca de lado de um quadro para o outro.
+ */
+function foraDoTronco(p: V3, pelve: V3, pescoco: V3, raio: number, lado: 1 | -1): V3 {
+  const c = noSegmento(p, pelve, pescoco)
+  const dx = p.x - c.x
+  const dz = p.z - c.z
+  if (Math.hypot(dx, dz) >= raio) return p
+  const z = Math.sqrt(Math.max(0, raio * raio - dx * dx))
+  if (lado * dz >= z) return p
+  return { x: p.x, y: p.y, z: c.z + lado * z }
+}
+
+const TRONCO_RAIO = 0.14
+const CABECA_RAIO = 0.11
+const COXA_RAIO = 0.08
+const CANELA_RAIO = 0.055
+
+/** A bola não atravessa o corpo: do tronco e da cabeça sai pelo caminho mais curto; das pernas, na horizontal. */
+function afastarDoCorpo(b: V3, c: { pelve: V3; pescoco: V3; cabeca: V3; pernaF: Membro; pernaT: Membro }, frente: boolean): V3 {
+  const R = MEDIDAS.raioBola
+  let p = b
+  for (const [a, z, r] of [[c.pelve, c.pescoco, TRONCO_RAIO], [c.cabeca, c.cabeca, CABECA_RAIO]] as const) {
+    const q = noSegmento(p, a, z)
+    const d = sub(p, q)
+    const n = comprimento(d)
+    if (n < r + R) p = soma(q, mul(n < 1e-6 ? v3(frente ? 1 : 0, 0, frente ? 0 : 1) : mul(d, 1 / n), r + R))
+  }
+  // Duas passadas: tirar a bola de uma perna pode encostá-la na outra.
+  for (const perna of [c.pernaF, c.pernaT, c.pernaF, c.pernaT]) {
+    for (const [a, z, r] of [[perna.raiz, perna.meio, COXA_RAIO], [perna.meio, perna.ponta, CANELA_RAIO]] as const) {
+      const q = noSegmento(p, a, z)
+      const d = sub(p, q)
+      const precisa = r + R
+      if (comprimento(d) >= precisa) continue
+      // Sai da perna pelo caminho mais curto na horizontal (a altura fica a mesma): contínuo de um quadro para o
+      // outro, contornando a perna em vez de saltar da frente para trás dela.
+      const h = Math.hypot(d.x, d.z)
+      const dir = h < 1e-6 ? v3(0, 0, 1) : v3(d.x / h, 0, d.z / h)
+      const falta = Math.sqrt(Math.max(0, precisa * precisa - d.y * d.y))
+      p = { x: q.x + dir.x * falta, y: p.y, z: q.z + dir.z * falta }
+    }
+  }
+  return p
+}
+
+/** Como afastarDoCorpo, mas já no mundo (a bola solta não gira com o corpo). A bola também nunca passa do chão. */
+function afastarNoMundo(b: V3, c: { pelve: V3; pescoco: V3; cabeca: V3; pernaF: Membro; pernaT: Membro }): V3 {
+  const R = MEDIDAS.raioBola
+  let p = { ...b, y: Math.max(b.y, R) }
+  for (const [a, z, r] of [[c.pelve, c.pescoco, TRONCO_RAIO], [c.cabeca, c.cabeca, CABECA_RAIO]] as const) {
+    const q = noSegmento(p, a, z)
+    const d = sub(p, q)
+    const n = comprimento(d)
+    if (n < r + R) p = soma(q, mul(n < 1e-6 ? v3(0, 0, 1) : mul(d, 1 / n), r + R))
+  }
+  // Duas passadas: tirar a bola de uma perna pode encostá-la na outra.
+  for (const perna of [c.pernaF, c.pernaT, c.pernaF, c.pernaT]) {
+    for (const [a, z, r] of [[perna.raiz, perna.meio, COXA_RAIO], [perna.meio, perna.ponta, CANELA_RAIO]] as const) {
+      const q = noSegmento(p, a, z)
+      const d = sub(p, q)
+      const precisa = r + R
+      if (comprimento(d) >= precisa) continue
+      // Sai da perna pelo caminho mais curto na horizontal (a altura fica a mesma): contínuo de um quadro para o
+      // outro, contornando a perna em vez de saltar da frente para trás dela.
+      const h = Math.hypot(d.x, d.z)
+      const dir = h < 1e-6 ? v3(0, 0, 1) : v3(d.x / h, 0, d.z / h)
+      const falta = Math.sqrt(Math.max(0, precisa * precisa - d.y * d.y))
+      p = { x: q.x + dir.x * falta, y: p.y, z: q.z + dir.z * falta }
+    }
+  }
+  return p
+}
+
 /** Gira em torno do eixo vertical (ângulo em rad), o ponto relativo à pelve. */
 function girarY(p: V3, a: number): V3 {
   const c = Math.cos(a)
@@ -186,16 +284,32 @@ export function construirCorpo3D(entrada: Esqueleto, ctx: Contexto): Corpo3D {
   const e = desespelhar(entrada, ctx.giro, frente)
   const q = e.quadril
   const folga = 18
+  const dy = ctx.ajusteY ?? 0
+  const z3 = ctx.z3 ?? {}
+  const z3peso = ctx.z3peso ?? {}
+  /** Profundidade da coreografia misturada à padrão (sem salto quando o canal começa ou termina). */
+  const zOu = (c: keyof Z3, padrao: number) => {
+    const v = z3[c]
+    return v === undefined ? padrao : padrao + (v - padrao) * (z3peso[c] ?? 1)
+  }
 
   // --- Plano da coreografia → eixos do corpo: X = para onde olha, Y = para cima, Z = lado perto. ---
   // De lado, o plano tem frente (x) e altura (y); a profundidade (Z) é inventada pelas larguras e pela coxa encurtada.
   // De frente, o plano tem o lado (x) e a altura (y); a profundidade (X, para quem assiste) vem da coxa encurtada.
   // De frente, os ombros do desenho são estreitos (cartum): o lado do tronco e dos braços ganha largura de atleta.
-  const plano = (p: { x: number; y: number }, lado: number, fundo: number, largura = 1): V3 =>
-    frente
-      ? { x: fundo, y: (CHAO - p.y) * ESCALA + SOBE, z: (p.x - q.x) * ESCALA * largura }
-      : { x: (p.x - q.x) * ESCALA, y: (CHAO - p.y) * ESCALA + SOBE, z: lado }
+  // `fixo`: os pés não recebem a suavização de altura (eles ficam no chão; o joelho absorve).
+  const plano = (p: { x: number; y: number }, lado: number, fundo: number, largura = 1, fixo = false): V3 => {
+    const y = (CHAO - p.y) * ESCALA + SOBE + (fixo ? 0 : dy)
+    // Z local é sempre o lado direito do atleta. De frente, ele olha para quem assiste: a direita da tela é a esquerda dele.
+    return frente ? { x: fundo, y, z: -(p.x - q.x) * ESCALA * largura } : { x: (p.x - q.x) * ESCALA, y, z: lado }
+  }
   const LARGURA_OMBRO_FRENTE = 1.4
+  // Sinal do lado das peças "P"/"F" no Z local: de lado são o lado perto (direito do atleta); de frente, a direita da
+  // tela (esquerda do atleta).
+  const sinalP = frente ? -1 : 1
+  // O eixo escondido pela vista plana: de lado é o Z (lado), de frente é o X (frente).
+  const oculto = (p: V3) => (frente ? p.x : p.z)
+  const comOculto = (p: V3, h: number): V3 => (frente ? { ...p, x: h } : { ...p, z: h })
 
   const abre = (eF: number) => Math.sqrt(Math.max(0, 1 - eF * eF)) * 34 * ESCALA
   const { pose } = ctx
@@ -212,61 +326,37 @@ export function construirCorpo3D(entrada: Esqueleto, ctx: Contexto): Corpo3D {
   // do lado oposto (a "queda" do quadril de quem caminha ou corre).
   const altoF = (CHAO - e.tornozeloF.y) * ESCALA
   const altoT = (CHAO - e.tornozeloT.y) * ESCALA
-  const peso = frente ? 0 : limitar((altoT - altoF) * 0.3, -0.06, 0.06)
+  const peso = frente ? 0 : (ctx.peso ?? limitar((altoT - altoF) * 0.3, -0.06, 0.06))
 
   // --- Quadris, ombros e pescoço ---
-  const pelve = { ...plano(q, 0, 0), z: peso }
-  const quadrilF = frente ? plano(e.quadrilF, 0, 0) : soma(pelve, lateral(1, MEDIDAS.larguraQuadril, giroPelve))
-  const quadrilT = frente ? plano(e.quadrilT, 0, 0) : soma(pelve, lateral(-1, MEDIDAS.larguraQuadril, giroPelve))
+  let pelve = { ...plano(q, 0, 0), z: peso }
+  let quadrilF = frente ? plano(e.quadrilF, 0, 0) : soma(pelve, lateral(1, MEDIDAS.larguraQuadril, giroPelve))
+  let quadrilT = frente ? plano(e.quadrilT, 0, 0) : soma(pelve, lateral(-1, MEDIDAS.larguraQuadril, giroPelve))
   const ombroCentro = frente ? mistura(plano(e.ombroP, 0, 0, LARGURA_OMBRO_FRENTE), plano(e.ombroL, 0, 0, LARGURA_OMBRO_FRENTE), 0.5) : plano({ x: (e.ombroP.x + e.ombroL.x) / 2, y: (e.ombroP.y + e.ombroL.y) / 2 }, -peso * 0.6, 0)
   let ombroP = frente ? plano(e.ombroP, 0, 0, LARGURA_OMBRO_FRENTE) : soma(ombroCentro, lateral(1, MEDIDAS.larguraOmbro, giroOmbro))
   let ombroL = frente ? plano(e.ombroL, 0, 0, LARGURA_OMBRO_FRENTE) : soma(ombroCentro, lateral(-1, MEDIDAS.larguraOmbro, giroOmbro))
-  const pescoco = plano(e.pescoco, -peso * 0.6, 0)
-  const cabeca = plano(e.cabeca, -peso * 0.4, 0)
+  let pescoco = plano(e.pescoco, -peso * 0.6, 0)
+  let cabeca = plano(e.cabeca, -peso * 0.4, 0)
 
-  // --- Bolas e contato das mãos ---
-  const maoP2 = plano(e.maoP, 0, 0, LARGURA_OMBRO_FRENTE)
-  const maoL2 = plano(e.maoL, 0, 0, LARGURA_OMBRO_FRENTE)
-  const bolasEntrada = (ctx.bolas ?? []).filter((b): b is PontoBola => !!b)
-  const bolas: Bola3D[] = []
-  const alvoMao = { P: v3(0, 0, 0), L: v3(0, 0, 0) }
-  const ladoMao = { P: MEDIDAS.larguraOmbro - 0.035, L: -(MEDIDAS.larguraOmbro - 0.035) }
-  const baseMao = (p: V3, lado: 'P' | 'L'): V3 => (frente ? { ...p, x: 0.12 } : { ...p, z: ladoMao[lado] })
-  alvoMao.P = baseMao(maoP2, 'P')
-  alvoMao.L = baseMao(maoL2, 'L')
-  const maoPlano = { P: e.maoP, L: e.maoL }
-  for (const b of bolasEntrada) {
-    const dP = Math.hypot(b.x - maoPlano.P.x, b.y - maoPlano.P.y)
-    const dL = Math.hypot(b.x - maoPlano.L.x, b.y - maoPlano.L.y)
-    const wP = 1 - suave(9, folga, dP)
-    const wL = 1 - suave(9, folga, dL)
-    const livre = plano(b, 0, 0)
-    const yBola = (CHAO - b.y - RAIO_BOLA) * ESCALA + MEDIDAS.raioBola
-    const centro: V3 = { x: livre.x, y: yBola, z: frente ? livre.z : 0 }
-    const dupla = Math.min(wP, wL)
-    const presa = Math.max(wP, wL)
-    // Presa à mão, a bola gira com o corpo: a posição dela vem do corpo sem espelho (o x da cena pode estar espelhado).
-    const naoEspelhado = frente || ctx.giro === 1 || Math.abs(ctx.giro) < 0.05 ? 1 : 1 / ctx.giro
-    let c = centro
-    if (!frente) {
-      // Uma mão: a bola está na palma (no mesmo lado dela). Duas mãos: no meio, abraçada pelos dois lados.
-      const zMao = mistura(v3(0, 0, ladoMao.L), v3(0, 0, ladoMao.P), wP / Math.max(1e-6, wP + wL)).z
-      c = presa > 0 ? { x: centro.x * naoEspelhado, y: yBola + SOBE * presa, z: zMao * (1 - dupla) } : centro
-    } else if (presa > 0) {
-      c = { x: 0.3 * presa, y: yBola + SOBE * presa, z: centro.z }
-    }
-    const R = MEDIDAS.raioBola - 0.012
-    if (dupla > 0) {
-      alvoMao.P = mistura(alvoMao.P, { x: c.x - 0.01, y: c.y, z: c.z + R }, dupla)
-      alvoMao.L = mistura(alvoMao.L, { x: c.x - 0.01, y: c.y, z: c.z - R }, dupla)
-    }
-    bolas.push({ centro: c, livre: centro, giro: b.giro, amasso: b.amasso, presa })
+  // De frente, agachar leva o quadril para trás (base atlética: joelhos à frente, quadril atrás, como quem senta),
+  // o que o desenho de frente não mostra. Os pés ficam onde estão; os joelhos dobram para a frente sozinhos.
+  const emPe = MEDIDAS.coxa + MEDIDAS.canela + MEDIDAS.alturaTornozelo + SOBE
+  const agachado = frente ? limitar((emPe - pelve.y) / 0.25, 0, 1) : 0
+  if (agachado > 0) {
+    const atras = (p: V3): V3 => ({ ...p, x: p.x - 0.11 * agachado })
+    pelve = atras(pelve)
+    quadrilF = atras(quadrilF)
+    quadrilT = atras(quadrilT)
+    ombroP = atras(ombroP)
+    ombroL = atras(ombroL)
+    pescoco = atras(pescoco)
+    cabeca = atras(cabeca)
   }
 
   // --- Pernas: quadril fixo, pé onde a coreografia pôs, joelho no lado certo ---
   const larg = MEDIDAS.larguraPassada
-  const tornozeloF2 = plano(e.tornozeloF, larg, 0)
-  const tornozeloT2 = plano(e.tornozeloT, -larg, 0)
+  const tornozeloF2 = plano(e.tornozeloF, larg, 0, 1, true)
+  const tornozeloT2 = plano(e.tornozeloT, -larg, 0, 1, true)
   const joelhoPolo = (j: { x: number; y: number }, t: V3, h: V3, lado: number, eF: number): V3 => {
     const p = plano(j, 0, 0)
     const fora = abre(eF)
@@ -280,20 +370,111 @@ export function construirCorpo3D(entrada: Esqueleto, ctx: Contexto): Corpo3D {
   const pernaF = doisOssos(quadrilF, tornozeloF2, poloF, MEDIDAS.coxa, MEDIDAS.canela, reservaPerna)
   const pernaT = doisOssos(quadrilT, tornozeloT2, poloT, MEDIDAS.coxa, MEDIDAS.canela, reservaPerna)
 
+  // --- Mãos: alvo no plano da coreografia, profundidade da coreografia (z3) ou a padrão ---
+  const ladoMao = { P: MEDIDAS.larguraOmbro - 0.035, L: -(MEDIDAS.larguraOmbro - 0.035) }
+  const ocultoPadrao = (lado: 'P' | 'L') => (frente ? 0.12 : ladoMao[lado])
+  const alvoMao = {
+    P: comOculto(plano(e.maoP, 0, 0, LARGURA_OMBRO_FRENTE), zOu('maoP', ocultoPadrao('P'))),
+    L: comOculto(plano(e.maoL, 0, 0, LARGURA_OMBRO_FRENTE), zOu('maoL', ocultoPadrao('L'))),
+  }
+  // Distância bola–mão no desenho da cena (os dois espelhados do mesmo jeito; o esqueleto "e" já foi desespelhado).
+  const maoPlano = { P: entrada.maoP, L: entrada.maoL }
+
+  // --- Bolas ---
+  const R = MEDIDAS.raioBola
+  const bolas: Bola3D[] = []
+  ;(ctx.bolas ?? []).forEach((b, i) => {
+    if (!b) return
+    const canal = i === 0 ? 'bola' : 'bola2'
+    const dP = Math.hypot(b.x - maoPlano.P.x, b.y - maoPlano.P.y)
+    const dL = Math.hypot(b.x - maoPlano.L.x, b.y - maoPlano.L.y)
+    const dita = i === 0 ? ctx.segura : undefined
+    const k = dita ? (ctx.seguraPeso ?? 1) : 0
+    // Pela distância no desenho; bola em voo não fica presa a nenhuma mão, mesmo passando perto dela.
+    const suaves = ctx.perto?.[i]
+    const pertoP = b.voando ? 0 : suaves ? suaves.P : 1 - suave(9, folga, dP)
+    const pertoL = b.voando ? 0 : suaves ? suaves.L : 1 - suave(9, folga, dL)
+    const wP = dita ? pertoP + (dita.P - pertoP) * k : pertoP
+    const wL = dita ? pertoL + (dita.L - pertoL) * k : pertoL
+    const dupla = Math.min(wP, wL)
+    const presa = Math.max(wP, wL)
+    const visto = plano(b, 0, 0)
+    const yLivre = (CHAO - b.y - RAIO_BOLA) * ESCALA + R
+    const yPresa = yLivre + (SOBE + dy) * presa
+    // Profundidade: a da coreografia, se houver; senão, solta fica no meio (de lado) ou à frente (de frente);
+    // presa, vai para o lado da mão que a segura (de lado) ou para a frente do corpo (de frente).
+    const zMao = mistura(v3(0, 0, ladoMao.L), v3(0, 0, ladoMao.P), wP / Math.max(1e-6, wP + wL)).z
+    const ocultoLivre = zOu(canal, frente ? 0.25 : 0)
+    const ocultoPreso = zOu(canal, frente ? 0.3 : zMao * (1 - dupla))
+    const livre = comOculto({ x: visto.x, y: yLivre, z: visto.z }, ocultoLivre)
+    // Presa: a bola é desenhada a partir da mão (com o lado dado pelo sinal do giro). Refazê-la a partir da mão sem
+    // espelho evita ampliar a distância bola–mão no meio da virada (o desespelho divide por até 0,3).
+    const soma2 = wP + wL
+    const refCena = soma2 > 1e-6 ? { x: (entrada.maoP.x * wP + entrada.maoL.x * wL) / soma2 } : { x: b.x }
+    const refCrua = soma2 > 1e-6 ? { x: (e.maoP.x * wP + e.maoL.x * wL) / soma2 } : { x: b.x }
+    const xPresa = frente ? visto.x : (refCrua.x - q.x) * ESCALA + (b.x - refCena.x) * ESCALA * (ctx.giro < 0 ? -1 : 1)
+    let centro = comOculto({ x: xPresa, y: yPresa, z: visto.z }, presa > 0 ? ocultoPreso : ocultoLivre)
+    centro = afastarDoCorpo(centro, { pelve, pescoco, cabeca, pernaF: { raiz: quadrilF, ...pernaF }, pernaT: { raiz: quadrilT, ...pernaT } }, frente)
+    // Mãos na bola: duas mãos abraçam pelos lados; uma mão vai até a profundidade da bola e encosta a palma nela,
+    // do lado de onde veio (em cima no quique, embaixo no arremesso).
+    // Cada mão com o seu peso na bola: de 0 (solta, no lugar do desenho) a 0,6 ou mais (encostada na bola). O ponto
+    // de contato mistura a pegada de duas mãos (cada uma de um lado da bola) com a de uma mão só, na proporção de
+    // quanto a pegada é dupla: sem saltos quando uma mão chega ou sai.
+    for (const [lado, peso] of [['P', wP], ['L', wL]] as const) {
+      if (peso <= 0) continue
+      const w = suave(0, 0.85, peso)
+      const base = alvoMao[lado]
+      const alvo = comOculto(base, oculto(base) + (oculto(centro) - oculto(base)) * w)
+      // Uma mão: a palma encosta no lado da bola voltado para o ombro (em cima no quique, embaixo no arremesso),
+      // puxada um pouco para onde a mão já estava: estável mesmo com a mão bem no centro da bola.
+      const ombro = lado === 'P' ? ombroP : ombroL
+      const lado3 = normalizar(soma(mul(normalizar(sub(alvo, centro), v3(0, 1, 0)), 0.6), normalizar(sub(ombro, centro), v3(0, 1, 0))), v3(0, 1, 0))
+      const umaMao = soma(centro, mul(lado3, R + 0.015))
+      // Duas mãos: cada uma de um lado da bola.
+      const r = R - 0.012
+      const duasMaos = { x: centro.x - 0.01, y: centro.y, z: centro.z + (lado === 'P' ? r : -r) * sinalP }
+      const contato = mistura(umaMao, duasMaos, limitar(dupla / peso, 0, 1))
+      alvoMao[lado] = mistura(alvo, contato, w)
+    }
+    bolas.push({ centro, livre, giro: b.giro, amasso: b.amasso, presa })
+  })
+
+  // De frente, o desenho não mostra o tronco indo para a frente. Ele inclina sozinho (dobrando o quadril) quando o
+  // atleta agacha e quando a bola que ele segura está baixa: sem isso, a mão não alcançaria a bola nos joelhos.
+  if (frente) {
+    let alcance = 0
+    for (const b of bolas) if (b.presa > 0.05) alcance = Math.max(alcance, b.presa * limitar((pelve.y + 0.2 - b.centro.y) / 0.45, 0, 1))
+    const ang = Math.min(68, Math.max(32 * agachado, 68 * alcance)) * DEG
+    if (ang > 0.001) {
+      const inclinar = (p: V3): V3 => {
+        const x = p.x - pelve.x
+        const y = p.y - pelve.y
+        return { x: pelve.x + x * Math.cos(ang) + y * Math.sin(ang), y: pelve.y - x * Math.sin(ang) + y * Math.cos(ang), z: p.z }
+      }
+      ombroP = inclinar(ombroP)
+      ombroL = inclinar(ombroL)
+      pescoco = inclinar(pescoco)
+      cabeca = inclinar(cabeca)
+    }
+  }
+
+  // As mãos não entram no tronco: com o braço cruzando o corpo, a mão passa por fora.
+  for (const lado of ['P', 'L'] as const) alvoMao[lado] = foraDoTronco(alvoMao[lado], pelve, pescoco, 0.17, ((lado === 'P' ? 1 : -1) * sinalP) as 1 | -1)
+
   // --- Braços: ombro fixo, mão no alvo, cotovelo para fora e para trás ---
   const poloBraco = (c: { x: number; y: number }, lado: 'P' | 'L'): V3 => {
     const p = plano(c, 0, 0, LARGURA_OMBRO_FRENTE)
-    return frente ? { x: -0.1, y: p.y, z: p.z + (lado === 'P' ? 0.12 : -0.12) } : { x: p.x, y: p.y, z: ladoMao[lado] * 1.35 }
+    return frente ? { x: -0.06, y: p.y - 0.05, z: p.z + (lado === 'P' ? 0.26 : -0.26) * sinalP } : { x: p.x, y: p.y, z: ladoMao[lado] * 1.35 }
   }
   // Cintura escapular: com o braço para cima, a escápula sobe e o ombro encolhe um pouco (o ombro não é um ponto fixo).
   const eleva = (o: V3, alvo: V3, lado: 1 | -1): V3 => {
     const k = suave(0.2, 0.95, normalizar(sub(alvo, o), v3(0, -1, 0)).y)
     return { x: o.x, y: o.y + 0.04 * k, z: o.z - lado * 0.022 * k }
   }
-  ombroP = eleva(ombroP, alvoMao.P, 1)
-  ombroL = eleva(ombroL, alvoMao.L, -1)
-  const bracoP = doisOssos(ombroP, alvoMao.P, poloBraco(e.cotoveloP, 'P'), MEDIDAS.braco, MEDIDAS.antebraco, v3(-1, 0, 0.3))
-  const bracoL = doisOssos(ombroL, alvoMao.L, poloBraco(e.cotoveloL, 'L'), MEDIDAS.braco, MEDIDAS.antebraco, v3(-1, 0, -0.3))
+  ombroP = eleva(ombroP, alvoMao.P, sinalP as 1 | -1)
+  ombroL = eleva(ombroL, alvoMao.L, -sinalP as 1 | -1)
+  const bracoP = doisOssos(ombroP, alvoMao.P, poloBraco(e.cotoveloP, 'P'), MEDIDAS.braco, MEDIDAS.antebraco, v3(-1, 0, 0.3 * sinalP))
+  const bracoL = doisOssos(ombroL, alvoMao.L, poloBraco(e.cotoveloL, 'L'), MEDIDAS.braco, MEDIDAS.antebraco, v3(-1, 0, -0.3 * sinalP))
 
   // --- Pés: apontam para a frente (um pouco abertos); o calcanhar sobe e a ponta fica no chão ---
   const pePara = (t: V3, lado: number): Pe => {
@@ -309,8 +490,8 @@ export function construirCorpo3D(entrada: Esqueleto, ctx: Contexto): Corpo3D {
     const ponta = soma(t, v3(frenteDoPe.x * 0.2 * c, frenteDoPe.x * 0.2 * s - 0.04, frenteDoPe.z * 0.2 * c))
     return { tornozelo: t, frente: frenteDoPe, inclinacao, calcanhar, ponta }
   }
-  const peF = pePara(pernaF.ponta, 1)
-  const peT = pePara(pernaT.ponta, -1)
+  const peF = pePara(pernaF.ponta, sinalP)
+  const peT = pePara(pernaT.ponta, -sinalP)
 
   // --- Eixos (para orientar pelve, tórax e cabeça) ---
   const eixos = (cima: V3, ladoRef: V3): Eixos => {
@@ -319,10 +500,11 @@ export function construirCorpo3D(entrada: Esqueleto, ctx: Contexto): Corpo3D {
     const f = normalizar(cruz(c, lado), v3(1, 0, 0))
     return { frente: f, cima: c, lado }
   }
-  const toraxEixos = eixos(sub(pescoco, pelve), sub(ombroP, ombroL))
-  const pelviaEixos = eixos(v3(Math.sin(pose.t * 0.25 * DEG), 1, 0), sub(quadrilF, quadrilT))
+  // O lado dos eixos é sempre a direita do atleta (de frente, P e F estão à esquerda dele).
+  const toraxEixos = eixos(sub(pescoco, pelve), mul(sub(ombroP, ombroL), sinalP))
+  const pelviaEixos = eixos(v3(Math.sin(pose.t * 0.25 * DEG), 1, 0), mul(sub(quadrilF, quadrilT), sinalP))
   const olhar = sub(cabeca, pescoco)
-  const cabecaEixos = eixos(olhar, sub(ombroP, ombroL))
+  const cabecaEixos = eixos(olhar, mul(sub(ombroP, ombroL), sinalP))
 
   // --- Ângulos para mostrar ---
   const flexao = (a: V3, b: V3, c: V3) => {
@@ -368,12 +550,12 @@ export interface Colocacao {
 }
 
 function colocarPonto(p: V3, c: Colocacao): V3 {
-  if (c.frente) return { x: c.origem.x + p.z, y: p.y, z: c.origem.z + p.x }
+  if (c.frente) return { x: c.origem.x - p.z, y: p.y, z: c.origem.z + p.x }
   const r = girarY(p, -c.virada)
   return { x: c.origem.x + r.x, y: p.y, z: c.origem.z + r.z }
 }
 function colocarVetor(v: V3, c: Colocacao): V3 {
-  if (c.frente) return { x: v.z, y: v.y, z: v.x }
+  if (c.frente) return { x: -v.z, y: v.y, z: v.x }
   return girarY(v, -c.virada)
 }
 
@@ -384,14 +566,19 @@ export function colocarNoMundo(corpo: Corpo3D, c: Colocacao): Corpo3D {
   const membro = (m: Membro): Membro => ({ raiz: P(m.raiz), meio: P(m.meio), ponta: P(m.ponta) })
   const eixo = (x: Eixos): Eixos => ({ frente: V(x.frente), cima: V(x.cima), lado: V(x.lado) })
   const pe = (p: Pe): Pe => ({ ...p, tornozelo: P(p.tornozelo), frente: V(p.frente), calcanhar: P(p.calcanhar), ponta: P(p.ponta) })
+  const pernaF = membro(corpo.perna.F)
+  const pernaT = membro(corpo.perna.T)
+  const pelve = P(corpo.pelve)
+  const pescoco = P(corpo.pescoco)
+  const cabeca = P(corpo.cabeca)
   return {
     ...corpo,
-    pelve: P(corpo.pelve),
-    pescoco: P(corpo.pescoco),
-    cabeca: P(corpo.cabeca),
+    pelve,
+    pescoco,
+    cabeca,
     quadril: { F: P(corpo.quadril.F), T: P(corpo.quadril.T) },
     ombro: { P: P(corpo.ombro.P), L: P(corpo.ombro.L) },
-    perna: { F: membro(corpo.perna.F), T: membro(corpo.perna.T) },
+    perna: { F: pernaF, T: pernaT },
     braco: { P: membro(corpo.braco.P), L: membro(corpo.braco.L) },
     pe: { F: pe(corpo.pe.F), T: pe(corpo.pe.T) },
     pelvia: eixo(corpo.pelvia),
@@ -399,8 +586,10 @@ export function colocarNoMundo(corpo: Corpo3D, c: Colocacao): Corpo3D {
     cabecaEixos: eixo(corpo.cabecaEixos),
     bolas: corpo.bolas.map((b) => {
       const presa = P(b.centro)
-      const livre: V3 = c.frente ? { x: c.origem.x + b.livre.z, y: b.livre.y, z: c.origem.z + 0.15 } : { x: c.origem.x + b.livre.x, y: b.livre.y, z: c.origem.z + b.livre.z }
-      const centro = b.presa > 0 ? mistura(livre, presa, b.presa) : livre
+      const livre: V3 = c.frente ? { x: c.origem.x - b.livre.z, y: b.livre.y, z: c.origem.z + b.livre.x } : { x: c.origem.x + b.livre.x, y: b.livre.y, z: c.origem.z + b.livre.z }
+      const junto = b.presa > 0 ? mistura(livre, presa, b.presa) : livre
+      // No mundo, a bola (solta ou presa) ainda é tirada de dentro do corpo: no mundo o eixo escondido é sempre o Z.
+      const centro = afastarNoMundo(junto, { pelve, pescoco, cabeca, pernaF, pernaT })
       return { ...b, centro }
     }),
   }
@@ -446,7 +635,12 @@ function olharDoAtleta(corpo: Corpo3D, cesta: V3 | null): Eixos {
 }
 
 /** O corpo da cena num instante: do esqueleto do motor ao corpo 3D já no mundo. */
-export function corpoNoInstante(inst: Instante, frente: boolean, cena?: Cena): Corpo3D {
+export function corpoNoInstante(
+  inst: Instante,
+  frente: boolean,
+  cena?: Cena,
+  suavizado: { ajusteY?: number; peso?: number; perto?: ({ P: number; L: number } | undefined)[] } = {},
+): Corpo3D {
   const corpo = construirCorpo3D(inst.e, {
     frente,
     giro: inst.giro,
@@ -455,8 +649,15 @@ export function corpoNoInstante(inst: Instante, frente: boolean, cena?: Cena): C
     solo: inst.solo,
     hl: inst.hl,
     bolas: [inst.bola, inst.bola2],
+    z3: inst.z3,
+    z3peso: inst.z3peso,
+    segura: inst.segura,
+    seguraPeso: inst.seguraPeso,
+    perto: suavizado.perto,
+    ...suavizado,
   })
-  const virada = frente ? 0 : Math.acos(limitar(inst.giro, -1, 1))
+  // A virada usa o giro contínuo (o do desenho plano pula de -0,3 para 0,3 no meio da volta).
+  const virada = frente ? 0 : inst.angulo ?? Math.acos(limitar(inst.virada ?? inst.giro, -1, 1))
   const col: Colocacao = {
     origem: { x: inst.e.quadril.x * ESCALA, y: 0, z: frente ? 0 : inst.prof * 0.9 },
     virada,
@@ -465,6 +666,36 @@ export function corpoNoInstante(inst: Instante, frente: boolean, cena?: Cena): C
   const mundo = colocarNoMundo(corpo, col)
   mundo.cabecaEixos = olharDoAtleta(mundo, posicaoDaCesta(cena))
   return mundo
+}
+
+// Janela da média no tempo (ms) e o peso de cada amostra: tira os trancos da altura do quadril e do peso.
+const JANELA = [-70, -35, 0, 35, 70]
+const PESOS = [0.1, 0.22, 0.36, 0.22, 0.1]
+
+/**
+ * O corpo no tempo t de uma animação. A altura do corpo e o peso sobre o pé de apoio vêm de uma média curta no
+ * tempo: no desenho plano o quadril dá um pequeno tranco na troca de pé, e o peso trocaria de lado de uma vez.
+ */
+export function corpoNoTempo(anim: Animacao, t: number, cena?: Cena): Corpo3D {
+  const inst = instante(anim, t)
+  let y = 0
+  let peso = 0
+  const perto = [{ P: 0, L: 0 }, { P: 0, L: 0 }]
+  JANELA.forEach((d, i) => {
+    const amostra = d === 0 ? inst : instante(anim, limitar(t + d, 0, anim.total))
+    ;[amostra.bola, amostra.bola2].forEach((b, k) => {
+      if (!b || b.voando) return
+      perto[k].P += (1 - suave(9, 18, Math.hypot(b.x - amostra.e.maoP.x, b.y - amostra.e.maoP.y))) * PESOS[i]
+      perto[k].L += (1 - suave(9, 18, Math.hypot(b.x - amostra.e.maoL.x, b.y - amostra.e.maoL.y))) * PESOS[i]
+    })
+    y += amostra.e.quadril.y * PESOS[i]
+    const altoF = (CHAO - amostra.e.tornozeloF.y) * ESCALA
+    const altoT = (CHAO - amostra.e.tornozeloT.y) * ESCALA
+    peso += limitar((altoT - altoF) * 0.3, -0.06, 0.06) * PESOS[i]
+  })
+  // Na bola solta agora (acabou de sair da mão), a média não a prende de volta: as mãos soltam junto com ela.
+  const pertoAgora = [inst.bola, inst.bola2].map((b, k) => (b && !b.voando ? perto[k] : undefined))
+  return corpoNoInstante(inst, anim.frente, cena, { ajusteY: (inst.e.quadril.y - y) * ESCALA, peso, perto: pertoAgora })
 }
 
 /** O parceiro (defensor, passador…) vem de uma pose parada, sem bola. */
