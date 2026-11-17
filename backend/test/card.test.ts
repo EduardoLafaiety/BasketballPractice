@@ -65,6 +65,26 @@ describe('Cartão do atleta', () => {
     assert.deepEqual(body.current, outubro)
   })
 
+  it('as taxas de arremesso do mês (jogo e treino) também entram na nota geral', async () => {
+    const { token } = await register()
+    const jogo = { points: 36, fgMade: 12, fgAtt: 24, threeMade: 4, threeAtt: 10, ftMade: 8, ftAtt: 10 }
+    assert.equal((await api('POST', '/games', { ...jogo, playedOn: '2026-10-12' }, token)).status, 201)
+    // Poucos arremessos num mês não viram nota nem criam cartão.
+    assert.equal((await api('POST', '/games', { points: 4, fgMade: 2, fgAtt: 5, playedOn: '2026-09-12' }, token)).status, 201)
+    assert.equal((await api('POST', '/tests', { kind: 'lances_1min', value: 18, performedAt: '2026-10-05' }, token)).status, 201)
+
+    const { body } = await api('GET', '/card', undefined, token)
+    assert.deepEqual(body.months.map((m: { month: string }) => m.month), ['2026-10'])
+    const [outubro] = body.months
+    assert.deepEqual(outubro.shooting.tres, { pct: 40, attempts: 10, rating: 83 })
+    assert.deepEqual(outubro.shooting.quadra, { pct: 50, attempts: 24, rating: 71 })
+    assert.deepEqual(outubro.shooting.lance_pct, { pct: 80, attempts: 10, rating: 72 })
+    // Bateria (só o lance livre, nota 99) e as três taxas: média das quatro notas.
+    assert.equal(outubro.overall, Math.round((99 + 83 + 71 + 72) / 4))
+    assert.equal(outubro.complete, false)
+    assert.equal(body.shootingSkills.length, 3)
+  })
+
   it('recusa resultados fora do possível, que inflariam a nota', async () => {
     const { token } = await register()
     const casos = [

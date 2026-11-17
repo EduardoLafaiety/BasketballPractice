@@ -2392,3 +2392,28 @@ html::-webkit-scrollbar, .menu-tela::-webkit-scrollbar { display: none; }
 .hoje-frente h2 { margin: 0; font-size: clamp(3rem, 9vw, 7rem); }
 .treino-hoje .lista-treino { max-width: 52rem; margin-inline: auto; }
 .hoje-rodape { display: flex; justify-content: center; margin-top: 2.5rem; }
+
+/* Ficha do jogador (boneco + notas), no estilo dos jogos de basquete */
+.ficha-2k { --faixa: var(--laranja); box-shadow: var(--sombra), inset 0 6px 0 var(--faixa); }
+.ficha-2k.faixa-bronze { --faixa: #c9814a; }
+.ficha-2k.faixa-prata { --faixa: #c3c8d0; }
+.ficha-2k.faixa-ouro { --faixa: #ffc83d; }
+.ficha-2k.faixa-ametista { --faixa: #b47bff; }
+.ficha-2k-topo { display: flex; align-items: center; gap: clamp(1rem, 3vw, 1.75rem); }
+.ficha-2k .boneco { flex: none; width: clamp(5.5rem, 14vw, 8rem); height: auto; image-rendering: pixelated; }
+.ficha-2k-id { display: grid; gap: 0.3rem; min-width: 0; }
+.ficha-2k .cartao-geral { color: var(--faixa); }
+.ficha-2k-faixa { justify-self: start; padding: 0.1rem 0.5rem; background: var(--faixa); color: #101010; font-size: 0.7rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; }
+.ficha-2k-grupo { margin: 0; font-size: 0.75rem; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: #b5b3a6; }
+.ficha-2k .cartao-notas li { grid-template-columns: minmax(7rem, 11rem) minmax(0, 1fr) 2.6rem; }
+.ficha-2k .cartao-notas li > span:first-child { display: grid; font-weight: 700; }
+.ficha-2k .cartao-notas small { font-size: 0.68rem; font-weight: 600; color: #b5b3a6; }
+.ficha-2k .cartao-notas li strong { color: var(--faixa); }
+.ficha-2k .cartao-barra i { background: var(--faixa); }
+.ficha-2k .cartao-notas li.faixa-bronze { --faixa: #c9814a; }
+.ficha-2k .cartao-notas li.faixa-prata { --faixa: #c3c8d0; }
+.ficha-2k .cartao-notas li.faixa-ouro { --faixa: #ffc83d; }
+.ficha-2k .cartao-notas li.faixa-ametista { --faixa: #b47bff; }
+.ficha-2k .cartao-notas li.faixa-sem { --faixa: #6b6a62; }
+.desempenho-ficha { display: grid; gap: 0.5rem; margin-bottom: 1rem; }
+.desempenho-ficha .meta { margin: 0; }

@@ -1,8 +1,9 @@
 import { useState, type FormEvent } from 'react'
 import { dataLocal } from '../api'
 import { useAuth } from '../auth'
-import { nomeMes, useCartao, type CartaoMes, type Habilidade, type IdHabilidade } from '../cartao/api'
+import { nomeMes, useCartao, type CartaoMes, type Habilidade, type IdHabilidade, type Tiro } from '../cartao/api'
 import { Carregando, ErroCarga } from '../components/Estado'
+import FichaJogador from '../components/FichaJogador'
 import GraficoLinha from '../components/GraficoLinha'
 import { useTestes } from '../store'
 
@@ -23,6 +24,7 @@ const exemplo = (habilidades: Habilidade[]): CartaoMes => ({
   mes: mesAtual(),
   geral: 69,
   completo: true,
+  arremessos: { tres: { pct: 33, tentativas: 60, nota: 60 }, quadra: { pct: 45, tentativas: 120, nota: 56 }, lance_pct: { pct: 75, tentativas: 80, nota: 63 } },
   notas: Object.fromEntries(habilidades.map((h, i) => [h.id, { valor: 0, nota: NOTAS_EXEMPLO[i % NOTAS_EXEMPLO.length] }])) as CartaoMes['notas'],
 })
 
@@ -38,12 +40,12 @@ export default function CartaoDoAtleta() {
     <>
       <h1>Cartão do atleta</h1>
       <p className="muted">
-        Uma bateria de quatro testes por mês. Cada resultado vira uma nota de 0 a 99, e a nota geral é a média delas. Refaça todo mês para ver a evolução.
+        Uma bateria de quatro testes por mês. Cada resultado vira uma nota de 0 a 99, e a nota geral é a média delas e das suas taxas de arremesso do mês (de 3, de quadra e lance livre, no treino e no jogo). Refaça todo mês para ver a evolução.
       </p>
 
       {ultimo ? (
         <div className="cartao-topo">
-          <Ficha mes={ultimo} habilidades={cartao.habilidades} atual={ultimo === desteMes} />
+          <Ficha mes={ultimo} habilidades={cartao.habilidades} tiros={cartao.tiros} atual={ultimo === desteMes} />
           <section className="card cartao-radar" aria-labelledby="cartao-radar-titulo">
             <h2 id="cartao-radar-titulo" className="sem-margem">Perfil</h2>
             <Radar habilidades={cartao.habilidades} mes={ultimo} comparar={anterior} />
@@ -57,7 +59,7 @@ export default function CartaoDoAtleta() {
         // Antes do primeiro teste, um cartão de exemplo apagado mostra o que vai aparecer aqui.
         <div className="desempenho-vazio">
           <div className="desempenho-fantasma cartao-topo" aria-hidden>
-            <Ficha mes={exemplo(cartao.habilidades)} habilidades={cartao.habilidades} atual />
+            <Ficha mes={exemplo(cartao.habilidades)} habilidades={cartao.habilidades} tiros={cartao.tiros} atual />
             <section className="card cartao-radar">
               <Radar habilidades={cartao.habilidades} mes={exemplo(cartao.habilidades)} />
             </section>
@@ -100,33 +102,9 @@ export default function CartaoDoAtleta() {
   )
 }
 
-function Ficha({ mes, habilidades, atual }: { mes: CartaoMes; habilidades: Habilidade[]; atual: boolean }) {
+function Ficha({ mes, habilidades, tiros, atual }: { mes: CartaoMes; habilidades: Habilidade[]; tiros: Tiro[]; atual: boolean }) {
   const { usuario } = useAuth()
-  const faltam = habilidades.filter((h) => !mes.notas[h.id]).length
-  return (
-    <section className="cartao-ficha" aria-label={`Nota geral ${mes.geral ?? 'sem nota'}`}>
-      <div className="cartao-ficha-topo">
-        <span className="cartao-geral">{mes.geral ?? '—'}</span>
-        <div>
-          <span className="cartao-nome">{usuario?.name ?? 'Atleta'}</span>
-          <span className="cartao-mes">{atual ? 'Este mês' : 'Último cartão'} · {nomeMes(mes.mes, 'long')}</span>
-          <span className="cartao-status">{faltam ? `Falta${faltam > 1 ? 'm' : ''} ${faltam} teste${faltam > 1 ? 's' : ''} da bateria` : 'Bateria completa'}</span>
-        </div>
-      </div>
-      <ul className="cartao-notas">
-        {habilidades.map((h) => {
-          const n = mes.notas[h.id]
-          return (
-            <li key={h.id}>
-              <span>{h.nome}</span>
-              <span className="cartao-barra" aria-hidden><i style={{ width: `${((n?.nota ?? 0) / 99) * 100}%` }} /></span>
-              <strong>{n?.nota ?? '—'}</strong>
-            </li>
-          )
-        })}
-      </ul>
-    </section>
-  )
+  return <FichaJogador mes={mes} habilidades={habilidades} tiros={tiros} nome={usuario?.name ?? 'Atleta'} atual={atual} />
 }
 
 /** Radar de quatro eixos (um por habilidade), de 0 no centro a 99 na ponta. */
