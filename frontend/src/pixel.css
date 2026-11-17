@@ -43,7 +43,7 @@
  * pseudo-elemento a cada recálculo (a cada quadro da rolagem), o que deixava o site pesado.
  */
 /* Formulários e o mapa trazem cantos arredondados do próprio navegador ou do Leaflet. */
-button, input, select, textarea, dialog, .leaflet-bar, .leaflet-bar a, .leaflet-control-attribution, .leaflet-popup-content-wrapper, .leaflet-popup-tip { border-radius: 0; }
+button, input, select, textarea, dialog { border-radius: 0; }
 
 /* Ícones sem suavização: a linha vira serrilhado. Só neles: em ilustrações grandes e em figuras animadas o
    crispEdges deixa a rasterização várias vezes mais lenta (medido: quadros de 250 ms ao rolar Artigos). */
@@ -56,17 +56,15 @@ button, input, select, textarea, dialog, .leaflet-bar, .leaflet-bar a, .leaflet-
 .card, .btn, .input, .chip, .vazio { border-width: var(--px); }
 
 /* Botões, campos e etiquetas com o canto em degrau. O contorno de foco vai para dentro: fora ele seria cortado. */
-.btn, .topo-menu, .input, .chip, .gs-chip, .gs-botao, .ferr-aba, .dia-hoje, .dia-mix,
-.alimentos li, .dieta-foco span, .nba-coroa, .placar-item.placar-previa, .legenda-escala {
+.btn, .topo-menu, .input, .chip, .gs-chip, .gs-botao, .dia-hoje, .dia-mix, .alimentos li, .dieta-foco span, .nba-coroa, .placar-item.placar-previa {
   clip-path: var(--canto-pixel);
 }
-:is(.btn, .topo-menu, .input, .chip, .gs-chip, .gs-botao, .ferr-aba):focus-visible,
-.input:focus {
+:is(.btn, .topo-menu, .input, .chip, .gs-chip, .gs-botao):focus-visible, .input:focus {
   outline: var(--px) solid var(--laranja);
   outline-offset: calc(var(--px) * -3);
 }
 /* O que era círculo vira um "círculo" de jogo 8 bits. */
-.avatar, .marca, .conquista-icone, .meta-check, .rota-no, .nba-time-cor, .spinner {
+.avatar, .marca, .rota-no, .nba-time-cor, .spinner {
   clip-path: var(--canto-pixel-2);
 }
 
@@ -79,8 +77,6 @@ button, input, select, textarea, dialog, .leaflet-bar, .leaflet-bar a, .leaflet-
 .chip { box-shadow: var(--px) var(--px) 0 var(--borda); }
 .programa-cartao:hover { box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.55); }
 .aviso-cookies { box-shadow: var(--sombra-alta); }
-.mapa-marcador span { box-shadow: var(--px) var(--px) 0 rgba(0, 0, 0, 0.5); }
-.mapa-voce span { box-shadow: 0 0 0 4px rgba(47, 124, 246, 0.35); }
 .dia.hoje { box-shadow: 0 0 0 var(--px) var(--laranja), 4px 4px 0 var(--laranja-escuro); }
 .nba-escudo.nba-escudo-lider { filter: drop-shadow(3px 3px 0 rgba(0, 0, 0, 0.35)); }
 .desempenho-fantasma { filter: grayscale(0.4); }
