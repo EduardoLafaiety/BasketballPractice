@@ -22,7 +22,7 @@ export interface Time {
   cor: string
   costura: string
   /** O que a bola de verdade (Wilson NBA Team Tribute) tem de diferente do padrão "cor do time + faixa preta + canal na segunda cor". */
-  bola?: { frente?: string; faixa?: string; canal?: string }
+  bola?: { frente?: string; faixa?: string; canal?: string; logoMono?: boolean }
   /** Ícone próprio inspirado no nome do time (nunca o logo). */
   icone: IconeTime
 }
@@ -46,25 +46,25 @@ export interface BolaMarca {
 }
 
 export const TIMES: Time[] = [
-  { sigla: 'ATL', cidade: 'Atlanta', nome: 'Hawks', conferencia: 'leste', cor: '#E03A3E', costura: '#C1D32F', icone: 'pena', bola: { canal: '#FDB927' } },
+  { sigla: 'ATL', cidade: 'Atlanta', nome: 'Hawks', conferencia: 'leste', cor: '#E03A3E', costura: '#C1D32F', icone: 'pena', bola: { canal: '#FDB927', logoMono: true } },
   { sigla: 'BOS', cidade: 'Boston', nome: 'Celtics', conferencia: 'leste', cor: '#007A33', costura: '#BA9653', icone: 'trevo', bola: { canal: '#F1E6D2' } },
   { sigla: 'BKN', cidade: 'Brooklyn', nome: 'Nets', conferencia: 'leste', cor: '#111111', costura: '#FFFFFF', icone: 'rede', bola: { frente: '#9EA2A2', canal: '#FFFFFF' } },
   { sigla: 'CHA', cidade: 'Charlotte', nome: 'Hornets', conferencia: 'leste', cor: '#1D1160', costura: '#1BA9BE', icone: 'vespa' },
-  { sigla: 'CHI', cidade: 'Chicago', nome: 'Bulls', conferencia: 'leste', cor: '#CE1141', costura: '#111111', icone: 'chifres', bola: { canal: '#5A5A5A' } },
+  { sigla: 'CHI', cidade: 'Chicago', nome: 'Bulls', conferencia: 'leste', cor: '#CE1141', costura: '#111111', icone: 'chifres', bola: { canal: '#5A5A5A', logoMono: true } },
   { sigla: 'CLE', cidade: 'Cleveland', nome: 'Cavaliers', conferencia: 'leste', cor: '#860038', costura: '#FDBB30', icone: 'espada', bola: { frente: '#FDBB30', faixa: '#860038', canal: '#041E42' } },
-  { sigla: 'DET', cidade: 'Detroit', nome: 'Pistons', conferencia: 'leste', cor: '#C8102E', costura: '#1D42BA', icone: 'pistao' },
+  { sigla: 'DET', cidade: 'Detroit', nome: 'Pistons', conferencia: 'leste', cor: '#C8102E', costura: '#1D42BA', icone: 'pistao', bola: { logoMono: true } },
   { sigla: 'IND', cidade: 'Indiana', nome: 'Pacers', conferencia: 'leste', cor: '#002D62', costura: '#FDBB30', icone: 'bandeira' },
   { sigla: 'MIA', cidade: 'Miami', nome: 'Heat', conferencia: 'leste', cor: '#98002E', costura: '#F9A01B', icone: 'chama' },
   { sigla: 'MIL', cidade: 'Milwaukee', nome: 'Bucks', conferencia: 'leste', cor: '#00471B', costura: '#EEE1C6', icone: 'galhada' },
   { sigla: 'NYK', cidade: 'Nova York', nome: 'Knicks', conferencia: 'leste', cor: '#006BB6', costura: '#F58426', icone: 'predios' },
   { sigla: 'ORL', cidade: 'Orlando', nome: 'Magic', conferencia: 'leste', cor: '#0077C0', costura: '#C4CED4', icone: 'estrela' },
   { sigla: 'PHI', cidade: 'Filadélfia', nome: '76ers', conferencia: 'leste', cor: '#006BB6', costura: '#ED174C', icone: 'sino', bola: { faixa: '#002B5C' } },
-  { sigla: 'TOR', cidade: 'Toronto', nome: 'Raptors', conferencia: 'leste', cor: '#CE1141', costura: '#A1A1A4', icone: 'garras' },
+  { sigla: 'TOR', cidade: 'Toronto', nome: 'Raptors', conferencia: 'leste', cor: '#CE1141', costura: '#A1A1A4', icone: 'garras', bola: { logoMono: true } },
   { sigla: 'WAS', cidade: 'Washington', nome: 'Wizards', conferencia: 'leste', cor: '#002B5C', costura: '#E31837', icone: 'chapeu-mago' },
   { sigla: 'DAL', cidade: 'Dallas', nome: 'Mavericks', conferencia: 'oeste', cor: '#00538C', costura: '#B8C4CA', icone: 'chapeu' },
   { sigla: 'DEN', cidade: 'Denver', nome: 'Nuggets', conferencia: 'oeste', cor: '#0E2240', costura: '#FEC524', icone: 'pepita' },
   { sigla: 'GSW', cidade: 'Golden State', nome: 'Warriors', conferencia: 'oeste', cor: '#1D428A', costura: '#FFC72C', icone: 'escudo', bola: { faixa: '#FFC72C', canal: '#141414' } },
-  { sigla: 'HOU', cidade: 'Houston', nome: 'Rockets', conferencia: 'oeste', cor: '#CE1141', costura: '#C4CED4', icone: 'foguete' },
+  { sigla: 'HOU', cidade: 'Houston', nome: 'Rockets', conferencia: 'oeste', cor: '#CE1141', costura: '#C4CED4', icone: 'foguete', bola: { logoMono: true } },
   { sigla: 'LAC', cidade: 'Los Angeles', nome: 'Clippers', conferencia: 'oeste', cor: '#C8102E', costura: '#1D428A', icone: 'veleiro' },
   { sigla: 'LAL', cidade: 'Los Angeles', nome: 'Lakers', conferencia: 'oeste', cor: '#552583', costura: '#FDB927', icone: 'ondas' },
   { sigla: 'MEM', cidade: 'Memphis', nome: 'Grizzlies', conferencia: 'oeste', cor: '#5D76A9', costura: '#12173F', icone: 'pegada-urso', bola: { canal: '#F5B112' } },

@@ -42,10 +42,12 @@ interface Props {
   modelo?: string
   canalLargo?: boolean
   faixaClara?: string
+  /** Logo em uma cor só (silhueta na cor da tinta), para quando o logo do time se perde na cor da faixa. */
+  logoMono?: boolean
   grao?: boolean
 }
 
-export default function Bola({ frente, faixa, canal, marca, logo, icone, modelo, canalLargo, faixaClara, grao }: Props) {
+export default function Bola({ frente, faixa, canal, marca, logo, icone, modelo, canalLargo, faixaClara, grao, logoMono }: Props) {
   const [semLogo, setSemLogo] = useState(false)
   // Uma imagem por modelo (e não centenas de retângulos de SVG por bola): a lista tem uma bola por time.
   const sprite = useMemo(
@@ -73,7 +75,7 @@ export default function Bola({ frente, faixa, canal, marca, logo, icone, modelo,
           y={centroDoLogo - LOGO / 2}
           width={LOGO}
           height={LOGO}
-          style={{ imageRendering: 'pixelated' }}
+          style={{ imageRendering: 'pixelated', filter: logoMono ? (tinta(frente) === '#141414' ? 'brightness(0)' : 'brightness(0) invert(1)') : undefined }}
           onError={() => setSemLogo(true)}
         />
       )}
