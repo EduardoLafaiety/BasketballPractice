@@ -2,7 +2,10 @@ import CompartilharSemana from '../compartilhar/CompartilharSemana'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { api, dataLocal } from '../api'
+import { useAuth } from '../auth'
+import { useCartao } from '../cartao/api'
 import { AvisoDesatualizado, Carregando, ErroCarga } from '../components/Estado'
+import FichaJogador from '../components/FichaJogador'
 import GraficoLinha from '../components/GraficoLinha'
 import Quadra, { type DadosZonas } from '../components/Quadra'
 import { baixarArquivo, sessoesParaCsv } from '../lib/arquivo'
@@ -118,6 +121,8 @@ export default function Desempenho() {
       <AvisoDesatualizado erro={erro} tentarDeNovo={recarregar} />
 
       {resumo.erro && <p className="erro" role="alert">Totais desatualizados: {resumo.erro.message}</p>}
+      <FichaDoJogador />
+
       <section className="stats">
         <div className="card stat"><strong>{r.sessoes}</strong><span className="muted">sessões no total</span></div>
         <div className="card stat"><strong>{r.minutos}</strong><span className="muted">minutos treinados</span></div>
@@ -193,6 +198,29 @@ export default function Desempenho() {
         </ul>
       </section>
     </>
+  )
+}
+
+/** Boneco com a nota geral e as taxas de arremesso do mês: a mesma ficha do Cartão do atleta. */
+function FichaDoJogador() {
+  const { cartao } = useCartao()
+  const { usuario } = useAuth()
+  const ultimo = cartao?.meses.at(-1)
+  if (!cartao || !ultimo) return null
+  return (
+    <section className="desempenho-ficha">
+      <FichaJogador
+        mes={ultimo}
+        habilidades={cartao.habilidades}
+        tiros={cartao.tiros}
+        nome={usuario?.name ?? 'Atleta'}
+        atual={ultimo.mes === dataLocal(new Date()).slice(0, 7)}
+      />
+      <p className="meta">
+        A nota geral soma as taxas de arremesso (treino e jogo) com os testes da bateria.{' '}
+        <Link to="/cartao" className="link">Ver o cartão completo</Link>
+      </p>
+    </section>
   )
 }
 

@@ -63,6 +63,25 @@ describe('Cartão do atleta', () => {
     expect(within(linhas[2]).getAllByRole('cell').map((c) => c.textContent)).toEqual(['50', '40', '30', '—', '40'])
   })
 
+  it('a ficha mostra o boneco e as taxas de arremesso de 3, de quadra e de lance livre ao lado do geral', async () => {
+    const shooting = {
+      tres: { pct: 36.4, attempts: 44, rating: 71 },
+      quadra: { pct: 48, attempts: 100, rating: 65 },
+      lance_pct: null,
+    }
+    abrirCartao([{ ...mes('2026-11', [66, 45, 60, 52]), shooting }])
+
+    const ficha = await screen.findByLabelText('Nota geral 56')
+    expect(within(ficha).getByRole('img', { name: 'Boneco do jogador' })).toBeInTheDocument()
+    const bola = within(ficha).getByText('Bola de 3').closest('li')!
+    expect(bola).toHaveTextContent('36,4% · 44 arremessos')
+    expect(bola).toHaveTextContent('71')
+    expect(within(ficha).getByText('Arremesso de quadra').closest('li')).toHaveTextContent('65')
+    const lance = within(ficha).getByText('Lance livre (%)').closest('li')!
+    expect(lance).toHaveTextContent('precisa de 10 arremessos no mês')
+    expect(lance).toHaveTextContent('—')
+  })
+
   it('cartão de outro mês aparece como o último, com aviso do que falta', async () => {
     abrirCartao([mes('2026-09', [50, null, null, 40])])
     const ficha = await screen.findByLabelText('Nota geral 45')

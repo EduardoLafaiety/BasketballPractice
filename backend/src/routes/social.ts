@@ -5,7 +5,7 @@ import { isPgError, many, one, UNIQUE_VIOLATION, type Database, type Queryable }
 import { HttpError, notFound } from '../lib/http-error.js'
 import { idParam, parse } from '../lib/validate.js'
 import { currentUser } from '../middleware/auth.js'
-import { CARD_SKILLS, skillRating } from './card.js'
+import { monthlyCards } from './card.js'
 import { tzQuery } from './sessions.js'
 import { localToday, streaks } from './stats.js'
 
@@ -98,30 +98,13 @@ async function trainingDays(db: Queryable, ids: number[], p: Period, tzOffset: n
   return new Map([...byUser].map(([id, days]) => [id, weekly ? days.length : streaks(days, today).current]))
 }
 
-/** Nota do cartão: semana = cartão do mês atual; geral = a melhor nota mensal. Só meses com a bateria completa. */
+/** Nota do cartão, a mesma da ficha do jogador: semana = cartão do mês atual; geral = a melhor nota mensal. Só meses com a bateria completa. */
 async function cardRatings(db: Queryable, ids: number[], tzOffset: number, weekly: boolean) {
-  const rows = await many<{ userId: number; month: string; kind: string; best: number; worst: number }>(
-    db,
-    `SELECT user_id AS "userId", to_char(performed_at - make_interval(mins => $2::int), 'YYYY-MM') AS month, kind,
-            MAX(value)::float8 AS best, MIN(value)::float8 AS worst
-     FROM physical_tests WHERE user_id = ANY($1::int[]) AND kind = ANY($3::text[]) GROUP BY 1, 2, 3`,
-    [ids, tzOffset, CARD_SKILLS.map((s) => s.test)],
-  )
   const currentMonth = localToday(tzOffset).slice(0, 7)
-  const overall = new Map<string, { userId: number; ratings: number[] }>()
-  for (const r of rows) {
-    if (weekly && r.month !== currentMonth) continue
-    const skill = CARD_SKILLS.find((s) => s.test === r.kind)!
-    const key = `${r.userId}:${r.month}`
-    const entry = overall.get(key) ?? { userId: r.userId, ratings: [] }
-    entry.ratings.push(skillRating(skill, skill.zero > skill.top ? r.worst : r.best))
-    overall.set(key, entry)
-  }
   const result: Values = new Map()
-  for (const { userId, ratings } of overall.values()) {
-    if (ratings.length < CARD_SKILLS.length) continue
-    const avg = Math.round(ratings.reduce((a, b) => a + b, 0) / ratings.length)
-    result.set(userId, Math.max(result.get(userId) ?? 0, avg))
+  for (const id of ids) {
+    const months = (await monthlyCards(db, id, tzOffset)).filter((m) => m.complete && m.overall !== null && (!weekly || m.month === currentMonth))
+    if (months.length) result.set(id, Math.max(...months.map((m) => m.overall!)))
   }
   return result
 }
