@@ -67,14 +67,13 @@ describe('Ícones dos times', () => {
 })
 
 describe('bolas de time: réplica da Wilson NBA Team Tribute', () => {
-  it('cada bola leva a marca e o logo do time, pequeno, para ser ampliado em blocos', async () => {
+  it('cada bola leva a marca e o logo do time, em alta resolução', async () => {
     abrir('/equipamentos')
     const lakers = await screen.findByRole('link', { name: /Los Angeles Lakers/ })
     expect(lakers.querySelector('.bola-nome')).toHaveTextContent('Wilson')
     const logo = lakers.querySelector('.bola-logo')!
     // Faixa roxa (escura): logo na versão para fundo escuro.
-    expect(logo.getAttribute('href')).toBe('https://a.espncdn.com/combiner/i?img=/i/teamlogos/nba/500-dark/lal.png&h=22&w=22')
-    expect(logo).toHaveStyle({ imageRendering: 'pixelated' })
+    expect(logo.getAttribute('href')).toBe('https://a.espncdn.com/combiner/i?img=/i/teamlogos/nba/500-dark/lal.png&h=90&w=90')
     // A ESPN abrevia alguns times de outro jeito.
     const jazz = screen.getByRole('link', { name: /Utah Jazz/ })
     expect(jazz.querySelector('.bola-logo')!.getAttribute('href')).toContain('/utah.png')
