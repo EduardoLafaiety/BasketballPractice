@@ -114,6 +114,9 @@ describe('Ranking', () => {
     const resto: [string, number][] = [['arremesso_5_pontos', 11], ['drible_cones', 19.5], ['impulsao', 47.5]]
     for (const [kind, value] of resto) await api('POST', '/tests', { kind, value, performedAt: hoje }, gil.token)
     assert.equal(await ranking('cartao'), 50)
+    // As taxas de arremesso do mês entram na nota, como na ficha: lance livre 10/10 vale 99 e a média das cinco notas sobe para 60.
+    assert.equal((await api('POST', '/games', { playedOn: hoje, points: 10, ftMade: 10, ftAtt: 10 }, gil.token)).status, 201)
+    assert.equal(await ranking('cartao'), 60)
   })
 
   it('valores absurdos têm teto: uma sessão soma no máximo 200 cestas', async () => {
