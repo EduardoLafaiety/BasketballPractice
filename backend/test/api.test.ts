@@ -55,7 +55,7 @@ describe('API', () => {
     assert.equal((await api('GET', '/auth/me')).body.name, 'Atleta')
   })
 
-  it('cria treino, registra sessão e calcula estatísticas', async () => {
+  it('cria treino e registra sessão', async () => {
     const shooting = (await api('GET', '/exercises?category=arremesso')).body
     assert.ok(shooting.length > 0)
     const freeThrow = shooting.find((e: { name: string }) => e.name === 'Lance livre')
@@ -97,15 +97,9 @@ describe('API', () => {
     const impossibleDate = await api('POST', '/sessions', { performedAt: '2026-02-31' })
     assert.equal(impossibleDate.status, 400)
     assert.deepEqual(impossibleDate.body.details, { performedAt: ['Data inválida'] })
-    assert.equal((await api('GET', '/stats/summary?from=2026-13-01')).status, 400)
 
     assert.equal((await api('DELETE', `/exercises/${custom.body.id}`)).status, 409)
 
-    const stats = (await api('GET', '/stats/summary?from=2026-10-01&to=2026-10-31')).body
-    assert.equal(stats.totals.sessions, 1)
-    assert.equal(stats.totals.minutes, 60)
-    assert.deepEqual(stats.shooting, { makes: 55, attempts: 80, percentage: 68.8 })
-    assert.equal(stats.byWeek[0].weekStart, '2026-10-19')
 
     await api('POST', '/sessions', { performedAt: '2026-10-22', notes: 'Sem exercícios' })
     const list = (await api('GET', '/sessions?from=2026-10-01&to=2026-10-31')).body
@@ -129,29 +123,6 @@ describe('API', () => {
     const fromLocalMidnight = encodeURIComponent('2026-10-23T00:00:00-03:00')
     assert.equal((await api('GET', `/sessions?from=${fromLocalMidnight}`)).body.length, 0)
     assert.equal((await api('GET', '/sessions?from=2026-10-23&to=2026-10-23')).body.length, 1)
-  })
-
-  it('conta dias e semanas no fuso do cliente (tzOffset)', async () => {
-    const auth = (await novaConta('Fuso', 'fuso@example.com')).token
-    // Domingo 25/10 às 23h em Brasília = segunda 26/10 02h em UTC.
-    await api('POST', '/sessions', { performedAt: '2026-10-25T23:00:00-03:00', durationMinutes: 45 }, auth)
-    const brt = 'tzOffset=180'
-
-    const sunday = (await api('GET', `/sessions?from=2026-10-25&to=2026-10-25&${brt}`, undefined, auth)).body
-    assert.equal(sunday.length, 1)
-    assert.equal((await api('GET', `/sessions?from=2026-10-26&${brt}`, undefined, auth)).body.length, 0)
-
-    const summary = (await api('GET', `/stats/summary?from=2026-10-25&to=2026-10-25&${brt}`, undefined, auth)).body
-    assert.equal(summary.totals.sessions, 1)
-    assert.equal(summary.totals.minutes, 45)
-    assert.deepEqual(summary.byWeek.map((w: { weekStart: string }) => w.weekStart), ['2026-10-19'])
-
-    // Sem tzOffset continua valendo o dia em UTC (compatível com clientes antigos).
-    const utc = (await api('GET', '/stats/summary?from=2026-10-26&to=2026-10-26', undefined, auth)).body
-    assert.equal(utc.totals.sessions, 1)
-    assert.equal(utc.byWeek[0].weekStart, '2026-10-26')
-
-    assert.equal((await api('GET', '/stats/summary?tzOffset=9999', undefined, auth)).status, 400)
   })
 
   it('isola os dados entre usuários', async () => {

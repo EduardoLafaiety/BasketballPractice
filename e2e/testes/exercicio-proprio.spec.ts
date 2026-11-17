@@ -30,8 +30,8 @@ test('exercício próprio: registra uma sessão e só deixa excluir quando não 
   await page.getByLabel('Acertos', { exact: true }).fill('4')
   await expect(salvar).toBeEnabled()
   await salvar.click()
-  await expect(page).toHaveURL(/\/desempenho$/)
-  await expect(page.locator('.historico > li').first()).toContainText('Floater E2E')
+  // Salvou: a sessão está no banco.
+  await expect.poll(async () => ((await (await request.get('/api/sessions', { headers: { Authorization: `Bearer ${token}` } })).json()) as unknown[]).length).toBe(1)
 
   // Em uso numa sessão: o Postgres barra a exclusão e o app explica o motivo (antes era um erro 500).
   await page.goto(paginaDoExercicio)

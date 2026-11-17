@@ -6,7 +6,9 @@ import { HttpError, notFound } from '../lib/http-error.js'
 import { dbId, parse } from '../lib/validate.js'
 import { currentUser } from '../middleware/auth.js'
 import { tzQuery } from './sessions.js'
-import { localToday } from './stats.js'
+
+// Data de hoje no fuso do atleta (tzOffset em minutos, como o do navegador).
+const localToday = (tzOffset: number) => new Date(Date.now() - tzOffset * 60_000).toISOString().slice(0, 10)
 
 const programParam = z.object({ id: z.string().max(60) })
 const dayParam = programParam.extend({ day: z.coerce.number().int().min(1).max(366) })

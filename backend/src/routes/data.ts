@@ -5,10 +5,8 @@ import { HttpError } from '../lib/http-error.js'
 import { dbId, parse } from '../lib/validate.js'
 import { currentUser } from '../middleware/auth.js'
 import { CATEGORIES, METRICS } from './exercises.js'
-import { assertGoalExerciseKind, goalSchema } from './goals.js'
 import { insertSession, sessionDetails, sessionSchema, type SessionInput } from './sessions.js'
 import { readSettings, settingsSchema, writeSettings } from './settings.js'
-import { testSchema } from './tests.js'
 import { workoutSchema } from './workouts.js'
 
 const FORMAT = 'basketball-practice'
@@ -61,16 +59,11 @@ const importSchema = z.object({
     )
     .max(20000)
     .default([]),
-  goals: z
-    .array(z.object({ exerciseName: z.string().nullish() }).passthrough())
-    .max(500)
-    .default([]),
-  physicalTests: z.array(testSchema).max(5000).default([]),
   settings: settingsSchema.optional(),
 })
 
 async function exportData(db: Queryable, userId: number) {
-  const [exercises, workouts, workoutItems, sessions, goals, physicalTests] = await Promise.all([
+  const [exercises, workouts, workoutItems, sessions] = await Promise.all([
     many(
       db,
       'SELECT id, name, category, metric, description FROM exercises WHERE user_id = $1 ORDER BY id',
@@ -91,18 +84,6 @@ async function exportData(db: Queryable, userId: number) {
               s.notes, w.name AS "workoutName"
        FROM practice_sessions s LEFT JOIN workouts w ON w.id = s.workout_id
        WHERE s.user_id = $1 ORDER BY s.performed_at, s.id`,
-      [userId],
-    ),
-    many(
-      db,
-      `SELECT g.title, g.kind, g.target, g.exercise_id AS "exerciseId", e.name AS "exerciseName",
-              to_char(g.deadline, 'YYYY-MM-DD') AS deadline
-       FROM goals g LEFT JOIN exercises e ON e.id = g.exercise_id WHERE g.user_id = $1 ORDER BY g.id`,
-      [userId],
-    ),
-    many(
-      db,
-      `SELECT kind, value, performed_at AS "performedAt", notes FROM physical_tests WHERE user_id = $1 ORDER BY performed_at`,
       [userId],
     ),
   ])
@@ -128,8 +109,6 @@ async function exportData(db: Queryable, userId: number) {
         shots,
       }
     }),
-    goals,
-    physicalTests,
     // Só para a pessoa ter tudo o que é dela; a importação ignora esta parte.
     extras: await exportExtras(db, userId),
   }
@@ -146,18 +125,6 @@ async function exportExtras(db: Queryable, userId: number) {
               COALESCE(array_agg(d.day ORDER BY d.day) FILTER (WHERE d.day IS NOT NULL), '{}') AS "daysDone"
        FROM user_programs p LEFT JOIN program_days_done d ON d.user_id = p.user_id AND d.program_id = p.program_id
        WHERE p.user_id = $1 GROUP BY 1, 2 ORDER BY 2`,
-    ),
-    games: await q(
-      `SELECT to_char(played_on, 'YYYY-MM-DD') AS "playedOn", opponent, team_score AS "teamScore", opp_score AS "oppScore", minutes, points,
-              rebounds, assists, steals, blocks, turnovers, fg_made AS "fgMade", fg_att AS "fgAtt", three_made AS "threeMade",
-              three_att AS "threeAtt", ft_made AS "ftMade", ft_att AS "ftAtt", notes FROM games WHERE user_id = $1 ORDER BY played_on, id`,
-    ),
-    plays: await q(`SELECT name, court, data FROM plays WHERE user_id = $1 ORDER BY id`),
-    rankingProfile: (await q(`SELECT nickname, public FROM profiles WHERE user_id = $1`))[0] ?? null,
-    friends: await q(`SELECT p.nickname FROM friendships f JOIN profiles p ON p.user_id = f.friend_id WHERE f.user_id = $1 ORDER BY 1`),
-    teams: await q(
-      `SELECT t.name, 'tecnico' AS role FROM teams t WHERE t.coach_id = $1
-       UNION ALL SELECT t.name, 'atleta' FROM team_members m JOIN teams t ON t.id = m.team_id WHERE m.user_id = $1`,
     ),
   }
 }
@@ -200,8 +167,8 @@ async function existingFingerprints(tx: Queryable, userId: number, sessions: Ses
 }
 
 async function importData(tx: Queryable, userId: number, data: z.infer<typeof importSchema>) {
-  const created = { exercises: 0, workouts: 0, sessions: 0, goals: 0, physicalTests: 0 }
-  const skipped = { sessions: 0, goals: 0, physicalTests: 0 }
+  const created = { exercises: 0, workouts: 0, sessions: 0 }
+  const skipped = { sessions: 0 }
 
   // Exercícios do atleta: reaproveita um de mesmo nome para que importar duas vezes não duplique.
   const visible = await many<{ id: number; name: string; ownerId: number | null }>(
@@ -290,50 +257,6 @@ async function importData(tx: Queryable, userId: number, data: z.infer<typeof im
     }
     await insertSession(tx, userId, session)
     created.sessions++
-  }
-
-  for (const raw of data.goals) {
-    const { exerciseName, ...rest } = raw
-    const goal = parse(goalSchema, {
-      ...rest,
-      exerciseId: exerciseName ? resolve({ exerciseId: raw.exerciseId as number | null, exerciseName }) : null,
-    })
-    assertGoalExerciseKind(goal)
-    const duplicate = await one(tx, 'SELECT 1 FROM goals WHERE user_id = $1 AND title = $2 AND kind = $3 AND target = $4', [
-      userId,
-      goal.title,
-      goal.kind,
-      goal.target,
-    ])
-    if (duplicate) {
-      skipped.goals++
-      continue
-    }
-    await tx.query(
-      'INSERT INTO goals (user_id, title, kind, target, exercise_id, deadline) VALUES ($1, $2, $3, $4, $5, $6)',
-      [userId, goal.title, goal.kind, goal.target, goal.exerciseId ?? null, goal.deadline?.slice(0, 10) ?? null],
-    )
-    created.goals++
-  }
-
-  for (const test of data.physicalTests) {
-    const duplicate = await one(tx, 'SELECT 1 FROM physical_tests WHERE user_id = $1 AND kind = $2 AND performed_at = $3', [
-      userId,
-      test.kind,
-      test.performedAt,
-    ])
-    if (duplicate) {
-      skipped.physicalTests++
-      continue
-    }
-    await tx.query('INSERT INTO physical_tests (user_id, kind, value, performed_at, notes) VALUES ($1, $2, $3, $4, $5)', [
-      userId,
-      test.kind,
-      test.value,
-      test.performedAt,
-      test.notes ?? null,
-    ])
-    created.physicalTests++
   }
 
   return { created, skipped }

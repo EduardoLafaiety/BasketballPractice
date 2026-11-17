@@ -1,11 +1,11 @@
 import { expect, test } from '@playwright/test'
-import { SENHA, emailUnico, esperarEmail, linkDoEmail, novaConta, numero, irPara, abrirMenu } from './ajuda'
+import { SENHA, emailUnico, esperarEmail, linkDoEmail, novaConta, irPara, abrirMenu } from './ajuda'
 
 test('cadastro pelo formulário, ativação pelo e-mail, sair e entrar de novo voltando à página pedida', async ({ page }) => {
   const email = emailUnico('cadastro')
 
   // Sem login, uma página protegida manda para o login.
-  await page.goto('/desempenho')
+  await page.goto('/artigos')
   await expect(page).toHaveURL(/\/entrar$/)
 
   await page.getByRole('link', { name: 'Criar conta' }).click()
@@ -38,7 +38,7 @@ test('cadastro pelo formulário, ativação pelo e-mail, sair e entrar de novo v
   await page.getByRole('button', { name: 'Sair' }).click()
   await expect(page).toHaveURL(/\/entrar$/)
 
-  await page.goto('/metas')
+  await page.goto('/artigos')
   await expect(page).toHaveURL(/\/entrar$/)
   await page.getByLabel('E-mail').fill(email)
   await page.getByLabel('Senha').fill('senha-errada-123')
@@ -47,9 +47,9 @@ test('cadastro pelo formulário, ativação pelo e-mail, sair e entrar de novo v
 
   await page.getByLabel('Senha').fill(SENHA)
   await page.getByRole('button', { name: 'Entrar' }).click()
-  // O endereço antigo (/metas) leva para a aba Conquistas.
-  await expect(page).toHaveURL(/conquistas$/)
-  await expect(page.getByRole('heading', { name: 'Conquistas', level: 1 })).toBeVisible()
+  // Depois do login, volta para a página que foi pedida.
+  await expect(page).toHaveURL(/artigos$/)
+  await expect(page.getByRole('heading', { name: 'Artigos', level: 1 })).toBeVisible()
 })
 
 test('cadastrar um e-mail que já tem conta não revela isso na tela: o aviso vai para o dono', async ({ page, request }) => {

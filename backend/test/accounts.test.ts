@@ -491,7 +491,7 @@ describe('Senhas óbvias', () => {
 })
 
 describe('Excluir a própria conta', () => {
-  const tabelas = ['exercises', 'workouts', 'practice_sessions', 'goals', 'physical_tests', 'user_settings', 'password_reset_tokens']
+  const tabelas = ['exercises', 'workouts', 'practice_sessions', 'user_settings', 'password_reset_tokens']
 
   async function contaComTudo(app: Awaited<ReturnType<typeof startApi>>) {
     const conta = await app.register()
@@ -499,8 +499,6 @@ describe('Excluir a própria conta', () => {
     const exercicio = (await app.api('POST', '/exercises', { name: 'Floater', category: 'finalizacao', metric: 'acertos' }, token)).body.id
     await app.api('POST', '/workouts', { name: 'Treino', exercises: [{ exerciseId: exercicio }] }, token)
     await app.api('POST', '/sessions', { performedAt: '2026-10-20', entries: [{ exerciseId: exercicio, makes: 1, attempts: 2 }], shots: [{ zone: 'garrafao', makes: 1, attempts: 2 }] }, token)
-    await app.api('POST', '/goals', { title: 'Meta', kind: 'cestas_total', target: 10, exerciseId: exercicio }, token)
-    await app.api('POST', '/tests', { kind: 'impulsao', value: 50, performedAt: '2026-10-20' }, token)
     await app.api('PUT', '/settings', { theme: 'escuro' }, token)
     await app.api('POST', '/auth/forgot-password', { email: conta.email })
     await app.caixa.terminar()

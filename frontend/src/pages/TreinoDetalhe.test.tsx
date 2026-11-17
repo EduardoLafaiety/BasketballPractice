@@ -50,7 +50,7 @@ describe('Registrar sessão de um exercício', () => {
     await user.click(salvar())
 
     // Salvar navega depois da resposta da API: espera a troca de página em vez de olhar uma vez só.
-    await waitFor(() => expect(screen.getByTestId('caminho')).toHaveTextContent('/desempenho'))
+    await waitFor(() => expect(screen.getByTestId('caminho')).toHaveTextContent('/'))
     expect(ultima('POST', '/sessions')?.corpo).toMatchObject({
       durationMinutes: 15,
       notes: 'boa mecânica',
@@ -69,7 +69,7 @@ describe('Registrar sessão de um exercício', () => {
     await user.type(screen.getByLabelText('Duração (min)'), '20')
     await user.click(salvar())
 
-    await screen.findByText('/desempenho')
+    await screen.findByText('/')
     expect(ultima('POST', '/sessions')?.corpo).toMatchObject({ entries: [{ makes: 30, attempts: 50, bestStreak: null }] })
   })
 
@@ -102,7 +102,7 @@ describe('Registrar sessão de um exercício', () => {
     expect(screen.getByLabelText('Duração (min)')).toHaveAttribute('placeholder', '2 (cronômetro)')
 
     await user.click(salvar())
-    await screen.findByText('/desempenho')
+    await screen.findByText('/')
     expect(ultima('POST', '/sessions')?.corpo).toMatchObject({ durationMinutes: 2, entries: [{ exerciseId: 3, seconds: 95 }] })
   })
 
@@ -114,7 +114,7 @@ describe('Registrar sessão de um exercício', () => {
     await user.type(screen.getByLabelText('Duração (min)'), '10')
     await user.click(salvar())
 
-    await screen.findByText('/desempenho')
+    await screen.findByText('/')
     expect(ultima('POST', '/sessions')?.corpo).toMatchObject({ entries: [{ exerciseId: 2, reps: 40, makes: null, attempts: null }] })
   })
 

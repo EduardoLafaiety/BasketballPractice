@@ -91,7 +91,7 @@ export default function TreinoDetalhe() {
         ],
         zonas: contaArremessos ? zonasParaLista(contador.zonas) : [],
       })
-      navigate('/desempenho')
+      navigate('/')
     } catch (e) {
       setErroSalvar((e as Error).message)
       setSalvando(false)

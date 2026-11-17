@@ -41,7 +41,7 @@ describe('Entrar', () => {
       'POST /auth/login': { token: 'tk-1', user: usuarioFalso() },
       'GET /settings': configFalsa,
     })
-    abrirApp('/metas')
+    abrirApp('/artigos')
 
     expect(await screen.findByRole('heading', { name: 'Entrar' })).toBeInTheDocument()
     const entrar = screen.getByRole('button', { name: 'Entrar' })
@@ -51,7 +51,7 @@ describe('Entrar', () => {
     await user.type(campo(/senha/i), 'senha-segura')
     await user.click(entrar)
 
-    expect(await screen.findByRole('heading', { name: 'Conquistas' })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: 'Artigos' })).toBeInTheDocument()
     expect(ultima('POST', '/auth/login')?.corpo).toEqual({ email: 'marina@example.com', password: 'senha-segura' })
     expect(tokenAtual()).toBe('tk-1')
     expect(screen.getByText('Marina')).toBeInTheDocument()

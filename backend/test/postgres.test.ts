@@ -253,16 +253,15 @@ describe('Postgres de verdade', { skip: ADMIN_URL ? false : 'defina TEST_POSTGRE
   describe('Contas', () => {
     const SENHA = 'senha-segura'
 
-    it('excluir a própria conta passa pelo RESTRICT de verdade: exercício próprio em treino, sessão e meta', async () => {
+    it('excluir a própria conta passa pelo RESTRICT de verdade: exercício próprio em treino e sessão', async () => {
       const { token, id } = await conta()
       const outra = await conta()
       const exercicio = (await api('POST', '/exercises', { name: 'Floater', category: 'finalizacao', metric: 'acertos' }, token)).body.id
       assert.equal((await api('POST', '/workouts', { name: 'Treino', exercises: [{ exerciseId: exercicio }] }, token)).status, 201)
       assert.equal((await api('POST', '/sessions', { performedAt: '2026-10-20', entries: [{ exerciseId: exercicio, makes: 1, attempts: 2 }] }, token)).status, 201)
-      assert.equal((await api('POST', '/goals', { title: 'Meta', kind: 'cestas_total', target: 10, exerciseId: exercicio }, token)).status, 201)
 
       assert.equal((await api('DELETE', '/auth/me', { password: SENHA }, token)).status, 204)
-      for (const tabela of ['exercises', 'workouts', 'practice_sessions', 'goals']) {
+      for (const tabela of ['exercises', 'workouts', 'practice_sessions']) {
         assert.equal((await db.query(`SELECT 1 FROM ${tabela} WHERE user_id = $1`, [id])).rows.length, 0, tabela)
       }
       assert.equal((await api('GET', '/auth/me', undefined, token)).status, 401)
@@ -374,22 +373,6 @@ describe('Postgres de verdade', { skip: ADMIN_URL ? false : 'defina TEST_POSTGRE
     assert.equal((await api('GET', '/sessions', undefined, token)).status, 200)
   })
 
-  it('apagar exercício ligado a meta dá 409, com o código que o Postgres responde (23503)', async () => {
-    const { token, id } = await conta()
-    const exercicio = (await api('POST', '/exercises', { name: 'Com meta', category: 'arremesso', metric: 'acertos' }, token)).body
-    await api('POST', '/goals', { title: 'Meta', kind: 'cestas_total', target: 5, exerciseId: exercicio.id }, token)
-    const recusa = await api('DELETE', `/exercises/${exercicio.id}`, undefined, token)
-    assert.equal(recusa.status, 409)
-    assert.match(recusa.body.error, /meta/)
-    assert.equal((await api('GET', '/goals', undefined, token)).body.length, 1)
-
-    // A cascata da conta apaga meta e exercício juntos, sem o RESTRICT barrar.
-    await db.transaction(async (tx) => {
-      await tx.query('DELETE FROM users WHERE id = $1', [id])
-    })
-    assert.equal((await db.query('SELECT 1 FROM exercises WHERE id = $1', [exercicio.id])).rows.length, 0)
-  })
-
   it('o banco recusa o que a API também recusaria (violação de CHECK e de UNIQUE)', async () => {
     const { id } = await conta()
     const codigo = async (sql: string, params: unknown[] = []) => {
@@ -401,28 +384,7 @@ describe('Postgres de verdade', { skip: ADMIN_URL ? false : 'defina TEST_POSTGRE
       }
     }
     assert.equal(await codigo(`INSERT INTO practice_sessions (user_id, performed_at, duration_minutes) VALUES ($1, now(), -1)`, [id]), '23514')
-    assert.equal(await codigo(`INSERT INTO goals (user_id, title, kind, target) VALUES ($1, 'x', 'inventada', 1)`, [id]), '23514')
-    assert.equal(await codigo(`INSERT INTO physical_tests (user_id, kind, value, performed_at) VALUES ($1, 'inventado', 1, now())`, [id]), '23514')
     assert.equal(await codigo(`INSERT INTO exercises (name, category, metric) VALUES ('Lance livre', 'arremesso', 'acertos')`), '23505')
-  })
-
-  it('somas além do integer chegam como número no driver pg', async () => {
-    const { token, id } = await conta()
-    const exercicio = (await api('GET', '/exercises', undefined, token)).body[0].id
-    const { rows } = await db.query<{ id: number }>(
-      `INSERT INTO practice_sessions (user_id, performed_at, duration_minutes) VALUES ($1, now(), 2000000000), ($1, now(), 2000000000) RETURNING id`,
-      [id],
-    )
-    for (const row of rows) {
-      await db.query('INSERT INTO session_entries (session_id, exercise_id, attempts, makes) VALUES ($1, $2, 2000000000, 2000000000)', [row.id, exercicio])
-    }
-    const resumo = await api('GET', '/stats/summary', undefined, token)
-    assert.equal(resumo.status, 200)
-    assert.strictEqual(resumo.body.totals.minutes, 4_000_000_000)
-    assert.strictEqual(resumo.body.shooting.makes, 4_000_000_000)
-    const progresso = await api('GET', '/stats/progress', undefined, token)
-    assert.equal(progresso.status, 200)
-    assert.strictEqual(progresso.body.totals.makes, 4_000_000_000)
   })
 
   it('entrada que antes virava erro do banco agora é 400', async () => {
@@ -430,7 +392,6 @@ describe('Postgres de verdade', { skip: ADMIN_URL ? false : 'defina TEST_POSTGRE
     for (const [method, path, body] of [
       ['GET', '/sessions/2147483648'],
       ['GET', '/sessions?offset=99999999999999999999'],
-      ['GET', '/stats/summary?to=9999-12-31'],
       ['POST', '/sessions', { performedAt: '9999-12-31T23:59:59-14:00', entries: [] }],
       ['POST', '/exercises', { name: 'a\u0000b', category: 'drible', metric: 'tempo' }],
     ] as [string, string, unknown?][]) {

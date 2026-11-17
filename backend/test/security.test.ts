@@ -82,7 +82,7 @@ describe('Isolamento entre atletas', () => {
   // A cria um item de cada tipo; B tenta ler, editar, apagar e usar cada um.
   let a: { token: string }
   let b: { token: string }
-  const ids = { exercise: 0, workout: 0, session: 0, goal: 0, test: 0 }
+  const ids = { exercise: 0, workout: 0, session: 0 }
 
   before(async () => {
     a = await register('Dono')
@@ -97,8 +97,6 @@ describe('Isolamento entre atletas', () => {
         a.token,
       )
     ).body.id
-    ids.goal = (await api('POST', '/goals', { title: 'Meta A', kind: 'sessoes_total', target: 10 }, a.token)).body.id
-    ids.test = (await api('POST', '/tests', { kind: 'impulsao', value: 50, performedAt: '2026-10-20' }, a.token)).body.id
     assert.ok(Object.values(ids).every((id) => id > 0), 'dados do atleta A criados')
   })
 
@@ -113,9 +111,6 @@ describe('Isolamento entre atletas', () => {
       ['GET', `/sessions/${ids.session}`],
       ['PUT', `/sessions/${ids.session}`, { performedAt: '2026-10-21' }],
       ['DELETE', `/sessions/${ids.session}`],
-      ['PUT', `/goals/${ids.goal}`, { title: 'Roubada', kind: 'sessoes_total', target: 1 }],
-      ['DELETE', `/goals/${ids.goal}`],
-      ['DELETE', `/tests/${ids.test}`],
     ]
     for (const [method, path, body] of attempts) {
       assert.equal((await api(method, path, body, b.token)).status, 404, `${method} ${path}`)
@@ -125,8 +120,6 @@ describe('Isolamento entre atletas', () => {
     assert.equal((await api('GET', `/exercises/${ids.exercise}`, undefined, a.token)).body.name, 'Floater')
     assert.equal((await api('GET', `/workouts/${ids.workout}`, undefined, a.token)).body.name, 'Treino A')
     assert.equal((await api('GET', `/sessions/${ids.session}`, undefined, a.token)).body.entries.length, 1)
-    assert.equal((await api('GET', '/goals', undefined, a.token)).body[0].title, 'Meta A')
-    assert.equal((await api('GET', '/tests', undefined, a.token)).body.length, 1)
   })
 
   it('não deixa usar exercício ou treino de outro atleta nos próprios registros', async () => {
@@ -144,19 +137,14 @@ describe('Isolamento entre atletas', () => {
     )
     assert.equal(withExercise.status, 400)
 
-    const goal = await api('POST', '/goals', { title: 'Meta', kind: 'cestas_total', target: 5, exerciseId: ids.exercise }, b.token)
-    assert.equal(goal.status, 400)
   })
 
-  it('listas, resumo, metas e backup mostram só os dados do próprio atleta', async () => {
+  it('listas e backup mostram só os dados do próprio atleta', async () => {
     const exercises = (await api('GET', '/exercises', undefined, b.token)).body
     assert.ok(!exercises.some((e: { id: number }) => e.id === ids.exercise))
     assert.deepEqual((await api('GET', '/sessions', undefined, b.token)).body, [])
-    assert.deepEqual((await api('GET', '/goals', undefined, b.token)).body, [])
-    assert.deepEqual((await api('GET', '/tests', undefined, b.token)).body, [])
-    assert.equal((await api('GET', '/stats/summary', undefined, b.token)).body.totals.sessions, 0)
 
     const backup = (await api('GET', '/data/export', undefined, b.token)).body
-    assert.deepEqual([backup.exercises, backup.workouts, backup.sessions, backup.goals], [[], [], [], []])
+    assert.deepEqual([backup.exercises, backup.workouts, backup.sessions], [[], [], []])
   })
 })

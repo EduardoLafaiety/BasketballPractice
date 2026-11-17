@@ -140,33 +140,6 @@ describe('conversão dos dados do backend', () => {
     })
   })
 
-  it('pede o resumo com fuso e período, com o fim exclusivo', async () => {
-    const { ultima } = apiFalsa({
-      'GET /stats/summary': {
-        totals: { sessions: '3', minutes: '135', averageRating: '4.5', averageFatigue: null },
-        shooting: { makes: '30', attempts: '50', percentage: '60' },
-        byWeek: [{ weekStart: '2026-10-26', sessions: '3', minutes: '135', makes: '30', attempts: '50' }],
-      },
-    })
-    const desde = new Date(2026, 9, 26)
-    const ate = new Date(2026, 9, 30)
-    const r = await api.resumo(desde, ate)
-
-    expect(r).toEqual({
-      sessoes: 3,
-      minutos: 135,
-      acertos: 30,
-      tentativas: 50,
-      esforcoMedio: 4.5,
-      cansacoMedio: undefined,
-      semanas: [{ inicio: '2026-10-26', sessoes: 3, minutos: 135, acertos: 30, tentativas: 50 }],
-    })
-    const params = ultima('GET', '/stats/summary')!.url.searchParams
-    expect(params.get('tzOffset')).toBe(String(new Date().getTimezoneOffset()))
-    expect(params.get('from')).toBe(desde.toISOString())
-    expect(params.get('to')).toBe(new Date(ate.getTime() - 1).toISOString())
-  })
-
   it('remonta a rotina a partir dos treinos marcados com o dia', async () => {
     apiFalsa({
       'GET /workouts': [

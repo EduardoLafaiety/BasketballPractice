@@ -2,12 +2,6 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { criarServidor, type ServidorDemo } from './servidor'
 
-// Fuso dos testes: America/Sao_Paulo (vite.config.ts), como o app manda em ?tzOffset.
-const FUSO = `tzOffset=${new Date().getTimezoneOffset()}`
-
-type Resumo = { totals: { sessions: number; minutes: number }; shooting: { makes: number; attempts: number } }
-type Progresso = { streak: { current: number; best: number }; achievements: { id: string; unlocked: boolean }[] }
-
 async function abrir() {
   const servidor = await criarServidor()
   const get = async <T>(caminho: string) => (await servidor.executar('GET', caminho)).body as T
@@ -18,15 +12,6 @@ async function abrir() {
 async function esperarZerado(get: <T>(caminho: string) => Promise<T>) {
   expect(await get('/sessions?limit=200')).toEqual([])
   expect(await get('/workouts')).toEqual([])
-  expect(await get(`/goals?${FUSO}`)).toEqual([])
-  expect(await get('/tests')).toEqual([])
-  const resumo = await get<Resumo>(`/stats/summary?${FUSO}`)
-  expect(resumo.totals).toMatchObject({ sessions: 0, minutes: 0 })
-  expect(resumo.shooting).toMatchObject({ makes: 0, attempts: 0 })
-  const progresso = await get<Progresso>(`/stats/progress?${FUSO}`)
-  expect(progresso.streak).toEqual({ current: 0, best: 0 })
-  expect(progresso.achievements.filter((a) => a.unlocked)).toEqual([])
-  expect((await get<{ attempts: number }[]>(`/stats/zones?${FUSO}`)).every((z) => z.attempts === 0)).toBe(true)
   // Só o catálogo padrão, nenhum exercício próprio.
   const exercicios = await get<{ custom: boolean }[]>('/exercises')
   expect(exercicios.length).toBeGreaterThanOrEqual(150)
@@ -105,13 +90,12 @@ describe('Registros do visitante', () => {
   }, 60_000)
   afterAll(() => servidor.fechar())
 
-  it('o primeiro treino entra nas estatísticas', async () => {
+  it('o primeiro treino entra no histórico', async () => {
     await servidor.executar('POST', '/workouts', {
       name: 'Rotina de quinta',
       description: 'bp-rotina:4',
       exercises: [{ exerciseId: 1 }],
     })
-    await servidor.executar('POST', '/goals', { title: '4 treinos por semana', kind: 'sessoes_semana', target: 4 })
     const criada = await servidor.executar('POST', '/sessions', {
       performedAt: new Date().toISOString(),
       durationMinutes: 30,
@@ -119,13 +103,6 @@ describe('Registros do visitante', () => {
       shots: [{ zone: 'lance_livre', makes: 8, attempts: 10 }],
     })
     expect(criada.status).toBe(201)
-
-    const resumo = await get<Resumo>(`/stats/summary?${FUSO}`)
-    expect(resumo.totals).toMatchObject({ sessions: 1, minutes: 30 })
-    expect(resumo.shooting).toMatchObject({ makes: 8, attempts: 10 })
-    const progresso = await get<Progresso>(`/stats/progress?${FUSO}`)
-    expect(progresso.streak).toEqual({ current: 1, best: 1 })
-    expect(progresso.achievements.find((a) => a.id === 'primeira-sessao')?.unlocked).toBe(true)
-    expect((await get<{ current: number }[]>(`/goals?${FUSO}`))[0].current).toBe(1)
+    expect(await get('/sessions?limit=200')).toHaveLength(1)
   }, 60_000)
 })

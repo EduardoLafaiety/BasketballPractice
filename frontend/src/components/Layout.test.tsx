@@ -37,7 +37,7 @@ describe('Menu em tela cheia', () => {
     abrir()
     const botao = await botaoMenu()
     await user.click(botao)
-    screen.getByRole('link', { name: /Ferramentas/ }).focus()
+    screen.getAllByRole('link', { name: /Artigos/ })[0].focus()
     await user.keyboard('{Escape}')
     expect(tela()).not.toHaveClass('aberto')
     expect(botao).toHaveFocus()
@@ -66,10 +66,10 @@ describe('Menu em tela cheia', () => {
     await user.click(await botaoMenu())
     expect(screen.getByText('Treinos', { selector: '.topo-secao' })).toBeInTheDocument()
 
-    await user.click(screen.getByRole('link', { name: /Ferramentas/ }))
-    await waitFor(() => expect(screen.getByTestId('caminho')).toHaveTextContent('/ferramentas'))
+    await user.click(screen.getAllByRole('link', { name: /Artigos/ })[0])
+    await waitFor(() => expect(screen.getByTestId('caminho')).toHaveTextContent('/artigos'))
     expect(tela()).not.toHaveClass('aberto')
-    expect(screen.getByText('Ferramentas', { selector: '.topo-secao' })).toBeInTheDocument()
+    expect(screen.getByText('Artigos', { selector: '.topo-secao' })).toBeInTheDocument()
   })
 })
 

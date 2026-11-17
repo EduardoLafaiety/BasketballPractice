@@ -1,5 +1,4 @@
 import { apiProgramas } from '../programas/api'
-import { apiTime } from '../time/api'
 import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
 import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import Contador, { useContador, zonasParaLista } from '../components/Contador'
@@ -18,8 +17,6 @@ export interface PlanoGuiado {
   workoutId?: number
   /** Dia de um programa: ao salvar a sessão, o dia é marcado como feito. */
   programa?: { id: string; dia: number }
-  /** Treino passado pelo técnico: ao salvar a sessão, a tarefa fica cumprida. */
-  tarefa?: { timeId: number; tarefaId: number }
 }
 
 const MINUTOS_PADRAO = 10
@@ -180,7 +177,7 @@ function Execucao({ plano }: { plano: PlanoGuiado }) {
     )
   }
 
-  if (!bloco) return <Final plano={plano} entradas={entradas} zonas={zonas} segundos={total} inicio={inicio.current} salvar={adicionar} aoSalvar={() => navigate(plano.programa ? `/programas/${plano.programa.id}` : plano.tarefa ? `/time/${plano.tarefa.timeId}` : '/desempenho')} />
+  if (!bloco) return <Final plano={plano} entradas={entradas} zonas={zonas} segundos={total} inicio={inicio.current} salvar={adicionar} aoSalvar={() => navigate(plano.programa ? `/programas/${plano.programa.id}` : '/')} />
 
   const acabou = restante <= 0
   return (
@@ -291,7 +288,6 @@ function Final({
         zonas: zonasParaLista(zonas),
       })
       if (plano.programa) await apiProgramas.concluirDia(plano.programa.id, plano.programa.dia, criada.id)
-      if (plano.tarefa) await apiTime.concluirTarefa(plano.tarefa.timeId, plano.tarefa.tarefaId, criada.id)
       aoSalvar()
     } catch (e) {
       setErro((e as Error).message)

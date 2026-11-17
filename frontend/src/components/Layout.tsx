@@ -7,7 +7,7 @@ import { useAnimacoes } from '../lib/movimento'
 import { marcarLembrado, notificar, proximoLembrete } from '../lib/lembretes'
 import { aplicarTema } from '../lib/tema'
 import { vibrar } from '../lib/audio'
-import { diasAtras, useConfig } from '../store'
+import { useConfig } from '../store'
 import type { Config } from '../types'
 import Icone from './Icone'
 import { Carregando } from './Estado'
@@ -24,13 +24,6 @@ const LINKS: { to: string; rotulo: string; fim?: boolean }[] = [
   { to: '/alimentacao', rotulo: 'Alimentação' },
   { to: '/equipamentos', rotulo: 'Equipamentos' },
   { to: '/artigos', rotulo: 'Artigos' },
-  { to: '/desempenho', rotulo: 'Desempenho' },
-  { to: '/cartao', rotulo: 'Cartão do atleta' },
-  { to: '/jogos', rotulo: 'Diário de jogos' },
-  { to: '/conquistas', rotulo: 'Conquistas' },
-  { to: '/ranking', rotulo: 'Ranking' },
-  { to: '/time', rotulo: 'Time' },
-  { to: '/ferramentas', rotulo: 'Ferramentas' },
 ]
 
 // Barra de baixo do celular: os atalhos ao alcance do polegar, com a bola de gerar treino no meio.
@@ -65,8 +58,8 @@ function useLembretes(lembretes: Config['lembretes']) {
         if (espera <= REAGENDAR_MS) {
           try {
             // Já treinou hoje? Então não incomoda.
-            const hoje = await api.resumo(diasAtras(0))
-            if (hoje.sessoes === 0 && marcarLembrado(dataLocal(new Date())))
+            const hoje = (await api.sessoes()).filter((s) => dataLocal(new Date(s.data)) === dataLocal(new Date()))
+            if (hoje.length === 0 && marcarLembrado(dataLocal(new Date())))
               await notificar('Hora do treino!', 'Sua sessão de hoje ainda não foi registrada. Bora pra quadra?')
           } catch {
             // sem conexão: lembra mesmo assim

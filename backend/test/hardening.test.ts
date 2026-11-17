@@ -5,9 +5,7 @@ import { z } from 'zod'
 import { assertProductionSecret } from '../src/config.js'
 import type { Database, Queryable } from '../src/db/index.js'
 import { MAX_ARRAY_ITEMS, parse } from '../src/lib/validate.js'
-import { GOAL_KINDS } from '../src/routes/goals.js'
 import { ZONES } from '../src/routes/sessions.js'
-import { TEST_KINDS } from '../src/routes/tests.js'
 import { startApi } from './http.js'
 
 const { api, db, register } = await startApi()
@@ -24,8 +22,6 @@ describe('Entrada que o Postgres recusaria vira 400', () => {
       ['GET', `/exercises/${grande}`],
       ['GET', `/workouts/${grande}`],
       ['GET', `/sessions/${grande}`],
-      ['DELETE', `/goals/${grande}`],
-      ['DELETE', `/tests/${grande}`],
       ['GET', '/sessions/1e30'],
     ]) {
       assert.equal((await api(method, path, undefined, token)).status, 400, path)
@@ -38,10 +34,6 @@ describe('Entrada que o Postgres recusaria vira 400', () => {
     assert.equal((await api('POST', '/sessions', { ...session, entries: [{ exerciseId: grande }] }, token)).status, 400)
     assert.equal((await api('POST', '/workouts', { name: 'Treino', exercises: [{ exerciseId: grande }] }, token)).status, 400)
     assert.equal(
-      (await api('POST', '/goals', { title: 'Meta', kind: 'cestas_total', target: 1, exerciseId: grande }, token)).status,
-      400,
-    )
-    assert.equal(
       (await api('POST', '/data/import', backup({ sessions: [{ performedAt: '2026-01-01', entries: [{ exerciseId: grande, exerciseName: exercise.name }] }] }), token)).status,
       400,
     )
@@ -52,18 +44,13 @@ describe('Entrada que o Postgres recusaria vira 400', () => {
     for (const query of ['offset=2147483648', 'offset=1e30', 'to=9999-12-31', 'from=9999-12-31', 'from=0100-01-01']) {
       assert.equal((await api('GET', `/sessions?${query}`, undefined, token)).status, 400, query)
     }
-    assert.equal((await api('GET', '/stats/summary?to=9999-12-31', undefined, token)).status, 400)
-    assert.equal((await api('GET', '/stats/zones?to=9999-12-31', undefined, token)).status, 400)
     assert.equal((await api('GET', '/sessions?offset=2147483647', undefined, token)).status, 200)
-    // Nas pontas aceitas, com o fuso mais distante, a data calculada ainda cabe no banco.
-    assert.equal((await api('GET', '/stats/summary?to=2100-12-31&tzOffset=840', undefined, token)).status, 200)
     assert.equal((await api('GET', '/sessions?from=1900-01-01&tzOffset=-840', undefined, token)).status, 200)
 
     for (const performedAt of ['9999-12-31T23:59:59-14:00', '9999-12-31', '0001-01-01']) {
       assert.equal((await api('POST', '/sessions', { performedAt, entries: [] }, token)).status, 400, performedAt)
     }
     assert.equal((await api('POST', '/sessions', { performedAt: '2100-12-31', entries: [] }, token)).status, 201)
-    assert.equal((await api('POST', '/tests', { kind: 'sprint', value: 3, performedAt: '9999-12-31' }, token)).status, 400)
   })
 
   it('caractere nulo em qualquer texto', async () => {
@@ -78,8 +65,6 @@ describe('Entrada que o Postgres recusaria vira 400', () => {
       ['POST', '/workouts', { name: 'Treino', exercises: [{ exerciseId: exercise.id, notes: nulo }] }],
       ['POST', '/sessions', { performedAt: '2026-01-01', notes: nulo, entries: [] }],
       ['POST', '/sessions', { performedAt: '2026-01-01', entries: [{ exerciseId: exercise.id, notes: nulo }] }],
-      ['POST', '/goals', { title: nulo, kind: 'sessoes_total', target: 1 }],
-      ['POST', '/tests', { kind: 'sprint', value: 3, performedAt: '2026-01-01', notes: nulo }],
       ['POST', '/data/import', backup({ sessions: [{ performedAt: '2026-01-01', notes: nulo, entries: [] }] })],
       ['POST', '/data/import', backup({ exercises: [{ id: 1, name: nulo, category: 'drible', metric: 'tempo' }] })],
     ]
@@ -131,57 +116,6 @@ describe('Arrays enormes não chegam à validação', () => {
     const resposta = await api('POST', '/data/import', backup({ sessions: [...sessions, { performedAt: 'lixo', entries: [] }] }), token)
     assert.equal(resposta.status, 400)
     assert.notDeepEqual(resposta.body.details, { sessions: ['Itens demais'] })
-  })
-})
-
-describe('Somas além do integer', () => {
-  it('estatísticas e metas respondem o valor certo com mais de 2 bilhões de cestas', async () => {
-    const { token, id } = await register()
-    const [exercise] = (await api('GET', '/exercises', undefined, token)).body
-    const goal = (await api('POST', '/goals', { title: 'Muitas', kind: 'cestas_total', target: 1 }, token)).body
-    const minutes = (await api('POST', '/goals', { title: 'Tempo', kind: 'minutos_total', target: 1 }, token)).body
-    assert.equal(goal.current, 0)
-    assert.equal(minutes.current, 0)
-
-    // Cada valor cabe em integer; só a soma passa. Pelo SQL, porque a API levaria milhares de pedidos.
-    const { rows } = await db.query<{ id: number }>(
-      `INSERT INTO practice_sessions (user_id, performed_at, duration_minutes) VALUES
-       ($1, now(), 2000000000), ($1, now(), 2000000000) RETURNING id`,
-      [id],
-    )
-    for (const row of rows) {
-      await db.query('INSERT INTO session_entries (session_id, exercise_id, attempts, makes, reps, seconds) VALUES ($1, $2, 2000000000, 1500000000, 2000000000, 2000000000)', [row.id, exercise.id])
-      await db.query(`INSERT INTO session_shots (session_id, zone, makes, attempts) VALUES ($1, 'garrafao', 1500000000, 2000000000)`, [row.id])
-    }
-
-    const summary = await api('GET', '/stats/summary', undefined, token)
-    assert.equal(summary.status, 200)
-    assert.equal(summary.body.totals.minutes, 4_000_000_000)
-    assert.equal(summary.body.shooting.makes, 3_000_000_000)
-    assert.equal(summary.body.shooting.attempts, 4_000_000_000)
-    assert.equal(summary.body.shooting.percentage, 75)
-    assert.equal(summary.body.byExercise[0].reps, 4_000_000_000)
-    assert.equal(summary.body.byExercise[0].seconds, 4_000_000_000)
-    assert.equal(summary.body.byWeek[0].minutes, 4_000_000_000)
-    assert.equal(summary.body.byWeek[0].makes, 3_000_000_000)
-
-    const zones = await api('GET', '/stats/zones', undefined, token)
-    assert.equal(zones.status, 200)
-    assert.equal(zones.body.find((z: { zone: string }) => z.zone === 'garrafao').makes, 3_000_000_000)
-
-    const progress = await api('GET', '/stats/progress', undefined, token)
-    assert.equal(progress.status, 200)
-    assert.equal(progress.body.totals.minutes, 4_000_000_000)
-    assert.equal(progress.body.totals.makes, 3_000_000_000)
-    assert.equal(progress.body.totals.attempts, 4_000_000_000)
-    assert.equal(progress.body.totals.bestDayMakes, 3_000_000_000)
-
-    await api('POST', '/goals', { title: 'Aproveitamento', kind: 'aproveitamento', target: 50 }, token)
-    await api('POST', '/goals', { title: 'Semana', kind: 'minutos_semana', target: 50 }, token)
-    const goals = await api('GET', '/goals', undefined, token)
-    assert.equal(goals.status, 200)
-    const byTitle = Object.fromEntries(goals.body.map((g: { title: string; current: number }) => [g.title, g.current]))
-    assert.deepEqual(byTitle, { Muitas: 3_000_000_000, Tempo: 4_000_000_000, Aproveitamento: 75, Semana: 4_000_000_000 })
   })
 })
 
@@ -357,7 +291,7 @@ describe('Importação e o resto da API', () => {
   it('a vaga também volta quando a importação falha', async () => {
     const limitada = await startApi({ maxImports: 1 })
     const { token } = await limitada.register()
-    const ruim = backup({ goals: [{ title: 'x', kind: 'inexistente', target: 1 }] })
+    const ruim = backup({ sessions: [{ performedAt: 'não é data', entries: [] }] })
     assert.equal((await limitada.api('POST', '/data/import', ruim, token)).status, 400)
     assert.equal((await limitada.api('POST', '/data/import', backup({}), token)).status, 200)
   })
@@ -377,8 +311,6 @@ describe('O banco barra sozinho', () => {
     }
     await recusa('UPDATE practice_sessions SET duration_minutes = -1 WHERE id = $1', [sessionId])
     await recusa(`INSERT INTO session_shots (session_id, zone, makes, attempts) VALUES ($1, 'inventada', 0, 0)`, [sessionId])
-    await recusa(`INSERT INTO goals (user_id, title, kind, target) VALUES ($1, 'x', 'inventada', 1)`, [id])
-    await recusa(`INSERT INTO physical_tests (user_id, kind, value, performed_at) VALUES ($1, 'inventado', 1, now())`, [id])
     await recusa(`INSERT INTO exercises (name, category, metric) VALUES ('Lance livre', 'arremesso', 'acertos')`, [])
   })
 
@@ -393,54 +325,11 @@ describe('O banco barra sozinho', () => {
       const resposta = await api('POST', '/sessions', { performedAt: '2026-01-01', entries: [], shots: [{ zone, makes: 0, attempts: 0 }] }, token)
       assert.equal(resposta.status, 201, zone)
     }
-    for (const kind of GOAL_KINDS) {
-      assert.equal((await api('POST', '/goals', { title: `Meta ${kind}`, kind, target: 1 }, token)).status, 201, kind)
-    }
-    for (const kind of Object.keys(TEST_KINDS)) {
-      assert.equal((await api('POST', '/tests', { kind, value: 1, performedAt: '2026-01-01' }, token)).status, 201, kind)
-    }
   })
 
   it('os índices das chaves estrangeiras existem', async () => {
-    const { rows } = await db.query<{ indexname: string }>(`SELECT indexname FROM pg_indexes WHERE indexname IN ('idx_sessions_workout', 'idx_goals_exercise')`)
-    assert.equal(rows.length, 2)
-  })
-})
-
-describe('Exercício ligado a uma meta', () => {
-  it('apagar responde 409 e a meta continua lá; sem a meta, apaga', async () => {
-    const { token } = await register()
-    const exercise = (await api('POST', '/exercises', { name: 'Meu arremesso', category: 'arremesso', metric: 'acertos' }, token)).body
-    const goal = (await api('POST', '/goals', { title: 'Meta', kind: 'cestas_total', target: 5, exerciseId: exercise.id }, token)).body
-
-    const recusa = await api('DELETE', `/exercises/${exercise.id}`, undefined, token)
-    assert.equal(recusa.status, 409)
-    assert.match(recusa.body.error, /meta/)
-    assert.equal((await api('GET', '/goals', undefined, token)).body.length, 1)
-
-    assert.equal((await api('DELETE', `/goals/${goal.id}`, undefined, token)).status, 204)
-    assert.equal((await api('DELETE', `/exercises/${exercise.id}`, undefined, token)).status, 204)
-  })
-
-  it('o aviso de uso por treino não muda', async () => {
-    const { token } = await register()
-    const exercise = (await api('POST', '/exercises', { name: 'Outro', category: 'drible', metric: 'tempo' }, token)).body
-    await api('POST', '/workouts', { name: 'Treino', exercises: [{ exerciseId: exercise.id }] }, token)
-    const recusa = await api('DELETE', `/exercises/${exercise.id}`, undefined, token)
-    assert.equal(recusa.status, 409)
-    assert.equal(recusa.body.error, 'Exercício está em uso por treinos ou registros')
-  })
-
-  it('excluir a conta inteira continua funcionando, com meta presa a exercício próprio', async () => {
-    const { token, id } = await register()
-    const exercise = (await api('POST', '/exercises', { name: 'Próprio', category: 'arremesso', metric: 'acertos' }, token)).body
-    await api('POST', '/goals', { title: 'Meta', kind: 'cestas_total', target: 5, exerciseId: exercise.id }, token)
-    // Como a demonstração recria o visitante: em transação, com a cascata apagando metas e exercícios juntos.
-    await db.transaction(async (tx) => {
-      await tx.query('DELETE FROM users WHERE id = $1', [id])
-    })
-    const { rows } = await db.query('SELECT 1 FROM exercises WHERE user_id = $1', [id])
-    assert.equal(rows.length, 0)
+    const { rows } = await db.query<{ indexname: string }>(`SELECT indexname FROM pg_indexes WHERE indexname IN ('idx_sessions_workout')`)
+    assert.equal(rows.length, 1)
   })
 })
 

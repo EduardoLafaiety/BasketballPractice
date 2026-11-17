@@ -355,7 +355,6 @@ export const ARTIGOS: Artigo[] = [
       },
     ],
     fontes: ['Dweck CS. Mindset: The New Psychology of Success. Random House, 2006.', 'Sisk VF, Burgoyne AP, Sun J, Butler JL, Macnamara BN. To what extent and under which circumstances are growth mind-sets important to academic achievement? Psychological Science, 2018.'],
-    noApp: { to: '/conquistas', rotulo: 'Ver minhas conquistas' },
   },
   {
     id: 'treino-deliberado',
@@ -392,7 +391,6 @@ export const ARTIGOS: Artigo[] = [
       'Ericsson KA, Krampe RT, Tesch-Römer C. The role of deliberate practice in the acquisition of expert performance. Psychological Review, 1993.',
       'Macnamara BN, Hambrick DZ, Oswald FL. Deliberate practice and performance in music, games, sports, education, and professions: a meta-analysis. Psychological Science, 2014.',
     ],
-    noApp: { to: '/desempenho', rotulo: 'Ver meu desempenho' },
   },
   {
     id: 'pressao-e-rotina',
@@ -439,7 +437,6 @@ export const ARTIGOS: Artigo[] = [
       "Lonsdale C, Tam JT. On the temporal and behavioural consistency of pre-performance routines: an intra-individual analysis of elite basketball players' free throw shooting accuracy. Journal of Sports Sciences, 2008.",
       'Hatzigeorgiadis A, Zourbanos N, Galanis E, Theodorakis Y. Self-talk and sports performance: a meta-analysis. Perspectives on Psychological Science, 2011.',
     ],
-    noApp: { to: '/ferramentas', rotulo: 'Abrir o contador de arremessos' },
   },
   {
     id: 'metas-de-processo',
@@ -481,7 +478,6 @@ export const ARTIGOS: Artigo[] = [
       'Locke EA, Latham GP. Building a practically useful theory of goal setting and task motivation: a 35-year odyssey. American Psychologist, 2002.',
       'Kingston KM, Hardy L. Effects of different types of goals on processes that support performance. The Sport Psychologist, 1997.',
     ],
-    noApp: { to: '/conquistas', rotulo: 'Ver minhas conquistas' },
   },
   {
     id: 'olhar-quieto',
@@ -523,7 +519,6 @@ export const ARTIGOS: Artigo[] = [
       'Vickers JN. Visual control when aiming at a far target. Journal of Experimental Psychology: Human Perception and Performance, 1996.',
       'Harle SK, Vickers JN. Training quiet eye improves accuracy in the basketball free throw. The Sport Psychologist, 2001.',
     ],
-    noApp: { to: '/ferramentas', rotulo: 'Abrir o contador de arremessos' },
   },
 
   {
@@ -715,7 +710,6 @@ export const ARTIGOS: Artigo[] = [
       },
     ],
     fontes: ['Markovic G. Does plyometric training improve vertical jump height? A meta-analytical review. British Journal of Sports Medicine, 2007.'],
-    noApp: { to: '/ferramentas', rotulo: 'Registrar um teste físico' },
   },
   {
     id: 'prevencao-de-lesoes',
@@ -1314,7 +1308,6 @@ export const ARTIGOS: Artigo[] = [
       },
     ],
     fontes: ['Foster C, Florhaug JA, Franklin J et al. A new approach to monitoring exercise training. Journal of Strength and Conditioning Research, 2001.'],
-    noApp: { to: '/desempenho', rotulo: 'Ver meu desempenho' },
   },
   {
     id: 'proteina',

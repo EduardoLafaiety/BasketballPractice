@@ -397,6 +397,13 @@ const migrations: string[] = [
     PRIMARY KEY (assignment_id, user_id)
   );
   `,
+  // Páginas removidas (Desempenho, Cartão do atleta, Diário de jogos, Conquistas, Ranking, Time e Ferramentas):
+  // as tabelas que só elas usavam e os dados dos atletas nelas saem do banco.
+  `
+  DROP TABLE IF EXISTS team_assignment_done, team_assignments, team_members, teams CASCADE;
+  DROP TABLE IF EXISTS friend_challenges, friendships, profiles CASCADE;
+  DROP TABLE IF EXISTS games, plays, physical_tests, goals CASCADE;
+  `,
 ]
 
 /** Versão do schema depois de todas as migrações. */

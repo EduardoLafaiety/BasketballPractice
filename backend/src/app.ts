@@ -5,28 +5,20 @@ import helmet from 'helmet'
 import { config } from './config.js'
 import type { Database } from './db/index.js'
 import { createEmailSender, type EmailSender } from './lib/email.js'
-import { createPushSender, sendToUser, type PushSender } from './lib/push.js'
+import { createPushSender, type PushSender } from './lib/push.js'
 import { requireAdmin, requireAuth } from './middleware/auth.js'
 import { errorHandler, notFoundHandler } from './middleware/errors.js'
 import { emailDoLogin, limitarTentativas, type LimiteTentativas } from './middleware/rate-limit.js'
 import { adminRouter } from './routes/admin.js'
 import { authRouter } from './routes/auth.js'
-import { cardRouter } from './routes/card.js'
 import { dataRouter } from './routes/data.js'
 import { exercisesRouter } from './routes/exercises.js'
-import { gamesRouter } from './routes/games.js'
-import { goalsRouter } from './routes/goals.js'
 import { plansRouter } from './routes/plans.js'
-import { playsRouter } from './routes/plays.js'
 import { programsRouter } from './routes/programs.js'
 import { pushCronRouter, pushRouter } from './routes/push.js'
 import { sessionsRouter } from './routes/sessions.js'
 import { settingsRouter } from './routes/settings.js'
-import { socialRouter } from './routes/social.js'
-import { statsRouter } from './routes/stats.js'
-import { teamsRouter } from './routes/teams.js'
 import { stylesRouter } from './routes/styles.js'
-import { testsRouter } from './routes/tests.js'
 import { workoutsRouter } from './routes/workouts.js'
 
 export interface AppOptions {
@@ -112,25 +104,10 @@ export function createApp(
   app.use('/api/exercises', auth, exercisesRouter(db))
   app.use('/api/workouts', auth, workoutsRouter(db))
   app.use('/api/sessions', auth, sessionsRouter(db))
-  app.use('/api/stats', auth, statsRouter(db))
-  app.use('/api/goals', auth, goalsRouter(db))
-  app.use('/api/card', auth, cardRouter(db))
-  app.use('/api/tests', auth, testsRouter(db))
   app.use('/api/plans', auth, plansRouter(db))
   app.use('/api/programs', auth, programsRouter(db))
-  app.use('/api/plays', auth, playsRouter(db))
-  app.use('/api/games', auth, gamesRouter(db))
-  // Avisos no celular (desafio recebido, aceito…) saem em segundo plano: uma falha no push não derruba o pedido.
-  const notificar = push.send
-    ? (userId: number, message: Parameters<PushSender>[1]) => {
-        const tarefa = sendToUser(db, push.send!, userId, message).then(() => undefined, () => undefined)
-        segundoPlano?.(tarefa)
-      }
-    : undefined
-  app.use('/api/social', auth, socialRouter(db, { notificar }))
   app.use('/api/push/run', pushCronRouter(db, { secret: push.cronSecret ?? '', send: push.send }))
   app.use('/api/push', auth, pushRouter(db, push))
-  app.use('/api/teams', auth, teamsRouter(db))
   app.use('/api/styles', auth, stylesRouter(db))
   app.use('/api/settings', auth, settingsRouter(db))
   app.use('/api/data', auth, dataRouter(db, { maxImports }))

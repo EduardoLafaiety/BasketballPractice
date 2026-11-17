@@ -30,30 +30,13 @@
 - 🌟 **Jogue Como**: Escolha Um Entre 28 Jogadores Da NBA E Treine Os Movimentos Que Definem O Estilo Dele.
 - ▶️ **Sessão Guiada**: Animação Ao Lado Do Cronômetro, Contador De Acertos E Registro Automático No Fim.
 - 🗓️ **Rotina Semanal**: Gere A Semana Inteira Pelo Tempo, Nível E Foco, Ou Monte O Que Treinar Em Cada Dia.
-- 📈 **Desempenho**: Comparativos, Gráficos E Mapa De Arremessos Por Zona Da Quadra.
-- 🏆 **Metas E Conquistas**: Barras De Progresso, Sequência De Dias Seguidos E Medalhas.
-- 🪪 **Cartão Do Atleta**: Bateria Mensal De Quatro Testes, Nota De 0 A 99, Radar E Evolução Mês A Mês.
 - 📅 **Programas De 30 Dias**: Um Treino Liberado Por Dia, Com Barra De Progresso.
-- 🥇 **Ranking E Desafios Entre Amigos**: Listas Da Semana E Gerais, Convite Por Link E Duelos Semanais.
-- 📋 **Modo Técnico**: Times, Tarefas E O Acompanhamento De Cada Atleta.
-- 📓 **Diário De Jogos**: As Partidas De Verdade, Comparadas Com O Treino.
-- 🗺️ **Quadras Perto De Você E Prancheta Tática**: Mapa Com Quadras Do OpenStreetMap E Jogadas Desenhadas Em Meia Ou Quadra Inteira.
-- 🖼️ **Imagem Da Semana**: PNG No Tamanho Dos Stories Com O Mapa De Arremessos E A Sequência.
-- 🧰 **Ferramentas**: Timer De Intervalos, Contador De Arremessos, Metrônomo De Drible E Calculadoras; O Vídeo Em Câmera Lenta Chega Em Breve.
 - 🏀 **Visual De Quadra**: A Bola Da Abertura Amplia Sem Perder Nitidez Ao Rolar A Página, E Uma Listra Com As Costuras Dela Abre As Seções De Números E Ferramentas.
 - 📱 **PWA**: Instalável No Celular, Com Tema Claro/Escuro E Lembretes De Treino, Inclusive Com O App Fechado (Web Push).
 
 ## 📸 Telas
 
 <table>
-  <tr>
-    <td width="50%"><img src="docs/screenshots/desempenho.png" alt="Página De Desempenho Com Comparativos, Gráficos E Mapa De Arremessos" /></td>
-    <td width="50%"><img src="docs/screenshots/metas.png" alt="Metas Com Barras De Progresso E Conquistas" /></td>
-  </tr>
-  <tr>
-    <td align="center"><b>Desempenho</b> · Comparativos, Gráficos E Mapa De Arremessos</td>
-    <td align="center"><b>Metas E Conquistas</b> · Sequência, Metas E Medalhas</td>
-  </tr>
   <tr>
     <td><img src="docs/screenshots/rotina.png" alt="Rotina Semanal Com Os Treinos De Cada Dia" /></td>
     <td><img src="docs/screenshots/gerador.png" alt="Gerador De Treino Montando Uma Sessão De 45 Minutos" /></td>
@@ -64,11 +47,11 @@
   </tr>
   <tr>
     <td><img src="docs/screenshots/treinos.png" alt="Treinos Divididos Em Iniciante, Intermediário E Avançado, Com O Aquecimento Em Ordem" /></td>
-    <td><img src="docs/screenshots/ferramentas.png" alt="Ferramentas: Timer De Intervalos, Contador, Metrônomo, Vídeo E Calculadoras" /></td>
+    <td></td>
   </tr>
   <tr>
     <td align="center"><b>Treinos</b> · Três Níveis, Com O Aquecimento Primeiro</td>
-    <td align="center"><b>Ferramentas</b> · Timer, Contador, Metrônomo E Mais</td>
+    <td></td>
   </tr>
   <tr>
     <td><img src="docs/screenshots/jogue-como.png" alt="Grade Da Aba Jogue Como, Com As Fotos Em Preto E Branco E O Mouse Revelando A Cor De Uma Delas" /></td>
