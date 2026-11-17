@@ -2,16 +2,14 @@ import { useEffect, useState, type CSSProperties } from 'react'
 import { Link } from 'react-router-dom'
 import { COR, POSICOES, REFEICOES } from '../alimentacao/dados'
 import IconeRefeicao from '../alimentacao/icones'
-import { ARTIGOS, CATEGORIAS, categoria, minutosDeLeitura } from '../artigos/dados'
 import { api } from '../api'
 import { AvisoDesatualizado, Carregando, ErroCarga } from '../components/Estado'
 import GradeJogadores from '../components/GradeJogadores'
 import Icone from '../components/Icone'
-import { ResumoSemana } from '../components/InicioDestaques'
-import { AberturaBola, EscadaRolagem, Figura, FraseRolagem, ListraBola, NomesRolagem } from '../components/rolagem'
+import { AberturaBola, EscadaRolagem, Figura, FraseRolagem, NomesRolagem } from '../components/rolagem'
 import { corDoJogador } from '../lib/cor-do-time'
 import { NIVEIS } from '../lib/niveis'
-import { DIAS, ROTULO_METRICA, aproveitamento, diasAtras, useDrills, useResumo, useRotina } from '../store'
+import { DIAS, ROTULO_METRICA, useDrills, useRotina } from '../store'
 import type { DiaSemana, Drill, EstiloResumo, Nivel } from '../types'
 
 const FIGURA_DO_NIVEL: Record<Nivel, string> = {
@@ -20,16 +18,6 @@ const FIGURA_DO_NIVEL: Record<Nivel, string> = {
   avancado: 'Finger roll',
 }
 const ORDEM_SEMANA: DiaSemana[] = [1, 2, 3, 4, 5, 6, 0]
-// Um artigo de cada assunto que mais conversa com quem treina.
-const ARTIGOS_EM_DESTAQUE = ['sono-e-arremesso', 'treino-deliberado', 'salto-vertical', 'cesto-de-pessego', 'qual-recuperacao-funciona'].map((id) => ARTIGOS.find((a) => a.id === id)!)
-const FERRAMENTAS: { to: string; titulo: string; texto: string }[] = [
-  { to: '/ranking', titulo: 'Ranking e desafios', texto: 'Lances livres, sequência e nota do cartão contra todo mundo ou só contra os amigos, com duelos semanais.' },
-  { to: '/programas', titulo: 'Programas de 30 dias', texto: 'Um treino liberado por dia, com barra de progresso: arremesso, mão fraca e os primeiros 30 dias.' },
-  { to: '/rotina', titulo: 'Rotina semanal', texto: 'Escolha os dias, o tempo, o nível e o foco: o app monta a semana inteira, do aquecimento ao mais difícil.' },
-  { to: '/ferramentas', titulo: 'Ferramentas de quadra', texto: 'Cronômetro, metrônomo, contador ao vivo, calculadoras e testes físicos.' },
-  { to: '/desempenho', titulo: 'Desempenho', texto: 'Gráficos, mapa de arremessos e a sua evolução ao longo do tempo.' },
-  { to: '/conquistas', titulo: 'Conquistas', texto: 'Desbloqueie conquistas e mantenha a sequência de dias treinando.' },
-]
 
 // Onde cada posição joga na meia quadra do convite da Alimentação.
 const JOGADORES_QUADRA = [
@@ -41,7 +29,6 @@ const JOGADORES_QUADRA = [
 ] as const
 
 export default function Inicio() {
-  const { resumo, erro: erroResumo } = useResumo(diasAtras(6))
   const rotina = useRotina()
   const drills = useDrills()
   const [estilos, setEstilos] = useState<EstiloResumo[]>([])
@@ -53,12 +40,8 @@ export default function Inicio() {
   const treinosHoje = rotina.rotina[hoje].map(drills.drillPorId).filter((d): d is Drill => !!d)
   const contagem = (id: Nivel) => drills.drills.filter((d) => d.nivel === id && !d.aquecimento).length
 
-  const pct = resumo ? aproveitamento(resumo.acertos, resumo.tentativas) : null
-  const valor = (n: number | string | undefined) => (n === undefined ? (erroResumo ? '!' : '—') : n)
 
   const erroHoje = rotina.erro ?? drills.erro
-  // Na segunda-feira, o balanço da semana que passou vem logo no alto.
-  const segunda = new Date().getDay() === 1
   const prontoHoje = rotina.carregado && drills.carregado
 
   return (
@@ -73,8 +56,6 @@ export default function Inicio() {
       />
 
       <FraseRolagem texto="Ninguém começa arremessando de três. Primeiro vem a bola na mão, depois o arremesso colado à cesta, e só então a distância." />
-
-      {segunda && <ResumoSemana />}
 
       <section className="faixa-clara banda treino-hoje">
         <div className="hoje-frente">
@@ -210,78 +191,6 @@ export default function Inicio() {
           })}
         </div>
       </section>
-
-      {!segunda && <ResumoSemana />}
-
-      <section className="faixa-laranja banda com-listra" aria-busy={!resumo}>
-        <ListraBola />
-        <h2 className="titulo-gigante">Seus números</h2>
-        {erroResumo && <p className="erro" role="alert">Não foi possível carregar seus números: {erroResumo.message}</p>}
-        <div className="stats faixa">
-          <Stat valor={valor(resumo?.sessoes)} rotulo="sessões nos últimos 7 dias" />
-          <Stat valor={valor(resumo?.minutos)} rotulo="minutos treinados" />
-          <Stat
-            valor={resumo ? (pct === null ? '—' : `${pct}%`) : valor(undefined)}
-            rotulo="aproveitamento nos arremessos"
-            destaque
-          />
-        </div>
-      </section>
-
-      <section className="faixa-clara artigos-chamada" aria-labelledby="artigos-chamada-titulo">
-        <div className="artigos-chamada-texto">
-          <span className="rotulo-forte">Artigos</span>
-          <h2 id="artigos-chamada-titulo">Entenda o jogo</h2>
-          <p className="muted">Leituras curtas sobre história, mentalidade, condicionamento, sono e recuperação, com o estudo por trás de cada ideia.</p>
-          <div className="artigos-chamada-categorias">
-            {CATEGORIAS.map((c) => (
-              <Link key={c.id} to={`/artigos?categoria=${c.id}`} className="artigos-chamada-categoria" style={{ '--c': c.cor } as CSSProperties}>
-                {c.nome}
-              </Link>
-            ))}
-          </div>
-          <div className="acoes">
-            <Link to="/artigos" className="link-forte">Ver todos os artigos</Link>
-          </div>
-        </div>
-        <div className="artigos-chamada-lista">
-          {ARTIGOS_EM_DESTAQUE.map((a) => {
-            const cat = categoria(a.categoria)
-            return (
-              <Link key={a.id} to={`/artigos/${a.id}`} className="artigos-chamada-artigo" style={{ '--c': cat.cor } as CSSProperties}>
-                <span className="artigos-chamada-nome">
-                  <span className="tag">{cat.nome}</span>
-                  <strong>{a.titulo}</strong>
-                  <span className="meta">{minutosDeLeitura(a)} min de leitura</span>
-                </span>
-                <Icone nome="seta" />
-              </Link>
-            )
-          })}
-        </div>
-      </section>
-
-      <section className="faixa-preta banda com-listra">
-        <ListraBola />
-        <h2 className="titulo-gigante">Ferramentas</h2>
-        <div className="ferramentas-lista">
-          {FERRAMENTAS.map((f) => (
-            <Link key={f.to} to={f.to} className="ferramenta-linha surge">
-              <h3>{f.titulo}</h3>
-              <p>{f.texto}</p>
-            </Link>
-          ))}
-        </div>
-      </section>
-    </div>
-  )
-}
-
-function Stat({ valor, rotulo, destaque }: { valor: number | string; rotulo: string; destaque?: boolean }) {
-  return (
-    <div className={`stat${destaque ? ' destaque' : ''}`}>
-      <strong>{valor}</strong>
-      <span>{rotulo}</span>
     </div>
   )
 }
