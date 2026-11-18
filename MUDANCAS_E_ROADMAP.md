@@ -288,3 +288,6 @@ Limitações mantidas: não há promessa de ganho de tempo sem medição equival
 - Builds de produção e demonstração, além de typecheck da API, aprovados durante a implementação. O CI deverá confirmar o commit publicado.
 
 A retirada do pré-carregamento global revelou uma transição para página não disponível ao terminar offline. A confirmação passou a permanecer na sessão e foi adicionado um limite de erro por página para preservar navegação e pendências. O fluxo offline completo foi validado novamente antes de publicar.
+
+
+A limpeza do README publicada no PR #164 foi preservada. As instruções de instalação, ambiente, execução, testes e auditoria estão em [DESENVOLVIMENTO.md](DESENVOLVIMENTO.md).

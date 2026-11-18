@@ -86,7 +86,7 @@ npm run build:site
 npm run build:demo
 ```
 
-As dependências continuam sendo instaladas em cada pacote conforme o README. `npm --prefix e2e run audit` registra as cinco telas principais em dois tamanhos e dois temas, com screenshots e contagem de recursos em diretório temporário do sistema. A auditoria usa o banco exclusivo dos testes E2E; não deve rodar simultaneamente com outra suíte que recrie esse mesmo banco.
+As dependências continuam sendo instaladas em cada pacote conforme [DESENVOLVIMENTO.md](DESENVOLVIMENTO.md). `npm --prefix e2e run audit` registra as cinco telas principais em dois tamanhos e dois temas, com screenshots e contagem de recursos em diretório temporário do sistema. A auditoria usa o banco exclusivo dos testes E2E; não deve rodar simultaneamente com outra suíte que recrie esse mesmo banco.
 
 Os logs temporários da refatoração foram removidos da raiz e não devem ser recriados nela. Resultados permanentes e limitações devem ser descritos no roadmap; dados brutos e capturas de validação ficam fora da árvore de código ou nos diretórios de teste ignorados.
 
