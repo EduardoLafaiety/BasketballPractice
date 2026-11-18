@@ -11,3 +11,5 @@ export const exerciseSchema = z.object({
 })
 
 export const listQuery = z.object({ category: z.enum(CATEGORIES).optional(), level: z.enum(LEVELS).optional() })
+export type ExerciseInput = z.infer<typeof exerciseSchema>
+export type ExerciseQuery = z.infer<typeof listQuery>

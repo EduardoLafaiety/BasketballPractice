@@ -107,6 +107,47 @@ describe('Postgres de verdade', { skip: ADMIN_URL ? false : 'defina TEST_POSTGRE
     assert.equal(await quantasSessoes(id), 3)
   })
 
+  it('programas serializam reinício, conclusão e saída por conta', { timeout: 20_000 }, async () => {
+    const owner = await conta(), other = await conta()
+    const path = '/programs/arremesso-30'
+    assert.equal((await api('POST', `${path}/start`, {}, owner.token)).status, 201)
+    const lock = new pg.Client({ connectionString: urlDoBanco() })
+    await lock.connect()
+    try {
+      for (const [method, suffix, expected] of [['POST', '/start', 201], ['POST', '/days/1/complete', 201], ['DELETE', '', 204]] as const) {
+        await lock.query('SELECT pg_advisory_lock(4244, $1::int)', [owner.id])
+        let finished = false
+        const pending = api(method, path + suffix, method === 'POST' ? {} : undefined, owner.token).finally(() => { finished = true })
+        try {
+          // Outra conta continua progredindo enquanto a conta sob teste aguarda sua trava.
+          assert.equal((await api('POST', `${path}/start`, {}, other.token)).status, 201)
+          let waiting = false
+          for (let attempt = 0; attempt < 100; attempt++) {
+            waiting = (await admin("SELECT 1 FROM pg_stat_activity WHERE datname = $1 AND wait_event_type = 'Lock' AND query LIKE '%pg_advisory_xact_lock(4244,%'", [BANCO])).rows.length > 0
+            if (waiting) break
+            await espera(20)
+          }
+          assert.equal(waiting, true, method + suffix)
+          assert.equal(finished, false, method + suffix)
+        } finally { await lock.query('SELECT pg_advisory_unlock(4244, $1::int)', [owner.id]) }
+        assert.equal((await pending).status, expected)
+      }
+    } finally { await lock.end() }
+    assert.equal((await api('GET', path, undefined, owner.token)).body.status.started, false)
+  })
+
+  it('programas serializam dois reinícios e recusam conclusão duplicada sem erro interno', async () => {
+    const { token } = await conta()
+    const path = '/programs/arremesso-30'
+    const starts = await Promise.all([1, 2].map(() => api('POST', `${path}/start`, {}, token)))
+    assert.deepEqual(starts.map((r) => r.status), [201, 201])
+    const completions = await Promise.all([1, 2].map(() => api('POST', `${path}/days/1/complete`, {}, token)))
+    assert.deepEqual(completions.map((r) => r.status).sort(), [201, 409])
+    const program = await api('GET', path, undefined, token)
+    assert.equal(program.body.status.done, 1)
+    assert.equal(program.body.days.filter((day: { state: string }) => day.state === 'done').length, 1)
+  })
+
   it('o mesmo backup enviado duas vezes ao mesmo tempo não duplica', async () => {
     const { token, id } = await conta()
     const corpo = backup(sessoes(500))

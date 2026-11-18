@@ -48,6 +48,7 @@ Fontes: `backend/src/modules/auth/auth.routes.ts`, `admin.ts`, `backend/src/midd
 - **RN-EX-05 — Métricas:** acertos e tentativas, repetições ou tempo.
 - **RN-EX-06 — Níveis:** o catálogo utiliza iniciante, intermediário e avançado. Exercícios próprios não recebem nível no cadastro atual e podem ser usados pelo gerador em qualquer nível.
 - **RN-EX-07 — Aquecimento:** exercícios do catálogo podem ser marcados como aquecimento e possuir posição na progressão.
+- **RN-EX-08 — Alterações protegidas:** edição e exclusão verificam propriedade e bloqueiam o registro na mesma transação da alteração. Referências do banco impedem excluir exercícios em uso; esse bloqueio retorna conflito 409.
 - **RN-TR-01 — Composição:** um treino contém até 50 itens ordenados, referenciando apenas exercícios visíveis para a conta.
 - **RN-TR-02 — Metas dos itens:** a API aceita séries, alvo de repetições, alvo de segundos e notas. Nem toda informação disponível na API é utilizada por todos os fluxos do frontend.
 - **RN-TR-03 — Edição atômica:** criação e edição validam exercícios dentro da transação. A edição bloqueia o treino da conta antes de substituir cabeçalho e itens, preservando a ordem. Falhas preservam a versão anterior inteira; a última edição confirmada prevalece.
@@ -114,6 +115,7 @@ Fontes: `frontend/src/features/sessao/model/treino-local.ts`, `components/Sessoe
 - **RN-PR-05 — Conclusão:** o programa termina ao completar todos os dias definidos.
 - **RN-PR-06 — Atomicidade:** ao salvar uma sessão guiada vinculada a programa, registro e conclusão do dia pertencem à mesma transação. Uma rejeição desfaz ambos.
 - **RN-PR-07 — Exclusão de sessão:** apagar a sessão vinculada deixa a referência nula, mas mantém o dia concluído. Esse comportamento difere do recálculo de conquistas e Overall.
+- **RN-PR-08 — Concorrência:** iniciar/reiniciar, concluir e sair de programas usam a mesma trava por conta. Reinício que falha desfaz a remoção do progresso anterior. A data local de escrita é calculada após obter a trava, com a mesma data no registro de início e na resposta.
 
 Fontes: `backend/src/modules/programs/programs.routes.ts`, `sessions.ts`, `backend/src/db/programs.ts` e `migrations.ts`.
 

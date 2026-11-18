@@ -337,7 +337,7 @@ Sequência seguinte: concluir a revisão de contratos e persistência dos domín
 
 ## Etapa atual — contratos de treinos e backup
 
-Estado: implementação validada localmente e publicada no [PR #168](https://github.com/EduardoLafaiety/BasketballPractice/pull/168), branch `codex/contratos-treinos-backup`, baseada na PR #167 integrada. Commit de implementação: `1495cd3`.
+Estado: integrado pelo [PR #168](https://github.com/EduardoLafaiety/BasketballPractice/pull/168), commit `37eef7a`, com todos os checks aprovados. Commit de implementação: `1495cd3`.
 
 - Treinos: rotas delegam consulta, criação, edição e exclusão ao serviço; SQL e substituição ordenada de itens ficam no repositório. Validação e resposta de escrita pertencem à mesma transação; edição bloqueia o treino da conta.
 - Schema de exercício de treino unificado entre API e importação. A escrita de itens é compartilhada por treinos, rotina e backup, preservando séries, metas, notas, posições e IDs legados.
@@ -352,3 +352,20 @@ Validações locais: 178 testes da API, três cenários de concorrência de back
 Limites: sem mudança de versão do backup, tabela, endpoint, dependência ou interface. A exportação usa uma conexão durante sua execução; não há streaming nem paginação do arquivo. Não implementa restauração de extras, conflitos por versão ou sincronização entre backup e gravações normais da conta. Importações da mesma conta continuam serializadas entre si.
 
 A orientação vigente é concluir o backend antes do frontend. A fila restante está no [plano de refatoração](PLANO_DE_REFATORACAO.md): exercícios/programas/planos; autenticação/administração/preferências; notificações/estilos; fechamento das verificações e documentação. Somente depois entram recuperação local e preparação offline na interface.
+
+## Etapa atual — exercícios, programas e planos
+
+Estado: implementação validada localmente e publicada no [PR #169](https://github.com/EduardoLafaiety/BasketballPractice/pull/169), branch `codex/arquitetura-exercicios-programas-planos`, baseada na PR #168 integrada. Commit de implementação: `cf95857`.
+
+- Exercícios: consultas, gravações e exclusão movidas para repositório; serviço preserva visibilidade por conta, catálogo protegido e conflito de referência em uso. Edição/exclusão verificam propriedade dentro da transação e bloqueiam o registro.
+- Programas: validação de parâmetros/corpo em schema; status e data local em modelo próprio; leitura e escrita de progresso em repositório; serviço concentra lista, detalhe, início, saída e conclusão.
+- Início/reinício e saída passam a compartilhar a trava por conta já usada na conclusão. Reinícios concorrentes são serializados; conclusão repetida retorna conflito. Outra conta segue operando. Data de gravação é calculada após a trava; início usa um único valor na gravação e resposta. A sessão vinculada é protegida por trava de referência durante a conclusão.
+- Planos: rota delega ao serviço, projeção de exercícios visíveis no repositório e algoritmo no gerador puro. Semente, duração, aquecimento, exclusões preferenciais, progressão e fallback mantidos. Gerar não persiste dados.
+- Contratos dos três módulos adicionados a [CONTRATOS_BACKEND.md](CONTRATOS_BACKEND.md). Guardas de arquitetura abrangem os novos módulos e recusam SQL nos serviços migrados.
+- Testes novos de rollback do reinício com vínculo de sessão, isolamento/edição de exercícios, serviço de geração sem HTTP e coordenação de programas em PostgreSQL real. Dois cenários concorrentes de programas entram no CI junto aos três cenários de backup.
+
+Validações: 181 testes da API aprovados; dois cenários de coordenação de programas em PostgreSQL real aprovados; 24 testes ponta a ponta com Chrome/PostgreSQL e 15 testes dos adaptadores HTTP/demonstração aprovados. Build do backend, typecheck, builds de produção e demonstração aprovados; guardas de arquitetura aprovadas e verificadas com violações temporárias, removidas em seguida. A revalidação preservou a precedência de 403 para edição de catálogo mesmo com corpo inválido. Builds de demonstração e produção devem ser executados separadamente quando compartilham a pasta `frontend/dist`.
+
+Limites: não adiciona endpoints, tabelas, dependências ou mudanças de interface. Não altera o algoritmo de geração nem prescreve o próximo treino. Leituras de progresso continuam sem snapshot único entre consultas; a trava por conta coordena escritas, sem controle otimista de versão entre dispositivos.
+
+Depois desta entrega, permanecem no backend autenticação, administração e preferências; notificações e estilos; revisão final de contratos, dependências e validações. O frontend só entra após esse fechamento.

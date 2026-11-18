@@ -31,8 +31,9 @@ BasketballPractice/
 ├── backend/src/
 │   ├── modules/              # Endpoints organizados por domínio
 │   │   ├── sessions/         # Rotas, schema, serviço, repositório e agregação
-│   │   ├── programs/         # Rotas e serviço de progressão
-│   │   ├── plans/            # Rotas, schema e gerador
+│   │   ├── programs/         # Schema, modelo de status, serviço, repositório e rotas
+│   │   ├── plans/            # Rotas, schema, serviço, consulta e gerador puro
+│   │   ├── exercises/        # Catálogo visível, validação, serviço e repositório
 │   │   ├── routine/          # Rotas, schema, serviço e persistência da semana
 │   │   ├── workouts/         # Contrato, serviço e persistência compartilhada de treinos
 │   │   ├── data/             # Contrato v1, serviço, repositório e identidade do backup
@@ -58,14 +59,18 @@ BasketballPractice/
 6. Serviços, repositórios e geradores não dependem dos arquivos de rota HTTP.
 7. Contratos compartilhados são declarações de tipos, sem dependências de React, Express ou PostgreSQL.
 
-`npm run check:architecture` verifica imports locais e as fronteiras acima. Em sessões, rotina, treinos e backup, também impede SQL/transações e acesso direto a repositórios nas rotas. Schemas, serviços e repositórios não importam Express ou os módulos HTTP do Node; repositórios não importam serviços; schemas não importam serviços ou repositórios. A mesma verificação está no CI. O script não substitui revisão de domínio ou detecta toda possível dependência dinâmica.
+`npm run check:architecture` verifica imports locais e as fronteiras acima. Em sessões, rotina, treinos, backup, exercícios, programas e planos, impede SQL/transações e acesso direto a repositórios nas rotas e SQL direto nos serviços. Schemas, serviços e repositórios não importam Express ou módulos HTTP do Node; repositórios não importam serviços; schemas não importam serviços ou repositórios; geradores não importam infraestrutura HTTP ou PostgreSQL. A mesma verificação está no CI. O script não substitui revisão de domínio ou detecta toda possível dependência dinâmica.
 
 ## Decisões da refatoração
+
+- Exercícios possuem serviço para visibilidade, proteção do catálogo e tradução de referência em uso para conflito. Edição e exclusão bloqueiam o exercício e validam propriedade dentro da transação; SQL fica no repositório. As validações de referências reutilizadas pelos demais módulos continuam em `exercise.repository.ts`.
+- Programas possuem schema HTTP, modelo de status sem acesso ao banco, serviço e repositório. Início/reinício, conclusão e saída usam a trava de progresso por conta. O serviço de sessão continua chamando a conclusão dentro da própria transação, preservando a atomicidade.
+- Planos possuem serviço para carregar exercícios elegíveis e calcular a resposta, repositório para a projeção do catálogo e gerador puro. O algoritmo e a política de fallback não foram alterados. Testes do algoritmo importam o gerador diretamente, sem depender das rotas.
 
 - O antigo store foi dividido em infraestrutura de cache e hooks das funcionalidades. Pedidos em andamento para a mesma chave são compartilhados. Logout e invalidação impedem respostas antigas de repopular o cache.
 - O transporte HTTP é separado da adaptação dos endpoints. O arquivo `shared/api/backend.ts` continua sendo a fachada de integração; não é um componente de interface.
 - Rotas e testes foram atualizados para os caminhos novos, sem manter cópias dos módulos antigos.
-- Sessões, rotina, treinos e backup seguem `rota → serviço → repositório`. Rotas validam entradas, obtêm a conta autenticada e devolvem HTTP; serviços coordenam regras e transações; repositórios executam SQL. Sessões mantêm a agregação de comparação em módulo próprio. Os demais módulos aprofundam essa separação por fluxo, sem criar camadas vazias.
+- Sessões, rotina, treinos, backup, exercícios, programas e planos seguem `rota → serviço → repositório`. Rotas validam entradas, obtêm a conta autenticada e devolvem HTTP; serviços coordenam regras e transações; repositórios executam SQL. Na edição de exercício, o serviço verifica propriedade antes de validar o corpo para preservar a precedência histórica de 403/404. Sessões mantêm a agregação de comparação em módulo próprio. Os demais módulos aprofundam essa separação por fluxo, sem criar camadas vazias.
 - O schema de item de treino é reutilizado pelo contrato de backup. Edição, rotina e importação usam a mesma gravação de itens, com ordem, metas e notas preservadas. O contrato está em [CONTRATOS_BACKEND.md](CONTRATOS_BACKEND.md).
 - O serviço de backup controla o limite de importações por instância, liberando vagas em `finally`. Importação, preferências e trava por conta ficam na mesma transação. A exportação usa `REPEATABLE READ READ ONLY` para obter um retrato consistente; as consultas dessa conexão são sequenciais.
 - O schema de preferências fica separado do serviço para permitir reuso nos contratos sem depender de persistência. Reexports existentes do serviço permanecem compatíveis.
