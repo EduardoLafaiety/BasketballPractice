@@ -87,3 +87,10 @@ h1:not(.abertura-titulo),
 
 /* A unidade pequena ao lado do número grande não leva a profundidade (viraria uma mancha). */
 .gs-tempo .gs-minutos small { text-shadow: none; }
+
+/* Todo o texto do site em maiúsculas, como nas letras dos fliperamas. O !important vence os "text-transform: none"
+   espalhados pelos arquivos de estilo. O que o usuário digita nos campos fica como foi escrito. */
+body,
+body *:not(input):not(textarea):not(select):not(option) {
+  text-transform: uppercase !important;
+}
