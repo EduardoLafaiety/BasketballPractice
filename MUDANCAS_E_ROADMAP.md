@@ -390,7 +390,7 @@ Próximo bloco ainda no backend: notificações e estilos; depois revisão final
 
 ## Etapa atual — notificações, estilos e revisão final do backend
 
-Estado: implementação e revisão local concluídas na branch codex/fechamento-arquitetura-backend; publicação e integração acompanhadas nesta etapa.
+Estado: implementação e revisão local concluídas, publicadas no [PR #173](https://github.com/EduardoLafaiety/BasketballPractice/pull/173), branch `codex/fechamento-arquitetura-backend`. Commit de implementação: `8d66e8d`. Integração condicionada aos checks do GitHub.
 
 - Notificações separadas em schema, modelo puro de elegibilidade, serviço, repositório e agendador. O adaptador Web Push fica em lib/push.ts, com dependências injetadas para testes sem envios reais.
 - Limite de dez endpoints coordenado na transação por conta; atualização de endpoint existente preserva a vaga. Cron e agendador usam trava por aparelho e revalidam a elegibilidade antes do envio.
