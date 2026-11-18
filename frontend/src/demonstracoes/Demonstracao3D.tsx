@@ -72,11 +72,11 @@ export default function Demonstracao3D({ coreografia, nome, aoFalhar, aoVer2D }:
     setMocap(null)
     if (!id) return
     let vivo = true
-    carregarClipe(id).then((c) => vivo && setMocap(prepararCena(c, id))).catch(() => {})
+    carregarClipe(id).then((c) => vivo && setMocap(prepararCena(c, id, coreografia.vista === 'frente'))).catch(() => {})
     return () => { vivo = false }
   }, [nome])
   const anim = useMemo(
-    () => (mocap ? { ...animBase, frente: false, total: mocap.total, inicioFase: coreografia.fases.map((_, i) => (i * mocap.total) / coreografia.fases.length) } : animBase),
+    () => (mocap ? { ...animBase, total: mocap.total, inicioFase: coreografia.fases.map((_, i) => (i * mocap.total) / coreografia.fases.length) } : animBase),
     [animBase, mocap, coreografia.fases],
   )
   const [tocando, setTocando] = useState(() => !menosMovimento())
@@ -229,7 +229,7 @@ export default function Demonstracao3D({ coreografia, nome, aoFalhar, aoVer2D }:
       if (linha.current && document.activeElement !== linha.current) linha.current.value = String(Math.round(t))
       if (angulos.current) {
         angulos.current.querySelectorAll('li').forEach((li, i) => {
-          const chave = ROTULOS_ANGULOS(anim.frente)[i][0]
+          const chave = ROTULOS_ANGULOS(anim.frente && !mocap)[i][0]
           const v = corpo.angulos[chave]
           const b = li.querySelector('b')
           if (b) b.textContent = `${Math.round(v)}°`
@@ -375,7 +375,8 @@ export default function Demonstracao3D({ coreografia, nome, aoFalhar, aoVer2D }:
   }
 
   const { fases } = coreografia
-  const rotulos = ROTULOS_ANGULOS(anim.frente)
+  // Com movimento real o jogador usa sempre a própria direita/esquerda: rótulos por lado do corpo, não da tela.
+  const rotulos = ROTULOS_ANGULOS(anim.frente && !mocap)
 
   return (
     <section className={`demo demo3d ${ampliado ? 'ampliado' : ''}`} aria-label={`Demonstração em 3D: ${nome}`}>

@@ -4,7 +4,7 @@ import { ARO } from './motor'
 import { ESCALA, v3 } from './corpo3d'
 import { construirBola, duracao, momentoDaSoltura, momentoDoPasse, poseEm, toques, yawParaOlharAMais, type Arremesso, type BolaMocap, type Clipe, type Colocacao3D } from './mocap'
 
-export type IdClipe = '141_11' | '06_02' | '06_08' | '06_13' | '06_14' | '06_15' | '124_06' | '124_05' | '124_11' | '13_40' | '118_01'
+export type IdClipe = '22_15' | '22_14' | '141_11' | '06_02' | '06_08' | '06_13' | '06_14' | '06_15' | '124_06' | '124_05' | '124_11' | '13_40' | '118_01'
 
 /** Exercício (pelo nome do catálogo) → clipe real que o mostra. */
 export const MOCAP_DE_EXERCICIO: Record<string, IdClipe> = {
@@ -25,6 +25,9 @@ export const MOCAP_DE_EXERCICIO: Record<string, IdClipe> = {
   'Saltos com aterrissagem controlada': '118_01',
   'Saltos curtos de tornozelo': '124_11',
   'Passe de peito no alvo': '141_11',
+  'Polichinelo leve': '22_15',
+  'Agachamento livre': '22_14',
+  'Agachamento com braços acima': '22_14',
 }
 
 /** Clipes de passe de peito: a bola vai nas duas mãos, sai no empurrão e voa reta até o alvo. */
@@ -33,7 +36,7 @@ const PASSE: IdClipe[] = ['141_11']
 /** Clipes em que o jogador só leva a bola (sem quicar): bandeja e arremesso em suspensão. */
 const SEM_QUIQUE: IdClipe[] = ['124_06', '124_05', '141_11']
 /** Clipes de saltos: sem bola. */
-const SEM_BOLA: IdClipe[] = ['124_11', '13_40', '118_01']
+const SEM_BOLA: IdClipe[] = ['124_11', '13_40', '118_01', '22_15', '22_14']
 /** Distância (m) do jogador à cesta na hora da soltura: bandeja perto, arremesso em suspensão de média distância. */
 const DISTANCIA_DA_CESTA: Partial<Record<IdClipe, number>> = { '124_06': 1.15, '124_05': 4.6 }
 
@@ -51,6 +54,8 @@ const CARREGADORES: Record<IdClipe, () => Promise<{ default: unknown }>> = {
   '13_40': () => import('./mocap/13_40.json'),
   '118_01': () => import('./mocap/118_01.json'),
   '141_11': () => import('./mocap/141_11.json'),
+  '22_15': () => import('./mocap/22_15.json'),
+  '22_14': () => import('./mocap/22_14.json'),
 }
 
 export async function carregarClipe(id: IdClipe): Promise<Clipe> {
@@ -70,14 +75,15 @@ export interface CenaMocap {
 }
 
 /** Prepara o clipe para a cena: vira o jogador para a cesta (+x) e o leva para onde o arremesso é de uns 5 m. */
-export function prepararCena(clipe: Clipe, id?: IdClipe): CenaMocap {
+export function prepararCena(clipe: Clipe, id?: IdClipe, deFrente = false): CenaMocap {
   const semBola = !!id && SEM_BOLA.includes(id)
   const ev = id && SEM_QUIQUE.includes(id) ? [] : toques(clipe)
   const ehPasse = !!id && PASSE.includes(id)
   const soltura = semBola ? null : ehPasse ? momentoDoPasse(clipe) : momentoDaSoltura(clipe, ev)
-  const yaw = yawParaOlharAMais(clipe, soltura ?? 0)
+  // De frente (exercícios de frente para a câmera), o jogador olha para quem assiste (+z); senão, para a cesta (+x).
+  const yaw = yawParaOlharAMais(clipe, soltura ?? 0) - (deFrente ? Math.PI / 2 : 0)
   const cestaX = ARO.lado.x * ESCALA
-  let origemX = 1.5
+  let origemX = deFrente ? 4.4 : 1.5
   let pelveNaSoltura = 0
   if (soltura !== null) {
     const p0 = poseEm(clipe, 0).Hips
