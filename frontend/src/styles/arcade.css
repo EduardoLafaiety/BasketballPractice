@@ -84,3 +84,6 @@ h1:not(.abertura-titulo),
 @media (max-width: 480px) {
   .conteudo h1:not(.abertura-titulo) { font-size: min(3.1rem, 12.5vw); }
 }
+
+/* A unidade pequena ao lado do número grande não leva a profundidade (viraria uma mancha). */
+.gs-tempo .gs-minutos small { text-shadow: none; }

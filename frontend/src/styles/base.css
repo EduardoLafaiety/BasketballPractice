@@ -847,7 +847,7 @@ section + section, .card + section { margin-top: 1.5rem; }
 .demo3d > .demo3d-vistas { position: static; margin-bottom: 0.6rem; gap: 0.35rem; }
 .demo3d > .demo3d-vistas .chip { font-size: 0.85rem; padding: 0.4rem 0.65rem; min-height: 42px; }
 .demo3d-ampliar { position: absolute; top: 0.5rem; right: 0.5rem; z-index: 2; }
-.demo3d-dica { margin: 0.6rem 0 0.9rem; font-family: 'Trebuchet MS', 'Segoe UI', sans-serif; font-size: 1rem; line-height: 1.6; color: var(--texto); text-transform: none; letter-spacing: normal; }
+.demo3d-dica { margin: 0.6rem 0 0.9rem; font-family: var(--fonte-texto); font-size: 1rem; line-height: 1.6; color: var(--texto); text-transform: none; letter-spacing: normal; }
 .demo3d.ampliado .demo3d-palco { aspect-ratio: auto; height: min(78vh, 760px); }
 .demo3d-carregando { min-height: 200px; display: grid; place-items: center; color: var(--muted); }
 .demo3d-linha { flex: 1 1 8rem; min-width: 6rem; accent-color: var(--laranja); }
