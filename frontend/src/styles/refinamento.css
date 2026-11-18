@@ -63,7 +63,6 @@ body::after { opacity: 0.12; background: repeating-linear-gradient(0deg, #000 0 
 .rodape-marca .icone-svg { color: var(--laranja); flex-shrink: 0; }
 .rodape-principal nav { display: flex; flex-wrap: wrap; gap: 1.25rem; }
 .rodape-principal nav a { color: var(--laranja-texto); padding-block: 0.75rem; text-decoration: none; }
-.rodape-creditos { max-width: 75ch; font-size: 0.9rem; line-height: 1.7; color: var(--muted); margin-block: 1.75rem; text-transform: none; }
 .rodape .links-legais { justify-content: start; }
 .rodape .links-legais a, .rodape .links-legais button { font-size: 0.85rem; text-transform: none; letter-spacing: 0; }
 @media (max-width: 860px) { .topo-atalhos { display: none; } .topo-menu { margin-left: auto; } .doca-item { font-size: 0.7rem; text-transform: none; letter-spacing: 0; } }
