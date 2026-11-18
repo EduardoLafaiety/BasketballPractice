@@ -162,7 +162,7 @@ body::after {
   gap: 0.5rem;
   position: relative;
 }
-.pagina-inicio .treino-hoje .treino-numero { font-size: 1.6rem; line-height: 1; }
+.pagina-inicio .treino-hoje .treino-numero { font-size: 2rem; line-height: 1; }
 .pagina-inicio .treino-hoje .treino-corpo { gap: 0.4rem; align-content: start; }
 .pagina-inicio .treino-hoje .treino-corpo h3 { font-size: 1.05rem; line-height: 1.25; overflow-wrap: anywhere; }
 .pagina-inicio .treino-hoje .treino-corpo .muted {
@@ -177,3 +177,14 @@ body::after {
 @media (max-width: 900px) { .pagina-inicio .treino-hoje .lista-treino { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 @media (max-width: 560px) { .pagina-inicio .treino-hoje .lista-treino { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 380px) { .pagina-inicio .treino-hoje .lista-treino { grid-template-columns: 1fr; } }
+
+/* Número do exercício: letra cheia em vez de contorno fino (o traço de 1,5px borrava). Com 2rem cada quadradinho da
+   letra cai em 2px exatos, então fica nítido. */
+.treino-numero {
+  color: var(--texto);
+  -webkit-text-stroke: 0;
+}
+.treino-linha:hover .treino-numero {
+  color: var(--laranja);
+  -webkit-text-stroke: 0;
+}
