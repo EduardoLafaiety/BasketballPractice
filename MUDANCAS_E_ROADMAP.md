@@ -372,7 +372,7 @@ Depois desta entrega, permanecem no backend autenticação, administração e pr
 
 ## Etapa atual — autenticação, administração e preferências
 
-Estado: implementação validada localmente na branch `codex/arquitetura-contas-permissoes`, baseada na PR #169 integrada, preparada para revisão no GitHub.
+Estado: implementação validada localmente e publicada no [PR #170](https://github.com/EduardoLafaiety/BasketballPractice/pull/170), branch `codex/arquitetura-contas-permissoes`, baseada na PR #169 integrada. Commit de implementação: `c7a4f3e`.
 
 - Autenticação separada em schema, serviço e repositório. Rotas preservam respostas, proteção HTTP e tarefas de e-mail disparadas após o 202; serviço recebe provedor e controle de envios por injeção, sem depender do middleware.
 - Sessões públicas montadas por campos explícitos. Login revalida o hash antes de assinar a versão do token; troca e exclusão verificam a senha atual dentro da transação. Ordem de bloqueio de conta antes dos links de recuperação, consumo único e revogação preservados.
