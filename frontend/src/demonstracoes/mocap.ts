@@ -123,15 +123,17 @@ export function toques(c: Clipe): EventoBola[] {
 
 /** Instante (ms) em que as duas mãos soltam a bola no alto, depois do último toque; null se não há arremesso. */
 export function momentoDaSoltura(c: Clipe, ev = toques(c)): number | null {
-  if (!ev.length) return null
   const dt = 1000 / c.fps
   let melhor: { t: number; y: number } | null = null
-  for (let t = ev[ev.length - 1].t + 300; t <= duracao(c); t += dt) {
+  for (let t = ev.length ? ev[ev.length - 1].t + 300 : 300; t <= duracao(c); t += dt) {
     const p = poseEm(c, t)
-    const y = (p.RightHand.y + p.LeftHand.y) / 2
-    if (distancia(p.RightHand, p.LeftHand) < 0.5 && (!melhor || y > melhor.y)) melhor = { t, y }
+    // Duas mãos juntas no alto (arremesso em suspensão) ou uma mão bem alta (bandeja): vale a que for mais alta.
+    const alta = Math.max(p.RightHand.y, p.LeftHand.y)
+    const duas = distancia(p.RightHand, p.LeftHand) < 0.5 && (p.RightHand.y + p.LeftHand.y) / 2 > 1.55
+    const y = duas ? (p.RightHand.y + p.LeftHand.y) / 2 + 0.2 : alta
+    if ((duas || alta > 1.9) && (!melhor || y > melhor.y)) melhor = { t, y }
   }
-  return melhor && melhor.y > 1.55 ? melhor.t : null
+  return melhor && melhor.y > 1.75 ? melhor.t : null
 }
 
 export interface BolaMocap {
@@ -153,7 +155,16 @@ export function construirBola(c: Clipe, ev = toques(c)): (t: number) => BolaMoca
   const tempoSegurando = 130
   return (t: number) => {
     const p = poseEm(c, t)
-    if (ev.length === 0) return { centro: mix(abaixoDaMao(p, 'P'), abaixoDaMao(p, 'L'), 0.5), presa: 1, maos: { P: 0.5, L: 0.5 } }
+    if (ev.length === 0) {
+      // Sem quique, a bola é levada: entre as duas mãos quando juntas; senão, em cima da mão que a leva (a mais alta).
+      const juntas = 1 - suave(0.45, 0.7, distancia(p.RightHand, p.LeftHand))
+      const maior = p.RightHand.y >= p.LeftHand.y ? 'P' : 'L'
+      const mao = maior === 'P' ? p.RightHand : p.LeftHand
+      const emCima = v3(mao.x, mao.y + 0.1, mao.z)
+      const entre = mix(p.RightHand, p.LeftHand, 0.5)
+      const centro = mix(emCima, v3(entre.x, entre.y + 0.02, entre.z), juntas)
+      return { centro, presa: 1, maos: { P: maior === 'P' ? 1 - juntas * 0.5 : 0.5 * juntas, L: maior === 'L' ? 1 - juntas * 0.5 : 0.5 * juntas } }
+    }
     // Antes do primeiro toque, a bola está na mão do primeiro; depois do último, continua na do último.
     if (t <= ev[0].t) return { centro: abaixoDaMao(p, ev[0].mao), presa: 1, maos: { P: ev[0].mao === 'P' ? 1 : 0, L: ev[0].mao === 'L' ? 1 : 0 } }
     const ult = ev[ev.length - 1]
