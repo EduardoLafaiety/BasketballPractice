@@ -1,0 +1,21 @@
+/* Controles e foco preservam fontes, bordas retas e a paleta retrô existente. */
+:where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: 3px solid var(--laranja-texto);
+  outline-offset: 3px;
+}
+.pular-conteudo { position: fixed; top: 0.5rem; left: 0.5rem; z-index: 100; transform: translateY(-180%); background: var(--superficie); color: var(--texto); border: 2px solid var(--laranja); padding: 0.8rem; }
+.pular-conteudo:focus { transform: none; }
+.menu-fechar { align-self: flex-end; flex-shrink: 0; min-height: 44px; color: #f4f2ea; border-color: #f4f2ea; }
+.rotina-item-acoes { display: flex; flex-wrap: wrap; gap: 0.5rem; max-width: 100%; }
+.rotina-item-acoes select { max-width: 9rem; min-height: 44px; font: inherit; color: var(--texto); background: var(--superficie); border: 1px solid var(--borda); }
+.remover { min-width: 44px; min-height: 44px; }
+.rota-texto { min-width: 0; overflow-wrap: anywhere; }
+.acoes-principais { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-block: 1rem; }
+.gs-pendente { min-width: 0; border: 0; padding: 0; margin: 0; }
+@media (max-width: 860px) {
+  .rota li { flex-wrap: wrap; }
+  .rotina-item-acoes { margin-inline-start: auto; }
+  .rotina-item-acoes input, .chip, .gs-chip, .gs-atalhos button { min-height: 44px; }
+  .acoes-principais > .btn { min-height: 44px; }
+}
+@media (hover: none) { .rota .remover { opacity: 1; } }

@@ -1,8 +1,31 @@
 import { describe, expect, it, vi } from 'vitest'
-import { ApiError, aoTokenExpirar, api, dataLocal, definirToken, tokenAtual } from './backend'
+import { ApiError, aoTokenExpirar, api, dataLocal, definirToken, tokenAtual, request } from './backend'
 import { apiFalsa, Resposta } from '../../test/api-falsa'
 
 describe('request', () => {
+  it('uma resposta 401 de outra sessão não encerra a conta atual', async () => {
+    let responder!: (r: Response) => void
+    vi.stubGlobal('fetch', vi.fn(() => new Promise<Response>((r) => { responder = r })))
+    const expirou = vi.fn(); aoTokenExpirar(expirou)
+    definirToken('antigo')
+    const pedido = api.eu()
+    definirToken('novo')
+    responder(new Response(JSON.stringify({ error: 'Expirado' }), { status: 401 }))
+    await expect(pedido).rejects.toMatchObject({ status: 401 })
+    expect(expirou).not.toHaveBeenCalled()
+    expect(tokenAtual()).toBe('novo')
+    aoTokenExpirar(null)
+  })
+
+  it('encaminha cancelamento da consulta sem convertê-lo em falha de rede', async () => {
+    vi.stubGlobal('fetch', vi.fn((_url, init: RequestInit) => new Promise((_resolve, reject) => {
+      init.signal!.addEventListener('abort', () => reject(init.signal!.reason))
+    })))
+    const controller = new AbortController()
+    const pedido = request('GET', '/exercises', undefined, { signal: controller.signal })
+    controller.abort()
+    await expect(pedido).rejects.toMatchObject({ name: 'AbortError' })
+  })
   it('envia o token salvo e o guarda no localStorage', async () => {
     const { ultima } = apiFalsa({ 'GET /auth/me': { id: 1, name: 'A', email: 'a@a.com', isAdmin: false } })
     definirToken('abc')

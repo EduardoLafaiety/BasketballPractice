@@ -4,7 +4,7 @@ import { describe, expect, it, vi } from 'vitest'
 import { definirToken, tokenAtual } from '../../../shared/api/backend'
 import { AuthProvider, REVERIFICAR_MS, useAuth } from './auth'
 import { apiFalsa, configFalsa, Resposta, usuarioFalso } from '../../../test/api-falsa'
-import { abrirApp } from '../../../test/renderizar'
+import { abrirApp, abrirMenu } from '../../../test/renderizar'
 
 const menu = () => screen.getByRole('navigation', { name: 'Principal' })
 
@@ -34,6 +34,7 @@ describe('sessão do usuário', () => {
     apiFalsa({ 'GET /auth/me': usuarioFalso(), 'GET /settings': configFalsa })
     abrirApp('/configuracoes')
 
+    await abrirMenu()
     await userEvent.click(await screen.findByRole('button', { name: 'Sair' }))
     expect(await screen.findByRole('heading', { name: 'Entrar' })).toBeInTheDocument()
     expect(tokenAtual()).toBeNull()
@@ -48,6 +49,7 @@ describe('acesso de administrador', () => {
     abrirApp('/admin')
 
     expect(await screen.findByRole('heading', { name: 'Página não encontrada' })).toBeInTheDocument()
+    await abrirMenu()
     expect(within(menu()).queryByRole('link', { name: 'Admin' })).toBeNull()
     expect(chamadas.some((c) => c.caminho.startsWith('/admin'))).toBe(false)
   })
@@ -62,6 +64,7 @@ describe('acesso de administrador', () => {
     abrirApp('/configuracoes')
 
     await screen.findByText('Marina')
+    await abrirMenu()
     const link = within(menu()).getByRole('link', { name: 'Admin' })
     await userEvent.click(link)
     expect(await screen.findByRole('heading', { name: 'Administração' })).toBeInTheDocument()
@@ -160,6 +163,7 @@ describe('falha passageira ao conferir a sessão', () => {
     expect(await screen.findByRole('heading', { name: 'Configurações' })).toBeInTheDocument()
     expect(chamadasEu(chamadas)).toBe(1)
     expect(screen.queryByText('Marina')).toBeNull()
+    await abrirMenu()
     expect(within(menu()).queryByRole('link', { name: 'Admin' })).toBeNull()
 
     await passarEspera()
@@ -213,6 +217,7 @@ describe('falha passageira ao conferir a sessão', () => {
     abrirApp('/admin')
 
     await screen.findByRole('alert')
+    await abrirMenu()
     await user.click(screen.getByRole('button', { name: 'Sair' }))
     expect(await screen.findByRole('heading', { name: 'Entrar' })).toBeInTheDocument()
 
@@ -229,6 +234,7 @@ describe('falha passageira ao conferir a sessão', () => {
     abrirApp('/admin')
 
     await userEvent.click(await screen.findByRole('button', { name: 'Tentar de novo' }))
+    await abrirMenu()
     await userEvent.click(screen.getByRole('button', { name: 'Sair' }))
     expect(await screen.findByRole('heading', { name: 'Entrar' })).toBeInTheDocument()
 
@@ -250,6 +256,7 @@ describe('falha passageira ao conferir a sessão', () => {
     abrirApp('/admin')
 
     await user.click(await screen.findByRole('button', { name: 'Tentar de novo' }))
+    await abrirMenu()
     await user.click(screen.getByRole('button', { name: 'Sair' }))
     await screen.findByRole('heading', { name: 'Entrar' })
 

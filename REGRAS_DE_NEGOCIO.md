@@ -200,3 +200,15 @@ Cada migração de módulo deve citar as regras afetadas, manter ou adicionar os
 - **RN-SI-14 — Alcance offline:** permite iniciar o plano preparado sem rascunho anterior, contar, pausar, concluir e guardar o registro. Animações, busca completa e conteúdo externo precisam de conexão nesta etapa. O plano preparado pode estar desatualizado; data e origem são mostradas. Confirmação do dia de programa depende da API na sincronização.
 - **RN-SI-15 — Conta e confirmação:** dados preparados também são removidos no logout explícito. Expiração mantém os dados para retorno à mesma conta. Respostas de envio anteriores não alteram a tela/cache de outra conta; falha tardia não recria fila após sair. O local continua separado da confirmação no servidor, com clientId estável.
 - **RN-SI-16 — Exportação de recuperação:** o arquivo local contém somente registros de treino da conta selecionada, sem token. Não é o backup v1 do servidor e não possui importação automática nesta etapa. Serve para preservar o conteúdo antes de uma correção manual ou descarte.
+
+## Experiência, contratos e navegação — passos 5 a 8
+
+- **RN-UX-01 — Identidade:** campos, botões, avisos e estados vazios reutilizam fontes, paleta, bordas retas, temas e tokens do produto; padronização não autoriza alterar fórmulas, catálogo ou regras de treino.
+- **RN-UX-02 — Consultas compartilhadas:** componentes que usam a mesma chave compartilham o pedido. Saída de um consumidor não cancela os demais; saída do último, invalidação ou logout cancela consultas que propagam o sinal. Cancelamento não equivale a desfazer uma operação já recebida pelo servidor.
+- **RN-UX-03 — Sessão atual:** um 401 atrasado só encerra a sessão se o token atual ainda for o token daquele pedido. Resposta antiga de outra sessão não deve derrubar um login novo.
+- **RN-UX-04 — Formulários:** rótulo, ajuda e erro são associados ao campo. Erro local de nome recebe foco para correção. Botão ocupado impede ativação durante envio e informa o estado; a mensagem de erro oferece contexto para nova tentativa.
+- **RN-UX-05 — Navegação por teclado:** menu aberto contém Tab/Shift+Tab e fecha com Escape, devolvendo foco ao acionador. Menu fechado não oferece links ocultos à tecnologia assistiva. Atalho de conteúdo e foco de navegação mantêm orientação entre telas.
+- **RN-UX-06 — Movimento na rotina:** seletor e arraste preservam o exercício, sua posição de origem e duração, inclusive quando há IDs repetidos. A gravação usa a semana inteira no servidor atual; servidor legado sem esse contrato usa fallback sequencial, sem a mesma garantia atômica.
+- **RN-UX-07 — Confirmação:** aplicar uma prévia só mostra sucesso após confirmação da API. Falha mantém a prévia para revisão e oferece recarga. O atalho Iniciar treino de hoje aguarda salvamentos e só navega na mesma sessão; não anuncia gravação otimista como confirmação remota.
+
+Controles de remoção e os controles móveis abrangidos por este ciclo têm área mínima de 44 px onde aplicada. Isso é uma meta de interação do produto, não uma declaração de auditoria integral de acessibilidade.

@@ -5,7 +5,7 @@ import { definirToken } from '../../../shared/api/backend'
 import { TAG_AFILIADO, TIMES } from '../dados'
 import { ICONES_TIMES } from '../icones-times'
 import { apiFalsa, configFalsa, usuarioFalso } from '../../../test/api-falsa'
-import { abrirApp } from '../../../test/renderizar'
+import { abrirApp, abrirMenu } from '../../../test/renderizar'
 
 vi.mock('../../../shared/lib/audio', () => ({ bipe: vi.fn(), vibrar: vi.fn() }))
 
@@ -18,6 +18,7 @@ function abrir(caminho: string) {
 describe('Equipamentos', () => {
   it('aparece no menu principal', async () => {
     abrir('/')
+    await abrirMenu()
     const nav = await screen.findByRole('navigation', { name: 'Principal' })
     expect(within(nav).getByRole('link', { name: /Equipamentos/ })).toHaveAttribute('href', '/equipamentos')
   })

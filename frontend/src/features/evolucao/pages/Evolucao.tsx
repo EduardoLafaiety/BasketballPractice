@@ -7,7 +7,7 @@ import { useRecurso } from '../../../shared/data/recursos'
 export default function Evolucao() {
   const [dias, setDias] = useState(7)
   const [exercicio, setExercicio] = useState('')
-  const { dados, erro, recarregar } = useRecurso(`progresso-comparacao:${dias}:${exercicio}`, () => api.comparacao(dias, exercicio))
+  const { dados, erro, recarregar } = useRecurso(`progresso-comparacao:${dias}:${exercicio}`, (signal) => api.comparacao(dias, exercicio, signal))
   const [nomes, setNomes] = useState<{ id: string; nome: string }[]>([])
   useEffect(() => { if (dados) setNomes(dados.exercicios) }, [dados])
   const atual = dados?.atual

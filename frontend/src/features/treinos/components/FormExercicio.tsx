@@ -1,4 +1,8 @@
-import { useState, type FormEvent } from 'react'
+import { useRef, useState, type FormEvent } from 'react'
+import Campo from '../../../shared/ui/Campo'
+import Botao from '../../../shared/ui/Botao'
+import Mensagem from '../../../shared/ui/Mensagem'
+import { ApiError } from '../../../shared/api/http'
 import { ROTULO_METRICA } from '../../../shared/lib/formatacao'
 import type { Categoria, Drill, Metrica } from '../../../shared/types'
 
@@ -22,19 +26,24 @@ export default function FormExercicio({
   const [descricao, setDescricao] = useState(inicial?.descricao ?? '')
   const [salvando, setSalvando] = useState(false)
   const [erro, setErro] = useState<string | null>(null)
+  const [campos, setCampos] = useState<Record<string, string | undefined>>({})
+  const campoNome = useRef<HTMLInputElement>(null)
 
   async function enviar(e: FormEvent) {
     e.preventDefault()
     if (nome.trim().length < 2) {
-      setErro('O nome precisa ter pelo menos 2 letras.')
+      setCampos({ name: 'O nome precisa ter pelo menos 2 letras.' })
+      campoNome.current?.focus()
       return
     }
     setSalvando(true)
     setErro(null)
+    setCampos({})
     try {
       await aoSalvar({ nome: nome.trim(), categoria, metrica, descricao: descricao.trim() })
     } catch (e) {
       setErro((e as Error).message)
+      if (e instanceof ApiError && e.details) setCampos(Object.fromEntries(Object.entries(e.details).map(([k, v]) => [k, v?.[0]])))
       setSalvando(false)
     }
   }
@@ -42,21 +51,18 @@ export default function FormExercicio({
   return (
     <form className="card form form-solto" onSubmit={enviar}>
       <h3>{inicial ? 'Editar exercício' : 'Novo exercício'}</h3>
-      <label>
-        Nome
-        <input className="input" value={nome} maxLength={100} onChange={(e) => setNome(e.target.value)} autoFocus />
-      </label>
+      <Campo rotulo="Nome" erro={campos.name}>
+        <input ref={campoNome} className="input" value={nome} maxLength={100} onChange={(e) => { setNome(e.target.value); setCampos((c) => ({ ...c, name: undefined })) }} autoFocus />
+      </Campo>
       <div className="linha">
-        <label>
-          Categoria
+        <Campo rotulo="Categoria" erro={campos.category}>
           <select className="input" value={categoria} onChange={(e) => setCategoria(e.target.value as Categoria)}>
             {CATEGORIAS.map((c) => (
               <option key={c}>{c}</option>
             ))}
           </select>
-        </label>
-        <label>
-          Como medir
+        </Campo>
+        <Campo rotulo="Como medir" erro={campos.metric}>
           <select className="input" value={metrica} onChange={(e) => setMetrica(e.target.value as Metrica)}>
             {(Object.keys(ROTULO_METRICA) as Metrica[]).map((m) => (
               <option key={m} value={m}>
@@ -64,10 +70,9 @@ export default function FormExercicio({
               </option>
             ))}
           </select>
-        </label>
+        </Campo>
       </div>
-      <label>
-        Descrição
+      <Campo rotulo="Descrição" erro={campos.description}>
         <textarea
           className="input"
           rows={3}
@@ -76,15 +81,15 @@ export default function FormExercicio({
           onChange={(e) => setDescricao(e.target.value)}
           placeholder="Como fazer o exercício"
         />
-      </label>
-      {erro && <p className="erro" role="alert">{erro}</p>}
+      </Campo>
+      {erro && <Mensagem>{erro}</Mensagem>}
       <div className="acoes">
-        <button className="btn btn-primario" type="submit" disabled={salvando}>
+        <Botao className="btn btn-primario" type="submit" ocupado={salvando}>
           {salvando ? 'Salvando' : 'Salvar'}
-        </button>
-        <button className="btn" type="button" onClick={aoCancelar}>
+        </Botao>
+        <Botao className="btn" onClick={aoCancelar} disabled={salvando}>
           Cancelar
-        </button>
+        </Botao>
       </div>
     </form>
   )

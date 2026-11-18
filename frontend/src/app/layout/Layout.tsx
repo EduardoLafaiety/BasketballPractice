@@ -15,6 +15,7 @@ import Icone from '../../shared/ui/Icone'
 import { Carregando } from '../../shared/ui/Estado'
 import { LinksLegais } from '../../features/autenticacao/components/TelaAuth'
 import SessoesPendentes from '../../features/sessao/components/SessoesPendentes'
+import Botao from '../../shared/ui/Botao'
 
 const LINKS: { to: string; rotulo: string; fim?: boolean }[] = [
   { to: '/', rotulo: 'Início', fim: true },
@@ -94,6 +95,8 @@ export default function Layout() {
   // Quem abriu o menu (o botão do topo ou o da barra de baixo) recebe o foco de volta no Esc.
   const botaoMenu = useRef<HTMLButtonElement | null>(null)
   const barra = useRef<HTMLElement>(null)
+  const menu = useRef<HTMLDivElement>(null)
+  const rotaAnterior = useRef(pathname)
 
   useEffect(() => {
     if (carregado) aplicarTema(config.tema)
@@ -107,13 +110,24 @@ export default function Layout() {
   // Cada tela começa do topo, e o menu fecha ao navegar.
   useEffect(() => {
     setMenuAberto(false)
+    if (rotaAnterior.current !== pathname) conteudo.current?.focus({ preventScroll: true })
+    rotaAnterior.current = pathname
     if (!navigator.userAgent.includes('jsdom')) window.scrollTo(0, 0)
   }, [pathname])
 
   useEffect(() => {
     document.body.style.overflow = menuAberto ? 'hidden' : ''
     if (!menuAberto) return
+    menu.current?.querySelector<HTMLAnchorElement>('a[href]')?.focus()
     const aoTeclar = (e: KeyboardEvent) => {
+      if (e.key === 'Tab') {
+        const itens = [...(menu.current?.querySelectorAll<HTMLElement>('a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex="0"]') ?? [])]
+        const primeiro = itens[0], ultimo = itens[itens.length - 1]
+        if (!primeiro) return
+        if (!menu.current?.contains(document.activeElement) || (!e.shiftKey && document.activeElement === ultimo)) { e.preventDefault(); primeiro.focus() }
+        else if (e.shiftKey && document.activeElement === primeiro) { e.preventDefault(); ultimo.focus() }
+        return
+      }
       if (e.key !== 'Escape') return
       setMenuAberto(false)
       botaoMenu.current?.focus()
@@ -152,6 +166,7 @@ export default function Layout() {
 
   return (
     <div className="app" onPointerOver={(e) => { if (e.pointerType !== 'touch') antecipar(e.target) }} onFocusCapture={(e) => antecipar(e.target)}>
+      <a className="pular-conteudo" href="#conteudo">Pular para o conteúdo</a>
       <div className="progresso-pagina" aria-hidden><i ref={barra} /></div>
       <header className="topo">
         <Link to="/" className="marca" aria-label="Basketball Practice, início">
@@ -164,7 +179,8 @@ export default function Layout() {
         </button>
       </header>
 
-      <div id="menu-tela" className={`menu-tela ${menuAberto ? 'aberto' : ''}`}>
+      <div ref={menu} id="menu-tela" role={menuAberto ? 'dialog' : undefined} aria-label="Menu principal" aria-hidden={!menuAberto} {...(!menuAberto ? { inert: '' } : {})} className={`menu-tela ${menuAberto ? 'aberto' : ''}`}>
+        <Botao className="btn menu-fechar" onClick={() => { setMenuAberto(false); botaoMenu.current?.focus() }}>Fechar navegação</Botao>
         <nav className="nav" aria-label="Principal" style={{ '--linhas': Math.ceil((LINKS.length + (usuario?.isAdmin ? 1 : 0)) / 2) } as CSSProperties}>
           {[
             { titulo: 'Treinar', caminhos: ['/', '/treinos', '/programas', '/jogue-como'] },
@@ -204,7 +220,7 @@ export default function Layout() {
         </div>
       </div>
 
-      <main className="conteudo" ref={conteudo}>
+      <main id="conteudo" tabIndex={-1} className="conteudo" ref={conteudo} {...(menuAberto ? { inert: '' } : {})}>
         <SessoesPendentes />
         <LimiteDeErro key={pathname}><Suspense fallback={<Carregando />}>
           <Outlet />

@@ -1,15 +1,8 @@
 import { fuso, request } from '../../../shared/api/backend'
 import { invalidar, useRecurso } from '../../../shared/data/recursos'
-import type { BlocoPlano, Categoria, Metrica, Nivel } from '../../../shared/types'
+import type { BlocoPlano, Metrica, Nivel } from '../../../shared/types'
 
-const CATEGORIA: Record<string, Categoria> = {
-  arremesso: 'Arremesso',
-  drible: 'Drible',
-  passe: 'Passe',
-  finalizacao: 'Finalização',
-  defesa: 'Defesa',
-  condicionamento: 'Condicionamento',
-}
+import { CATEGORIA } from '../../../shared/api/mapeamento'
 
 export interface StatusPrograma {
   comecado: boolean
@@ -85,11 +78,11 @@ const paraResumo = (p: ProgramaApi): ResumoPrograma => ({
 })
 
 export const apiProgramas = {
-  async lista() {
-    return (await request<ProgramaApi[]>('GET', `/programs?${fuso()}`)).map(paraResumo)
+  async lista(signal?: AbortSignal) {
+    return (await request<ProgramaApi[]>('GET', `/programs?${fuso()}`, undefined, { signal })).map(paraResumo)
   },
-  async detalhe(id: string): Promise<Programa> {
-    const p = await request<ProgramaApi>('GET', `/programs/${encodeURIComponent(id)}?${fuso()}`)
+  async detalhe(id: string, signal?: AbortSignal): Promise<Programa> {
+    const p = await request<ProgramaApi>('GET', `/programs/${encodeURIComponent(id)}?${fuso()}`, undefined, { signal })
     return {
       ...paraResumo(p),
       dias: (p.days ?? []).map((d) => ({
@@ -121,6 +114,6 @@ export function useProgramas() {
 }
 
 export function usePrograma(id: string) {
-  const { dados, ...resto } = useRecurso(`programa:${id}`, () => apiProgramas.detalhe(id))
+  const { dados, ...resto } = useRecurso(`programa:${id}`, (signal) => apiProgramas.detalhe(id, signal))
   return { programa: dados, ...resto }
 }

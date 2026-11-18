@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { describe, expect, it } from 'vitest'
 import { definirToken } from '../../../shared/api/backend'
 import { apiFalsa, configFalsa, usuarioFalso } from '../../../test/api-falsa'
-import { abrirApp } from '../../../test/renderizar'
+import { abrirApp, abrirMenu } from '../../../test/renderizar'
 // A página é baixada sob demanda; já carregada, o primeiro teste não depende do tempo de leitura do módulo.
 import './Conquistas'
 
@@ -34,6 +34,7 @@ describe('aba Conquistas', () => {
   it('está no menu', async () => {
     abrir([])
     expect(await screen.findByRole('heading', { name: 'Conquistas' })).toBeInTheDocument()
+    await abrirMenu()
     expect(within(screen.getByRole('navigation', { name: 'Principal' })).getByRole('link', { name: /Conquistas/ })).toHaveAttribute('href', '/conquistas')
   })
 

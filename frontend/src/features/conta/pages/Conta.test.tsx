@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { describe, expect, it } from 'vitest'
 import { definirToken, tokenAtual } from '../../../shared/api/backend'
 import { apiFalsa, configFalsa, Resposta, usuarioFalso } from '../../../test/api-falsa'
-import { abrirApp } from '../../../test/renderizar'
+import { abrirApp, abrirMenu } from '../../../test/renderizar'
 
 const caminho = () => screen.getByTestId('caminho').textContent
 const sessao = { token: 'tk-novo', user: usuarioFalso() }
@@ -18,6 +18,7 @@ describe('Sair', () => {
     })
     abrirApp('/configuracoes')
 
+    await abrirMenu()
     await userEvent.click(await screen.findByRole('button', { name: 'Sair' }))
     expect(await screen.findByRole('heading', { name: 'Entrar' })).toBeInTheDocument()
     expect(ultima('POST', '/auth/logout')?.headers.Authorization).toBe('Bearer tk-salvo')

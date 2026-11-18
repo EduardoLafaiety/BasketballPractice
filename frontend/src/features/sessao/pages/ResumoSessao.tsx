@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 import Botao from '../../../shared/ui/Botao'
+import Campo from '../../../shared/ui/Campo'
+import Mensagem from '../../../shared/ui/Mensagem'
 import { salvarOuEnfileirar } from '../model/salvar-sessao'
 import { minutosDaSessao, montarSessao } from '../model/execucao'
 import type { DadosZonas } from '../model/contador'
@@ -87,13 +89,12 @@ export default function Final({
           Cansaço ao terminar: {cansaco}/5 <span className="meta">(1 = inteiro, 5 = exausto)</span>
           <input type="range" min={1} max={5} value={cansaco} onChange={(e) => setCansaco(Number(e.target.value))} />
         </label>
-        <label>
-          Notas
+        <Campo rotulo="Notas">
           <textarea className="input" rows={3} value={notas} onChange={(e) => setNotas(e.target.value)} placeholder="Como se sentiu? Alguma dor?" />
-        </label>
-        {erroLocal && <p className="erro" role="alert">{erroLocal}</p>}
-        {erro && <p className="erro" role="alert">{erro}</p>}
-        <Botao className="btn btn-primario" type="submit" disabled={salvando}>
+        </Campo>
+        {erroLocal && <Mensagem>{erroLocal}</Mensagem>}
+        {erro && <Mensagem>{erro}</Mensagem>}
+        <Botao className="btn btn-primario" type="submit" ocupado={salvando}>
           {salvando ? 'Salvando' : 'Salvar sessão'}
         </Botao>
       </form>

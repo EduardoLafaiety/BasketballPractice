@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import { api, tokenAtual } from '../../../shared/api/backend'
 import { cache, useRecurso } from '../../../shared/data/recursos'
 import { DIAS } from '../../../shared/lib/formatacao'
@@ -11,7 +11,10 @@ let filaRotina: Promise<unknown> = Promise.resolve()
 
 export function useRotina() {
   const { dados, setDados, recarregar, ...resto } = useRecurso('rotina', api.rotina)
-  const [erroSalvar, setErroSalvar] = useState<Error | null>(null)
+  const [erroSalvar, definirErroSalvar] = useState<Error | null>(null)
+  const erroAtual = useRef<Error | null>(null)
+  const setErroSalvar = (e: Error | null) => { erroAtual.current = e; definirErroSalvar(e) }
+  const [gravacoes, setGravacoes] = useState(0)
 
   const alterarDia = useCallback(
     (dia: DiaSemana, atualizar: (ids: string[]) => string[], tempos?: number[]) => {
@@ -31,6 +34,7 @@ export function useRotina() {
         return { ...atual!, rotina: { ...atual!.rotina, [dia]: novos }, duracoes: { ...atual!.duracoes, [dia]: novasDuracoes } }
       })
       setErroSalvar(null)
+      setGravacoes((n) => n + 1)
 
       filaRotina = filaRotina.then(async () => {
         if (tokenAtual() !== token) return
@@ -49,7 +53,7 @@ export function useRotina() {
           }
           recarregar()
         }
-      })
+      }).finally(() => setGravacoes((n) => n - 1))
     },
     [setDados, recarregar],
   )
@@ -57,22 +61,39 @@ export function useRotina() {
   // No servidor atual, a semana é salva numa transação única.
   const aplicarModelo = useCallback((modelo: Rotina, duracoes: Partial<Record<DiaSemana, number[]>> = {}) => {
     const atual = cache.get('rotina') as typeof dados
-    if (!atual) return
+    if (!atual) return Promise.resolve(false)
     const token = tokenAtual()
     const tempos = Object.fromEntries(([0, 1, 2, 3, 4, 5, 6] as DiaSemana[]).map((dia) => [dia, modelo[dia].map((_, i) => duracoes[dia]?.[i] ?? 10)])) as Record<DiaSemana, number[]>
     setDados(() => ({ ...atual, rotina: modelo, duracoes: tempos }))
     setErroSalvar(null)
-    filaRotina = filaRotina.then(async () => {
-      if (tokenAtual() !== token) return
+    setGravacoes((n) => n + 1)
+    const gravacao = filaRotina.then(async () => {
+      if (tokenAtual() !== token) return false
       try {
         const ids = await api.salvarSemana(modelo, tempos, (cache.get('rotina') as typeof atual)?.ids ?? atual.ids)
+        if (tokenAtual() !== token) return false
         if (cache.has('rotina')) setDados((d) => ({ ...d!, ids }))
-      } catch (e) { if (tokenAtual() === token) { setErroSalvar(e as Error); recarregar() } }
-    })
+        return true
+      } catch (e) { if (tokenAtual() === token) { setErroSalvar(e as Error); recarregar() }; return false }
+    }).finally(() => setGravacoes((n) => n - 1))
+    filaRotina = gravacao
+    return gravacao
   }, [setDados, recarregar])
 
   /** Promessa que termina quando todos os salvamentos pendentes da rotina acabarem. */
-  const aguardarSalvamentos = useCallback(() => filaRotina, [])
+  const aguardarSalvamentos = useCallback(async () => {
+    const token = tokenAtual()
+    let atual: Promise<unknown>
+    do { atual = filaRotina; await atual } while (atual !== filaRotina)
+    return tokenAtual() === token && !erroAtual.current
+  }, [])
+  const moverExercicio = useCallback((origem: DiaSemana, indice: number, destino: DiaSemana) => {
+    const atual = cache.get('rotina') as typeof dados
+    if (!atual || origem === destino || !atual.rotina[origem][indice]) return
+    const modelo = { ...atual.rotina, [origem]: atual.rotina[origem].filter((_, i) => i !== indice), [destino]: [...atual.rotina[destino], atual.rotina[origem][indice]] }
+    const tempos = { ...atual.duracoes, [origem]: atual.duracoes[origem].filter((_, i) => i !== indice), [destino]: [...atual.duracoes[destino], atual.duracoes[origem][indice] ?? 10] }
+    aplicarModelo(modelo, tempos)
+  }, [aplicarModelo])
 
   return {
     rotina: dados?.rotina ?? ROTINA_VAZIA,
@@ -84,8 +105,10 @@ export function useRotina() {
     alterarDia,
     aplicarModelo,
     aguardarSalvamentos,
+    moverExercicio,
     erroSalvar,
-    recarregar,
+    salvando: gravacoes > 0,
+    recarregar: () => { setErroSalvar(null); recarregar() },
     ...resto,
   }
 }

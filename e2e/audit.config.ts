@@ -5,7 +5,7 @@ import config from './playwright.config'
 
 export default defineConfig(config, {
   testDir: './audits',
-  outputDir: join(tmpdir(), 'basketball-practice-audit'),
+  outputDir: process.env.AUDIT_OUTPUT_DIR ?? join(tmpdir(), 'basketball-practice-audit'),
   reporter: 'list',
   workers: 1,
   use: { ...config.use, reducedMotion: 'reduce' },

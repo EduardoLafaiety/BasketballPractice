@@ -53,13 +53,14 @@ interface Props {
   aoGerar: (previa: PreviaSemana) => void
   aoDescartar: () => void
   aoAplicar: () => void
+  aplicando?: boolean
 }
 
 /**
  * O único lugar do app que gera treino: escolhe os dias, o tempo, o nível e o foco, e a semana inteira é montada de uma vez.
  * O resultado aparece como prévia nos cartões da rotina e só vira a rotina de verdade em "Aplicar à rotina".
  */
-export default function GeradorSemana({ rotina, previa, aoGerar, aoDescartar, aoAplicar }: Props) {
+export default function GeradorSemana({ rotina, previa, aoGerar, aoDescartar, aoAplicar, aplicando = false }: Props) {
   const hoje = new Date().getDay()
   const [dias, setDias] = useState<DiaSemana[]>(() => {
     const comTreino = ORDEM_SEMANA.filter((d) => rotina[d].length > 0)
@@ -123,7 +124,8 @@ export default function GeradorSemana({ rotina, previa, aoGerar, aoDescartar, ao
   const nDias = dias.length
 
   return (
-    <form className="gs" onSubmit={enviar} aria-label="Gerar rotina semanal">
+    <form className="gs" onSubmit={enviar} aria-label="Gerar rotina semanal" aria-busy={aplicando}>
+      <fieldset className="gs-pendente" disabled={aplicando}>
       <div className="gs-corpo">
         <div className="gs-coluna">
           <fieldset className="gs-bloco">
@@ -220,6 +222,7 @@ export default function GeradorSemana({ rotina, previa, aoGerar, aoDescartar, ao
       </div>
       {previa && !erro && <p className="gs-aviso">Prévia da semana nos cartões abaixo. Ela só vira a sua rotina quando você aplicar.</p>}
       {erro && <p className="gs-aviso gs-erro" role="alert">{erro}</p>}
+      </fieldset>
     </form>
   )
 }

@@ -135,3 +135,14 @@ Os logs temporários da refatoração foram removidos da raiz e não devem ser r
 - A comparação do rascunho lido com o armazenamento evita sobrescrita e limpeza de versões diferentes quando o conflito é detectado. Não é uma transação entre abas; gravações exatamente simultâneas em localStorage continuam sendo uma limitação. A deduplicação final permanece no servidor.
 
 Método, resultados e limites em [REFERENCIA_FRONTEND.md](REFERENCIA_FRONTEND.md) e [IMPLEMENTACOES_FRONTEND.md](IMPLEMENTACOES_FRONTEND.md).
+
+## Contratos, controles e navegação — passos 5 a 8
+
+- contracts/api.d.ts reúne DTOs de leitura da fachada central; contracts/primitivos.d.ts centraliza métrica, nível e zona, reutilizados pelos tipos do frontend. Arquivos contêm somente declarações e imports de tipos, sem runtime. Backend de exercícios e schema de preferências também verificam esses contratos na compilação.
+- shared/api/mapeamento.ts contém conversões sem rede; backend.ts preserva sua fachada pública. request aceita AbortSignal e só aplica expiração 401 ao token usado naquele pedido. Não cancela automaticamente gravações nem repete mutações.
+- shared/data/recursos.ts mantém deduplicação/cache e conta consumidores. Cancela o transporte ao invalidar, limpar cache ou desmontar o último consumidor; desmontar uma das telas não cancela o pedido da outra. Carregadores propagam o sinal nas consultas centrais e de programas. Respostas antigas continuam impedidas de repovoar cache.
+- shared/ui/Campo associa rótulo, ajuda e erro ao controle nativo; Mensagem, EstadoVazio e Botao ocupado padronizam os estados, preservando os estilos existentes. Aplicação inicial em exercícios, resumo da sessão e rotina; migração das demais telas permanece incremental.
+- Layout mantém navegação e apresenta o menu como diálogo quando aberto, com controle de foco e Escape. O menu fechado fica fora da navegação assistiva; o conteúdo principal fica inerte durante abertura. Um atalho leva ao main, que recebe foco ao mudar de página.
+- useRotina coordena movimentação por seletor/arraste pela gravação da semana, preservando ordem e duração. aplicarModelo retorna confirmação booleana; a prévia só vira sucesso após resposta. Iniciar treino de hoje aguarda a fila e verifica a conta antes de navegar.
+
+Os contratos de leitura não substituem validação de respostas em runtime. As garantias de atomicidade pertencem ao servidor atual; o fallback legado de rotina continua sequencial. Não foi adicionada dependência, migração, tabela ou alteração de endpoint.

@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import type { SettingsApi } from '../../../../contracts/api.js'
 // Preferências que acompanham o atleta entre dispositivos. Campos ausentes recebem o padrão.
 export const settingsSchema = z.object({
   theme: z.enum(['sistema', 'claro', 'escuro']).default('sistema'),
@@ -13,7 +14,7 @@ export const settingsSchema = z.object({
     })
     .prefault({}),
   metronomeBpm: z.number().int().min(30).max(240).default(90),
-})
+}) satisfies z.ZodType<SettingsApi>
 
 export type Settings = z.infer<typeof settingsSchema>
 
