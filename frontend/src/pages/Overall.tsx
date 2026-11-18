@@ -49,6 +49,9 @@ export default function Overall() {
             <Radar atributos={lista} cor={faixa.cor} />
           </section>
 
+          <div className="overall-painel">
+          <div className="overall-caixa">
+          <h3>Atributos</h3>
           <ul className="overall-atributos">
             {lista.map((a) => (
               <li key={a.id} className="overall-atributo" style={{ '--cor': a.cor, '--faixa-nota': faixaDaNota(a.valor).cor } as CSSProperties}>
@@ -70,7 +73,17 @@ export default function Overall() {
               </li>
             ))}
           </ul>
-          <p className="muted overall-nota-info">Todo atleta começa com 40 em cada atributo. O teto é {TETO}. As cores da nota vão de Bronze (50) a Diamante rosa (99).</p>
+          </div>
+          <aside className="overall-caixa overall-foco">
+            <h3>Foco sugerido</h3>
+            <p>
+              {fraco && forte && fraco.valor < forte.valor
+                ? `${fraco.rotulo} está em ${fraco.valor}. Treinar esse atributo sobe a média mais rápido.`
+                : 'Todos os atributos estão iguais. Qualquer treino registrado já sobe a média.'}
+            </p>
+            <p className="muted overall-nota-info">Todo atleta começa com 40 em cada atributo. O teto é {TETO}. As cores da nota vão de Bronze (50) a Diamante rosa (99).</p>
+          </aside>
+          </div>
         </>
       )}
     </>
