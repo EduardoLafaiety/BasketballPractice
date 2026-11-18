@@ -1,7 +1,8 @@
 import { useId } from 'react'
 import type { Zona } from '../../../shared/types'
 
-export type DadosZonas = Partial<Record<Zona, { acertos: number; tentativas: number }>>
+import type { DadosZonas } from '../model/contador'
+export type { DadosZonas } from '../model/contador'
 
 // Meia-quadra em escala 1 unidade = 3 cm (500 × 470 ≈ 15 m × 14 m), tabela no topo.
 // Lado "_e"/"_d" é a esquerda/direita de quem está de frente para a cesta.

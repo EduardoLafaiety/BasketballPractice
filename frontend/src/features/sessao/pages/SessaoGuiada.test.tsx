@@ -7,6 +7,7 @@ import { abrirApp } from '../../../test/renderizar'
 import type { BlocoPlano } from '../../../shared/types'
 import type { PlanoGuiado } from './SessaoGuiada'
 import { lerLocal, pendentes } from '../model/treino-local'
+import { guardarTreinoOffline } from '../model/treino-offline'
 
 // Sem Web Audio no jsdom: o som e a vibração viram espiões.
 vi.mock('../../../shared/lib/audio', () => ({ bipe: vi.fn(), vibrar: vi.fn() }))
@@ -43,6 +44,15 @@ function abrirSessao(rotas: Parameters<typeof apiFalsa>[0] = {}, rota: Parameter
 const clicar = (user: ReturnType<typeof userEvent.setup>, nome: string | RegExp) => user.click(screen.getByRole('button', { name: nome }))
 
 describe('Sessão guiada', () => {
+  it('oferece o treino preparado quando a API falha mesmo com navegador conectado', async () => {
+    guardarTreinoOffline('1', { titulo: 'Treino preparado', blocos: [bloco({})] }, [{ id: '1', nome: 'Lance livre', categoria: 'Arremesso', metrica: 'acertos', descricao: 'Instruções guardadas.', personalizado: false }])
+    const user = userEvent.setup()
+    abrirSessao({ 'GET /exercises': new Resposta(503, { error: 'Indisponível' }), 'GET /workouts': new Resposta(503, { error: 'Indisponível' }) }, '/sessao?hoje')
+    await user.click(await screen.findByRole('button', { name: 'Abrir treino preparado neste aparelho' }))
+    expect(screen.getByRole('heading', { name: 'Treino preparado' })).toBeInTheDocument()
+    await clicar(user, 'Começar')
+    expect(screen.getByRole('region', { name: 'Instruções: Lance livre' })).toHaveTextContent('Instruções guardadas.')
+  })
   it('retoma contadores, bloco e diário após reabrir a página', async () => {
     const user = userEvent.setup()
     abrirSessao()

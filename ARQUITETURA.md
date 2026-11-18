@@ -124,3 +124,14 @@ Os logs temporários da refatoração foram removidos da raiz e não devem ser r
 - [Regras de negócio](REGRAS_DE_NEGOCIO.md)
 - [Histórico e roadmap](MUDANCAS_E_ROADMAP.md)
 - [Plano de refatoração](PLANO_DE_REFATORACAO.md)
+
+## Primeiro ciclo de frontend — sessão e offline
+
+- sessao/model/execucao.ts contém transições puras de preparação, execução rodando/pausada e resumo, além da montagem do registro. usarExecucao.ts coordena relógio por timestamps, efeitos, contadores e persistência; SessaoGuiada.tsx apresenta o estado e as ações.
+- Tipos e conversão de zonas ficam no modelo contador.ts; o hook usarContador.ts cuida do contador vivo. Componentes mantêm reexports compatíveis, sem dependência do modelo em arquivos de UI.
+- treino-local.ts concentra armazenamento e recuperação; sincronizar-sessoes.ts coordena envios por conta/Web Locks, confirmações e rejeições; salvar-sessao.ts escolhe entre confirmação remota e fila em falha transitória. Respostas de uma conta anterior não repovoam o cache da conta nova.
+- validacao-local.ts verifica estrutura e contagens antes da retomada/envio. Schemas HTTP continuam sendo a autoridade final; rejeições corrigíveis, como notas extensas, permanecem revisáveis na fila.
+- treino-offline.ts guarda um snapshot versionado do plano e apenas os exercícios referenciados. preparar-offline.ts confirma os arquivos pelo service worker; usarTreinoOffline.ts coordena a preparação e o estado de conexão. Não existe cache de respostas autenticadas da API no service worker.
+- A comparação do rascunho lido com o armazenamento evita sobrescrita e limpeza de versões diferentes quando o conflito é detectado. Não é uma transação entre abas; gravações exatamente simultâneas em localStorage continuam sendo uma limitação. A deduplicação final permanece no servidor.
+
+Método, resultados e limites em [REFERENCIA_FRONTEND.md](REFERENCIA_FRONTEND.md) e [IMPLEMENTACOES_FRONTEND.md](IMPLEMENTACOES_FRONTEND.md).

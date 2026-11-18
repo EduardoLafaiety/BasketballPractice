@@ -1,10 +1,13 @@
+import { sincronizar } from '../model/sincronizar-sessoes'
 import { useEffect, useRef, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { api, ApiError, contaLocal, tokenAtual } from '../../../shared/api/backend'
 import { useAuth } from '../../autenticacao/model/auth'
 import { invalidar } from '../../../shared/data/recursos'
-import { enfileirar, lerLocal, pendentes, removerPendente, sincronizar } from '../model/treino-local'
-import type { FalhaEnvio } from '../model/treino-local'
+import { descartarRegistrosInvalidos, enfileirar, exportarTreinosLocais, lerLocal, pendentes, registrosComProblema, removerPendente } from '../model/treino-local'
+import { rascunhoValido } from '../model/sessao'
+import { baixarArquivo } from '../../../shared/lib/arquivo'
+import type { FalhaEnvio } from '../model/sincronizar-sessoes'
 import type { NovaSessao } from '../../../shared/types'
 import Botao from '../../../shared/ui/Botao'
 
@@ -16,6 +19,7 @@ export default function SessoesPendentes() {
   const { pathname } = useLocation()
   const [rascunho, setRascunho] = useState(false)
   const [quantidade, setQuantidade] = useState(0)
+  const [problemas, setProblemas] = useState(0)
   const [fila, setFila] = useState<NovaSessao[]>([])
   const [falhas, setFalhas] = useState<Record<string, FalhaEnvio>>({})
   const falhasAtuais = useRef<Record<string, FalhaEnvio>>({})
@@ -25,7 +29,7 @@ export default function SessoesPendentes() {
   const [erro, setErro] = useState('')
   const [tentativa, setTentativa] = useState(0)
   useEffect(() => {
-    if (!conta) { setQuantidade(0); setRascunho(false); return }
+    if (!conta) { setQuantidade(0); setRascunho(false); setProblemas(0); return }
     const atual = `${conta}:${token}`
     if (identidade.current !== atual) { bloqueado.current = false; identidade.current = atual; setErro(''); falhasAtuais.current = {}; setFalhas({}); setEnviando(false) }
     let ativa = true
@@ -33,7 +37,7 @@ export default function SessoesPendentes() {
       const itens = pendentes(conta)
       const atuais = Object.fromEntries(Object.entries(falhasAtuais.current).filter(([id, falha]) => itens.some((s) => s.clientId === id && JSON.stringify(s) === JSON.stringify(falha.sessao))))
       falhasAtuais.current = atuais; setFalhas(atuais)
-      setFila(itens); setQuantidade(itens.length); setRascunho(lerLocal(conta, 'rascunho') !== null)
+      setFila(itens); setQuantidade(itens.length); setRascunho(rascunhoValido(lerLocal(conta, 'rascunho'))); setProblemas(registrosComProblema(conta).length)
     } }
     const enviar = () => {
       atualizar()
@@ -59,8 +63,14 @@ export default function SessoesPendentes() {
     const timer = window.setInterval(() => { if (pendentes(conta).length) enviar() }, 30_000)
     return () => { ativa = false; window.clearInterval(timer); window.removeEventListener('online', enviar); window.removeEventListener('treino-local', atualizar); window.removeEventListener('storage', atualizar) }
   }, [conta, autenticado, token, tentativa])
-  if (!quantidade && (!rascunho || pathname === '/sessao')) return null
+  if (!quantidade && !problemas && (!rascunho || pathname === '/sessao')) return null
   return <aside className="card pendentes" aria-label="Treinos neste aparelho" aria-busy={enviando}>
+    {problemas > 0 && <div>
+      <p role="alert">{problemas} registro(s) local(is) precisam de revisão. Os dados foram preservados e não serão enviados automaticamente.</p>
+      <Botao onClick={() => { try { baixarArquivo(exportarTreinosLocais(conta!), 'treinos-recuperacao-local.json', 'application/json') } catch { setErro('Não foi possível exportar os dados deste aparelho.') } }}>Exportar dados para recuperação</Botao>
+      <Botao disabled={enviando} onClick={() => { if (conta && window.confirm('Descartar somente os registros locais inválidos? Exporte uma cópia antes; essa ação não pode ser desfeita.')) { try { descartarRegistrosInvalidos(conta) } catch { setErro('Não foi possível descartar os registros locais.') } } }}>Descartar registros inválidos</Botao>
+      {erro && !quantidade && <p role="alert">{erro}</p>}
+    </div>}
     {rascunho && pathname !== '/sessao' && <p><Link className="btn" to="/sessao">Retomar treino em andamento</Link></p>}
     {quantidade > 0 && <div role="status"><p>{quantidade} sessão(ões) salva(s) neste aparelho, aguardando sincronização. Entre nesta conta com conexão para enviar.</p>
     {erro && <p>{erro}</p>}

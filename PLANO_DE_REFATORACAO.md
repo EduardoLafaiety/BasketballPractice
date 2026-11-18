@@ -1,8 +1,8 @@
 # Plano de refatoração, desempenho e experiência
 
-Atualizado em **18/11/2026**. Estado: **PRs #165 a #170 integradas; fechamento estrutural dos 12 módulos do backend implementado e validado localmente**.
+Atualizado em **18/11/2026**. Estado: **backend integrado até a PR #173; primeiro ciclo de frontend (passos 1 a 4) implementado, em validação final**.
 
-Prioridade atual: concluir a arquitetura do backend antes de alterar o frontend, conforme orientação do usuário. Sessões, rotina, treinos e backup separam transporte, casos de uso e persistência, com validação dos limites transacionais e contratos existentes. Recuperação local e preparação offline ficam depois do fechamento dessa etapa de backend.
+Prioridade atual: validar e integrar referência visual/métricas, recuperação de dados locais, arquitetura da sessão e preparação de um treino offline, nessa ordem autorizada pelo usuário. O fechamento estrutural dos 12 módulos do backend foi integrado na PR #173.
 
 Sequência do backend implementada:
 
@@ -12,7 +12,7 @@ Sequência do backend implementada:
 4. Notificações e estilos: camadas separadas, concorrência e falhas externas.
 5. Revisão dos 12 módulos, guardas de arquitetura para módulos futuros e relatório de limites em [REVISAO_ARQUITETURA_BACKEND.md](REVISAO_ARQUITETURA_BACKEND.md).
 
-Próxima etapa após a integração desse fechamento: validar e recuperar formatos locais de rascunho/fila; preparar o catálogo mínimo offline; medir desempenho, acessibilidade e aparência retrô antes de otimizar a interface. Esta entrega mantém o frontend existente.
+O primeiro ciclo de frontend executa esses quatro passos. Resultados e limites: [IMPLEMENTACOES_FRONTEND.md](IMPLEMENTACOES_FRONTEND.md). Referência medida: [REFERENCIA_FRONTEND.md](REFERENCIA_FRONTEND.md). A sequência seguinte consolida contratos de dados, componentes retrô, acessibilidade e navegação; otimizações de desempenho dependem de comparação equivalente.
 
 Não criar camadas vazias para preencher pastas; cada separação corresponde a uma operação real. Fechamento estrutural não significa concluir todas as evoluções de produto, sincronização ou operação descritas abaixo.
 
@@ -154,12 +154,13 @@ Os fluxos críticos passam nos testes de negócio, ponta a ponta, aparência e d
 
 As metas de LCP, INP e CLS seguem as recomendações de [Core Web Vitals](https://web.dev/articles/vitals). A área de toque de 44 × 44 é uma escolha proposta para o produto; a orientação [W3C sobre tamanho mínimo de alvo](https://www.w3.org/WAI/WCAG22/Understanding/target-size-minimum.html) explica o mínimo de 24 × 24, suas exceções e a referência ampliada de 44 × 44. Essas metas não constituem uma auditoria de conformidade já concluída.
 
-## Primeiro ciclo recomendado
+## Primeiro ciclo autorizado — passos 1 a 4
 
-1. Registrar a referência visual e medir as cinco telas principais.
-2. Aplicar os tokens e componentes retrô primeiro à sessão guiada.
-3. Corrigir os gargalos de carregamento efetivamente encontrados, começando pela antecipação de rotas e pelo custo do 3D.
-4. Extrair o domínio de sessão e robustecer rascunho/fila.
-5. Validar o ciclo inteiro em celular, inclusive offline, antes de migrar as demais áreas.
+1. Referência de cinco telas em dois tamanhos/temas, com capturas e medições locais.
+2. Validação e recuperação de rascunhos/fila, preservação de dados desconhecidos, exportação por conta e aviso de conflito entre abas.
+3. Separação da execução, relógio, contadores, montagem do registro, persistência e sincronização; estados explícitos e retomada pausada.
+4. Preparação explícita de um plano com catálogo mínimo/instruções e confirmação do cache estático; início após reabertura offline e envio posterior com identidade estável.
 
-Cada PR deve indicar regras preservadas, mudança observável, validação e limitações. Datas e estimativas serão definidas por ciclo após o levantamento inicial.
+Implementação concluída; integração condicionada aos testes. A referência visual permanece retrô e esta etapa não redesenha as páginas.
+
+Cada PR deve indicar regras preservadas, mudança observável, validação e limitações. As fases anteriores contêm o histórico de oportunidades; itens já entregues não devem ser refeitos como trabalho novo. Datas e estimativas futuras serão definidas por ciclo.

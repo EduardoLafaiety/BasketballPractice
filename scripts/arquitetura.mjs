@@ -78,6 +78,8 @@ export function analisarArquitetura(root, { checkGit = true } = {}) {
       const target = resolveImport(file, specifier)
       if (!target) { errors.push(`${origin}: import ausente ${specifier}`); continue }
       const destination = name(target)
+      if (origin.startsWith('frontend/src/features/sessao/model/') && /frontend\/src\/features\/[^/]+\/(pages|components)\//.test(destination)) errors.push(`${origin}: modelo de sessão depende da interface`)
+      if (/frontend\/src\/features\/sessao\/model\/(execucao|sessao|contador|validacao-local)\.ts$/.test(origin) && /\/(shared\/(api|data)|usar[^/]*\.ts)/.test(destination)) errors.push(`${origin}: regra pura de sessão depende de efeitos ou transporte`)
       if (contract && !destination.startsWith('contracts/')) errors.push(`${origin}: contrato compartilhado depende de implementação`)
       if (backend && !typeOnly && destination.startsWith('backend/src/')) edges.push(target)
       if (origin.startsWith('frontend/src/') && !origin.startsWith('frontend/src/demo/') && destination.startsWith('backend/')) errors.push(`${origin}: somente o adaptador demo pode importar o backend`)

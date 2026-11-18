@@ -1,5 +1,6 @@
+import { sincronizar } from './sincronizar-sessoes'
 import { describe, expect, it, vi } from 'vitest'
-import { enfileirar, gravarLocal, lerLocal, limparTreinosLocais, pendentes, sincronizar } from './treino-local'
+import { enfileirar, gravarLocal, lerLocal, limparTreinosLocais, pendentes } from './treino-local'
 import type { NovaSessao } from '../../../shared/types'
 import { ApiError } from '../../../shared/api/http'
 
