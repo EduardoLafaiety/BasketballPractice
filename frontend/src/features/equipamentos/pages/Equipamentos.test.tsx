@@ -95,3 +95,24 @@ describe('bolas de time: réplica da Wilson NBA Team Tribute', () => {
     expect(document.querySelector('.bola-logo')).toBeNull()
   })
 })
+
+describe('bolas Wilson NBA All Team', () => {
+  it('a Retro e a All Team levam os logos dos times espalhados pela bola', async () => {
+    abrir('/equipamentos')
+    await userEvent.click(await screen.findByRole('tab', { name: /Marcas/ }))
+    const retro = screen.getByRole('link', { name: /NBA All Team Retro/ })
+    const todas = screen.getByRole('link', { name: /NBA All Team(?! Retro)/ })
+    for (const bola of [retro, todas]) {
+      const logos = [...bola.querySelectorAll('.bola-colagem-logo')].map((l) => l.getAttribute('href'))
+      expect(logos.length).toBeGreaterThan(8)
+      expect(new Set(logos).size).toBeGreaterThan(8)
+      expect(logos.every((h) => h!.includes('teamlogos/nba'))).toBe(true)
+    }
+    // Sobre a Retro (preta) entram os logos para fundo escuro; sobre as calotas brancas, os de fundo claro.
+    expect(retro.querySelector('.bola-colagem-logo')!.getAttribute('href')).toContain('500-dark')
+    expect(todas.querySelector('.bola-colagem-logo')!.getAttribute('href')).not.toContain('500-dark')
+    expect(todas.querySelector('.bola-nome')).toHaveTextContent('Wilson')
+    // Bolas comuns não levam colagem.
+    expect(screen.getByRole('link', { name: /TF-1000 Legacy/ }).querySelector('.bola-colagem-logo')).toBeNull()
+  })
+})

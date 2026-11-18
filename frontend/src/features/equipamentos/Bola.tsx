@@ -1,5 +1,5 @@
-import { useMemo, useState } from 'react'
-import { CANAL_DO_MEIO, LADO, bolaModeloPng } from '../../shared/ui/bolaPixel'
+import { useId, useMemo, useState } from 'react'
+import { CANAL_DO_MEIO, LADO, bolaModeloPng, canais } from '../../shared/ui/bolaPixel'
 import { ICONES_TIMES, type IconeTime } from './icones-times'
 
 // Bola em pixel art, réplica da bola de verdade vista de frente, como na foto do produto: a marca na faixa
@@ -28,6 +28,42 @@ const MEIO = DESLOCA + CANAL_DO_MEIO * ESCALA
 /** Lado do logo no desenho (cerca de 44 px na tela). */
 const LOGO = 30
 export const LADO_DO_LOGO = 90
+/** Logos dos times espalhados pela bola, como nas Wilson NBA All Team: só nas calotas ou na bola toda (menos nos canais). */
+export interface Colagem {
+  logos: { claro: string; escuro: string }[]
+  onde: 'tudo' | 'calotas'
+  /** Distância entre os logos no desenho. */
+  passo: number
+}
+
+const px = (bloco: number) => DESLOCA + bloco * ESCALA
+const CANTO = 8
+const FIM = 112
+
+/** Faixa entre duas curvas (em blocos da grade), como caminho do desenho: onde os logos podem aparecer. */
+function faixaEntre(de: (x: number) => number, ate: (x: number) => number) {
+  const xs = Array.from({ length: LADO + 1 }, (_, i) => i)
+  const ponto = (x: number, f: (x: number) => number) => `${px(x).toFixed(1)} ${px(f(x)).toFixed(1)}`
+  return `M${xs.map((x) => ponto(x, de)).join('L')}L${[...xs].reverse().map((x) => ponto(x, ate)).join('L')}Z`
+}
+
+/** Os trechos da bola que levam logo: a folga em volta dos canais (em blocos) deixa a costura limpa. */
+function regioes(onde: Colagem['onde']) {
+  const recuo = onde === 'calotas' ? 2 : 0
+  const w = onde === 'calotas' ? 1 : 1.5
+  const cima = (x: number) => canais(x, recuo).cima
+  const baixo = (x: number) => canais(x, recuo).baixo
+  const topo = () => -10
+  const fundo = () => 50
+  if (onde === 'calotas') return [faixaEntre(topo, (x) => cima(x) - w), faixaEntre((x) => baixo(x) + w, fundo)]
+  return [
+    faixaEntre(topo, (x) => cima(x) - w),
+    faixaEntre((x) => cima(x) + w, () => CANAL_DO_MEIO - w),
+    faixaEntre(() => CANAL_DO_MEIO + w, (x) => baixo(x) - w),
+    faixaEntre((x) => baixo(x) + w, fundo),
+  ]
+}
+
 /** Contorno branco fino em volta do logo, nos quatro lados. */
 const CONTORNO = ['0.8px 0', '-0.8px 0', '0 0.8px', '0 -0.8px'].map((d) => `drop-shadow(${d} 0 #fff)`).join(' ')
 
@@ -48,15 +84,37 @@ interface Props {
   /** Contorno branco em volta do logo, para quando ele se perde na cor da faixa (logo vermelho em faixa vermelha). */
   logoContorno?: boolean
   grao?: boolean
+  /** Calotas de outra cor que as faixas, e os logos dos times espalhados pela bola (as All Team). */
+  calota?: string
+  colagem?: Colagem
+  /** Cor da marca quando não é a tinta automática (o dourado da Retro) e o contorno escuro que a destaca da colagem. */
+  marcaCor?: string
+  marcaContorno?: string
+  /** Mini logo da liga ao lado do nome do modelo. */
+  emblema?: boolean
 }
 
-export default function Bola({ frente, faixa, canal, marca, logo, icone, modelo, canalLargo, faixaClara, grao, logoContorno }: Props) {
+export default function Bola({ frente, faixa, canal, marca, logo, icone, modelo, canalLargo, faixaClara, grao, logoContorno, calota, colagem, marcaCor, marcaContorno, emblema }: Props) {
   const [semLogo, setSemLogo] = useState(false)
   // Uma imagem por modelo (e não centenas de retângulos de SVG por bola): a lista tem uma bola por time.
   const sprite = useMemo(
-    () => bolaModeloPng({ gomos: [frente, faixa], costura: canal, canalLargo, faixa: faixaClara, grao }),
-    [frente, faixa, canal, canalLargo, faixaClara, grao],
+    () => bolaModeloPng({ gomos: [frente, faixa], costura: canal, canalLargo, faixa: faixaClara, grao, calota }),
+    [frente, faixa, canal, canalLargo, faixaClara, grao, calota],
   )
+  const id = useId()
+  const regioesDaColagem = useMemo(() => (colagem ? regioes(colagem.onde) : []), [colagem])
+  const logosDaColagem = useMemo(() => {
+    if (!colagem) return []
+    const { passo, logos } = colagem
+    const saida: { x: number; y: number; href: string }[] = []
+    for (let linha = 0, y = CANTO; y < FIM; linha++, y += passo * 0.88) {
+      for (let coluna = 0, x = CANTO + (linha % 2 ? passo / 2 : 0); x < FIM; coluna++, x += passo) {
+        const t = logos[(linha * 5 + coluna * 11 + linha * coluna) % logos.length]
+        saida.push({ x, y, href: colagem.onde === 'tudo' ? t.escuro : t.claro })
+      }
+    }
+    return saida
+  }, [colagem])
   const centroDoLogo = MEIO + 2 + LOGO / 2
 
   return (
@@ -66,7 +124,29 @@ export default function Bola({ frente, faixa, canal, marca, logo, icone, modelo,
 
       <image href={sprite} x={DESLOCA} y={DESLOCA} width={LADO_DO_SPRITE} height={LADO_DO_SPRITE} style={{ imageRendering: 'pixelated' }} />
 
-      <text className="bola-nome" x="60" y={MEIO - 8} textAnchor="middle" fill={tinta(faixa)} fontSize="19" textLength={Math.min(64, marca.length * 9.5)} lengthAdjust="spacingAndGlyphs">
+      {colagem && (
+        <g clipPath={`url(#${id}-bola)`}>
+          <defs>
+            <clipPath id={`${id}-bola`}>
+              <circle cx="60" cy="60" r="51.5" />
+            </clipPath>
+            <clipPath id={`${id}-faixas`}>
+              {regioesDaColagem.map((d) => <path key={d} d={d} />)}
+            </clipPath>
+          </defs>
+          <g clipPath={`url(#${id}-faixas)`}>
+            {logosDaColagem.map((l, i) => (
+              <image key={i} className="bola-colagem-logo" href={l.href} x={l.x - colagem.passo * 0.46} y={l.y - colagem.passo * 0.46} width={colagem.passo * 0.92} height={colagem.passo * 0.92} />
+            ))}
+            {/* Sombra em degraus, no lado de baixo e da direita, para os logos acompanharem o volume. */}
+            {[7, 15, 24].map((d) => (
+              <path key={d} fillRule="evenodd" fill="#000" opacity=".13" d={`M8 60a52 52 0 1 0 104 0a52 52 0 1 0-104 0ZM${8 - d} ${60 - d}a52 52 0 1 0 104 0a52 52 0 1 0-104 0Z`} />
+            ))}
+          </g>
+        </g>
+      )}
+
+      <text className="bola-nome" x="60" y={MEIO - 8} textAnchor="middle" fill={marcaCor ?? tinta(faixa)} stroke={marcaContorno} strokeWidth={marcaContorno ? 2.2 : undefined} paintOrder="stroke" strokeLinejoin="round" fontSize="19" textLength={Math.min(64, marca.length * 9.5)} lengthAdjust="spacingAndGlyphs">
         {marca}
       </text>
 
@@ -87,8 +167,16 @@ export default function Bola({ frente, faixa, canal, marca, logo, icone, modelo,
           {ICONES_TIMES[icone]}
         </g>
       )}
+      {emblema && (
+        <g transform={`translate(32 ${centroDoLogo - 9})`} aria-hidden>
+          <rect width="10" height="18" fill="#17408B" stroke="#F4F2EA" strokeWidth="0.8" />
+          <path d="M0 10L10 6V18H0z" fill="#C9082A" />
+          <path d="M2 12.5L8 8.5" stroke="#F4F2EA" strokeWidth="1.6" />
+          <rect x="3.4" y="2" width="3" height="3" fill="#F4F2EA" />
+        </g>
+      )}
       {modelo && (
-        <text className="bola-nome" x="60" y={centroDoLogo + 4} textAnchor="middle" fill={tinta(frente)} fontSize="13" textLength={Math.min(52, modelo.length * 7)} lengthAdjust="spacingAndGlyphs">
+        <text className="bola-nome" x={emblema ? 70 : 60} y={centroDoLogo + 4} textAnchor="middle" fill={tinta(frente)} fontSize="13" textLength={Math.min(emblema ? 34 : 52, modelo.length * 7)} lengthAdjust="spacingAndGlyphs">
           {modelo}
         </text>
       )}

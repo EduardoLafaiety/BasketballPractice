@@ -40,6 +40,13 @@ export interface BolaMarca {
   canalLargo?: boolean
   faixa?: string
   grao?: boolean
+  /** Calotas de outra cor que as faixas e logos dos times espalhados pela bola (as Wilson NBA All Team). */
+  calota?: string
+  colagem?: { onde: 'tudo' | 'calotas'; passo: number }
+  /** Marca em dourado com contorno (a Retro) e mini logo da liga ao lado do modelo. */
+  marcaCor?: string
+  marcaContorno?: string
+  emblema?: boolean
   /** O que vem impresso na faixa de baixo, onde as bolas de time levam o logo. */
   modelo: string
   busca: string
@@ -137,6 +144,36 @@ export const MARCAS: BolaMarca[] = [
     canalLargo: true,
     modelo: 'DRV PRO',
     busca: 'bola basquete Wilson DRV Pro',
+  },
+  {
+    id: 'wilson-all-team-retro',
+    marca: 'Wilson',
+    nome: 'NBA All Team Retro',
+    texto: 'Preta, coberta de logos clássicos dos times da NBA. Bola de coleção que também vai para a quadra.',
+    uso: 'Coberta e externa',
+    material: 'Borracha',
+    cor: '#141414',
+    costura: '#0B0B0B',
+    modelo: '', // a colagem cobre a faixa de baixo, como na bola de verdade
+    marcaCor: '#F0DDA8',
+    marcaContorno: '#1E1407',
+    colagem: { onde: 'tudo', passo: 13 },
+    busca: 'bola basquete Wilson NBA All Team Retro 7',
+  },
+  {
+    id: 'wilson-all-team',
+    marca: 'Wilson',
+    nome: 'NBA All Team',
+    texto: 'Faixas azuis, calotas brancas com os logos dos times e o selo da NBA. Vermelha, branca e azul.',
+    uso: 'Coberta e externa',
+    material: 'Borracha',
+    cor: '#1D428A',
+    costura: '#141414',
+    calota: '#F4F2EA',
+    emblema: true,
+    modelo: 'NBA',
+    colagem: { onde: 'calotas', passo: 17 },
+    busca: 'bola basquete Wilson NBA All Team 7 vermelho branco azul',
   },
   {
     id: 'spalding-tf1000',
