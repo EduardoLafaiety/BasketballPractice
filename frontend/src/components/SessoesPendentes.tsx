@@ -8,6 +8,8 @@ import { lerLocal, pendentes, sincronizar } from '../lib/treino-local'
 export default function SessoesPendentes() {
   const { usuario } = useAuth()
   const conta = usuario ? String(usuario.id) : contaLocal()
+  const autenticado = usuario !== null
+  const token = tokenAtual()
   const { pathname } = useLocation()
   const [rascunho, setRascunho] = useState(false)
   const [quantidade, setQuantidade] = useState(0)
@@ -15,12 +17,11 @@ export default function SessoesPendentes() {
   const [tentativa, setTentativa] = useState(0)
   useEffect(() => {
     if (!conta) { setQuantidade(0); setRascunho(false); return }
-    const token = tokenAtual()
     let ativa = true
     const atualizar = () => { if (ativa) { setQuantidade(pendentes(conta).length); setRascunho(lerLocal(conta, 'rascunho') !== null) } }
     const enviar = () => {
       atualizar()
-      if (!navigator.onLine || !usuario) return
+      if (!navigator.onLine || !autenticado) return
       void sincronizar(conta, api.registrarSessao, () => ativa && tokenAtual() === token)
         .then(() => { if (ativa) { setErro(''); invalidar('sessoes', 'resumo', 'zonas', 'progresso') } })
         .catch((e: Error) => { if (ativa) setErro(e.message) })
@@ -33,7 +34,7 @@ export default function SessoesPendentes() {
     // Falhas transitórias também se recuperam sem exigir uma mudança de conexão.
     const timer = window.setInterval(() => { if (pendentes(conta).length) enviar() }, 30_000)
     return () => { ativa = false; window.clearInterval(timer); window.removeEventListener('online', enviar); window.removeEventListener('treino-local', atualizar) }
-  }, [conta, usuario, tentativa])
+  }, [conta, autenticado, token, tentativa])
   if (!quantidade && (!rascunho || pathname === '/sessao')) return null
   return <aside className="card pendentes" aria-label="Treinos neste aparelho">
     {rascunho && pathname !== '/sessao' && <p><Link className="btn" to="/sessao">Retomar treino em andamento</Link></p>}
