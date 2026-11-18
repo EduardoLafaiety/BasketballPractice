@@ -286,10 +286,20 @@ export function corpoMocap(
   const pelve = p.Hips
   // Tronco e braços na escala do nosso atleta, em torno da pelve (as pernas já estão na escala certa).
   const doTronco = (v: V3): V3 => v3(pelve.x + (v.x - pelve.x) * prop.tronco, pelve.y + (v.y - pelve.y) * prop.tronco, pelve.z + (v.z - pelve.z) * prop.tronco)
-  // Braço: do ombro (já na escala do tronco) até o ponto, com o vetor ombro→ponto na escala do braço.
+  // Ombros: saem do pescoço, na direção do ombro a ombro da gravação, com a largura do nosso atleta. No BVH o ombro
+  // sobe junto com o braço (a escápula), mas só um pouco: sem limite, o braço levantado fica acima do pescoço.
+  const pescocoClipe = doTronco(p.Neck)
+  const lateralOmbros = unit(sub(p.RightArm, p.LeftArm), v3(0, 0, 1))
+  const ombroClipe = (l: 'Right' | 'Left'): V3 => {
+    const bruto = p[l + 'Arm']
+    const sobe = lim(bruto.y - p.Neck.y, -0.1, 0.15) * 0.35 - 0.035
+    const lado = l === 'Right' ? 1 : -1
+    return v3(pescocoClipe.x + lateralOmbros.x * 0.205 * lado, pescocoClipe.y + sobe, pescocoClipe.z + lateralOmbros.z * 0.205 * lado)
+  }
+  // Braço: vetor ombro→ponto da gravação, na escala do braço, a partir do nosso ombro.
   const noBraco = (l: 'Right' | 'Left', v: V3): V3 => {
     const bruto = p[l + 'Arm']
-    const ombro = doTronco(bruto)
+    const ombro = ombroClipe(l)
     return v3(ombro.x + (v.x - bruto.x) * prop.braco, ombro.y + (v.y - bruto.y) * prop.braco, ombro.z + (v.z - bruto.z) * prop.braco)
   }
 
@@ -299,8 +309,8 @@ export function corpoMocap(
   const pernaF = perna(quadrilF, lugar(p.RightLeg), lugar(p.RightFoot))
   const pernaT = perna(quadrilT, lugar(p.LeftLeg), lugar(p.LeftFoot))
 
-  const ombroP = lugar(doTronco(p.RightArm))
-  const ombroL = lugar(doTronco(p.LeftArm))
+  const ombroP = lugar(ombroClipe('Right'))
+  const ombroL = lugar(ombroClipe('Left'))
   const alvoMao = (l: 'Right' | 'Left') => lugar(noBraco(l, p[l + 'Hand']))
   const maoP = alvoMao('Right')
   const maoL = alvoMao('Left')

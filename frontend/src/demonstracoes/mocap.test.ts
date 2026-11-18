@@ -78,7 +78,7 @@ describe('exercícios com movimento real', () => {
 })
 
 describe('todos os clipes, do jeito que a cena os usa', () => {
-  for (const id of ['06_02', '06_08', '06_13', '06_14', '06_15', '124_06', '124_05', '124_11', '13_40', '118_01', '141_11'] as const) {
+  for (const id of ['06_02', '06_08', '06_13', '06_14', '06_15', '124_06', '124_05', '124_11', '13_40', '118_01', '141_11', '22_15', '22_14'] as const) {
     it(`${id}: ossos fixos, pés no chão, bola válida`, async () => {
       const cena = prepararCena(await carregarClipe(id), id)
       for (let t = 0; t <= cena.total; t += 1000 / 30) {
