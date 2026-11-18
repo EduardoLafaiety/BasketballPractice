@@ -1,7 +1,7 @@
 import { useState, type ComponentProps, type CSSProperties } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { buscaTime, linkAmazon, MARCAS, TIMES, type Conferencia } from '../dados'
-import Bola, { LADO_DO_LOGO } from '../Bola'
+import Bola, { LADO_DO_LOGO, type Colagem } from '../Bola'
 import { logoPequeno } from '../../nba/escudos'
 import Icone from '../../../shared/ui/Icone'
 
@@ -20,6 +20,15 @@ const CONFERENCIAS: { id: Conferencia | 'todas'; rotulo: string }[] = [
   { id: 'leste', rotulo: 'Leste' },
   { id: 'oeste', rotulo: 'Oeste' },
 ]
+
+// Os logos de todos os times, espalhados pelas bolas All Team; o objeto é o mesmo a cada desenho.
+const LOGOS_DOS_TIMES = TIMES.map((t) => logoPequeno(t.sigla, 60))
+const colagens = new Map<NonNullable<(typeof MARCAS)[number]['colagem']>, Colagem>()
+function colagemDe(c: (typeof MARCAS)[number]['colagem']): Colagem | undefined {
+  if (!c) return undefined
+  if (!colagens.has(c)) colagens.set(c, { ...c, logos: LOGOS_DOS_TIMES })
+  return colagens.get(c)
+}
 
 function CartaoProduto(p: {
   /** A cor do cartão e as da bola. */
@@ -121,7 +130,7 @@ function Marcas() {
         <CartaoProduto
           key={b.id}
           cor={b.cor}
-          bola={{ frente: b.cor, faixa: b.cor, canal: b.costura, marca: b.marca, modelo: b.modelo, canalLargo: b.canalLargo, faixaClara: b.faixa, grao: b.grao }}
+          bola={{ frente: b.cor, faixa: b.cor, canal: b.costura, marca: b.marca, modelo: b.modelo, canalLargo: b.canalLargo, faixaClara: b.faixa, grao: b.grao, calota: b.calota, colagem: colagemDe(b.colagem), marcaCor: b.marcaCor, marcaContorno: b.marcaContorno, marcaTamanho: b.marcaTamanho, emblema: b.emblema }}
           tag={b.marca}
           nome={b.nome}
           meta={b.material}

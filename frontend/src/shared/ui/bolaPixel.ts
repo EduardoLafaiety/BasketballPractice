@@ -81,6 +81,8 @@ export interface ModeloBola {
   faixa?: string
   /** Grão do couro: os tons se misturam em pontilhado, em vez de faixas lisas. */
   grao?: boolean
+  /** Cor das duas calotas (em cima e embaixo), quando diferente das faixas do meio (Wilson NBA All Team: calotas brancas, faixas azuis). */
+  calota?: string
 }
 
 // Matriz de Bayer 4 × 4: o pontilhado ordenado dos jogos antigos.
@@ -100,21 +102,22 @@ export function tonsDoCouro(cor: string): string[] {
 
 /** Linha (em blocos) de cada canal na coluna x: o de cima e o de baixo acompanham a curva da bola. */
 export const CANAL_DO_MEIO = 19
-const canais = (x: number) => {
+export const canais = (x: number, recuo = 0) => {
   const u = ((x - CENTRO) / RAIO) ** 2
-  return { cima: 6 + 5.5 * u, meio: CANAL_DO_MEIO, baixo: 34 - 5.5 * u }
+  return { cima: 6 + recuo + 5.5 * u, meio: CANAL_DO_MEIO, baixo: 34 - recuo - 5.5 * u }
 }
 
-export type ParteDaBola = { gomo: 0 | 1; tom: number } | { faixa: true; tom: number } | 'costura' | null
+export type ParteDaBola = { gomo: 0 | 1; tom: number } | { faixa: true; tom: number } | { calota: true; tom: number } | 'costura' | null
 
 /** O que há no bloco (coluna, linha) de uma bola de vitrine. Gomo 0: faixa do logo e calota de cima; 1: as outras duas. */
-export function parteDoBloco(coluna: number, linha: number, modelo: Pick<ModeloBola, 'canalLargo' | 'faixa' | 'grao'> = {}, resolucao = 1): ParteDaBola {
+export function parteDoBloco(coluna: number, linha: number, modelo: Pick<ModeloBola, 'canalLargo' | 'faixa' | 'grao' | 'calota'> = {}, resolucao = 1): ParteDaBola {
   // Com resolução maior, (coluna, linha) é um pixel menor: as medidas continuam em blocos da grade de 40 × 40.
   const x = (coluna + 0.5) / resolucao
   const y = (linha + 0.5) / resolucao
   if (Math.hypot(x - CENTRO, y - CENTRO) > RAIO) return null
   const largura = modelo.canalLargo ? 1.3 : 0.75
-  const { cima, meio, baixo } = canais(x)
+  // Calotas de outra cor (All Team) são maiores: os canais de cima e de baixo recuam para o meio.
+  const { cima, meio, baixo } = canais(x, modelo.calota ? 2 : 0)
   if (Math.abs(y - cima) < largura || Math.abs(y - meio) < largura || Math.abs(y - baixo) < largura) return 'costura'
 
   const sombra = Math.hypot(x - LUZ.x, y - LUZ.y) / (0.8 * LADO)
@@ -127,6 +130,7 @@ export function parteDoBloco(coluna: number, linha: number, modelo: Pick<ModeloB
     if (dentro > 0 && dentro < 2.6) return { faixa: true, tom }
     if (dentro > 0 && dentro < 2.6 + largura * 1.4) return 'costura'
   }
+  if (modelo.calota && (y < cima || y > baixo)) return { calota: true, tom }
   const gomo = y < cima ? 0 : y < meio ? 1 : y < baixo ? 0 : 1
   return { gomo, tom }
 }
@@ -139,13 +143,14 @@ export function pixelsDoModelo(modelo: ModeloBola, resolucao = RESOLUCAO_VITRINE
   const gomos = modelo.gomos.map((c) => tonsDoCouro(c).map(rgb))
   const faixa = modelo.faixa ? tonsDoCouro(modelo.faixa).map(rgb) : null
   const costura = rgb(modelo.costura)
+  const calota = modelo.calota ? tonsDoCouro(modelo.calota).map(rgb) : null
   const lado = LADO * resolucao
   const dados = new Uint8Array(lado * lado * 4)
   for (let y = 0; y < lado; y++) {
     for (let x = 0; x < lado; x++) {
       const parte = parteDoBloco(x, y, modelo, resolucao)
       if (parte === null) continue
-      const [r, g, b] = parte === 'costura' ? costura : 'faixa' in parte ? faixa![parte.tom] : gomos[parte.gomo][parte.tom]
+      const [r, g, b] = (parte === 'costura' ? costura : 'faixa' in parte ? faixa![parte.tom] : 'calota' in parte ? calota![parte.tom] : gomos[parte.gomo][parte.tom])
       dados.set([r, g, b, 255], (y * lado + x) * 4)
     }
   }
@@ -221,6 +226,6 @@ export function bolaPng(couro?: readonly string[], costura?: string): string {
 
 /** A bola de vitrine do modelo como imagem (data URL de um PNG de LADO × RESOLUCAO_VITRINE pixels); cada modelo só é gerado uma vez. */
 export function bolaModeloPng(modelo: ModeloBola): string {
-  const { gomos, costura, canalLargo, faixa, grao } = modelo
-  return png(`modelo|${gomos.join()}|${costura}|${!!canalLargo}|${faixa ?? ''}|${!!grao}`, () => pixelsDoModelo(modelo), LADO * RESOLUCAO_VITRINE)
+  const { gomos, costura, canalLargo, faixa, grao, calota } = modelo
+  return png(`modelo|${gomos.join()}|${costura}|${!!canalLargo}|${faixa ?? ''}|${!!grao}|${calota ?? ''}`, () => pixelsDoModelo(modelo), LADO * RESOLUCAO_VITRINE)
 }
