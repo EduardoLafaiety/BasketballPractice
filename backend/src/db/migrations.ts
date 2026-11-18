@@ -404,6 +404,10 @@ const migrations: string[] = [
   DROP TABLE IF EXISTS friend_challenges, friendships, profiles CASCADE;
   DROP TABLE IF EXISTS games, plays, physical_tests, goals CASCADE;
   `,
+  `
+  ALTER TABLE practice_sessions ADD COLUMN client_id uuid;
+  CREATE UNIQUE INDEX idx_sessions_client ON practice_sessions(user_id, client_id) WHERE client_id IS NOT NULL;
+  `,
 ]
 
 /** Versão do schema depois de todas as migrações. */

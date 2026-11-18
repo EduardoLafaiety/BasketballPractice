@@ -1,0 +1,18 @@
+/* Grupos do menu e leitura de evolução, compartilhados no celular e no computador. */
+.menu-tela .nav { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: none; grid-auto-flow: row; gap: 1.5rem; }
+.nav-grupo { min-width: 0; }
+.nav-grupo h2 { font-size: 0.85rem; color: var(--laranja-texto); margin: 0 0 0.5rem; }
+.nav-grupo .nav-link { display: flex; gap: 0.75rem; font-size: clamp(0.9rem, 2vw, 1.35rem); padding: 0.5rem 0; }
+.evolucao-filtros { display: flex; flex-wrap: wrap; gap: 1rem; margin-block: 1.5rem; }
+.evolucao-filtros label { display: grid; gap: 0.5rem; min-width: 0; }
+.evolucao-filtros select { max-width: 100%; }
+.evolucao-tabela { overflow-x: auto; }
+.evolucao-tabela table { border-collapse: collapse; width: 100%; margin-block: 1.5rem; }
+.evolucao-tabela th, .evolucao-tabela td { padding: 0.75rem; text-align: left; border-bottom: 1px solid var(--borda); }
+.evolucao-tabela caption { text-align: left; }
+.pendentes { margin-bottom: 1rem; }
+@media (max-width: 560px) {
+  .menu-tela .nav { gap: 1rem; }
+  .nav-grupo .nav-link { font-size: 0.9rem; }
+  .evolucao-filtros { flex-direction: column; }
+}

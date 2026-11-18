@@ -1,0 +1,67 @@
+/* Resumo da semana (Início) */
+
+
+/* Cartão do atleta */
+
+/* Imagem da semana para compartilhar */
+
+/* Programas de 30 dias */
+.programas-grade { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 1.1rem; margin-top: 2rem; }
+.programa-cartao { position: relative; display: flex; flex-direction: column; gap: 0.8rem; min-height: 25rem; padding: 1.5rem; border-radius: 0; background: var(--c); color: #111; overflow: hidden; text-decoration: none; transition: transform 0.25s, box-shadow 0.25s; }
+.programa-cartao:hover { transform: translateY(-6px); box-shadow: 0 22px 40px -22px rgba(0, 0, 0, 0.55); }
+.programa-dias-gigante { position: absolute; right: 0.6rem; top: -1.6rem; font-family: var(--fonte-display); font-weight: var(--peso-display); font-size: 12rem; line-height: 1; color: rgba(255, 255, 255, 0.32); pointer-events: none; }
+.programa-foco { position: relative; font-size: 0.7rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; opacity: 0.8; }
+.programa-cartao h2 { position: relative; margin: auto 0 0; color: #111; font-size: clamp(2rem, 3vw, 2.4rem); line-height: 0.95; }
+.programa-cartao p { position: relative; margin: 0; font-size: 0.8rem; line-height: 1.5; font-weight: 600; color: #111; }
+.programa-rodape { position: relative; display: grid; gap: 0.6rem; padding-top: 0.9rem; border-top: 2px solid rgba(0, 0, 0, 0.35); }
+.programa-cartao .meta { color: #111; opacity: 0.8; }
+.programa-cartao .barra-progresso { background: rgba(0, 0, 0, 0.2); }
+.programa-cartao .barra-progresso > div { background: #111; }
+.programa-chamada { display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.7rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; }
+.programa-progresso { display: grid; gap: 0.35rem; }
+.programa-topo { display: grid; gap: 0.85rem; margin-bottom: 1.5rem; }
+.programa-dias { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.5rem; }
+.programa-dia { display: grid; grid-template-columns: 3.2rem minmax(0, 1fr) auto; gap: 0.4rem 1rem; align-items: center; padding: 0.9rem 1.1rem; border-radius: 0; background: var(--superficie); }
+.programa-dia h3, .programa-dia p { margin: 0; }
+.programa-dia-numero { font-family: var(--fonte-display); font-weight: var(--peso-display); font-size: 2.2rem; line-height: 1; color: var(--muted); font-variant-numeric: tabular-nums; }
+.programa-dia-estado { display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.68rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+.programa-dia.done .programa-dia-numero, .programa-dia.done .programa-dia-estado { color: var(--laranja-texto); }
+.programa-dia.available { box-shadow: inset 0 0 0 2px var(--laranja); }
+.programa-dia.available .programa-dia-numero { color: var(--texto); }
+.programa-dia.locked { opacity: 0.6; }
+.programa-dia-acoes { grid-column: 2 / -1; display: flex; gap: 0.6rem; flex-wrap: wrap; }
+@media (max-width: 640px) { .programa-dia { grid-template-columns: 2.6rem minmax(0, 1fr); } .programa-dia-estado { grid-column: 2; } .programa-dia-acoes { grid-column: 1 / -1; } }
+
+/* Prancheta tática */
+.prancheta { display: grid; gap: 0.75rem; }
+.seta { fill: none; stroke: #111111; stroke-width: 3.5; stroke-linecap: round; stroke-linejoin: round; }
+
+/* Quadras perto de você (Leaflet + OpenStreetMap) */
+.quadras { display: grid; gap: 0.75rem; }
+.mapa { height: min(60vh, 520px); border-radius: 0; overflow: hidden; background: var(--superficie-2); z-index: 0; }
+
+/* Diário de jogos */
+
+/* Menu com muitas seções: duas colunas em telas largas */
+@media (min-width: 900px) {
+  /* Preenche uma coluna inteira antes da outra, para a numeração seguir de cima para baixo. */
+  .nav { display: grid; grid-template-columns: repeat(2, max-content); grid-template-rows: repeat(var(--linhas, 9), auto); grid-auto-flow: column; column-gap: clamp(3rem, 8vw, 9rem); }
+  .nav-link { font-size: min(clamp(1.8rem, 6.4vh, 4.6rem), 5.4vw); }
+}
+
+/* Aviso de recurso que precisa de servidor (demonstração) */
+.so-com-servidor { display: flex; gap: 1rem; align-items: flex-start; }
+.so-com-servidor .icone-svg { flex-shrink: 0; color: var(--laranja-texto); }
+.so-com-servidor p { margin: 0.5rem 0 0; }
+
+/* Ranking e desafios entre amigos */
+.convite { display: grid; gap: 0.75rem; justify-items: start; margin-bottom: 1rem; }
+.convite h2 { font-size: clamp(2.4rem, 6vw, 4rem); }
+.campo { display: grid; gap: 0.35rem; flex: 1; }
+.push-celular { display: grid; gap: 0.5rem; padding-top: 0.75rem; border-top: 1px solid var(--borda); }
+
+/* Modo técnico */
+.tarefas { gap: 0.6rem; margin-top: 1rem; }
+.tarefa { display: grid; gap: 0.4rem; padding: 1rem 1.2rem; border-radius: 0; background: var(--superficie); }
+.tarefa h3, .tarefa p { margin: 0; }
+

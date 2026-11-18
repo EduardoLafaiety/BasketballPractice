@@ -142,25 +142,8 @@ export function programsRouter(db: Database) {
     const { id, day } = parse(dayParam, req.params)
     const { tzOffset } = parse(tzQuery, req.query)
     const { sessionId } = parse(completeSchema, req.body ?? {})
-    const program = findOr404(id)
-    const today = localToday(tzOffset)
-
     const status = await db.transaction(async (tx) => {
-      await tx.query('SELECT pg_advisory_xact_lock(4244, $1)', [userId])
-      const progress = (await loadProgress(tx, userId, id)).get(id) ?? null
-      const current = programStatus(program, progress, today)
-      if (!current.started) throw new HttpError(409, 'Comece o programa antes de concluir um dia')
-      if (current.nextDay !== day) throw new HttpError(409, current.finished ? 'Programa já concluído' : `O próximo dia é o ${current.nextDay}`)
-      if (!current.availableToday) throw new HttpError(409, 'Um dia por vez: o próximo treino libera amanhã')
-      if (sessionId != null) {
-        const own = await one(tx, 'SELECT 1 FROM practice_sessions WHERE id = $1 AND user_id = $2', [sessionId, userId])
-        if (!own) throw notFound('Sessão')
-      }
-      await tx.query(
-        'INSERT INTO program_days_done (user_id, program_id, day, done_on, session_id) VALUES ($1, $2, $3, $4, $5)',
-        [userId, id, day, today, sessionId ?? null],
-      )
-      return programStatus(program, { startedOn: progress!.startedOn, done: [...progress!.done, { day, doneOn: today }] }, today)
+      return completeProgramDay(tx, userId, id, day, tzOffset, sessionId ?? null)
     })
     res.status(201).json(status)
   })
@@ -173,4 +156,26 @@ export function programsRouter(db: Database) {
   })
 
   return router
+}
+
+/** Participa da mesma transação que cria a sessão. */
+export async function completeProgramDay(tx: Queryable, userId: number, id: string, day: number, tzOffset: number, sessionId: number | null) {
+  const program = findProgram(id)
+  if (!program) throw notFound('Programa')
+  const today = localToday(tzOffset)
+  await tx.query('SELECT pg_advisory_xact_lock(4244, $1)', [userId])
+  const progress = (await loadProgress(tx, userId, id)).get(id) ?? null
+  const current = programStatus(program, progress, today)
+  if (!current.started) throw new HttpError(409, 'Comece o programa antes de concluir um dia')
+  if (current.nextDay !== day) throw new HttpError(409, current.finished ? 'Programa já concluído' : `O próximo dia é o ${current.nextDay}`)
+  if (!current.availableToday) throw new HttpError(409, 'Um dia por vez: o próximo treino libera amanhã')
+  if (sessionId != null) {
+    const own = await one(tx, 'SELECT 1 FROM practice_sessions WHERE id = $1 AND user_id = $2', [sessionId, userId])
+    if (!own) throw notFound('Sessão')
+  }
+  await tx.query(
+    'INSERT INTO program_days_done (user_id, program_id, day, done_on, session_id) VALUES ($1, $2, $3, $4, $5)',
+    [userId, id, day, today, sessionId ?? null],
+  )
+  return programStatus(program, { startedOn: progress!.startedOn, done: [...progress!.done, { day, doneOn: today }] }, today)
 }

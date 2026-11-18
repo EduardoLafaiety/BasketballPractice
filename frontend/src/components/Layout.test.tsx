@@ -111,7 +111,7 @@ describe('Desafio do dia e quiz do dia saíram do app', () => {
     expect(await screen.findByRole('heading', { name: 'Artigos', level: 1 })).toBeInTheDocument()
   })
 
-  it('o menu não tem mais os dois, e a barra do celular passa a levar aos artigos', async () => {
+  it('o menu não tem mais os dois, e a barra do celular leva à evolução', async () => {
     const user = userEvent.setup()
     abrir()
     await user.click(await botaoMenu())
@@ -121,7 +121,7 @@ describe('Desafio do dia e quiz do dia saíram do app', () => {
     expect(menu.queryByRole('link', { name: /Quiz do dia/ })).toBeNull()
 
     const doca = within(screen.getByRole('navigation', { name: 'Atalhos' }))
-    expect(doca.getAllByRole('link').map((l) => l.textContent?.trim())).toEqual(['Início', 'Treinos', 'Gerar', 'Artigos'])
+    expect(doca.getAllByRole('link').map((l) => l.textContent?.trim())).toEqual(['Início', 'Treinos', 'Gerar', 'Evolução'])
     expect(doca.queryByRole('link', { name: /Desafio/ })).toBeNull()
   })
 })

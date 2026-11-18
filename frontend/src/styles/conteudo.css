@@ -1,0 +1,309 @@
+/* Alimentação */
+.dieta-aviso { max-width: 52rem; margin: 1.2rem 0 0; padding: 0.8rem 1rem; background: var(--superficie); border-radius: 0; color: var(--muted); font-size: 0.9rem; }
+.dieta-aviso strong { color: var(--texto); }
+.dieta-abas { grid-template-columns: repeat(4, minmax(0, 1fr)); margin-top: 2rem; }
+.dieta-posicoes { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.dieta-posicao { display: grid; gap: 0.35rem; align-content: start; overflow: hidden; padding-top: 0; text-align: left; font: inherit; color: var(--texto); cursor: pointer; border-top: 5px solid var(--c); }
+.dieta-posicao:hover { border-color: var(--c); }
+.dieta-posicao .tag { margin-top: 0.4rem; }
+.dieta-posicao h3 { margin: 0; }
+.dieta-numeros { margin: 0 -1.25rem 0.6rem; padding: 1.2rem; background: var(--superficie-2); text-align: center; font-family: var(--fonte-display); font-weight: var(--peso-display); font-size: 5rem; line-height: 1; color: var(--c); opacity: 0.85; }
+.dieta-foco { display: flex; flex-wrap: wrap; gap: 0.35rem; margin: 0.6rem 0 0.4rem; }
+.dieta-foco span { padding: 0.2rem 0.6rem; border: 1px solid var(--borda); border-radius: 0; font-size: 0.78rem; }
+.dieta-foco span:first-child { background: var(--c); border-color: var(--c); color: #111111; font-weight: 700; }
+.dieta-seletores { display: flex; flex-wrap: wrap; gap: 0.75rem 1.5rem; margin: 2rem 0 0; }
+.dieta-cabecalho { display: grid; grid-template-columns: 1fr auto; gap: 1rem 2rem; align-items: end; margin: 1.5rem 0; }
+.dieta-cabecalho .tag { --c: inherit; }
+.conteudo .dieta-nome { margin: 0.4rem 0 0.6rem; color: var(--c); font-size: clamp(2.8rem, 7vw, 5.5rem); }
+.dieta-porcoes { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0; }
+.dieta-porcoes div { min-width: 7.5rem; padding: 0.6rem 0.9rem; background: var(--superficie); border: 1px solid var(--borda); border-radius: 0; }
+.dieta-porcoes dt { color: var(--muted); font-size: 0.7rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
+.conteudo .dieta-porcoes div dd { margin: 0; letter-spacing: 0; text-transform: uppercase; line-height: 1.1; font-family: var(--fonte-display); font-weight: var(--peso-display); font-size: 1.6rem; }
+.dieta-refeicoes { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.dieta-refeicao { display: flex; flex-direction: column; gap: 0.8rem; border-top: 5px solid var(--c); }
+.dieta-refeicao h3 { margin: 0; }
+.dieta-opcao { padding: 0.75rem; background: var(--superficie-2); border-radius: 0; }
+.dieta-rotulo { display: block; margin-bottom: 0.45rem; color: var(--muted); font-size: 0.68rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; }
+.dieta-porque { margin: auto 0 0; padding-left: 0.7rem; border-left: 3px solid var(--borda); color: var(--muted); font-size: 0.85rem; }
+.dieta-extras { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); margin-top: 1.2rem; }
+.dieta-extras .tag { --c: var(--c-defesa); margin-bottom: 0.4rem; }
+.dieta-extras .card { display: grid; justify-items: center; align-content: start; text-align: center; }
+.dieta-extras .alimentos { justify-content: center; }
+.alimentos { display: flex; flex-wrap: wrap; gap: 0.35rem; margin: 0; padding: 0; list-style: none; }
+.alimentos li { display: inline-flex; align-items: baseline; gap: 0.4rem; padding: 0.2rem 0.65rem; border: 1px solid var(--borda); border-radius: 0; background: var(--superficie); font-size: 0.82rem; transition: opacity 0.2s; }
+.alimentos li.apagado { opacity: 0.25; }
+.alimentos-evitar li { border-color: color-mix(in srgb, var(--vermelho) 55%, var(--borda)); }
+.dieta-linha { display: grid; gap: 1rem; margin: 1.5rem 0 0; padding: 0 0 0 1.6rem; list-style: none; border-left: 2px solid var(--borda); }
+.dieta-linha > li { position: relative; display: grid; grid-template-columns: 11rem 1fr; gap: 1.2rem; }
+.dieta-linha > li::before { content: ''; position: absolute; left: calc(-1.6rem - 8px); top: 1.5rem; width: 14px; height: 14px; border-radius: 0; background: var(--c); box-shadow: 0 0 0 4px var(--bg); }
+.dieta-quando { display: grid; align-content: start; gap: 0.3rem; font-family: var(--fonte-display); font-weight: var(--peso-display); font-size: 1.8rem; line-height: 1; text-transform: uppercase; color: var(--c); }
+.dieta-quando .meta { font-family: var(--fonte-texto); font-weight: 600; font-size: 0.78rem; text-transform: none; color: var(--muted); }
+.dieta-grupos { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.dieta-grupos .card { border-top: 5px solid var(--c); }
+.dieta-grupo { display: flex; align-items: center; gap: 0.6rem; }
+@media (max-width: 960px) {
+  .dieta-refeicoes { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .dieta-posicoes { grid-template-columns: 1fr; }
+}
+@media (max-width: 640px) {
+  .dieta-refeicoes, .dieta-grupos { grid-template-columns: 1fr; }
+  .dieta-cabecalho, .dieta-linha > li { grid-template-columns: 1fr; }
+}
+.dieta-medidas { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.dieta-medidas .card { display: grid; gap: 0.2rem; }
+.dieta-peso { font-family: var(--fonte-display); font-weight: var(--peso-display); font-size: 1.8rem; line-height: 1; text-transform: uppercase; }
+.alimento-qtd { color: var(--laranja-texto); font-weight: 700; font-size: 0.7rem; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; }
+.dieta-refeicao-topo { display: flex; align-items: center; gap: 0.75rem; }
+.icone-refeicao { flex-shrink: 0; color: var(--texto); }
+@media (max-width: 960px) { .dieta-medidas { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+/* Com 4 abas, a grade de 2 colunas fecha certinho: nenhuma aba ocupa a linha sozinha. */
+@media (max-width: 860px) {
+  .dieta-abas { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .dieta-abas .nivel-opcao:last-child { grid-column: auto; }
+}
+
+/* Início: chamada discreta para a Alimentação, logo depois do Jogue como */
+.dieta-chamada { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: 2rem clamp(2rem, 6vw, 6rem); align-items: center; padding: clamp(3rem, 8vh, 5rem) clamp(1.25rem, 5vw, 5rem); border-top: 1px solid var(--borda); }
+.conteudo .dieta-chamada h2 { margin: 0.5rem 0 0.75rem; font-size: clamp(2rem, 4vw, 3.2rem); }
+.dieta-chamada-texto .muted { max-width: 30em; margin-bottom: 1.2rem; }
+.dieta-chamada-icones { display: flex; gap: 0.6rem; margin-bottom: 1.4rem; }
+.dieta-chamada-legenda { display: flex; flex-direction: column; gap: 0.6rem; margin-bottom: 1.4rem; }
+.dieta-chamada-legenda a { display: flex; align-items: center; gap: 0.7rem; color: var(--texto); text-decoration: none; }
+.dieta-chamada-legenda i { width: 0.9rem; height: 0.9rem; flex: none; border-radius: 0; background: var(--c); }
+.dieta-chamada-legenda strong { font-size: 0.85rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; }
+.dieta-chamada-legenda a:hover strong { color: var(--c); }
+.dieta-quadra { width: 100%; height: auto; max-height: 22rem; }
+.dieta-quadra .linha { fill: none; stroke: var(--borda); stroke-width: 2; }
+.dieta-quadra-no circle { fill: var(--c); }
+.dieta-quadra-no text { font-family: var(--fonte-display); font-weight: var(--peso-display); font-size: 22px; fill: #111; text-anchor: middle; dominant-baseline: central; }
+@media (max-width: 800px) { .dieta-chamada { grid-template-columns: 1fr; } }
+
+/* Equipamentos: bolas com link de afiliado da Amazon */
+.produtos-abas { grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: 40rem; margin-top: 2rem; }
+/* Flex em vez de grade: a última linha, quando incompleta, fica centralizada. Mesmas colunas da grade de antes (mín. 230px). */
+.produtos { display: flex; flex-wrap: wrap; justify-content: center; container-type: inline-size; }
+.produtos > .produto { flex: 0 0 100%; min-width: 0; }
+@container (min-width: 476px) { .produtos > .produto { flex-basis: calc((100% - 1rem) / 2); } }
+@container (min-width: 722px) { .produtos > .produto { flex-basis: calc((100% - 2rem) / 3); } }
+@container (min-width: 968px) { .produtos > .produto { flex-basis: calc((100% - 3rem) / 4); } }
+.produto { display: flex; flex-direction: column; gap: 0.35rem; overflow: hidden; padding-top: 0; color: var(--texto); text-decoration: none; border-top: 5px solid var(--c); }
+.produto:hover { border-color: var(--c); }
+.produto h3 { margin: 0; }
+.produto-vitrine { display: grid; place-items: center; margin: 0 -1.25rem 0.6rem; padding: 1.4rem; background: var(--superficie-2); }
+.produto-texto { font-size: 0.88rem; }
+.produto .dieta-foco { margin-bottom: 0; }
+.produto .dieta-foco span:first-child { background: none; border-color: var(--borda); color: inherit; font-weight: 400; }
+@media (max-width: 860px) { .produtos-abas .nivel-opcao:last-child { grid-column: auto; } }
+.produto-vitrine { padding: 1.1rem 1rem 0.6rem; }
+.bola-nome { font-family: var(--fonte-display); font-weight: 400; letter-spacing: 0.04em; text-transform: none; }
+
+/* Estatísticas da NBA: um cartão por categoria, com o líder na cor do time e o ranking em barras. */
+.nba-grade { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 1.25rem; }
+.nba-cartao { display: grid; align-content: start; gap: 0.9rem; padding: 1.25rem; }
+.nba-cartao h3 { margin: 0; font-size: 1rem; letter-spacing: 0.1em; text-transform: uppercase; }
+.nba-lider {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: end;
+  column-gap: 0.6rem;
+  padding: 1rem 1.1rem;
+  border-radius: 0;
+  overflow: hidden;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--time) 82%, #000), color-mix(in srgb, var(--time) 50%, #000));
+  color: #ffffff;
+}
+.nba-coroa { position: absolute; top: 0.7rem; right: 0.8rem; padding: 0.1rem 0.45rem; border-radius: 0; background: rgba(255, 255, 255, 0.18); font-size: 0.7rem; font-weight: 800; }
+.nba-valor { font-family: var(--fonte-display); font-weight: var(--peso-display); font-size: 3.4rem; line-height: 0.85; font-variant-numeric: tabular-nums; }
+.nba-unidade { padding-bottom: 0.3rem; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.8; }
+.nba-nome-lider { grid-column: 1 / -1; margin-top: 0.6rem; font-size: 1.15rem; line-height: 1.15; }
+.nba-time { grid-column: 1 / -1; font-size: 0.8rem; opacity: 0.8; }
+.nba-ranking { display: grid; gap: 0.45rem; margin: 0; padding: 0; list-style: none; }
+/* Escudo do líder à direita do número, grande, sobre o fundo na cor do time (por isso sempre a versão escura). */
+.nba-lider { padding-right: 5.6rem; }
+.nba-escudo.nba-escudo-lider { position: absolute; right: 0.9rem; bottom: 0.9rem; width: 64px; height: 64px; margin: 0; filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.35)); }
+.nba-ranking li {
+  display: grid;
+  grid-template-columns: 1.5rem 22px minmax(0, 1fr) auto 2.6rem;
+  grid-template-areas: 'pos escudo nome sigla num' 'pos escudo barra barra num';
+  align-items: center;
+  column-gap: 0.5rem;
+  row-gap: 3px;
+}
+.nba-ranking .nba-escudo-ranking, .nba-ranking .nba-time-cor { grid-area: escudo; justify-self: center; margin: 0; }
+.nba-escudo.nba-escudo-ranking { width: 22px; height: 22px; }
+.nba-pos { grid-area: pos; color: var(--muted); font-size: 0.8rem; font-weight: 700; text-align: center; }
+.nba-nome { grid-area: nome; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; font-size: 0.9rem; }
+.nba-sigla { grid-area: sigla; padding: 0.05rem 0.35rem; border-radius: 0; background: var(--time); color: #ffffff; font-size: 0.62rem; font-weight: 800; letter-spacing: 0.05em; text-decoration: none; }
+.nba-barra { grid-area: barra; height: 4px; border-radius: 0; background: var(--superficie-2); }
+.nba-barra i { display: block; width: calc(var(--pct) * 100%); height: 100%; border-radius: 0; background: var(--time); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12); }
+.nba-num { grid-area: num; font-family: var(--fonte-display); font-weight: var(--peso-display); font-size: 1.15rem; text-align: right; font-variant-numeric: tabular-nums; }
+.nba-fonte { margin-top: 1.5rem; color: var(--muted); font-size: 0.8rem; }
+
+/* Estatísticas da NBA: seções, classificação das conferências e notícias em cartões. */
+.nba-secao { margin-top: 2.75rem; }
+.nba-secao > h2 { margin: 0 0 1rem; }
+.nba-legenda { display: flex; flex-wrap: wrap; gap: 0.4rem 1.25rem; margin: 0.75rem 0 0; color: var(--muted); font-size: 0.8rem; }
+.nba-secao > h2 + .nba-legenda { margin: -0.5rem 0 1rem; }
+.nba-legenda-direto, .nba-legenda-playin, .nba-legenda-fora, .nba-legenda-rebaixado { display: inline-flex; align-items: center; gap: 0.4rem; }
+.nba-legenda-direto::before, .nba-legenda-playin::before, .nba-legenda-fora::before, .nba-legenda-rebaixado::before { content: ''; width: 4px; height: 1em; border-radius: 0; }
+.nba-legenda-direto::before { background: var(--verde); }
+.nba-legenda-playin::before { background: var(--laranja); }
+.nba-legenda-fora::before { background: var(--muted); }
+.nba-legenda-rebaixado::before { background: var(--vermelho); }
+
+/* NBB: uma tabela só, sem ficar larguíssima no computador. */
+.nbb-tabela-unica { max-width: 960px; }
+.nba-conferencias { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: 1.25rem; }
+.nba-tabela { width: 100%; border-collapse: separate; border-spacing: 0; background: var(--superficie); border: 1px solid var(--borda); border-radius: 0; box-shadow: var(--sombra); font-variant-numeric: tabular-nums; }
+.nba-tabela caption { padding: 0 0 0.6rem; text-align: left; font-weight: 800; font-size: 0.85rem; letter-spacing: 0.1em; text-transform: uppercase; }
+/* Sem overflow: hidden na tabela (cortava o começo da legenda): os cantos arredondados ficam por conta das células. */
+.nba-tabela thead th:first-child { border-top-left-radius: calc(var(--raio) - 1px); }
+.nba-tabela thead th:last-child { border-top-right-radius: calc(var(--raio) - 1px); }
+.nba-tabela tbody tr:last-child > :first-child { border-bottom-left-radius: calc(var(--raio) - 1px); }
+.nba-tabela tbody tr:last-child > :last-child { border-bottom-right-radius: calc(var(--raio) - 1px); }
+.nba-tabela th, .nba-tabela td { padding: 0.45rem 0.55rem; border-bottom: 1px solid var(--borda); text-align: center; vertical-align: middle; font-size: 0.85rem; }
+.nba-tabela thead th { padding-block: 0.6rem; background: var(--superficie-2); color: var(--muted); font-size: 0.68rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
+.nba-tabela thead th:nth-child(2) { text-align: left; }
+.nba-tabela abbr { text-decoration: none; }
+.nba-tabela tbody th { width: 100%; text-align: left; font-weight: 700; white-space: nowrap; }
+.nba-tabela tbody tr:last-child > * { border-bottom: 0; }
+/* Faixa à esquerda: verde para quem vai direto aos playoffs, laranja para o play-in, cinza para quem está fora. */
+.nba-tabela tbody td:first-child { width: 2.2rem; border-left: 4px solid transparent; color: var(--muted); font-weight: 700; }
+.nba-tabela tr.nba-direto td:first-child { border-left-color: var(--verde); }
+.nba-tabela tr.nba-playin td:first-child { border-left-color: var(--laranja); }
+.nba-tabela tr.nba-fora td:first-child { border-left-color: var(--muted); }
+.nba-tabela tr.nba-rebaixado td:first-child { border-left-color: var(--vermelho); }
+/* Derrotas e jogos atrás mais apagados, para as vitórias e o aproveitamento saltarem aos olhos. */
+.nba-tabela tbody td:nth-child(4), .nba-tabela tbody td:nth-child(6) { color: var(--muted); }
+
+/* Escudo do time: a versão para fundo escuro no tema escuro, a para fundo claro no tema claro. */
+.nba-escudo { display: inline-flex; width: 28px; height: 28px; margin-right: 0.65rem; vertical-align: middle; }
+.nba-escudo img { width: 100%; height: 100%; object-fit: contain; }
+.nba-escudo-claro { display: none; }
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme='dark']) .nba-escudo-claro { display: block; }
+  :root:not([data-theme='dark']) .nba-escudo-escuro { display: none; }
+}
+:root[data-theme='light'] .nba-escudo-claro { display: block; }
+:root[data-theme='light'] .nba-escudo-escuro { display: none; }
+.nba-time-cor { display: inline-block; width: 10px; height: 10px; margin: 0 1.1rem 0 0.5rem; border-radius: 0; background: var(--time); box-shadow: 0 0 0 1px rgba(127, 127, 127, 0.35); vertical-align: middle; }
+.nba-time-nome, .nba-time-sigla { vertical-align: middle; }
+.nba-time-sigla { display: none; }
+.nba-seq-v { color: var(--verde); font-weight: 700; }
+.nba-seq-d { color: var(--vermelho); font-weight: 700; }
+@media (max-width: 560px) {
+  .nba-time-nome { display: none; }
+  .nba-time-sigla { display: inline; }
+  .nba-tabela th, .nba-tabela td { padding: 0.4rem 0.35rem; }
+  .nba-escudo { width: 24px; height: 24px; margin-right: 0.45rem; }
+}
+
+.nba-noticias { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr)); gap: 1.25rem; }
+.nba-noticia { display: flex; flex-direction: column; gap: 0.5rem; padding: 0 0 1.1rem; overflow: hidden; color: inherit; text-decoration: none; }
+.nba-noticia-foto { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; background: var(--superficie-2); }
+.nba-noticia > :not(img) { margin: 0 1.1rem; }
+.nba-noticia > .nba-noticia-meta:first-child { margin-top: 1.1rem; }
+.nba-noticia-meta { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; min-height: 24px; color: var(--muted); font-size: 0.72rem; }
+/* Escudos dos times citados na notícia, à direita da fonte. */
+.nba-noticia-times { display: inline-flex; flex-shrink: 0; gap: 0.35rem; }
+.nba-noticia-times .nba-escudo { width: 24px; height: 24px; margin: 0; }
+.nba-noticia-times .nba-time-cor { margin: 0 0.25rem; }
+.nba-noticia-meta strong { color: var(--laranja-texto); }
+.nba-noticia h3 { margin-top: 0; margin-bottom: 0; }
+.conteudo .nba-noticia p { margin-top: 0; color: var(--muted); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.nba-noticia:hover h3 { color: var(--laranja-texto); }
+.nba-noticias-fim { height: 1px; }
+
+/* Artigos */
+/* Texto do artigo no padrão do site: fonte pequena, maiúscula e espaçada, também nas listas, nas citações e nas fontes. */
+.conteudo .artigo-texto li, .conteudo .artigo-texto cite { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.06em; line-height: 1.55; text-transform: uppercase; }
+.conteudo .artigo-texto p { line-height: 1.75; }
+.artigo-categorias { grid-template-columns: repeat(5, minmax(0, 1fr)); margin-top: 2rem; }
+.artigo-categoria { display: grid; gap: 0.3rem; align-content: start; text-align: left; font: inherit; color: var(--texto); cursor: pointer; border-top: 5px solid var(--c); }
+.conteudo .artigo-categoria strong { font-family: var(--fonte-display); font-weight: var(--peso-display); font-size: 1.35rem; letter-spacing: 0.01em; text-transform: uppercase; line-height: 1; overflow-wrap: break-word; hyphens: auto; }
+.artigo-categoria.ativo { background: var(--c); color: #111111; }
+.artigo-categoria.ativo .meta { color: #111111; }
+.artigo-contagem { margin-top: 0.4rem; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+.artigo-categoria.ativo .artigo-contagem { color: #111111; }
+.artigo-lista { grid-template-columns: repeat(4, minmax(0, 1fr)); margin-top: 1rem; }
+.artigo-cartao { display: flex; flex-direction: column; gap: 0.5rem; color: var(--texto); text-decoration: none; border-top: 5px solid var(--c); transition: transform 0.15s; }
+.artigo-cartao:hover { transform: translateY(-2px); }
+.artigo-cartao h3 { margin: 0.2rem 0 0; font-size: 1.2rem; }
+.artigo-cartao p { flex: 1; margin: 0; color: var(--muted); font-size: 0.9rem; line-height: 1.5; }
+.artigo-cartao-rodape { display: flex; align-items: center; gap: 0.6rem; white-space: nowrap; margin-top: 0.4rem; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.artigo-cartao-rodape .icone-svg { margin-left: auto; color: var(--laranja-texto); }
+.artigo-selo { color: var(--texto); }
+.artigo-selo::before { content: "· "; color: var(--muted); }
+.artigo-aviso { margin-top: 2rem; }
+
+.artigo { --largura: 68ch; }
+.artigo-topo, .artigo-corpo { max-width: var(--largura); }
+.artigo-topo { display: grid; gap: 0.6rem; justify-items: start; padding-bottom: 1.5rem; border-bottom: 5px solid var(--c); }
+.artigo-topo .tag { text-decoration: none; }
+.artigo-topo h1 { margin: 0.2rem 0 0; }
+.conteudo .artigo-linha-fina { margin: 0; font-size: 0.85rem; line-height: 1.6; }
+.artigo-corpo h2 { font-size: 1.5rem; margin-top: 2.25rem; }
+.artigo-corpo p { line-height: 1.7; overflow-wrap: break-word; hyphens: auto; }
+.artigo-rotulo { display: block; margin-bottom: 0.75rem; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--c); }
+.artigo-ciencia { margin: 2.25rem 0 0; padding: 1.25rem 1.4rem; border-left: 4px solid var(--c); background: var(--superficie); border-radius: 0; }
+.artigo-ciencia ul { display: grid; gap: 1rem; margin: 0; padding: 0; list-style: none; }
+.artigo-ciencia li { line-height: 1.6; }
+.artigo-ciencia cite { display: block; margin-top: 0.3rem; color: var(--muted); font-style: normal; }
+.artigo-pratica { margin-top: 1.25rem; }
+.artigo-pratica ul { display: grid; gap: 0.6rem; margin: 0; padding: 0; list-style: none; }
+.artigo-pratica li { display: grid; grid-template-columns: auto 1fr; gap: 0.6rem; align-items: start; line-height: 1.55; }
+.artigo-pratica li .icone-svg { margin-top: 0.15rem; color: var(--c); }
+.artigo-no-app { display: inline-flex; align-items: center; gap: 0.4rem; margin-top: 1.1rem; }
+.artigo-fontes ol { display: grid; gap: 0.5rem; padding-left: 1.2rem; color: var(--muted); }
+
+/* Fileiras sempre completas: 4 artigos por fileira (2 e 1 nas telas menores), e os 5 blocos de categoria
+   em 3 + 2 ou 2 + 2 + 1 com os blocos da última fileira esticados até a borda. */
+@media (max-width: 1180px) {
+  .artigo-lista { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .artigo-categorias { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+  .artigo-categoria { grid-column: span 2; }
+  .artigo-categoria:nth-child(n + 4) { grid-column: span 3; }
+}
+@media (max-width: 640px) {
+  .artigo-lista { grid-template-columns: minmax(0, 1fr); }
+  .artigo-categorias { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .artigo-categoria, .artigo-categoria:nth-child(n + 4) { grid-column: auto; }
+  .artigo-categoria:last-child:nth-child(odd) { grid-column: 1 / -1; }
+  .conteudo .artigo-categoria strong { font-size: 1.05rem; }
+  .artigo-categoria { padding: 0.9rem 1rem; }
+  .artigo-categoria .meta { display: none; }
+}
+
+/* Chamada dos artigos no Início, no mesmo molde da chamada da Alimentação */
+/* A bolinha da etiqueta usa a cor da categoria, que vem do cartão. */
+.artigo-cartao .tag, .artigo-topo .tag { --c: inherit; }
+
+/* Artigos e Estatísticas da NBA no padrão do site: todo texto em maiúsculas com fonte pequena.
+   Títulos de página e de seção e os números grandes (o valor do líder, o ranking) ficam como estão. */
+.conteudo .artigo p, .conteudo .artigo li, .conteudo .artigo cite, .conteudo .artigo .meta, .conteudo .artigo-cartao p, .conteudo .artigo-cartao-rodape,
+.conteudo .nba-noticia h3, .conteudo .nba-noticia p, .conteudo .nba-noticia-meta, .conteudo .nba-tabela caption, .conteudo .nba-tabela th, .conteudo .nba-tabela td,
+.conteudo .nba-nome, .conteudo .nba-time, .conteudo .nba-unidade, .conteudo .nba-legenda, .conteudo .nba-fonte {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  line-height: 1.55;
+  text-transform: uppercase;
+}
+/* Títulos de cartão: também em maiúsculas, um pouco maiores que o texto para continuar dando para ler a hierarquia. */
+.conteudo .artigo-cartao h3, .conteudo .nba-cartao h3, .conteudo .nba-nome-lider {
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  line-height: 1.3;
+  text-transform: uppercase;
+}
+.artigo-fonte-link { color: inherit; text-decoration: underline; text-decoration-color: var(--c); text-underline-offset: 3px; }
+.artigo-fonte-link:hover { color: var(--laranja-texto); }
+/* Imagens dos artigos: foto na História, ilustração própria nas outras categorias, sempre em 3:2 */
+.artigo-imagem { aspect-ratio: 3 / 2; overflow: hidden; border-radius: 0; background: var(--superficie-2); }
+.artigo-imagem img, .artigo-imagem svg { display: block; width: 100%; height: 100%; object-fit: cover; }
+.artigo-cartao .artigo-imagem { margin-bottom: 0.5rem; }
+.artigo-capa { max-width: var(--largura); margin: 1.75rem 0 0; }
+.conteudo .artigo-capa .credito-foto { margin-top: 0.6rem; font-size: 0.66rem; font-weight: 700; letter-spacing: 0.06em; line-height: 1.55; text-transform: uppercase; }
+

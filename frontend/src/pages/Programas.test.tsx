@@ -104,7 +104,8 @@ describe('Programas', () => {
     await user.click(await screen.findByRole('button', { name: 'Salvar sessão' }))
 
     expect(await screen.findByRole('heading', { name: 'Mão fraca em 4 semanas' })).toBeInTheDocument()
-    expect(ultima('POST', '/programs/mao-fraca-4/days/1/complete')?.corpo).toEqual({ sessionId: 55 })
+    expect(ultima('POST', '/sessions')?.corpo).toMatchObject({ program: { id: 'mao-fraca-4', day: 1 }, clientId: expect.any(String) })
+    expect(ultima('POST', '/programs/mao-fraca-4/days/1/complete')).toBeUndefined()
     expect(screen.getByTestId('caminho')).toHaveTextContent('/programas/mao-fraca-4')
   })
 })

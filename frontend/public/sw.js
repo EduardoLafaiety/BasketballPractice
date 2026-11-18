@@ -1,7 +1,7 @@
 // Service worker do Basketball Practice: deixa o app abrir sem internet.
 // Guarda só a "casca" do site (HTML, JS, CSS, ícones). Respostas da API nunca são guardadas:
-// os dados do atleta ficam no servidor e não sobram no aparelho depois do logout.
-const VERSAO = 'bp-v5'
+// Rascunhos e envios pendentes ficam no armazenamento local por conta, limpo no logout explícito.
+const VERSAO = 'bp-v6'
 // Caminhos relativos ao escopo: o site pode estar em / ou numa subpasta (ex.: /BasketballPractice/ no GitHub Pages).
 const BASE = new URL(self.registration.scope).pathname
 const INDEX = BASE + 'index.html'

@@ -4,7 +4,7 @@ import type { ArremessosZona, Zona } from '../types'
 import Icone from './Icone'
 import Quadra, { NOME_ZONA, type DadosZonas } from './Quadra'
 
-interface Toque {
+export interface Toque {
   acertou: boolean
   zona: Zona | null
 }
@@ -13,9 +13,9 @@ interface Toque {
 // Quantas das últimas tentativas aparecem na fileira de bolinhas.
 const ULTIMAS = 10
 
-export function useContador() {
-  const [toques, setToques] = useState<Toque[]>([])
-  const [zona, setZona] = useState<Zona | null>(null)
+export function useContador(inicial?: { toques: Toque[]; zona: Zona | null }) {
+  const [toques, setToques] = useState<Toque[]>(inicial?.toques ?? [])
+  const [zona, setZona] = useState<Zona | null>(inicial?.zona ?? null)
 
   let acertos = 0
   let sequenciaAtual = 0
@@ -47,6 +47,7 @@ export function useContador() {
   )
 
   return {
+    toques,
     acertos,
     tentativas: toques.length,
     sequenciaAtual,
