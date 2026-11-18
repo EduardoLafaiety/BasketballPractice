@@ -1,5 +1,4 @@
 import * as THREE from 'three'
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { MEDIDAS, type Corpo3D, type Eixos, type V3 } from '../corpo3d'
 import { Boneco, Tenis, type Cores } from './boneco'
 import { gestoDaMao } from './maos'
@@ -295,7 +294,10 @@ export class AtletaRealista {
 
   private async carregar(pronto: () => void, falhou: () => void) {
     try {
-      const resposta = await fetch(`${import.meta.env.BASE_URL}modelos/atleta/atleta.glb`, { signal: this.carregamento.signal })
+      const [resposta, { GLTFLoader }] = await Promise.all([
+        fetch(`${import.meta.env.BASE_URL}modelos/atleta/atleta.glb`, { signal: this.carregamento.signal }),
+        import('three/examples/jsm/loaders/GLTFLoader.js'),
+      ])
       if (!resposta.ok) throw new Error('Não foi possível carregar o atleta')
       const { scene } = await new GLTFLoader().parseAsync(await resposta.arrayBuffer(), '')
       if (this.encerrado) { liberarModelo(scene); return }

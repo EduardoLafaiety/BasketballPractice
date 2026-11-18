@@ -62,7 +62,7 @@ describe('Rotina semanal', () => {
     const user = userEvent.setup()
     const { rotas } = servidorDeRotina()
     abrirRotina({ ...rotas, 'POST /plans/generate': { minutes: 45, blocks: [{ exerciseId: 1, name: 'Lance livre', category: 'arremesso', metric: 'acertos', minutes: 45 }] }, 'PUT /routine': new Resposta(503, { error: 'Tente depois' }) })
-    await user.click(await screen.findByRole('button', { name: 'Gerar semana' }))
+    await user.click(await screen.findByRole('button', { name: 'Gerar treino' }))
     await user.click(await screen.findByRole('button', { name: 'Aplicar à rotina' }))
     expect(await screen.findByRole('alert')).toHaveTextContent('Tente depois')
     expect(screen.getByRole('button', { name: 'Aplicar à rotina' })).toBeInTheDocument()
