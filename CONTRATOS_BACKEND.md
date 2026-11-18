@@ -1,6 +1,8 @@
-# Contratos de treinos e backup
+# Contratos dos domínios de treino
 
 Atualizado em 18/11/2026. Referências executáveis: `backend/src/modules/workouts/workout.schema.ts` e `backend/src/modules/data/backup.schema.ts`.
+
+Exercícios, programas e planos utilizam seus próprios arquivos `exercise.schema.ts`, `program.schema.ts` e `plan.schema.ts` nos módulos correspondentes. A interface permanece compatível com os contratos existentes.
 
 Os endpoints abaixo exigem autenticação. A conta vem do token validado pelo servidor, nunca de um `userId` enviado pelo cliente. A reorganização preserva os caminhos e os formatos existentes.
 
@@ -89,3 +91,56 @@ Resposta de importação:
 ```
 
 O backup v1 não é uma cópia integral restaurável do banco: não restaura extras, credenciais, rascunhos/fila do navegador ou chaves de deduplicação de envio. A ausência de extras restaurados não significa que foram apagados na conta de destino. Mudanças dessas regras exigem evolução explícita do contrato e migração.
+
+## Exercícios — `/api/exercises`
+
+| Operação | Contrato |
+| --- | --- |
+| GET `/` | Catálogo padrão e exercícios próprios, ordenados por categoria e nome; filtros opcionais `category` e `level` |
+| GET `/:id` | Retorna exercício visível; 404 para ausente ou pertencente a outra conta |
+| POST `/` | Cria exercício próprio; 201 com o registro |
+| PUT `/:id` | Edita exercício próprio; 200 com o registro; catálogo protegido com 403 |
+| DELETE `/:id` | Remove exercício próprio; 204; catálogo retorna 403, exercício referenciado por treino ou sessão retorna 409 |
+
+Entrada: `name` com 2–100 caracteres após trim, `category`, `metric` e `description` opcional/nula com até 1.000 caracteres. Categorias: `arremesso`, `drible`, `passe`, `finalizacao`, `defesa`, `condicionamento`. Métricas: `acertos`, `repeticoes`, `tempo`.
+
+A resposta inclui `id`, nome, categoria, métrica, descrição, `level`, `warmup`, `position` e `custom`, sem expor `ownerId`. Nível, aquecimento e posição do catálogo não são campos editáveis por este contrato. O filtro `level` faz correspondência exata; exercícios próprios sem nível não aparecem quando esse filtro está preenchido.
+
+Edição e exclusão verificam propriedade dentro da transação, com bloqueio do registro. As FKs continuam sendo a garantia final contra excluir um exercício referenciado. Exercícios de outra conta retornam 404, sem revelar seu conteúdo.
+
+## Programas — `/api/programs`
+
+| Operação | Contrato |
+| --- | --- |
+| GET `/` | Programas definidos pelo produto, com resumo e status da conta |
+| GET `/:id` | Resumo, status e dias com título, estado, conclusão e blocos do catálogo padrão |
+| POST `/:id/start` | Inicia ou reinicia; 201 com progresso zerado; reiniciar remove as conclusões anteriores |
+| POST `/:id/days/:day/complete` | Conclui o próximo dia; 201 com status; corpo opcional `{ "sessionId": 1 }` vincula uma sessão da própria conta |
+| DELETE `/:id` | Remove o progresso da conta; 204; ausência de progresso retorna 404 |
+
+ID de programa: texto de até 60 caracteres; dia: inteiro de 1 a 366, limitado na prática à sequência definida pelo programa. Programas atuais têm 28 ou 30 dias. Consultas e operações de início/conclusão aceitam `tzOffset` na query, entre -840 e 840 minutos, padrão 0, no formato `Date.getTimezoneOffset()`.
+
+Sem início, o status contém `started: false`, `total` e `done: 0`. Após início, inclui `startedOn`, `finished`, `nextDay` e `availableToday`. Estados dos dias: `done`, `available`, `tomorrow` e `locked`. O programa detalhado resolve exercícios apenas pelo catálogo padrão; homônimos pessoais não substituem seus blocos.
+
+A conclusão exige início, próximo dia da sequência e disponibilidade na data local; violações retornam 409. Sessão inexistente ou de outra conta retorna 404. Uma data permite no máximo uma conclusão em cada programa, não um limite global para todos os programas.
+
+Início/reinício, conclusão e saída usam a mesma trava transacional por conta. Uma conta não bloqueia a progressão de outra. A data local de uma gravação é calculada depois de adquirir essa trava; o início usa a mesma data na gravação e na resposta. Falha ao reiniciar preserva o progresso e os vínculos anteriores. A conclusão integrada ao registro de sessão continua na transação dessa sessão.
+
+Excluir uma sessão vinculada não reabre o dia concluído. Reiniciar ou sair do programa não apaga sessões históricas.
+
+## Planos — `/api/plans/generate`
+
+POST com entrada:
+
+| Campo | Regra |
+| --- | --- |
+| `minutes` | Inteiro de 10 a 180 |
+| `focus` | Até seis categorias válidas; padrão `[]`, que considera todas |
+| `level` | Opcional: `iniciante`, `intermediario` ou `avancado` |
+| `warmup` | Booleano, padrão `true` |
+| `seed` | Inteiro opcional para reprodução do sorteio |
+| `exclude` | Até 500 inteiros; padrão `[]`; evita repetição quando há alternativas |
+
+Resposta 200: `{ "minutes": 30, "blocks": [...] }`; cada bloco contém `exerciseId`, `name`, `category`, `metric` e `minutes`. A lista vem somente do catálogo e dos exercícios próprios da conta, ordenada por ID antes do gerador. Mesma lista e mesmas opções com a mesma semente produzem o mesmo plano.
+
+O algoritmo permanece o existente: aquecimento precede a parte principal, respeita as opções disponíveis e a progressão do catálogo; exercícios próprios sem nível servem aos níveis solicitados. Ausência de opções no foco pode ampliar a seleção conforme o fallback legado. `exclude` é uma preferência, não uma proibição absoluta. Sem nenhum exercício visível, retorna 400. Gerar um plano não persiste treino ou sessão.

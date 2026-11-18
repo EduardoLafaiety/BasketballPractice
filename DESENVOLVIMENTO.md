@@ -45,6 +45,8 @@ Os testes da API usam PGlite; os testes ponta a ponta usam Postgres real, um ban
 
 ### Organização
 
+Além dos três cenários de backup, o CI verifica coordenação de programas em PostgreSQL real. Para repetir os dois cenários novos, com `TEST_POSTGRES_URL` configurada, rode em `backend`: `npx tsx --test --test-name-pattern 'programas serializam' test/postgres.test.ts`.
+
 Os [contratos de treinos e backup](CONTRATOS_BACKEND.md) descrevem compatibilidade, limites e restauração. O CI também executa três cenários de concorrência de backup contra PostgreSQL real. Para repeti-los localmente, configure `TEST_POSTGRES_URL` para o banco administrativo de testes e rode, em `backend`, `npx tsx --test --test-name-pattern 'mesmo backup enviado|backup mantém|trava da importação' test/postgres.test.ts`. A suíte cria e remove seu próprio banco temporário.
 
 - backend/src/modules: endpoints, schemas, serviços e persistência por domínio; backend/src/db: conexão, migrações e catálogo.

@@ -3,7 +3,7 @@ import type { AddressInfo } from 'node:net'
 import { after, before, describe, it } from 'node:test'
 import { createApp } from '../src/app.js'
 import { caixaDeEmails, criarConta } from './caixa.js'
-import { generatePlan } from '../src/modules/plans/plans.routes.js'
+import { generatePlan } from '../src/modules/plans/plan.generator.js'
 import { openTestDatabase } from './pglite.js'
 
 const db = await openTestDatabase()
