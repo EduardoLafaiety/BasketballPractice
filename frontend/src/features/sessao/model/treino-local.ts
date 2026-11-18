@@ -8,7 +8,7 @@ const chave = (conta: string, tipo: string) => `${PREFIXO}${conta}.${tipo}`
 export function lerLocal<T>(conta: string, tipo: string): T | null {
   try {
     const valor = JSON.parse(localStorage.getItem(chave(conta, tipo)) ?? 'null')
-    if (valor && typeof valor === 'object' && 'versaoRascunho' in valor) return valor.versaoRascunho === 2 ? valor.dados as T : null
+    if (tipo === 'rascunho' && valor && typeof valor === 'object' && 'versaoRascunho' in valor) return valor.versaoRascunho === 2 ? valor.dados as T : null
     return valor as T | null
   }
   catch { return null }

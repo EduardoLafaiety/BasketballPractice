@@ -62,6 +62,12 @@ it('não envia versão antiga sobreposta por um item futuro ou com identidade di
   expect(pendentes('1')).toEqual([])
 })
 
+it('não interpreta envelope de rascunho como formato conhecido da fila', () => {
+  localStorage.setItem('bp.treino.v1.1.fila', JSON.stringify({ versaoRascunho: 2, dados: [sessao] }))
+  expect(pendentes('1')).toEqual([])
+  expect(registrosComProblema('1')).toHaveLength(1)
+})
+
 it('não sobrescreve nem remove o rascunho atualizado em outra aba', () => {
   const primeiro = criarGravadorRascunho('1')
   primeiro(rascunhoExemplo())

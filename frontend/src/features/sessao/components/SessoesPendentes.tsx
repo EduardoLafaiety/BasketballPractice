@@ -63,6 +63,10 @@ export default function SessoesPendentes() {
     const timer = window.setInterval(() => { if (pendentes(conta).length) enviar() }, 30_000)
     return () => { ativa = false; window.clearInterval(timer); window.removeEventListener('online', enviar); window.removeEventListener('treino-local', atualizar); window.removeEventListener('storage', atualizar) }
   }, [conta, autenticado, token, tentativa])
+  const alterarLocal = (alterar: () => void) => {
+    try { alterar(); setErro(''); setTentativa((t) => t + 1) }
+    catch { setErro('Não foi possível alterar os dados neste aparelho. O registro anterior foi preservado; mantenha esta página aberta e tente novamente.') }
+  }
   if (!quantidade && !problemas && (!rascunho || pathname === '/sessao')) return null
   return <aside className="card pendentes" aria-label="Treinos neste aparelho" aria-busy={enviando}>
     {problemas > 0 && <div>
@@ -82,14 +86,14 @@ export default function SessoesPendentes() {
         {s.programa && <p>Programa: {s.programa.id}, dia {s.programa.dia}</p>}
         {falhas[s.clientId!] && <>
           <p role="alert">{falhas[s.clientId!].erro.message}</p>
-          <label>Corrigir notas<textarea key={s.notas} disabled={enviando} defaultValue={s.notas} maxLength={2000} onBlur={(e) => { if (conta && e.target.value !== (s.notas ?? '')) { enfileirar(conta, { ...s, notas: e.target.value }); setTentativa((t) => t + 1) } }} /></label>
+          <label>Corrigir notas<textarea key={s.notas} disabled={enviando} defaultValue={s.notas} maxLength={2000} onBlur={(e) => { if (conta && e.target.value !== (s.notas ?? '')) alterarLocal(() => enfileirar(conta, { ...s, notas: e.target.value })) }} /></label>
           <Botao disabled={enviando} onClick={() => { delete falhasAtuais.current[s.clientId!]; setTentativa((t) => t + 1) }}>Tentar esta sessão novamente</Botao>
         </>}
         {s.programa && falhas[s.clientId!]?.erro.status === 409 && <Botao disabled={enviando} onClick={() => {
           if (!conta || !window.confirm('Salvar este treino sem marcar um dia do programa como concluído?')) return
-          enfileirar(conta, { ...s, programa: undefined }); bloqueado.current = false; setTentativa((t) => t + 1)
+          alterarLocal(() => { enfileirar(conta, { ...s, programa: undefined }); bloqueado.current = false })
         }}>Salvar treino fora do programa</Botao>}
-        <Botao disabled={enviando} onClick={() => { if (conta && window.confirm('Descartar somente esta sessão ainda não sincronizada?')) { removerPendente(conta, s.clientId!); bloqueado.current = false; setTentativa((t) => t + 1) } }}>Descartar esta pendência</Botao>
+        <Botao disabled={enviando} onClick={() => { if (conta && window.confirm('Descartar somente esta sessão ainda não sincronizada?')) alterarLocal(() => { removerPendente(conta, s.clientId!); bloqueado.current = false }) }}>Descartar esta pendência</Botao>
       </li>)}
     </ul></details></div>}
   </aside>
