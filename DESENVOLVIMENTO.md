@@ -83,3 +83,15 @@ npx tsx --test test/postgres.test.ts
 A suíte cria e remove seu próprio banco temporário e provoca quedas de conexão deliberadas. Avisos de conexão encerrada fazem parte desses cenários. O build de demonstração e os testes ponta a ponta devem rodar em sequência, pois ambos escrevem frontend/dist.
 
 O agendador interno inicia com a API quando VAPID está configurado. O cron externo usa o mesmo serviço e a mesma coordenação por aparelho. Testes injetam um remetente falso; não enviam notificações reais. Contratos e limites de entrega estão em [CONTRATOS_BACKEND.md](CONTRATOS_BACKEND.md).
+
+### Preparar um treino offline
+
+Com conexão, abra /sessao?hoje ou um plano recebido do gerador, confira seus exercícios e escolha “Preparar este treino offline”. A confirmação exige o service worker ativo: use a versão publicada ou o build com preview; em desenvolvimento Vite o service worker permanece desligado. Na primeira visita, pode ser necessário recarregar após a instalação.
+
+A preparação guarda um único plano por conta, seus exercícios/instruções e arquivos estáticos. Depois da confirmação, reabrir /sessao sem conexão permite iniciá-lo. Salve ao concluir para gerar a pendência local; o servidor confirma após reconexão/autenticação. Se a API falhar com o navegador ainda conectado, a tela oferece abrir o treino preparado. Rascunhos existentes continuam tendo prioridade.
+
+A data de preparação é exibida. Mudanças posteriores na rotina/catalogo não atualizam essa cópia automaticamente. Conteúdo animado e APIs externas não fazem parte da promessa offline. Logout explícito e limpeza dos dados do site removem os dados locais.
+
+O aviso de dados locais permite exportar registros antes de descartar dados incompatíveis. A exportação de recuperação não é o backup do servidor nem possui importação automática. Os JSON originais são preservados até decisão explícita.
+
+Validação direcionada: npm --prefix frontend test -- src/features/sessao src/shared/lib/service-worker.test.ts. Jornadas: npm --prefix e2e test -- treino-recuperavel.spec.ts. O teste inclui preparo antes de qualquer rascunho, reabertura offline, envio posterior e conflito entre abas. A auditoria produz 20 capturas e recursos-por-tela.json em diretório temporário; execute separada dos E2E e do build demo, que compartilham portas/banco/dist.

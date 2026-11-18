@@ -1,5 +1,6 @@
 import type { NovaSessao } from '../../../shared/types'
-import { ApiError } from '../../../shared/api/http'
+import { sessaoValida } from './validacao-local'
+import { rascunhoValido } from './sessao'
 
 const PREFIXO = 'bp.treino.v1.'
 const chave = (conta: string, tipo: string) => `${PREFIXO}${conta}.${tipo}`
@@ -7,7 +8,7 @@ const chave = (conta: string, tipo: string) => `${PREFIXO}${conta}.${tipo}`
 export function lerLocal<T>(conta: string, tipo: string): T | null {
   try {
     const valor = JSON.parse(localStorage.getItem(chave(conta, tipo)) ?? 'null')
-    if (valor && typeof valor === 'object' && 'versaoRascunho' in valor) return valor.versaoRascunho === 2 ? valor.dados as T : null
+    if (tipo === 'rascunho' && valor && typeof valor === 'object' && 'versaoRascunho' in valor) return valor.versaoRascunho === 2 ? valor.dados as T : null
     return valor as T | null
   }
   catch { return null }
@@ -26,12 +27,6 @@ export function removerLocal(conta: string, tipo: string) {
 
 const prefixoItem = (conta: string) => `bp.treino.v2.${conta}.pendente.`
 const chaveItem = (conta: string, id: string) => prefixoItem(conta) + id
-function sessaoValida(s: unknown): s is NovaSessao {
-  if (!s || typeof s !== 'object') return false
-  const d = s as NovaSessao
-  return typeof d.clientId === 'string' && typeof d.data === 'string' && Number.isFinite(Date.parse(d.data)) &&
-    Number.isFinite(d.duracaoMin) && Array.isArray(d.entradas) && d.entradas.every((e) => e && typeof e.drillId === 'string')
-}
 
 /** Itens independentes evitam que duas abas sobrescrevam a fila inteira. O legado permanece até a confirmação. */
 export function pendentes(conta: string): NovaSessao[] {
@@ -43,10 +38,62 @@ export function pendentes(conta: string): NovaSessao[] {
   for (const k of chaves.filter((k) => k.startsWith(prefixoItem(conta)))) {
     try {
       const item = JSON.parse(localStorage.getItem(k)!)
-      if (item.versao === 2 && sessaoValida(item.sessao)) itens.set(item.sessao.clientId, item.sessao)
-    } catch { /* O registro inválido é preservado para recuperação, não é enviado. */ }
+      if (item?.versao === 2 && sessaoValida(item.sessao) && k === chaveItem(conta, item.sessao.clientId)) itens.set(item.sessao.clientId, item.sessao)
+      else itens.delete(k.slice(prefixoItem(conta).length))
+    } catch { itens.delete(k.slice(prefixoItem(conta).length)) /* Não envia o legado se a versão mais recente é desconhecida. */ }
   }
   return [...itens.values()]
+}
+
+/** Dados desconhecidos permanecem no aparelho e podem ser exportados antes de qualquer descarte. */
+export function registrosComProblema(conta: string): string[] {
+  const problemas: string[] = []
+  try {
+    for (const k of Object.keys(localStorage).filter((k) => k === chave(conta, 'rascunho') || k === chave(conta, 'fila') || k.startsWith(prefixoItem(conta)))) {
+      try {
+        const valor = JSON.parse(localStorage.getItem(k)!)
+        if (k === chave(conta, 'rascunho')) {
+          if (!rascunhoValido(valor?.versaoRascunho === 2 ? valor.dados : valor)) problemas.push(k)
+        } else if (k === chave(conta, 'fila')) {
+          if (!Array.isArray(valor) || !valor.every(sessaoValida)) problemas.push(k)
+        } else if (valor?.versao !== 2 || !sessaoValida(valor.sessao) || k !== chaveItem(conta, valor.sessao.clientId)) problemas.push(k)
+      } catch { problemas.push(k) }
+    }
+  } catch { /* A falha de armazenamento é mostrada ao gravar. */ }
+  return problemas
+}
+
+export function exportarTreinosLocais(conta: string) {
+  const registros = Object.fromEntries(Object.keys(localStorage).filter((k) => k.startsWith(`${PREFIXO}${conta}.`) || k.startsWith(prefixoItem(conta)) || k === `bp.treino.v3.${conta}.offline`).map((k) => [k, localStorage.getItem(k)]))
+  return JSON.stringify({ formato: 'basketball-practice-recuperacao-local', versao: 1, conta, registros }, null, 2)
+}
+
+export function descartarRegistrosInvalidos(conta: string) {
+  for (const k of registrosComProblema(conta)) {
+    if (k === chave(conta, 'fila')) {
+      try {
+        const valor = JSON.parse(localStorage.getItem(k)!)
+        if (Array.isArray(valor)) { localStorage.setItem(k, JSON.stringify(valor.filter(sessaoValida))); continue }
+      } catch { /* Apenas o registro inválido confirmado será removido. */ }
+    }
+    localStorage.removeItem(k)
+  }
+  window.dispatchEvent(new Event('treino-local'))
+}
+
+/** Detecta uma gravação de outra aba antes de sobrescrever o rascunho lido. */
+export function criarGravadorRascunho(conta: string, esperado?: unknown) {
+  let anterior: string | null = null
+  try { anterior = localStorage.getItem(chave(conta, 'rascunho')) } catch { /* A gravação exibirá a falha. */ }
+  const desatualizado = esperado !== undefined && JSON.stringify(lerLocal(conta, 'rascunho')) !== JSON.stringify(esperado)
+  const guardar = (dados: unknown) => {
+    if (desatualizado || localStorage.getItem(chave(conta, 'rascunho')) !== anterior) throw new Error('O rascunho mudou em outra aba. Reabra o treino para usar a versão mais recente.')
+    gravarLocal(conta, 'rascunho', dados)
+    anterior = localStorage.getItem(chave(conta, 'rascunho'))
+  }
+  return Object.assign(guardar, { remover: () => {
+    if (!desatualizado && localStorage.getItem(chave(conta, 'rascunho')) === anterior) removerLocal(conta, 'rascunho')
+  } })
 }
 
 export function enfileirar(conta: string, sessao: NovaSessao) {
@@ -64,46 +111,10 @@ export function removerPendente(conta: string, id: string) {
 }
 
 export function limparTreinosLocais() {
-  for (const k of Object.keys(localStorage)) if (/^bp\.treino\.v[12]\./.test(k)) localStorage.removeItem(k)
+  for (const k of Object.keys(localStorage)) if (/^bp\.treino\.v[123]\./.test(k)) localStorage.removeItem(k)
 }
 
 export function temTreinosLocais() {
   try { return Object.keys(localStorage).some((k) => /^bp\.treino\.v[12]\./.test(k) && localStorage.getItem(k) !== '[]') }
   catch { return false }
-}
-
-// Uma fila por conta, inclusive se mais de um componente pedir sincronização.
-export interface FalhaEnvio { sessao: NovaSessao; erro: ApiError }
-export interface ResultadoEnvio { enviadas: number; falhas: FalhaEnvio[]; interrupcao?: Error }
-const envios = new Map<string, Promise<ResultadoEnvio>>()
-export function sincronizar(conta: string, enviar: (s: NovaSessao) => Promise<unknown>, ativa: () => boolean, ignorar: (s: NovaSessao) => boolean = () => false): Promise<ResultadoEnvio> {
-  const existente = envios.get(conta)
-  if (existente) return existente
-  const executar = async () => {
-    const resultado: ResultadoEnvio = { enviadas: 0, falhas: [] }
-    for (const s of pendentes(conta)) {
-      if (!ativa()) return resultado
-      if (ignorar(s)) continue
-      try { await enviar(s) }
-      catch (erro) {
-        if (!ativa()) return resultado
-        // Rejeições do registro não impedem enviar os demais. Falhas de acesso,
-        // limite de pedidos e rede interrompem a tentativa e preservam toda a fila.
-        if (erro instanceof ApiError && [400, 404, 409, 422].includes(erro.status)) {
-          resultado.falhas.push({ sessao: s, erro }); continue
-        }
-        resultado.interrupcao = erro instanceof Error ? erro : new Error('Não foi possível enviar as sessões.')
-        return resultado
-      }
-      if (!ativa()) return resultado
-      resultado.enviadas++
-      // Releitura preserva sessões adicionadas enquanto a rede respondia.
-      const atual = pendentes(conta).find((p) => p.clientId === s.clientId)
-      if (JSON.stringify(atual) === JSON.stringify(s)) removerPendente(conta, s.clientId!)
-    }
-    return resultado
-  }
-  const envio = (navigator.locks ? navigator.locks.request(`bp-treino-envio:${conta}`, executar) : executar()).finally(() => { envios.delete(conta) })
-  envios.set(conta, envio)
-  return envio
 }

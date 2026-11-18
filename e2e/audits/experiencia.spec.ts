@@ -1,12 +1,30 @@
 import { expect, test } from '@playwright/test'
 import { autorizacao, entrarCom, idDoExercicio, novaConta } from '../testes/ajuda'
+import { writeFile } from 'node:fs/promises'
 
 test('registra aparência retrô e recursos das cinco telas principais', async ({ page, request }, info) => {
   test.setTimeout(120_000)
+  page.on('dialog', (dialog) => dialog.accept())
   const { token } = await novaConta(request, 'Atleta de referência')
   await entrarCom(page, token)
   // A aplicação tem sua própria preferência; o modo estático permite comparar conteúdo sem revelação por scroll.
-  await page.addInitScript(() => localStorage.setItem('bp.animacoes', 'desligadas'))
+  await page.addInitScript(() => {
+    localStorage.setItem('bp.animacoes', 'desligadas')
+    for (const k of Object.keys(localStorage)) if (k.endsWith('.rascunho')) localStorage.removeItem(k)
+  })
+  await page.addInitScript(() => {
+    const medidas = { lcpMs: 0, deslocamento: 0, tarefasLongasMs: 0 }
+    Object.assign(window, { medidasAuditoria: medidas })
+    for (const tipo of ['largest-contentful-paint', 'layout-shift', 'longtask']) {
+      new PerformanceObserver((lista) => {
+        for (const item of lista.getEntries()) {
+          if (tipo === 'largest-contentful-paint') medidas.lcpMs = item.startTime
+          if (tipo === 'layout-shift' && !(item as PerformanceEntry & { hadRecentInput: boolean }).hadRecentInput) medidas.deslocamento += (item as PerformanceEntry & { value: number }).value
+          if (tipo === 'longtask') medidas.tarefasLongasMs += item.duration
+        }
+      }).observe({ type: tipo, buffered: true })
+    }
+  })
   const exerciseId = await idDoExercicio(request, token, 'Lance livre')
   await request.put('/api/routine', { headers: autorizacao(token), data: {
     days: Array.from({ length: 7 }, (_, day) => ({ day, exercises: [{ exerciseId, minutes: 4 }] })),
@@ -29,11 +47,25 @@ test('registra aparência retrô e recursos das cinco telas principais', async (
         await page.screenshot({ path: info.outputPath(`${nome}-${largura}-${theme}.png`), fullPage: false, animations: 'disabled' })
         const recursos = await page.evaluate(() => {
           const entradas = performance.getEntriesByType('resource') as PerformanceResourceTiming[]
-          return { arquivos: entradas.length, bytesTransferidos: entradas.reduce((n, r) => n + r.transferSize, 0), js: entradas.filter((r) => /\.js($|\?)/.test(r.name)).length }
+          const navegacao = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming
+          return { arquivos: entradas.length, bytesTransferidos: entradas.reduce((n, r) => n + r.transferSize, 0), js: entradas.filter((r) => /\.js($|\?)/.test(r.name)).length,
+            domProntoMs: navegacao.domContentLoadedEventEnd,
+            ...(window as unknown as { medidasAuditoria: object }).medidasAuditoria }
         })
-        medicoes.push({ nome, largura, theme, ...recursos })
+        let iniciarEPausarMs: number | undefined
+        if (nome === 'sessao') {
+          const inicio = Date.now()
+          await page.getByRole('button', { name: 'Começar', exact: true }).click()
+          await page.getByRole('button', { name: 'Pausar', exact: true }).click()
+          await expect(page.getByRole('button', { name: 'Continuar', exact: true })).toBeVisible()
+          iniciarEPausarMs = Date.now() - inicio
+          // Cada captura começa em preparação, sem rascunho da passagem anterior.
+          await page.evaluate(() => { for (const k of Object.keys(localStorage)) if (k.endsWith('.rascunho')) localStorage.removeItem(k) })
+        }
+        medicoes.push({ nome, largura, theme, ...recursos, iniciarEPausarMs })
       }
     }
   }
   await info.attach('recursos-por-tela.json', { body: JSON.stringify(medicoes, null, 2), contentType: 'application/json' })
+  await writeFile(info.outputPath('recursos-por-tela.json'), JSON.stringify(medicoes, null, 2))
 })

@@ -86,10 +86,15 @@ test('fronteiras do frontend, imports ausentes e transporte nas regras são veri
   const errors = fixture({
     'frontend/src/features/a.ts': 'export const feature = 1',
     'frontend/src/shared/a.ts': "import { feature } from '../features/a'; import './ausente'",
+    'frontend/src/features/sessao/model/execucao.ts': "import '../pages/Tela'; import '../../../shared/api/http'",
+    'frontend/src/features/sessao/pages/Tela.tsx': 'export const Tela = 1',
+    'frontend/src/shared/api/http.ts': 'export const enviar = 1',
     'backend/src/modules/a/a.service.ts': "import { Router } from 'express'",
     'backend/src/modules/a/a.generator.ts': "import pg from 'pg'",
   }).join('\n')
   assert.match(errors, /shared depende de camada superior/)
+  assert.match(errors, /modelo de sessão depende da interface/)
+  assert.match(errors, /regra pura de sessão depende de efeitos ou transporte/)
   assert.match(errors, /import ausente/)
   assert.match(errors, /depende de transporte HTTP/)
   assert.match(errors, /modelo\/contrato depende de infraestrutura/)

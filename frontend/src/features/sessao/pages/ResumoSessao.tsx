@@ -1,9 +1,8 @@
-import { useState, type FormEvent } from 'react'
+import { useEffect, useRef, useState, type FormEvent } from 'react'
 import Botao from '../../../shared/ui/Botao'
-import { ApiError } from '../../../shared/api/backend'
-import { enfileirar } from '../model/treino-local'
-import { zonasParaLista } from '../components/Contador'
-import type { DadosZonas } from '../components/Quadra'
+import { salvarOuEnfileirar } from '../model/salvar-sessao'
+import { minutosDaSessao, montarSessao } from '../model/execucao'
+import type { DadosZonas } from '../model/contador'
 import type { Entrada } from '../../../shared/types'
 import type { useSessoes } from '../model/usarSessoes'
 import type { PlanoGuiado, Rascunho } from '../model/sessao'
@@ -33,48 +32,36 @@ export default function Final({
   aoGuardar: () => void
 }) {
   const { esforco, cansaco, notas } = diario
+  const ativa = useRef(true)
+  useEffect(() => { ativa.current = true; return () => { ativa.current = false } }, [])
   const setEsforco = (esforco: number) => setDiario({ ...diario, esforco })
   const setCansaco = (cansaco: number) => setDiario({ ...diario, cansaco })
   const setNotas = (notas: string) => setDiario({ ...diario, notas })
-  const [salvando, setSalvando] = useState(false)
+  const [estado, setEstado] = useState<'edicao' | 'enviando' | 'aparelho'>('edicao')
+  const salvando = estado === 'enviando'
   const [erro, setErro] = useState<string | null>(null)
-  const [guardada, setGuardada] = useState(false)
-  const minutos = Math.max(1, Math.round(segundos / 60))
+  const minutos = minutosDaSessao(segundos)
   const acertos = entradas.reduce((t, e) => t + (e.acertos ?? 0), 0)
   const tentativas = entradas.reduce((t, e) => t + (e.tentativas ?? 0), 0)
 
   async function enviar(e: FormEvent) {
     e.preventDefault()
-    setSalvando(true)
+    if (salvando) return
+    setEstado('enviando')
     setErro(null)
     try {
-      const sessao = {
-        clientId, programa: plano.programa, tzOffset: new Date().getTimezoneOffset(),
-        data: inicio || new Date().toISOString(),
-        duracaoMin: minutos,
-        esforco,
-        cansaco,
-        notas: [plano.titulo, notas.trim()].filter(Boolean).join(' — '),
-        workoutId: plano.workoutId,
-        entradas,
-        zonas: zonasParaLista(zonas),
-      }
-      try { await salvar(sessao) }
-      catch (e) {
-        if (!(e instanceof ApiError) || (e.status !== 0 && e.status < 500)) throw e
-        enfileirar(conta, sessao)
-        aoGuardar()
-        setGuardada(true)
+      const sessao = montarSessao({ clientId, plano, diario, entradas, zonas, segundos, inicio })
+      if (await salvarOuEnfileirar(conta, sessao, salvar) === 'aparelho') {
+        if (ativa.current) { aoGuardar(); setEstado('aparelho') }
         return
       }
-      aoSalvar()
+      if (ativa.current) aoSalvar()
     } catch (e) {
-      setErro((e as Error).message)
-      setSalvando(false)
+      if (ativa.current) { setErro((e as Error).message); setEstado('edicao') }
     }
   }
 
-  if (guardada) return <section className="card">
+  if (estado === 'aparelho') return <section className="card">
     <h1>Treino guardado neste aparelho</h1>
     <p>O aplicativo enviará o registro quando houver conexão. Ao concluir o envio, o aviso de pendência desaparecerá.</p>
   </section>

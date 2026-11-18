@@ -9,6 +9,25 @@ import SessoesPendentes from './SessoesPendentes'
 
 vi.mock('../../autenticacao/model/auth', () => ({ useAuth: () => ({ usuario: { id: 1 } }) }))
 
+it('avisa sobre dados desconhecidos sem enviá-los e permite descarte explícito isolado', async () => {
+  definirToken('tk')
+  localStorage.setItem('bp.treino.v1.1.rascunho', '{incompleto')
+  enfileirar('2', { clientId: 'outra', data: '2026-11-18T12:00:00Z', duracaoMin: 1, entradas: [] })
+  const enviar = vi.spyOn(api, 'registrarSessao')
+  const confirmar = vi.spyOn(window, 'confirm').mockReturnValue(false)
+  const user = userEvent.setup()
+  render(<MemoryRouter><SessoesPendentes /></MemoryRouter>)
+  expect(screen.getByRole('alert')).toHaveTextContent('precisam de revisão')
+  expect(screen.getByRole('button', { name: 'Exportar dados para recuperação' })).toBeInTheDocument()
+  expect(enviar).not.toHaveBeenCalled()
+  await user.click(screen.getByRole('button', { name: 'Descartar registros inválidos' }))
+  expect(localStorage.getItem('bp.treino.v1.1.rascunho')).toBe('{incompleto')
+  confirmar.mockReturnValue(true)
+  await user.click(screen.getByRole('button', { name: 'Descartar registros inválidos' }))
+  expect(localStorage.getItem('bp.treino.v1.1.rascunho')).toBeNull()
+  expect(pendentes('2')).toHaveLength(1)
+})
+
 it('associa cada erro à sessão e permite repetir uma rejeitada sem reenviar as outras', async () => {
   definirToken('tk')
   const user = userEvent.setup()
