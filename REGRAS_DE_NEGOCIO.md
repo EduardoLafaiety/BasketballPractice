@@ -50,6 +50,7 @@ Fontes: `backend/src/modules/auth/auth.routes.ts`, `admin.ts`, `backend/src/midd
 - **RN-EX-07 — Aquecimento:** exercícios do catálogo podem ser marcados como aquecimento e possuir posição na progressão.
 - **RN-TR-01 — Composição:** um treino contém até 50 itens ordenados, referenciando apenas exercícios visíveis para a conta.
 - **RN-TR-02 — Metas dos itens:** a API aceita séries, alvo de repetições, alvo de segundos e notas. Nem toda informação disponível na API é utilizada por todos os fluxos do frontend.
+- **RN-TR-03 — Edição atômica:** criação e edição validam exercícios dentro da transação. A edição bloqueia o treino da conta antes de substituir cabeçalho e itens, preservando a ordem. Falhas preservam a versão anterior inteira; a última edição confirmada prevalece.
 
 Fontes: `backend/src/modules/exercises/exercises.routes.ts`, `workouts.ts` e `backend/src/db/catalog.ts`.
 
@@ -138,8 +139,13 @@ Fontes: `frontend/src/features/evolucao/model/calculos.ts`, `comparacao.ts`, `us
 - **RN-DA-04 — Demonstração:** utiliza visitante e banco no navegador; não oferece conta real nem equivale ao ambiente autenticado de produção.
 - **RN-DA-05 — Exportação/importação:** o backup atual usa formato `basketball-practice`, versão 1. Exercícios do catálogo são referenciados por nome na importação; os IDs não devem ser tratados como universais entre bancos.
 - **RN-DA-06 — Serviços externos:** conteúdo de NBA/NBB e notícias pode ficar indisponível ou desatualizado. Essa falha não deve impedir o fluxo principal de treino.
+- **RN-DA-07 — Exportação consistente:** exercícios, treinos, sessões, extras e preferências são lidos no mesmo snapshot transacional, sem misturar versões produzidas por uma edição concorrente.
+- **RN-DA-08 — Importação atômica:** exercícios, treinos, sessões e preferências são importados em uma única transação. A falha em qualquer registro desfaz todos os efeitos da importação.
+- **RN-DA-09 — Identidade do backup:** exercícios são remapeados por IDs do arquivo ou nome; treinos com mesmo nome e descrição são reaproveitados e têm seus itens substituídos. Sessões são comparadas pelo conteúdo preservando ordem e multiplicidade, sem depender da chave de envio do navegador.
+- **RN-DA-10 — Limite da importação:** por padrão, até duas importações em andamento por instância. Ao atingir o limite, responder 503 com `Retry-After: 30`; falhas liberam a vaga. A trava por conta no banco serializa importações da mesma conta.
+- **RN-DA-11 — Alcance da restauração:** a importação v1 não restaura extras, credenciais ou dados locais do navegador. O progresso de programas exportado em extras é informativo. Limites e referências estão em [CONTRATOS_BACKEND.md](CONTRATOS_BACKEND.md).
 
-Fontes: `backend/src/modules/settings/settings.routes.ts`, `data.ts`, `backend/src/lib/push.ts`, `frontend/src/demo/servidor.ts` e módulos NBA/NBB.
+Fontes: módulos `settings`, `data` e `workouts` em `backend/src/modules`, `backend/src/lib/push.ts`, `frontend/src/demo/servidor.ts` e módulos NBA/NBB.
 
 ## 10. Diretriz visual obrigatória para a refatoração
 

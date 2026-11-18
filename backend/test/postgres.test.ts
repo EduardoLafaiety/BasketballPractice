@@ -7,6 +7,7 @@ import { fromPool, isDatabaseUnavailable, openDatabase, type Database } from '..
 import { migrate } from '../src/db/migrations.js'
 import { caixaDeEmails, criarConta } from './caixa.js'
 import { seed } from '../src/db/seed.js'
+import { createBackupService } from '../src/modules/data/backup.service.js'
 
 // O que o PGlite não reproduz: conexões de verdade, travas entre conexões e os códigos de erro do Postgres.
 // Roda só com TEST_POSTGRES_URL, a URL de um banco de administração (o `postgres`, nunca o de desenvolvimento):
@@ -114,6 +115,47 @@ describe('Postgres de verdade', { skip: ADMIN_URL ? false : 'defina TEST_POSTGRE
     assert.equal(a.body.created.sessions + b.body.created.sessions, 500)
     assert.equal(a.body.skipped.sessions + b.body.skipped.sessions, 500)
     assert.equal(await quantasSessoes(id), 500)
+  })
+
+  it('backup mantém um retrato consistente enquanto sessão e preferências são editadas', { timeout: 20_000 }, async () => {
+    const { token, id } = await conta()
+    const exerciseId = (await api('GET', '/exercises', undefined, token)).body[0].id
+    const input = { performedAt: new Date().toISOString(), notes: 'Antes', entries: [{ exerciseId, makes: 1, attempts: 2 }] }
+    const created = await api('POST', '/sessions', input, token)
+    assert.equal(created.status, 201)
+    assert.equal((await api('PUT', '/settings', { theme: 'claro' }, token)).status, 200)
+    let signal!: () => void
+    let release!: () => void
+    const paused = new Promise<void>((resolve) => { signal = resolve })
+    const gate = new Promise<void>((resolve) => { release = resolve })
+    let stop = true
+    const snapshotDb: Database = {
+      ...db,
+      transaction: (fn) => db.transaction((tx) => fn({
+        query: async (sql, params) => {
+          if (stop && sql.includes('FROM session_entries se JOIN')) {
+            stop = false; signal(); await gate
+          }
+          return tx.query(sql, params)
+        },
+      })),
+    }
+    const exporting = createBackupService(snapshotDb).exportBackup(id)
+    try {
+      await paused
+      const updated = await api('PUT', `/sessions/${created.body.id}`, { ...input, notes: 'Depois', entries: [{ exerciseId, makes: 3, attempts: 4 }] }, token)
+      assert.equal(updated.status, 200)
+      assert.equal((await api('PUT', '/settings', { theme: 'escuro' }, token)).status, 200)
+    } finally { release() }
+    const snapshot = JSON.parse(JSON.stringify(await exporting))
+    assert.equal(snapshot.sessions[0].notes, 'Antes')
+    assert.equal(snapshot.sessions[0].entries[0].makes, 1)
+    assert.equal(snapshot.settings.theme, 'claro')
+    const latest = await api('GET', '/data/export', undefined, token)
+    assert.equal(latest.status, 200)
+    assert.equal(latest.body.sessions[0].notes, 'Depois')
+    assert.equal(latest.body.sessions[0].entries[0].makes, 3)
+    assert.equal(latest.body.settings.theme, 'escuro')
   })
 
   it('a trava da importação é por atleta: um espera o outro só na mesma conta', async () => {

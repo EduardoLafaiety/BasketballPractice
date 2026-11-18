@@ -34,6 +34,8 @@ BasketballPractice/
 │   │   ├── programs/         # Rotas e serviço de progressão
 │   │   ├── plans/            # Rotas, schema e gerador
 │   │   ├── routine/          # Rotas, schema, serviço e persistência da semana
+│   │   ├── workouts/         # Contrato, serviço e persistência compartilhada de treinos
+│   │   ├── data/             # Contrato v1, serviço, repositório e identidade do backup
 │   │   └── ...
 │   ├── db/                   # Conexão, migrações, catálogo e dados iniciais
 │   ├── middleware/           # Autorização, limites e tratamento de erros
@@ -56,14 +58,17 @@ BasketballPractice/
 6. Serviços, repositórios e geradores não dependem dos arquivos de rota HTTP.
 7. Contratos compartilhados são declarações de tipos, sem dependências de React, Express ou PostgreSQL.
 
-`npm run check:architecture` verifica imports locais e as fronteiras acima. Em sessões e rotina, também impede SQL/transações e acesso direto a repositórios nas rotas. Schemas, serviços e repositórios não importam Express ou os módulos HTTP do Node; repositórios não importam serviços. A mesma verificação está no CI. O script não substitui revisão de domínio ou detecta toda possível dependência dinâmica.
+`npm run check:architecture` verifica imports locais e as fronteiras acima. Em sessões, rotina, treinos e backup, também impede SQL/transações e acesso direto a repositórios nas rotas. Schemas, serviços e repositórios não importam Express ou os módulos HTTP do Node; repositórios não importam serviços; schemas não importam serviços ou repositórios. A mesma verificação está no CI. O script não substitui revisão de domínio ou detecta toda possível dependência dinâmica.
 
 ## Decisões da refatoração
 
 - O antigo store foi dividido em infraestrutura de cache e hooks das funcionalidades. Pedidos em andamento para a mesma chave são compartilhados. Logout e invalidação impedem respostas antigas de repopular o cache.
 - O transporte HTTP é separado da adaptação dos endpoints. O arquivo `shared/api/backend.ts` continua sendo a fachada de integração; não é um componente de interface.
 - Rotas e testes foram atualizados para os caminhos novos, sem manter cópias dos módulos antigos.
-- Sessões e rotina seguem `rota → serviço → repositório`. Rotas validam entradas, obtêm a conta autenticada e devolvem HTTP; serviços coordenam regras e transações; repositórios executam SQL. Sessões mantêm a agregação de comparação em módulo próprio. Os demais módulos aprofundam essa separação por fluxo, sem criar camadas vazias.
+- Sessões, rotina, treinos e backup seguem `rota → serviço → repositório`. Rotas validam entradas, obtêm a conta autenticada e devolvem HTTP; serviços coordenam regras e transações; repositórios executam SQL. Sessões mantêm a agregação de comparação em módulo próprio. Os demais módulos aprofundam essa separação por fluxo, sem criar camadas vazias.
+- O schema de item de treino é reutilizado pelo contrato de backup. Edição, rotina e importação usam a mesma gravação de itens, com ordem, metas e notas preservadas. O contrato está em [CONTRATOS_BACKEND.md](CONTRATOS_BACKEND.md).
+- O serviço de backup controla o limite de importações por instância, liberando vagas em `finally`. Importação, preferências e trava por conta ficam na mesma transação. A exportação usa `REPEATABLE READ READ ONLY` para obter um retrato consistente; as consultas dessa conexão são sequenciais.
+- O schema de preferências fica separado do serviço para permitir reuso nos contratos sem depender de persistência. Reexports existentes do serviço permanecem compatíveis.
 - A criação da sessão mantém validação, deduplicação e conclusão do programa na mesma transação. A edição bloqueia a sessão da conta e valida referências dentro da transação antes de substituir cabeçalho, entradas e zonas. O resultado é montado antes do commit; reenvios com chave estável não substituem o conteúdo confirmado.
 - A rotina possui schema, serviço e repositório próprios; o serviço confirma a semana inteira em uma transação, mantendo IDs e representação legados. Não há nova tabela nem controle otimista de versão nesta etapa.
 - A rotina ganhou um contrato de escrita de semana inteira. A persistência continua usando os treinos existentes para preservar backups, IDs e referências de sessões. A migração para tabelas exclusivas é uma decisão futura, não uma migração já realizada.

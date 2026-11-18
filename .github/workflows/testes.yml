@@ -96,6 +96,11 @@ jobs:
       # Usa o Google Chrome que já vem no runner; nada de baixar navegador.
       - run: npx playwright test
         working-directory: e2e
+      - name: Contratos de backup em PostgreSQL real
+        run: npx tsx --test --test-name-pattern 'mesmo backup enviado|backup mantém|trava da importação' test/postgres.test.ts
+        working-directory: backend
+        env:
+          TEST_POSTGRES_URL: postgres://basketball:basketball@localhost:5433/postgres
       - if: failure()
         uses: actions/upload-artifact@v7
         with:

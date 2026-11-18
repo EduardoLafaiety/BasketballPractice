@@ -1,24 +1,9 @@
-import { z } from 'zod'
-import { one, type Database, type Queryable } from '../../db/index.js'
-// Preferências que acompanham o atleta entre dispositivos. Campos ausentes recebem o padrão.
-export const settingsSchema = z.object({
-  theme: z.enum(['sistema', 'claro', 'escuro']).default('sistema'),
-  reminders: z
-    .object({
-      enabled: z.boolean().default(false),
-      time: z
-        .string()
-        .regex(/^([01]\d|2[0-3]):[0-5]\d$/, 'Horário inválido')
-        .default('18:00'),
-      days: z.array(z.number().int().min(0).max(6)).max(7).default([1, 2, 3, 4, 5]),
-    })
-    .prefault({}),
-  metronomeBpm: z.number().int().min(30).max(240).default(90),
-})
+import { one, type Queryable } from '../../db/index.js'
+import { settingsSchema, type Settings } from './settings.schema.js'
+export { settingsSchema } from './settings.schema.js'
+export type { Settings } from './settings.schema.js'
 
-export type Settings = z.infer<typeof settingsSchema>
-
-export async function readSettings(db: Database, userId: number) {
+export async function readSettings(db: Queryable, userId: number) {
   const row = await one<{ data: unknown }>(db, 'SELECT data FROM user_settings WHERE user_id = $1', [userId])
   // Dados antigos ou de outra versão: o que não validar volta para o padrão.
   const parsed = settingsSchema.safeParse(row?.data ?? {})
