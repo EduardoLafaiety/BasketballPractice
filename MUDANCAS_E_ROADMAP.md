@@ -11,7 +11,7 @@ Referências para a próxima etapa: [regras de negócio](REGRAS_DE_NEGOCIO.md) e
 - As seis melhorias inicialmente propostas foram implementadas e integradas à `main` pelo [PR #163](https://github.com/EduardoLafaiety/BasketballPractice/pull/163).
 - Commit de integração: `16d73081a4dbfe0aee71d7478529630a723c9d99`.
 - Uma correção adicional de reconexão foi incluída no mesmo PR antes do merge.
-- A arquitetura foi reorganizada e o primeiro ciclo de melhorias está em validação. O PR #163 permanece sendo o histórico da entrega anterior; as alterações descritas na próxima seção pertencem ao ciclo seguinte.
+- A arquitetura e o primeiro ciclo de melhorias foram integrados pelo [PR #165](https://github.com/EduardoLafaiety/BasketballPractice/pull/165), commit `4eed541`.
 - Os itens futuros abaixo são propostas, sem prazo ou execução automática agendada. Registrar uma proposta aqui não significa que ela já foi implementada.
 
 ## Resumo da entrega
@@ -228,7 +228,7 @@ As contagens das verificações adicionais não devem ser somadas às suítes co
 
 ## Próximos passos propostos
 
-Esta fila organiza possibilidades futuras por impacto. Nenhum item abaixo está em execução ou possui data prometida.
+Esta fila registra a ordem original. Os itens 1, 2 e 6 foram entregues no ciclo do PR #165; os itens 3 e 4 foram parcialmente atendidos (versionamento e coordenação do envio). A revisão por sessão recebe o complemento descrito ao final deste documento. As demais propostas continuam sem data prometida.
 
 | Ordem sugerida | Proposta | Motivo | Critério de conclusão |
 | --- | --- | --- | --- |
@@ -255,7 +255,7 @@ Esta fila organiza possibilidades futuras por impacto. Nenhum item abaixo está 
 
 ## Ciclo seguinte — arquitetura, otimização e limpeza
 
-Estado: implementação validada localmente, em publicação para revisão e checks do GitHub. A organização está detalhada em [ARQUITETURA.md](ARQUITETURA.md).
+Estado: integrado pelo PR #165, commit `4eed541`. A organização está detalhada em [ARQUITETURA.md](ARQUITETURA.md).
 
 - Frontend organizado em app, funcionalidades e recursos compartilhados; testes acompanham suas funcionalidades.
 - Backend organizado por módulos, com extração de schemas, persistência de sessões, gerador e regras de programas.
@@ -291,3 +291,27 @@ A retirada do pré-carregamento global revelou uma transição para página não
 
 
 A limpeza do README publicada no PR #164 foi preservada. As instruções de instalação, ambiente, execução, testes e auditoria estão em [DESENVOLVIMENTO.md](DESENVOLVIMENTO.md).
+
+## Complemento — rejeições individuais na sincronização
+
+Estado: implementação validada localmente, na branch `codex/pendencias-por-sessao`, preparada para revisão no GitHub.
+
+- Correção do bloqueio da fila: rejeições HTTP 400, 404, 409 e 422 são associadas à sessão correspondente; os demais registros continuam sendo enviados.
+- Erro, correção de notas, nova tentativa e opção de desvincular programa aparecem no item correto. A desvinculação continua exigindo confirmação e não conclui o dia do programa.
+- Uma sessão rejeitada e inalterada não é reenviada automaticamente nesta montagem da interface. A ação individual repete apenas essa rejeição; a ação geral permite tentar todas novamente. Edição do registro libera nova tentativa.
+- Falhas de rede, servidor, autenticação, autorização e limite de pedidos interrompem a tentativa, preservando os itens restantes. HTTP 401/403 exige nova autenticação ou ação manual; falhas transitórias mantêm as tentativas já existentes.
+- Confirmações parciais invalidam os dados de evolução mesmo se outra sessão falhar depois. A chave de deduplicação, o isolamento por conta e a preservação de edições concorrentes são mantidos.
+- O estilo usa os componentes e classes retrô existentes. Não há novo serviço nem dependência.
+
+Arquivos principais: `frontend/src/features/sessao/model/treino-local.ts` e `frontend/src/features/sessao/components/SessoesPendentes.tsx`, com testes próximos aos módulos.
+
+Limites: os motivos das rejeições não são persistidos entre recarregamentos; a API os revalida na próxima abertura. A correção oferecida cobre notas e desvinculação de programa, sem editor completo de todos os campos.
+
+Validações executadas: 1.061 testes do frontend aprovados em 57 arquivos; três testes de recuperação/sincronização com Chrome e PostgreSQL real aprovados; builds de produção e demonstração aprovados; fronteiras de arquitetura verificadas. O teste de Evolução passou a aguardar a opção do exercício, eliminando uma corrida observada na suíte completa. Não houve alteração no backend; a suíte ponta a ponta completa permanece para os checks da PR.
+
+Próxima ordem sugerida após este complemento:
+
+1. Validar integralmente os rascunhos e dados locais, tornando registros incompatíveis visíveis e recuperáveis.
+2. Preparar explicitamente um treino para uso offline, com indicação dos recursos disponíveis.
+3. Integrar verificações de acessibilidade e limites de recursos ao CI a partir da auditoria existente.
+4. Paginar históricos e orientar o próximo treino com base nos registros disponíveis.

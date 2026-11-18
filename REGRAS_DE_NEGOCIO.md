@@ -1,6 +1,6 @@
 # Regras de negócio — Basketball Practice
 
-Atualizado em **18/11/2026**, incluindo o ciclo de reorganização e melhorias em validação após o PR #163.
+Atualizado em **18/11/2026**, incluindo o ciclo integrado pelo PR #165 e o complemento de revisão individual da fila em validação.
 
 Este documento descreve as regras observadas na implementação e os contratos que precisam ser preservados durante a refatoração. Regras identificadas como propostas ainda não representam comportamento implementado. Em caso de divergência, investigar código, testes e intenção do produto antes de alterar qualquer comportamento.
 
@@ -98,6 +98,8 @@ Fontes: `frontend/src/features/sessao/pages/SessaoGuiada.tsx`, `components/Conta
 - **RN-SI-07 — Confirmação:** o item sai da fila depois de envio confirmado. Trocar de conta ou perder a autenticação impede continuar o envio pela identidade anterior.
 - **RN-SI-08 — Saída:** logout explícito pede confirmação se houver dados de treino locais e os limpa ao prosseguir. Expiração preserva os dados para nova entrada. Exclusão da conta limpa os dados locais neste navegador.
 - **RN-SI-09 — Limites:** rascunho não acompanha o atleta entre aparelhos; limpar os dados do site remove os itens não enviados; não há sincronização garantida com o app fechado.
+- **RN-SI-10 — Rejeição individual:** respostas 400, 404, 409 e 422 pertencem ao registro rejeitado e não bloqueiam o envio dos demais. A mensagem e as ações de correção aparecem somente nesse registro. Uma rejeição inalterada aguarda edição ou tentativa manual nesta montagem da interface.
+- **RN-SI-11 — Interrupção do envio:** falhas de rede, servidor, autenticação, autorização e limite de pedidos interrompem a tentativa e preservam os itens restantes. Rejeições de acesso 401/403 bloqueiam novas tentativas automáticas até mudança de identidade ou ação manual.
 
 Fontes: `frontend/src/features/sessao/model/treino-local.ts`, `components/SessoesPendentes.tsx`, `auth.tsx`, `api.ts`, `backend/src/modules/sessions/sessions.routes.ts` e `backend/src/db/migrations.ts`.
 

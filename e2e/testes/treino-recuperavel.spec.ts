@@ -43,3 +43,29 @@ test('Postgres real serializa dois envios simultâneos com a mesma chave', async
   expect(a.id).toBe(b.id)
   expect(await (await request.get('/api/sessions', { headers: autorizacao(token) })).json()).toHaveLength(1)
 })
+
+test('uma sessão rejeitada não bloqueia a seguinte e pode ser corrigida individualmente', async ({ page, request }) => {
+  const { token } = await novaConta(request)
+  await entrarCom(page, token)
+  await page.goto('/')
+  await expect(page.locator('button[aria-controls="menu-tela"]:visible')).toBeVisible()
+  await page.evaluate((t) => {
+    const conta = JSON.parse(atob(t.split('.')[1].replace(/-/g, '+').replace(/_/g, '/'))).sub
+    for (const notas of ['inválida '.repeat(251), 'Treino válido']) {
+      const sessao = { clientId: crypto.randomUUID(), data: new Date().toISOString(), duracaoMin: 5, entradas: [], notas }
+      localStorage.setItem(`bp.treino.v2.${conta}.pendente.${sessao.clientId}`, JSON.stringify({ versao: 2, sessao }))
+    }
+    window.dispatchEvent(new Event('online'))
+  }, token)
+  const painel = page.getByRole('complementary', { name: 'Treinos neste aparelho' })
+  await expect(painel).toContainText('1 sessão(ões)')
+  await painel.getByText('Revisar sessões pendentes').click()
+  await expect(painel.getByRole('alert')).toBeVisible()
+  expect(await (await request.get('/api/sessions', { headers: autorizacao(token) })).json()).toHaveLength(1)
+  await painel.getByLabel('Corrigir notas').fill('Notas corrigidas')
+  await painel.getByLabel('Corrigir notas').press('Tab')
+  await expect(painel).toHaveCount(0)
+  const sessoes = await (await request.get('/api/sessions', { headers: autorizacao(token) })).json()
+  expect(sessoes).toHaveLength(2)
+  expect(sessoes.map((s: { notes: string }) => s.notes).sort()).toEqual(['Notas corrigidas', 'Treino válido'])
+})

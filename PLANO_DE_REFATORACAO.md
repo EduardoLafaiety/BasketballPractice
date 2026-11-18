@@ -1,6 +1,6 @@
 # Plano de refatoração, desempenho e experiência
 
-Atualizado em **18/11/2026**. Estado: **arquitetura reorganizada e primeiro ciclo de melhorias em validação**.
+Atualizado em **18/11/2026**. Estado: **arquitetura e primeiro ciclo integrados pelo PR #165; complemento de revisão individual da fila em validação**.
 
 A estrutura entregue está em [ARQUITETURA.md](ARQUITETURA.md). Já foram aplicados cache compartilhado, antecipação seletiva de rotas, suspensão de animações invisíveis, fila local por item, revisão de pendências, duração por exercício, escrita atômica da semana e comparação agregada no servidor. As fases abaixo continuam sendo a visão de evolução; nem todos os seus itens estão concluídos. A nova auditoria automatiza capturas e contagens locais, sem substituir medições em aparelhos reais ou dados de campo.
 
