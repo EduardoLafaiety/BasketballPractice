@@ -1,45 +1,5 @@
 /* Tudo em pixel art, como um jogo 8 bits. Duas fontes só: Pixelify Sans em quase tudo e Jersey 10 nos títulos e números grandes. O resto do visual pixelado fica em pixel.css. */
-:root {
-  /* Tema escuro (padrão) */
-  --bg: #1f2019;
-  --superficie: #26271f;
-  --superficie-2: #2f3027;
-  --borda: #45463a;
-  --texto: #f4f2ea;
-  --muted: #b5b3a6;
-  --laranja-texto: #ff8a33;
-  --erro: #ff6b6b;
-  --verde: #2fbf71;
-  --vermelho: #f25f5c;
-  /* Faixa de números: invertida em relação à página */
-  --faixa-bg: #f5f5f5;
-  --faixa-texto: #0b0b0b;
-  --faixa-muted: #525252;
-  --faixa-linha: #cfcfcf;
-  --faixa-destaque: #b8400a;
-  color-scheme: dark;
-  --fundo-quadra: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 620' preserveAspectRatio='xMidYMid slice'%3E%3Cg shape-rendering='crispEdges' fill='none' stroke='%2345463a' stroke-width='2'%3E%3Ccircle cx='500' cy='310' r='110'/%3E%3Ccircle cx='500' cy='310' r='245'/%3E%3Crect x='-40' y='190' width='240' height='240'/%3E%3Crect x='800' y='190' width='240' height='240'/%3E%3Cpath d='M500 -20V640M-40 40C120 40 240 170 240 310S120 580-40 580M1040 40C880 40 760 170 760 310S880 580 1040 580'/%3E%3C/g%3E%3C/svg%3E");
 
-  --laranja: #ff6a13;
-  --laranja-escuro: #d9530a;
-  --lateral: #0b0b0b;
-  --lateral-2: #1f1f1f;
-  --lateral-muted: #a3a3a3;
-  --raio: 0px;
-  --fonte-display: 'Jersey 10', 'Pixelify Sans Variable', 'Courier New', monospace;
-  --fonte-texto: 'Pixelify Sans Variable', 'Courier New', monospace;
-  --peso-display: 400;
-
-  --c-arremesso: #ff7a1a;
-  --c-drible: #4da3ff;
-  --c-passe: #43c59e;
-  --c-finalizacao: #c084fc;
-  --c-defesa: #f25f5c;
-  --c-condicionamento: #f5c542;
-
-  font-family: var(--fonte-texto);
-  line-height: 1.5;
-}
 
 /* Tema claro: pelo sistema, ou escolhido pelo atleta (data-theme vence o prefers-color-scheme) */
 @media (prefers-color-scheme: light) {

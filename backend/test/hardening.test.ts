@@ -5,7 +5,7 @@ import { z } from 'zod'
 import { assertProductionSecret } from '../src/config.js'
 import type { Database, Queryable } from '../src/db/index.js'
 import { MAX_ARRAY_ITEMS, parse } from '../src/lib/validate.js'
-import { ZONES } from '../src/routes/sessions.js'
+import { ZONES } from '../src/modules/sessions/sessions.routes.js'
 import { startApi } from './http.js'
 
 const { api, db, register } = await startApi()

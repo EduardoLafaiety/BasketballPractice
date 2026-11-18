@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { STYLES } from '../../../../backend/src/routes/styles'
+import { STYLES } from '../../../../backend/src/modules/styles/styles.routes'
 import { FOTOS_JOGADORES } from './fotos'
 
 describe('Fotos dos jogadores', () => {

@@ -1,8 +1,8 @@
 import '@testing-library/jest-dom/vitest'
 import { cleanup } from '@testing-library/react'
 import { afterEach, vi } from 'vitest'
-import { definirToken } from '../api'
-import { limparCache } from '../store'
+import { definirToken } from '../shared/api/backend'
+import { limparCache } from '../shared/data/recursos'
 
 // Avisos do React Router sobre a futura v7: não indicam problema e só poluem a saída.
 const avisar = console.warn

@@ -11,6 +11,15 @@
 .evolucao-tabela th, .evolucao-tabela td { padding: 0.75rem; text-align: left; border-bottom: 1px solid var(--borda); }
 .evolucao-tabela caption { text-align: left; }
 .pendentes { margin-bottom: 1rem; }
+.pendentes-lista { display: grid; gap: 1rem; padding-left: 1.5rem; }
+.pendentes-lista li { padding: 0.75rem; border: 1px solid var(--borda); }
+.pendentes-lista textarea { display: block; width: 100%; min-height: 5rem; }
+.rotina-item-acoes { display: flex; align-items: center; gap: 0.4rem; }
+.rotina-item-acoes label { display: grid; gap: 0.25rem; }
+.rotina-item-acoes input { width: 3.5rem; padding: 0.35rem; }
+@media (pointer: coarse) {
+  .guiada button, .pendentes button, .demo-controles button, .rotina-item-acoes button { min-height: 44px; min-width: 44px; }
+}
 @media (max-width: 560px) {
   .menu-tela .nav { gap: 1rem; }
   .nav-grupo .nav-link { font-size: 0.9rem; }

@@ -9,17 +9,18 @@ import { createPushSender, type PushSender } from './lib/push.js'
 import { requireAdmin, requireAuth } from './middleware/auth.js'
 import { errorHandler, notFoundHandler } from './middleware/errors.js'
 import { emailDoLogin, limitarTentativas, type LimiteTentativas } from './middleware/rate-limit.js'
-import { adminRouter } from './routes/admin.js'
-import { authRouter } from './routes/auth.js'
-import { dataRouter } from './routes/data.js'
-import { exercisesRouter } from './routes/exercises.js'
-import { plansRouter } from './routes/plans.js'
-import { programsRouter } from './routes/programs.js'
-import { pushCronRouter, pushRouter } from './routes/push.js'
-import { sessionsRouter } from './routes/sessions.js'
-import { settingsRouter } from './routes/settings.js'
-import { stylesRouter } from './routes/styles.js'
-import { workoutsRouter } from './routes/workouts.js'
+import { adminRouter } from './modules/admin/admin.routes.js'
+import { authRouter } from './modules/auth/auth.routes.js'
+import { dataRouter } from './modules/data/data.routes.js'
+import { exercisesRouter } from './modules/exercises/exercises.routes.js'
+import { plansRouter } from './modules/plans/plans.routes.js'
+import { programsRouter } from './modules/programs/programs.routes.js'
+import { pushCronRouter, pushRouter } from './modules/push/push.routes.js'
+import { sessionsRouter } from './modules/sessions/sessions.routes.js'
+import { settingsRouter } from './modules/settings/settings.routes.js'
+import { stylesRouter } from './modules/styles/styles.routes.js'
+import { workoutsRouter } from './modules/workouts/workouts.routes.js'
+import { routineRouter } from './modules/routine/routine.routes.js'
 
 export interface AppOptions {
   limiteTentativas?: LimiteTentativas
@@ -103,6 +104,7 @@ export function createApp(
   )
   app.use('/api/exercises', auth, exercisesRouter(db))
   app.use('/api/workouts', auth, workoutsRouter(db))
+  app.use('/api/routine', auth, routineRouter(db))
   app.use('/api/sessions', auth, sessionsRouter(db))
   app.use('/api/plans', auth, plansRouter(db))
   app.use('/api/programs', auth, programsRouter(db))
