@@ -115,3 +115,13 @@ textarea,
 optgroup {
   font-family: var(--fonte-texto);
 }
+
+/* Sem as linhas de quadra no fundo (círculos, garrafão e meia-quadra): o fundo fica liso. */
+.app::before,
+.linhas-quadra {
+  display: none;
+}
+.pagina-inicio > section:not(.abertura),
+.pagina-inicio .escada-fixa {
+  background-image: none;
+}
