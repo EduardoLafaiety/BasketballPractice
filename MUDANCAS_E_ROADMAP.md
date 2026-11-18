@@ -337,7 +337,7 @@ Sequência seguinte: concluir a revisão de contratos e persistência dos domín
 
 ## Etapa atual — contratos de treinos e backup
 
-Estado: implementação validada localmente, branch `codex/contratos-treinos-backup`, baseada na PR #167 integrada.
+Estado: implementação validada localmente e publicada no [PR #168](https://github.com/EduardoLafaiety/BasketballPractice/pull/168), branch `codex/contratos-treinos-backup`, baseada na PR #167 integrada. Commit de implementação: `1495cd3`.
 
 - Treinos: rotas delegam consulta, criação, edição e exclusão ao serviço; SQL e substituição ordenada de itens ficam no repositório. Validação e resposta de escrita pertencem à mesma transação; edição bloqueia o treino da conta.
 - Schema de exercício de treino unificado entre API e importação. A escrita de itens é compartilhada por treinos, rotina e backup, preservando séries, metas, notas, posições e IDs legados.
