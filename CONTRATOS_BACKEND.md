@@ -144,3 +144,57 @@ POST com entrada:
 Resposta 200: `{ "minutes": 30, "blocks": [...] }`; cada bloco contém `exerciseId`, `name`, `category`, `metric` e `minutes`. A lista vem somente do catálogo e dos exercícios próprios da conta, ordenada por ID antes do gerador. Mesma lista e mesmas opções com a mesma semente produzem o mesmo plano.
 
 O algoritmo permanece o existente: aquecimento precede a parte principal, respeita as opções disponíveis e a progressão do catálogo; exercícios próprios sem nível servem aos níveis solicitados. Ausência de opções no foco pode ampliar a seleção conforme o fallback legado. `exclude` é uma preferência, não uma proibição absoluta. Sem nenhum exercício visível, retorna 400. Gerar um plano não persiste treino ou sessão.
+
+## Autenticação — `/api/auth`
+
+Schemas em `auth.schema.ts`; casos de uso em `auth.service.ts`; persistência em `auth.repository.ts`.
+
+| Operação | Entrada e resultado |
+| --- | --- |
+| POST `/register` | `name`, `email`, `password`; 202 com mensagem genérica, sem autenticar; e-mail de ativação preparado após a resposta |
+| POST `/confirm` | `token`, `password` escolhida no cadastro; 201 com sessão após consumir o link |
+| POST `/login` | `email`, `password`; 200 com sessão ou 401 com mensagem genérica de credenciais incorretas |
+| POST `/forgot-password` | `email`; 202 com mensagem genérica, independentemente de existir conta |
+| POST `/reset-password` | `token`, `password` nova; 200 com sessão, consumindo o link e revogando acessos anteriores |
+| GET `/me` | Autenticado; 200 com usuário público |
+| POST `/logout` | Autenticado; 204, revogando a versão atual da conta em todos os aparelhos |
+| PUT `/password` | Autenticado; `currentPassword`, `newPassword`; 200 com sessão renovada |
+| DELETE `/me` | Autenticado; `password` atual; 204, excluindo a conta e seus dados; único administrador retorna 409 |
+
+Nome de cadastro: 2–80 caracteres após trim. E-mail é normalizado por trim e minúsculas. Senhas novas possuem 8–128 caracteres e seguem a política existente contra senhas óbvias. Login mantém compatibilidade com senhas antigas fracas. A senha atual informada na confirmação, troca ou exclusão aceita até 1.024 caracteres; senha incorreta nesses fluxos retorna 403, preservando o tratamento de sessão expirada reservado ao 401.
+
+Uma sessão contém `{ "token": "...", "user": { ... } }`. O usuário público possui somente `id`, `name`, `email`, `isAdmin` e `createdAt`; hash de senha e `tokenVersion` não são expostos nesse objeto. O JWT carrega a versão usada pela validação de revogação.
+
+Ativação vale por 24 horas e exige a senha escolhida no cadastro. Recuperação vale por 30 minutos. Tokens de link são guardados como hash; consumo único e atualização de conta são transacionais. A conta é bloqueada antes de consumir links de recuperação, seguindo a mesma ordem da troca de senha. Falha na gravação desfaz senha e versão de acesso juntas.
+
+O login verifica novamente, sob bloqueio, se o hash ainda é o mesmo que foi autenticado. Se a senha mudou durante a verificação, não assina um token da versão nova usando a credencial antiga. A troca e a exclusão verificam a senha atual dentro da transação; duas trocas simultâneas não podem usar novamente a senha anterior.
+
+Os limitadores de IP, conta, senha atual e envio de e-mail continuam em memória por instância. O serviço recebe uma função para controlar envio e um rastreador opcional de tarefas; não depende de Express ou do middleware de rate limit. A resposta 202 não garante entrega de e-mail: indisponibilidade do provedor ou encerramento do processo pode impedir o envio.
+
+## Administração — `/api/admin/users`
+
+Todas as operações exigem autenticação e papel administrativo no servidor.
+
+| Operação | Resultado |
+| --- | --- |
+| GET `/` | Usuários com identidade pública, quantidades de treinos/sessões e data da última sessão |
+| PATCH `/:id` | Corpo `{ "isAdmin": true }` ou `false`; 200 com resumo atualizado; alvo inexistente retorna 404 |
+| DELETE `/:id` | Remove a conta e seus dados em transação; 204 ou 404 para alvo inexistente |
+
+Alterar o próprio papel ou excluir a própria conta pelo painel retorna 400. Operações de escrita obtêm uma trava comum de composição administrativa e revalidam o papel do autor dentro da transação: um pedido que perdeu a permissão enquanto aguardava retorna 403. A exclusão pessoal usa a mesma trava, impedindo que remoções cruzadas deixem o sistema sem administrador.
+
+A ferramenta operacional `npm run admin -- email [--remover]` usa a mesma coordenação. Pode criar o primeiro administrador, mas recusa remover o papel do último, com erro e código de saída não zero. Ela continua exigindo acesso direto à configuração do servidor/banco, sem novo endpoint público. Escritas SQL externas que ignoram esse protocolo não recebem essa garantia.
+
+## Preferências — `/api/settings`
+
+GET `/` retorna preferências da conta; PUT `/` valida e substitui o objeto, respondendo 200 com os valores aplicados. Campos omitidos no PUT recebem padrões, não os valores anteriores. A conta é sempre obtida do token.
+
+| Campo | Regra e padrão |
+| --- | --- |
+| `theme` | `sistema`, `claro` ou `escuro`; padrão `sistema` |
+| `reminders.enabled` | Booleano, padrão `false` |
+| `reminders.time` | Horário `HH:MM`, padrão `18:00` |
+| `reminders.days` | Até sete inteiros de 0 a 6; padrão segunda a sexta `[1,2,3,4,5]` |
+| `metronomeBpm` | Inteiro de 30 a 240, padrão 90 |
+
+Leitura de um objeto persistido inválido retorna o conjunto de padrões. Schema, serviço e repositório são independentes do transporte; a escrita aceita a conexão da transação, preservando a atomicidade da importação de backup e a leitura do snapshot de exportação.

@@ -1,6 +1,6 @@
 # Plano de refatoração, desempenho e experiência
 
-Atualizado em **18/11/2026**. Estado: **PRs #165 a #168 integradas; arquitetura de exercícios, programas e planos validada localmente**.
+Atualizado em **18/11/2026**. Estado: **PRs #165 a #169 integradas; autenticação, administração e preferências validadas localmente**.
 
 Prioridade atual: concluir a arquitetura do backend antes de alterar o frontend, conforme orientação do usuário. Sessões, rotina, treinos e backup separam transporte, casos de uso e persistência, com validação dos limites transacionais e contratos existentes. Recuperação local e preparação offline ficam depois do fechamento dessa etapa de backend.
 
@@ -8,7 +8,7 @@ Fila para concluir o backend, em PRs por fluxo:
 
 1. Concluir os contratos de treinos e backup, documentar compatibilidade e validar concorrência e rollback.
 2. Exercícios, programas e planos: separação implementada e validada localmente; catálogo, gerador, progressão e coordenação das escritas verificados.
-3. Revisar autenticação, administração e preferências: explicitar contratos e dependências, preservando revogação, tokens de uso único e isolamento por conta.
+3. Autenticação, administração e preferências: separação implementada e validada localmente; contratos documentados, credenciais revalidadas e alterações administrativas coordenadas, preservando revogação e uso único de links.
 4. Revisar notificações e estilos de jogo, limites de concorrência e tratamento das falhas externas.
 5. Fechar verificações de arquitetura e compatibilidade dos endpoints, testes e documentação dos domínios migrados. Só então iniciar mudanças no frontend.
 

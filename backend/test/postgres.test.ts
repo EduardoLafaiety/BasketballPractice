@@ -107,6 +107,57 @@ describe('Postgres de verdade', { skip: ADMIN_URL ? false : 'defina TEST_POSTGRE
     assert.equal(await quantasSessoes(id), 3)
   })
 
+  it('contas serializam mudanças cruzadas de administrador e revalidam o autor', { timeout: 20_000 }, async () => {
+    const a = await conta(), b = await conta()
+    await db.query('UPDATE users SET is_admin = true WHERE id = ANY($1)', [[a.id, b.id]])
+    const lock = new pg.Client({ connectionString: urlDoBanco() })
+    await lock.connect()
+    try {
+      await lock.query('SELECT pg_advisory_lock(4247)')
+      const pending = Promise.all([
+        api('PATCH', `/admin/users/${b.id}`, { isAdmin: false }, a.token),
+        api('PATCH', `/admin/users/${a.id}`, { isAdmin: false }, b.token),
+      ])
+      try {
+        let waiting = 0
+        for (let attempt = 0; attempt < 100; attempt++) {
+          waiting = (await admin("SELECT 1 FROM pg_stat_activity WHERE datname = $1 AND wait_event_type = 'Lock' AND query LIKE '%pg_advisory_xact_lock(4247)%'", [BANCO])).rows.length
+          if (waiting === 2) break
+          await espera(20)
+        }
+        assert.equal(waiting, 2, 'os dois pedidos passaram no middleware e aguardam a trava de alteração')
+      } finally { await lock.query('SELECT pg_advisory_unlock(4247)') }
+      assert.deepEqual((await pending).map((r) => r.status).sort(), [200, 403])
+      assert.equal((await db.query('SELECT id FROM users WHERE id = ANY($1) AND is_admin', [[a.id, b.id]])).rows.length, 1)
+    } finally {
+      await lock.end()
+      await db.query('UPDATE users SET is_admin = false WHERE id = ANY($1)', [[a.id, b.id]])
+    }
+  })
+
+  it('contas serializam trocas de senha e não aceitam novamente a senha antiga', { timeout: 20_000 }, async () => {
+    const user = await conta()
+    const passwords = ['senha-primeira-na-quadra', 'senha-segunda-na-quadra']
+    let pending!: Promise<Awaited<ReturnType<typeof api>>[]>
+    await db.transaction(async (tx) => {
+      await tx.query('SELECT 1 FROM users WHERE id = $1 FOR UPDATE', [user.id])
+      pending = Promise.all(passwords.map((newPassword) => api('PUT', '/auth/password', { currentPassword: 'senha-segura', newPassword }, user.token)))
+      let waiting = 0
+      for (let attempt = 0; attempt < 100; attempt++) {
+        waiting = (await admin("SELECT 1 FROM pg_stat_activity WHERE datname = $1 AND wait_event_type = 'Lock' AND (query LIKE '%FROM users WHERE id =%' OR query LIKE 'UPDATE users SET password_hash%')", [BANCO])).rows.length
+        if (waiting === 2) break
+        await espera(20)
+      }
+      assert.equal(waiting, 2, 'ambos os pedidos autenticados aguardam a conta antes de alterar credenciais')
+    })
+    const responses = await pending
+    assert.deepEqual(responses.map((r) => r.status).sort(), [200, 403])
+    const winner = responses.findIndex((r) => r.status === 200)
+    assert.equal((await api('POST', '/auth/login', { email: user.email, password: passwords[winner] })).status, 200)
+    assert.equal((await api('POST', '/auth/login', { email: user.email, password: 'senha-segura' })).status, 401)
+    assert.equal((await api('GET', '/auth/me', undefined, user.token)).status, 401)
+  })
+
   it('programas serializam reinício, conclusão e saída por conta', { timeout: 20_000 }, async () => {
     const owner = await conta(), other = await conta()
     const path = '/programs/arremesso-30'

@@ -355,7 +355,7 @@ A orientação vigente é concluir o backend antes do frontend. A fila restante 
 
 ## Etapa atual — exercícios, programas e planos
 
-Estado: implementação validada localmente e publicada no [PR #169](https://github.com/EduardoLafaiety/BasketballPractice/pull/169), branch `codex/arquitetura-exercicios-programas-planos`, baseada na PR #168 integrada. Commit de implementação: `cf95857`.
+Estado: integrado pelo [PR #169](https://github.com/EduardoLafaiety/BasketballPractice/pull/169), commit `23913ce`, com todos os checks aprovados. Commit de implementação: `cf95857`.
 
 - Exercícios: consultas, gravações e exclusão movidas para repositório; serviço preserva visibilidade por conta, catálogo protegido e conflito de referência em uso. Edição/exclusão verificam propriedade dentro da transação e bloqueiam o registro.
 - Programas: validação de parâmetros/corpo em schema; status e data local em modelo próprio; leitura e escrita de progresso em repositório; serviço concentra lista, detalhe, início, saída e conclusão.
@@ -369,3 +369,21 @@ Validações: 181 testes da API aprovados; dois cenários de coordenação de pr
 Limites: não adiciona endpoints, tabelas, dependências ou mudanças de interface. Não altera o algoritmo de geração nem prescreve o próximo treino. Leituras de progresso continuam sem snapshot único entre consultas; a trava por conta coordena escritas, sem controle otimista de versão entre dispositivos.
 
 Depois desta entrega, permanecem no backend autenticação, administração e preferências; notificações e estilos; revisão final de contratos, dependências e validações. O frontend só entra após esse fechamento.
+
+## Etapa atual — autenticação, administração e preferências
+
+Estado: implementação validada localmente na branch `codex/arquitetura-contas-permissoes`, baseada na PR #169 integrada, preparada para revisão no GitHub.
+
+- Autenticação separada em schema, serviço e repositório. Rotas preservam respostas, proteção HTTP e tarefas de e-mail disparadas após o 202; serviço recebe provedor e controle de envios por injeção, sem depender do middleware.
+- Sessões públicas montadas por campos explícitos. Login revalida o hash antes de assinar a versão do token; troca e exclusão verificam a senha atual dentro da transação. Ordem de bloqueio de conta antes dos links de recuperação, consumo único e revogação preservados.
+- Administração separada em contrato, serviço e repositório; papel do autor revalidado dentro da transação. Exclusão pessoal e alterações administrativas usam a mesma trava de composição para impedir perda do último administrador por ações cruzadas.
+- Ferramenta `make-admin` delega ao serviço: bootstrap do primeiro administrador preservado; remover o último passa a ser recusado com erro. Consultas de versão/papel e trava compartilhada ficam em `db/account-access.ts`; middleware não executa SQL diretamente.
+- Preferências ganham repositório, mantendo padrões, fallback de dados inválidos, formato e participação na transação/snapshot do backup.
+- Contratos e regras atualizados, com guardas de arquitetura estendidas aos três módulos. CI passa a incluir sete cenários de conta em PostgreSQL real, além dos cinco de backup/programas.
+- Cobertura nova: login durante mudança de credenciais, rollback de senha/versão ao falhar limpeza de links, revalidação de autor e proteção do último administrador na ferramenta; corridas reais de troca de senha e alterações cruzadas de papéis.
+
+Validações locais: 184 testes da API aprovados; sete cenários de conta em PostgreSQL real aprovados, com barreiras garantindo pedidos concorrentes já autenticados; 24 testes ponta a ponta com Chrome/PostgreSQL e 15 testes dos adaptadores HTTP/demonstração aprovados. Builds de backend, produção e demonstração, typecheck e arquitetura aprovados. Guardas testadas com violações temporárias nos três módulos e sondas removidas em seguida. Os testes opcionais restantes de infraestrutura PostgreSQL não foram executados nesta etapa.
+
+Limites: sem tabela, endpoint, dependência, provedor ou mudança de interface. E-mail continua sem fila durável; limitadores seguem por instância. Revogação não cancela automaticamente toda operação já em andamento. Escritas SQL externas que ignoram a coordenação oficial não recebem a garantia de composição administrativa.
+
+Próximo bloco ainda no backend: notificações e estilos; depois revisão final dos contratos e fronteiras, testes e documentação dos módulos migrados. O frontend permanece posterior ao fechamento do backend.
