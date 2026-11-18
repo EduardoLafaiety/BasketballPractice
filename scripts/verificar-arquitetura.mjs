@@ -1,5 +1,6 @@
 import { readdirSync, readFileSync, existsSync, statSync } from 'node:fs'
 import { resolve, dirname, relative } from 'node:path'
+import { spawnSync } from 'node:child_process'
 
 const raiz = resolve(import.meta.dirname, '..')
 const normalizar = (p) => relative(raiz, p).replaceAll('\\', '/')
@@ -7,6 +8,8 @@ function arquivos(p) {
   return readdirSync(p, { withFileTypes: true }).flatMap((e) => e.isDirectory() ? arquivos(resolve(p, e.name)) : [resolve(p, e.name)])
 }
 const erros = []
+const ignorados = spawnSync('git', ['ls-files', '--others', '--ignored', '--exclude-standard', '--', 'backend/src', 'frontend/src'], { cwd: raiz, encoding: 'utf8' })
+if (ignorados.status === 0) for (const p of ignorados.stdout.trim().split('\n').filter((p) => /\.(ts|tsx|mjs)$/.test(p))) erros.push(`Código-fonte ignorado pelo Git: ${p}`)
 for (const arquivo of ['frontend/src', 'backend/src'].flatMap((p) => arquivos(resolve(raiz, p))).filter((p) => /\.(ts|tsx)$/.test(p) && !/\.test\./.test(p))) {
   const origem = normalizar(arquivo)
   const texto = readFileSync(arquivo, 'utf8')

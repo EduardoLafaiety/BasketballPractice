@@ -78,7 +78,7 @@ describe('Jogue como', () => {
     abrir('/jogue-como/luka-doncic')
     await userEvent.click(await screen.findByRole('button', { name: 'Começar este treino' }))
     await waitFor(() => expect(screen.getByTestId('caminho')).toHaveTextContent('/sessao'))
-    expect(screen.getByRole('heading', { name: 'Jogue como Luka Dončić' })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: 'Jogue como Luka Dončić' })).toBeInTheDocument()
     expect(screen.getByText(/3 exercícios · 34 min/)).toBeInTheDocument()
   })
 
