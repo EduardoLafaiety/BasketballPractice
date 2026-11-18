@@ -2,9 +2,9 @@
 // Gravações: CMU Graphics Lab Motion Capture Database (http://mocap.cs.cmu.edu), conversão BVH de Bruce Hahne.
 import { ARO } from './motor'
 import { ESCALA, v3 } from './corpo3d'
-import { construirBola, duracao, momentoDaSoltura, poseEm, toques, yawParaOlharAMais, type Arremesso, type BolaMocap, type Clipe, type Colocacao3D } from './mocap'
+import { construirBola, duracao, momentoDaSoltura, momentoDoPasse, poseEm, toques, yawParaOlharAMais, type Arremesso, type BolaMocap, type Clipe, type Colocacao3D } from './mocap'
 
-export type IdClipe = '06_02' | '06_08' | '06_13' | '06_14' | '06_15' | '124_06' | '124_05' | '124_11' | '13_40' | '118_01'
+export type IdClipe = '141_11' | '06_02' | '06_08' | '06_13' | '06_14' | '06_15' | '124_06' | '124_05' | '124_11' | '13_40' | '118_01'
 
 /** Exercício (pelo nome do catálogo) → clipe real que o mostra. */
 export const MOCAP_DE_EXERCICIO: Record<string, IdClipe> = {
@@ -24,10 +24,14 @@ export const MOCAP_DE_EXERCICIO: Record<string, IdClipe> = {
   'Agachamento com salto': '13_40',
   'Saltos com aterrissagem controlada': '118_01',
   'Saltos curtos de tornozelo': '124_11',
+  'Passe de peito no alvo': '141_11',
 }
 
+/** Clipes de passe de peito: a bola vai nas duas mãos, sai no empurrão e voa reta até o alvo. */
+const PASSE: IdClipe[] = ['141_11']
+
 /** Clipes em que o jogador só leva a bola (sem quicar): bandeja e arremesso em suspensão. */
-const SEM_QUIQUE: IdClipe[] = ['124_06', '124_05']
+const SEM_QUIQUE: IdClipe[] = ['124_06', '124_05', '141_11']
 /** Clipes de saltos: sem bola. */
 const SEM_BOLA: IdClipe[] = ['124_11', '13_40', '118_01']
 /** Distância (m) do jogador à cesta na hora da soltura: bandeja perto, arremesso em suspensão de média distância. */
@@ -46,6 +50,7 @@ const CARREGADORES: Record<IdClipe, () => Promise<{ default: unknown }>> = {
   '124_11': () => import('./mocap/124_11.json'),
   '13_40': () => import('./mocap/13_40.json'),
   '118_01': () => import('./mocap/118_01.json'),
+  '141_11': () => import('./mocap/141_11.json'),
 }
 
 export async function carregarClipe(id: IdClipe): Promise<Clipe> {
@@ -68,19 +73,27 @@ export interface CenaMocap {
 export function prepararCena(clipe: Clipe, id?: IdClipe): CenaMocap {
   const semBola = !!id && SEM_BOLA.includes(id)
   const ev = id && SEM_QUIQUE.includes(id) ? [] : toques(clipe)
-  const soltura = semBola ? null : momentoDaSoltura(clipe, ev)
+  const ehPasse = !!id && PASSE.includes(id)
+  const soltura = semBola ? null : ehPasse ? momentoDoPasse(clipe) : momentoDaSoltura(clipe, ev)
   const yaw = yawParaOlharAMais(clipe, soltura ?? 0)
   const cestaX = ARO.lado.x * ESCALA
   let origemX = 1.5
+  let pelveNaSoltura = 0
   if (soltura !== null) {
     const p0 = poseEm(clipe, 0).Hips
     const ps = poseEm(clipe, soltura).Hips
     const dx = ps.x - p0.x
     const dz = ps.z - p0.z
-    const relX = dx * Math.cos(-yaw) - dz * Math.sin(-yaw)
-    origemX = cestaX - ((id && DISTANCIA_DA_CESTA[id]) || 5.2) - relX
+    pelveNaSoltura = dx * Math.cos(-yaw) - dz * Math.sin(-yaw)
+    // Arremesso: a uma distância da cesta. Passe: no meio da quadra, com o alvo a 5 m à frente.
+    origemX = (ehPasse ? 3 : cestaX - ((id && DISTANCIA_DA_CESTA[id]) || 5.2)) - pelveNaSoltura
   }
   const colocacao: Colocacao3D = { yaw, origem: v3(origemX, 0, 0) }
-  const arremesso = soltura === null ? null : { t: soltura, cesta: v3(cestaX, 3.05, 0) }
+  let arremesso: Arremesso | null = null
+  if (soltura !== null) {
+    arremesso = ehPasse
+      ? { t: soltura, cesta: v3(origemX + pelveNaSoltura + 5, 1.15, 0), pico: 0.12, voo: 620 }
+      : { t: soltura, cesta: v3(cestaX, 3.05, 0) }
+  }
   return { clipe, colocacao, bola: semBola ? null : construirBola(clipe, ev), arremesso, total: duracao(clipe) + (soltura === null ? 0 : DEPOIS_DA_SOLTURA) }
 }

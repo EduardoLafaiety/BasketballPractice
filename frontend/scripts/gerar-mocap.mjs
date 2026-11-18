@@ -26,6 +26,8 @@ const CLIPES_PADRAO = {
   '124_11': { de: 1.0, ate: 5.2 },
   '13_40': { de: 0.1, ate: 2.7 },
   '118_01': { de: 2.7, ate: 5.0 },
+  // passe de peito (lançar e pegar a bola com as duas mãos)
+  '141_11': { de: 0.2, ate: 5.6 },
 }
 // Clipes: arquivo, intervalo (s) aproveitado. CLIPES (JSON no ambiente) troca a lista, para experimentar.
 const CLIPES = process.env.CLIPES ? JSON.parse(process.env.CLIPES) : CLIPES_PADRAO

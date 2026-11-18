@@ -78,7 +78,7 @@ describe('exercícios com movimento real', () => {
 })
 
 describe('todos os clipes, do jeito que a cena os usa', () => {
-  for (const id of ['06_02', '06_08', '06_13', '06_14', '06_15', '124_06', '124_05', '124_11', '13_40', '118_01'] as const) {
+  for (const id of ['06_02', '06_08', '06_13', '06_14', '06_15', '124_06', '124_05', '124_11', '13_40', '118_01', '141_11'] as const) {
     it(`${id}: ossos fixos, pés no chão, bola válida`, async () => {
       const cena = prepararCena(await carregarClipe(id), id)
       for (let t = 0; t <= cena.total; t += 1000 / 30) {
@@ -105,5 +105,20 @@ describe('todos os clipes, do jeito que a cena os usa', () => {
     expect(fim.bolas[0].centro.y).toBeLessThan(0.5)
     const perto = Math.abs(bandeja.arremesso!.cesta.x - corpoMocap(bandeja.clipe, bandeja.arremesso!.t, bandeja.colocacao, bandeja.bola, bandeja.arremesso).pelve.x)
     expect(perto).toBeLessThan(2)
+  })
+})
+
+describe('passe de peito real', () => {
+  it('a bola sai do peito no empurrão e vai reta, a uns 5 m, na altura do peito', async () => {
+    const cena = prepararCena(await carregarClipe('141_11'), '141_11')
+    expect(cena.arremesso).not.toBeNull()
+    const sai = corpoMocap(cena.clipe, cena.arremesso!.t, cena.colocacao, cena.bola, cena.arremesso)
+    expect(sai.bolas[0].centro.y).toBeGreaterThan(0.9)
+    expect(sai.bolas[0].centro.y).toBeLessThan(1.7)
+    const chega = corpoMocap(cena.clipe, cena.arremesso!.t + 620, cena.colocacao, cena.bola, cena.arremesso)
+    const dist = chega.bolas[0].centro.x - sai.bolas[0].centro.x
+    expect(dist).toBeGreaterThan(4)
+    expect(dist).toBeLessThan(6.5)
+    expect(Math.abs(chega.bolas[0].centro.z)).toBeLessThan(0.6)
   })
 })
