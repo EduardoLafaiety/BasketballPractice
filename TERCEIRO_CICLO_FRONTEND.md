@@ -69,3 +69,5 @@ Backlog, sem execução automática neste ciclo:
 3. Medir histórico grande antes de escolher paginação por cursor ou agregados persistidos, preservando equivalência das fórmulas.
 4. Adotar baseline visual aprovado por navegador/ambiente quando houver necessidade de bloquear diferenças de pixels.
 5. Avaliar fila durável de e-mail/notificações apenas quando os requisitos de entrega e operação justificarem a infraestrutura.
+
+Entrega publicada no [PR #177](https://github.com/EduardoLafaiety/BasketballPractice/pull/177), branch codex/otimizacao-operacao. A integração permanece condicionada aos checks aprovados do commit final.

@@ -448,3 +448,5 @@ Implementação na branch codex/otimizacao-operacao, a partir do PR #176 integra
 Próximos trabalhos: métricas reais e política de retenção, ensaio integral do banco com RPO/RTO observados, histórico grande medido, baseline visual aprovado e eventual fila durável. Não iniciados neste ciclo.
 
 Validação local deste ciclo: 1.110 testes do frontend, 193 da API, 27 de PostgreSQL real, 29 jornadas, sete testes de arquitetura, um de orçamento e três cenários de auditoria com 20 capturas aprovados. Builds de API, produção e demonstração aprovados. Integração condicionada ao commit final aprovado no GitHub.
+
+Entrega publicada no [PR #177](https://github.com/EduardoLafaiety/BasketballPractice/pull/177), branch codex/otimizacao-operacao. A integração permanece condicionada aos checks aprovados do commit final.
