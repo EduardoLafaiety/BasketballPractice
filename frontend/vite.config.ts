@@ -2,7 +2,7 @@
 import { fileURLToPath } from 'node:url'
 import { defineConfig, loadEnv, type Plugin } from 'vite'
 import react from '@vitejs/plugin-react'
-import { conteudoAdsTxt, idEditor } from './src/lib/adsense'
+import { conteudoAdsTxt, idEditor } from './src/shared/lib/adsense'
 
 const local = (caminho: string) => fileURLToPath(new URL(caminho, import.meta.url))
 
@@ -36,7 +36,7 @@ export default defineConfig(({ mode }) => {
         { find: /^@demo\/servidor$/, replacement: local(demo ? './src/demo/servidor.ts' : './src/demo/sem-demo.ts') },
         { find: /^express$/, replacement: local('./src/demo/express.ts') },
         { find: /^pg$/, replacement: local('./src/demo/stubs.ts') },
-        { find: /^\.\.\/lib\/token\.js$/, replacement: local('./src/demo/stubs.ts') },
+        { find: /^(?:\.\.\/)+lib\/token\.js$/, replacement: local('./src/demo/stubs.ts') },
       ],
     },
     // O 3D das demonstrações (three.js) é um arquivo à parte, baixado só quando uma demonstração aparece.

@@ -1,0 +1,150 @@
+import { screen, within } from '@testing-library/react'
+import { describe, expect, it, vi } from 'vitest'
+import { definirToken } from '../../../shared/api/backend'
+import { apiFalsa, configFalsa, Resposta, usuarioFalso } from '../../../test/api-falsa'
+import { abrirApp } from '../../../test/renderizar'
+
+const catalogo = [
+  { id: 1, name: 'Lance livre', category: 'arremesso', metric: 'acertos', description: 'Da linha', custom: false },
+  { id: 2, name: 'Suicídio', category: 'condicionamento', metric: 'tempo', description: null, custom: false },
+  { id: 3, name: 'Crossover', category: 'drible', metric: 'repeticoes', description: null, custom: false },
+]
+
+const resumo = (sessions: number, minutes: number, makes: number, attempts: number) => ({
+  totals: { sessions, minutes, averageRating: null },
+  shooting: { makes, attempts, percentage: null },
+  byWeek: [],
+})
+
+const meta = (extra: object) => ({
+  id: 1,
+  title: 'Treinar 3x',
+  kind: 'sessoes_semana',
+  target: 3,
+  current: 1,
+  achieved: false,
+  exerciseId: null,
+  exerciseName: null,
+  deadline: null,
+  ...extra,
+})
+
+/** Rotina com um treino "bp-rotina:<dia>" por dia informado. */
+function rotinaDe(dias: Record<number, number[]>) {
+  const treinos = Object.entries(dias).map(([dia, ids]) => ({
+    id: 10 + Number(dia),
+    name: `Rotina ${dia}`,
+    description: `bp-rotina:${dia}`,
+    exercises: ids.map((exerciseId) => ({ exerciseId })),
+  }))
+  return {
+    'GET /workouts': treinos.map(({ exercises: _, ...resumo }) => resumo),
+    'GET /workouts/:id': (_c: unknown, _u: URL, { id }: Record<string, string>) =>
+      treinos.find((t) => t.id === Number(id)) ?? new Resposta(404),
+  }
+}
+
+// Quarta-feira, 28/10/2026, 10h em São Paulo (o fuso dos testes).
+const QUARTA = new Date('2026-10-28T10:00:00-03:00')
+
+function abrirInicio(rotas: Parameters<typeof apiFalsa>[0] = {}) {
+  vi.useFakeTimers({ toFake: ['Date'] })
+  vi.setSystemTime(QUARTA)
+  definirToken('tk')
+  const api = apiFalsa({
+    'GET /auth/me': usuarioFalso(),
+    'GET /settings': configFalsa,
+    'GET /exercises': catalogo,
+    'GET /stats/summary': resumo(4, 95, 30, 40),
+    'GET /stats/progress': { streak: { current: 3, best: 5 }, achievements: [] },
+    'GET /goals': [],
+    ...rotinaDe({}),
+    ...rotas,
+  })
+  abrirApp('/')
+  return api
+}
+
+describe('Início', () => {
+  it('a abertura fica só com o título: sem o cartão de convite, sequência ou meta', async () => {
+    abrirInicio({ 'GET /goals': [meta({ id: 2, title: '100 cestas', kind: 'cestas_total', target: 100, current: 42 })] })
+    expect(await screen.findByRole('heading', { name: 'Treino de hoje' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Bora pra quadra.')
+    expect(screen.queryByText(/dias? seguidos?/)).toBeNull()
+    expect(screen.queryByRole('link', { name: /Meta:/ })).toBeNull()
+    expect(screen.queryByText(/Que tal 15 minutos/)).toBeNull()
+    expect(screen.queryByRole('link', { name: 'Gerar treino rápido' })).toBeNull()
+  })
+
+  it('a página mostra os níveis com a contagem real, a rotina da semana e todos os jogadores', async () => {
+    const estilo = (id: string, name: string) => ({ id, name, group: 'guard', archetype: 'Estilo', moveCount: 3, minutes: 40, mix: { arremesso: 100 } })
+    const doNivel = (id: number, level: string, warmup = false) => ({ id, name: `Exercício ${id}`, category: 'drible', metric: 'tempo', description: null, custom: false, level, warmup })
+    abrirInicio({
+      'GET /exercises': [doNivel(1, 'iniciante'), doNivel(2, 'iniciante'), doNivel(3, 'iniciante', true), doNivel(4, 'avancado'), ...catalogo],
+      'GET /styles': [estilo('luka-doncic', 'Luka Dončić'), estilo('stephen-curry', 'Stephen Curry')],
+      ...rotinaDe({ 1: [1] }),
+    })
+
+    const iniciante = (await screen.findByRole('heading', { name: 'Iniciante' })).closest('a') as HTMLElement
+    expect(iniciante).toHaveAttribute('href', '/treinos?nivel=iniciante')
+    // O aquecimento não conta como exercício do nível.
+    await within(iniciante).findByText('2 exercícios')
+    expect(within(screen.getByRole('heading', { name: 'Avançado' }).closest('a') as HTMLElement).getByText('1 exercícios')).toBeInTheDocument()
+
+    // Os dois jogadores têm link; os nomes que correm são decoração e não repetem o link.
+    expect(await screen.findByRole('link', { name: /Luka Dončić/ })).toHaveAttribute('href', '/jogue-como/luka-doncic')
+    expect(screen.getAllByRole('link', { name: /Dončić|Curry/ })).toHaveLength(2)
+    const nomes = document.querySelector('.nomes-linha') as HTMLElement
+    expect(nomes).toHaveTextContent('Luka Dončić')
+    expect(nomes).toHaveAttribute('aria-hidden', 'true')
+    expect(nomes.querySelector('a')).toBeNull()
+
+    const segunda = (await screen.findByRole('heading', { name: 'Seg' })).closest('article') as HTMLElement
+    await within(segunda).findByText('Exercício 1')
+    expect(screen.getByRole('heading', { name: 'Ter' }).closest('article')).toHaveTextContent('Descanso')
+  })
+
+  it('sem resposta dos jogadores, o resto da página continua', async () => {
+    abrirInicio({ 'GET /styles': new Resposta(500) })
+    expect(await screen.findByRole('heading', { name: 'Treino de hoje' })).toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: 'Jogue como' })).toBeNull()
+  })
+
+  it('lista o treino da rotina de hoje e leva à sessão do dia', async () => {
+    abrirInicio(rotinaDe({ 3: [3, 1], 4: [2] }))
+
+    const hoje = (await screen.findByRole('heading', { name: 'Treino de hoje' })).closest('section') as HTMLElement
+    const cartoes = await within(hoje).findAllByRole('link', { name: /Crossover|Lance livre|Suicídio/ })
+    expect(cartoes.map((c) => c.querySelector('h3')?.textContent)).toEqual(['Crossover', 'Lance livre'])
+    expect(cartoes[1]).toHaveAttribute('href', '/treinos/1')
+    expect(within(hoje).getByRole('link', { name: 'Começar treino de hoje' })).toHaveAttribute('href', '/sessao?hoje')
+  })
+
+  it('sem treino planejado para hoje, deixa só o link da rotina', async () => {
+    abrirInicio(rotinaDe({ 4: [2] }))
+
+    expect(await screen.findByRole('heading', { name: 'Treino de hoje' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Editar rotina' })).toHaveAttribute('href', '/rotina')
+    expect(screen.queryByRole('link', { name: /Adicione à rotina/ })).toBeNull()
+    expect(screen.queryByRole('link', { name: /Começar treino de hoje/ })).toBeNull()
+  })
+
+  it('no dia de descanso oferece montar a rotina ou treinar mesmo assim', async () => {
+    abrirInicio(rotinaDe({ 4: [2] }))
+
+    const hoje = (await screen.findByRole('heading', { name: 'Treino de hoje' })).closest('section') as HTMLElement
+    expect(await within(hoje).findByText(/dia de descanso/)).toBeInTheDocument()
+    expect(within(hoje).getByRole('link', { name: /Montar a rotina/ })).toHaveAttribute('href', '/rotina')
+    expect(within(hoje).getByRole('link', { name: 'Treinar mesmo assim' })).toHaveAttribute('href', '/treinos')
+  })
+
+  it('o treino de hoje vem antes da abertura animada', async () => {
+    abrirInicio(rotinaDe({ 3: [3] }))
+
+    const hoje = await screen.findByRole('heading', { name: 'Treino de hoje' })
+    const abertura = screen.getByRole('heading', { level: 1 })
+    expect(hoje.compareDocumentPosition(abertura) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+  })
+
+})
+

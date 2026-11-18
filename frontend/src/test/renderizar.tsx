@@ -1,11 +1,11 @@
 import { render } from '@testing-library/react'
 import type { ComponentProps } from 'react'
 import { MemoryRouter, useLocation } from 'react-router-dom'
-import App from '../App'
-import { AuthProvider } from '../auth'
+import App from '../app/App'
+import { AuthProvider } from '../features/autenticacao/model/auth'
 // No site o Início é baixado à parte, em paralelo com a entrada. Aqui ele já vem carregado, para o primeiro
 // teste de cada arquivo não depender do tempo de leitura do módulo.
-import '../pages/Inicio'
+import '../features/inicio/pages/Inicio'
 
 type Rota = NonNullable<ComponentProps<typeof MemoryRouter>['initialEntries']>[number]
 

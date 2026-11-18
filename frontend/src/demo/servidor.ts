@@ -3,14 +3,15 @@
 import { PGlite, type Transaction } from '@electric-sql/pglite'
 import { one, prepareDatabase, type Database, type Queryable } from '../../../backend/src/db/index'
 import { errorHandler, notFoundHandler } from '../../../backend/src/middleware/errors'
-import { dataRouter } from '../../../backend/src/routes/data'
-import { exercisesRouter } from '../../../backend/src/routes/exercises'
-import { plansRouter } from '../../../backend/src/routes/plans'
-import { programsRouter } from '../../../backend/src/routes/programs'
-import { sessionsRouter } from '../../../backend/src/routes/sessions'
-import { settingsRouter } from '../../../backend/src/routes/settings'
-import { stylesRouter } from '../../../backend/src/routes/styles'
-import { workoutsRouter } from '../../../backend/src/routes/workouts'
+import { dataRouter } from '../../../backend/src/modules/data/data.routes'
+import { exercisesRouter } from '../../../backend/src/modules/exercises/exercises.routes'
+import { plansRouter } from '../../../backend/src/modules/plans/plans.routes'
+import { programsRouter } from '../../../backend/src/modules/programs/programs.routes'
+import { sessionsRouter } from '../../../backend/src/modules/sessions/sessions.routes'
+import { settingsRouter } from '../../../backend/src/modules/settings/settings.routes'
+import { stylesRouter } from '../../../backend/src/modules/styles/styles.routes'
+import { workoutsRouter } from '../../../backend/src/modules/workouts/workouts.routes'
+import { routineRouter } from '../../../backend/src/modules/routine/routine.routes'
 import { RespostaDemo, type PedidoDemo, type RouterDemo } from './express'
 
 /** O atleta da demonstração: único, sem senha, nunca admin. */
@@ -74,6 +75,7 @@ export async function criarServidor({ dados }: { dados?: string } = {}) {
   const rotas: [string, RouterDemo][] = [
     ['/exercises', montar(exercisesRouter(db))],
     ['/workouts', montar(workoutsRouter(db))],
+    ['/routine', montar(routineRouter(db))],
     ['/sessions', montar(sessionsRouter(db))],
     ['/plans', montar(plansRouter(db))],
     ['/programs', montar(programsRouter(db))],

@@ -28,6 +28,7 @@ jobs:
           cache-dependency-path: backend/package-lock.json
       - run: npm ci
         working-directory: backend
+      - run: node scripts/verificar-arquitetura.mjs
       - run: npm run typecheck
         working-directory: backend
       - run: npm test

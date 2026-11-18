@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "test": "playwright test",
+    "audit": "playwright test --config audit.config.ts",
     "test:ui": "playwright test --ui",
     "report": "playwright show-report"
   },
