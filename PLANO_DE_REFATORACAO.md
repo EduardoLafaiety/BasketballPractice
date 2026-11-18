@@ -1,6 +1,6 @@
 # Plano de refatoração, desempenho e experiência
 
-Atualizado em **18/11/2026**. Estado: **backend integrado até a PR #173; primeiro ciclo integrado na PR #175; passos 5 a 8 implementados e validados localmente**.
+Atualizado em **18/11/2026**. Estado: **backend integrado até a PR #173; primeiro ciclo integrado na PR #175; passos 5 a 8 implementados e publicados na PR #176**.
 
 Prioridade atual: consolidar contratos/acesso a dados, componentes retrô, acessibilidade/celular e caminhos principais, na ordem dos passos 5 a 8 autorizada pelo usuário. Backend estrutural e primeiro ciclo de frontend foram integrados nas PRs #173 e #175.
 

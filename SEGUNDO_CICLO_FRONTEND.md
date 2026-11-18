@@ -1,6 +1,6 @@
 # Frontend — contratos, componentes, acessibilidade e caminhos principais
 
-Data: 18/11/2026. Base: PR #175 integrada, commit `53bd7ff`. Escopo: passos 5 a 8, nessa ordem, preservando a identidade retrô e integrando após os testes. Trabalho realizado em checkout isolado para preservar as alterações em andamento na página inicial.
+Data: 18/11/2026. Base: PR #175 integrada, commit `53bd7ff`. Escopo: passos 5 a 8, nessa ordem, preservando a identidade retrô e integrando após os testes. Trabalho realizado em checkout isolado para preservar as alterações em andamento na página inicial. Entrega: [PR #176](https://github.com/EduardoLafaiety/BasketballPractice/pull/176).
 
 ## 5. Contratos e acesso aos dados
 

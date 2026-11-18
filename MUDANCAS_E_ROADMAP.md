@@ -423,7 +423,7 @@ Próximos passos: contratos e acesso aos dados, componentes retrô, acessibilida
 
 ## Etapa atual — frontend: passos 5 a 8
 
-Estado: implementado e validado localmente na branch codex/frontend-contratos-experiencia, baseada na PR #175 integrada. Relatório: [SEGUNDO_CICLO_FRONTEND.md](SEGUNDO_CICLO_FRONTEND.md).
+Entrega: [PR #176](https://github.com/EduardoLafaiety/BasketballPractice/pull/176), branch `codex/frontend-contratos-experiencia`, baseada na PR #175 integrada. Commit de implementação: `b476b10`. Relatório: [SEGUNDO_CICLO_FRONTEND.md](SEGUNDO_CICLO_FRONTEND.md).
 
 5. Contratos declarativos de leitura e primitivos compartilhados; conversões isoladas da rede, mantendo a fachada existente. Exercícios/preferências verificam contratos também no backend. Consultas compartilham cache e cancelamento; último consumidor, invalidação e logout liberam pedidos. Um 401 antigo não encerra um login novo.
 6. Campo, mensagem, estado vazio e botão ocupado reutilizados nos fluxos centrais, com rótulos/ajuda/erros associados e estilos retrô preservados.
