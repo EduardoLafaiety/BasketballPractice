@@ -22,6 +22,17 @@
   src: url('../assets/fonts/quadra-8.woff') format('woff');
 }
 
+/* A mesma Quadra 8, em escala menor, para o texto corrido, rótulos e botões: com 80% a letra ocupa quase o mesmo
+   espaço que a Pixelify Sans ocupava e a grade 5×7 continua legível em corpo pequeno (sem faixas nem profundidade). */
+@font-face {
+  font-family: 'Arcade Texto';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  size-adjust: 80%;
+  src: url('../assets/fonts/quadra-8.woff') format('woff');
+}
+
 :root {
   --arcade-azul: #2447ff;
   --arcade-azul-escuro: #1b2fb8;
