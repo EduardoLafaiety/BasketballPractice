@@ -1,0 +1,84 @@
+/*
+ * Tipografia arcade: o jeito de escrever dos títulos do site, inspirado nas letras dos fliperamas
+ * (pixel grosso, faixas horizontais de amarelo a vermelho e a "espessura" azul atrás da letra).
+ *
+ * Três camadas, sempre as mesmas em todas as páginas:
+ *  1. Fonte  : a face "Arcade" (Press Start 2P) é a fonte de TODO texto de destaque (--fonte-display).
+ *  2. Extrusão: h2 e os números grandes ganham a profundidade azul (--arcade-extrusao), na cor que já tinham.
+ *  3. Letreiro: h1 e os títulos de abertura ganham as faixas coloridas + a profundidade (.arcade-letreiro).
+ * Texto corrido, botões e rótulos pequenos continuam na fonte de texto: letra tão larga não se lê em corpo pequeno.
+ */
+
+/* Press Start 2P é bem mais larga e alta que a Jersey 10 que os títulos usavam. O size-adjust encolhe a face
+   para que todos os tamanhos que já existem no CSS continuem cabendo, sem mexer um por um. */
+@font-face {
+  font-family: 'Arcade';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  size-adjust: 46%;
+  src: url('../../node_modules/@fontsource/press-start-2p/files/press-start-2p-latin-400-normal.woff2') format('woff2');
+}
+
+:root {
+  --arcade-azul: #2447ff;
+  --arcade-azul-escuro: #1b2fb8;
+  /* Faixas de 14% do alto da letra, do amarelo ao vermelho, como nas letras da referência. */
+  --arcade-faixas: linear-gradient(
+    180deg,
+    #fff06a 0 14%, #ffd52b 14% 28%, #ffb81f 28% 42%, #ff951a 42% 56%, #ff6f16 56% 70%, #f14a1b 70% 84%, #d62a22 84% 100%
+  );
+  /* Degraus na diagonal (proporcionais ao tamanho da letra, no mínimo 1px): a letra ganha volume, sem desfoque. */
+  --arcade-extrusao: max(1px, 0.03em) max(1px, 0.03em) 0 var(--arcade-azul), max(2px, 0.06em) max(2px, 0.06em) 0 var(--arcade-azul), max(3px, 0.09em) max(3px, 0.09em) 0 var(--arcade-azul-escuro);
+}
+
+/* Camada 2: profundidade azul na cor própria do texto. */
+h2,
+.stat strong,
+.contador-placar strong,
+.contador-toque strong,
+.conquistas-anel strong,
+.sequencia > div strong,
+.resultados dd,
+.nba-valor,
+.gs-tempo .gs-minutos,
+.dieta-peso,
+.dieta-quando,
+.plano-item::before,
+.movimento-numero {
+  text-shadow: var(--arcade-extrusao);
+}
+
+/* Camada 3: o letreiro. O filtro desenha a extrusão por cima do degradê recortado no texto
+   (text-shadow ficaria por cima do degradê e o esconderia). Só em poucos títulos grandes, por causa do custo. */
+h1:not(.abertura-titulo),
+.abertura-a,
+.abertura-b,
+.auth-titulo-a,
+.auth-titulo-b,
+.artigo-destaque-titulo,
+.nivel-cartao h3,
+.arcade-letreiro {
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  background-image: var(--arcade-faixas);
+  -webkit-background-clip: text;
+  background-clip: text;
+  text-shadow: none;
+  filter: drop-shadow(1px 1px 0 var(--arcade-azul)) drop-shadow(1px 1px 0 var(--arcade-azul)) drop-shadow(1px 1px 0 var(--arcade-azul-escuro))
+    drop-shadow(1px 1px 0 var(--arcade-azul-escuro)) drop-shadow(3px 3px 0 rgba(0, 0, 0, 0.85));
+  /* Cada linha do título leva o degradê inteiro (sem isto, um título de duas linhas esticaria as faixas pelas duas). */
+  background-size: 100% 1lh;
+  background-repeat: repeat-y;
+}
+
+/* Na abertura as letras sobem e descem com a rolagem: uma sombra só, para o filtro não pesar a cada quadro. */
+.abertura-a,
+.abertura-b {
+  filter: drop-shadow(0.035em 0.035em 0 var(--arcade-azul)) drop-shadow(0.07em 0.07em 0 var(--arcade-azul-escuro));
+}
+
+/* Celular: a letra é larga; palavras longas como "Configurações" precisam caber numa linha sem quebrar no meio. */
+@media (max-width: 480px) {
+  .conteudo h1:not(.abertura-titulo) { font-size: min(3.1rem, 12.5vw); }
+}

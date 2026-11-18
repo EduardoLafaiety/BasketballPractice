@@ -11,6 +11,8 @@ import '@fontsource/jersey-10'
 import '@fontsource-variable/pixelify-sans'
 import './styles.css'
 import './pixel.css'
+// Por último: a tipografia arcade vence os ajustes de título dos arquivos anteriores.
+import './styles/arcade.css'
 
 // Subpasta do site (VITE_BASE), ex.: /BasketballPractice no GitHub Pages; "/" no site normal.
 const BASE = import.meta.env.BASE_URL.replace(/\/$/, '') || '/'

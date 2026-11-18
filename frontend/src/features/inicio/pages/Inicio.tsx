@@ -50,7 +50,7 @@ export default function Inicio() {
     <div className="pagina-larga pagina-inicio">
       <section className="faixa-clara banda treino-hoje">
         <div className="hoje-frente">
-          <h2>Treino de hoje</h2>
+          <h2 className="arcade-letreiro">Treino de hoje</h2>
           {prontoHoje && treinosHoje.length > 0 && (
             <Link to="/sessao?hoje" className="btn btn-primario">
               Começar treino de hoje <Icone nome="seta" />
