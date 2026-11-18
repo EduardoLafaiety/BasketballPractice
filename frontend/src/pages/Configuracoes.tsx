@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { api, ApiError, dataLocal, definirToken, type ResultadoImportacao } from '../api'
 import { useAuth } from '../auth'
+import { limparTreinosLocais } from '../lib/treino-local'
 import { Carregando, ErroCarga } from '../components/Estado'
 import { baixarArquivo, sessoesParaCsv } from '../lib/arquivo'
 import { definirAnimacoes, useAnimacoes, type Animacoes } from '../lib/movimento'
@@ -344,6 +345,7 @@ function ExcluirConta() {
     setEnviando(true)
     try {
       await api.excluirConta(senha)
+      try { limparTreinosLocais() } catch { /* armazenamento indisponível */ }
       encerrarLocal()
     } catch (falha) {
       setErro(falha as Error)

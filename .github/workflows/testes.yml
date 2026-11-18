@@ -52,6 +52,12 @@ jobs:
         working-directory: frontend
       - run: npm test
         working-directory: frontend
+      - run: npm run build
+        working-directory: frontend
+      - run: npm run build:demo
+        working-directory: frontend
+        env:
+          VITE_DEMO: 'true'
 
   e2e:
     name: Ponta a ponta (Playwright + Postgres)

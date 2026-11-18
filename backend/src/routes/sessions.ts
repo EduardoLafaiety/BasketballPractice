@@ -5,6 +5,7 @@ import { HttpError, notFound } from '../lib/http-error.js'
 import { dbId, idParam, isoDate, MAX_INT, parse } from '../lib/validate.js'
 import { currentUser } from '../middleware/auth.js'
 import { assertExercisesVisible } from './exercises.js'
+import { completeProgramDay } from './programs.js'
 
 const count = z.number().int().min(0).max(100000).nullish()
 
@@ -245,14 +246,14 @@ export function sessionsRouter(db: Database) {
     return { ...session, ...(await sessionDetails(db, [id]))(id) }
   }
 
-  const validateReferences = async (input: SessionInput, userId: number) => {
+  const validateReferences = async (input: SessionInput, userId: number, connection: Queryable = db) => {
     if (
       input.workoutId != null &&
-      !(await one(db, 'SELECT 1 FROM workouts WHERE id = $1 AND user_id = $2', [input.workoutId, userId]))
+      !(await one(connection, 'SELECT 1 FROM workouts WHERE id = $1 AND user_id = $2', [input.workoutId, userId]))
     ) {
       throw new HttpError(400, `Treino ${input.workoutId} não existe`)
     }
-    await assertExercisesVisible(db, input.entries.map((entry) => entry.exerciseId), userId)
+    await assertExercisesVisible(connection, input.entries.map((entry) => entry.exerciseId), userId)
   }
 
   router.get('/', async (req, res) => {
@@ -280,10 +281,23 @@ export function sessionsRouter(db: Database) {
 
   router.post('/', async (req, res) => {
     const userId = currentUser(req)
-    const body = parse(sessionSchema, req.body)
-    await validateReferences(body, userId)
-
-    const id = await db.transaction((tx) => insertSession(tx, userId, body))
+    const body = parse(sessionSchema.extend({
+      clientId: z.string().uuid().optional(),
+      program: z.object({ id: z.string().max(60), day: z.number().int().min(1).max(366) }).optional(),
+      tzOffset: z.number().int().min(-840).max(840).default(0),
+    }), req.body)
+    const id = await db.transaction(async (tx) => {
+      await tx.query('SELECT pg_advisory_xact_lock(4245, $1)', [userId])
+      if (body.clientId) {
+        const previous = await one<{ id: number }>(tx, 'SELECT id FROM practice_sessions WHERE user_id = $1 AND client_id = $2', [userId, body.clientId])
+        if (previous) return previous.id
+      }
+      await validateReferences(body, userId, tx)
+      const created = await insertSession(tx, userId, body)
+      if (body.clientId) await tx.query('UPDATE practice_sessions SET client_id = $1 WHERE id = $2', [body.clientId, created])
+      if (body.program) await completeProgramDay(tx, userId, body.program.id, body.program.day, body.tzOffset, created)
+      return created
+    })
     res.status(201).json(await findSession(id, userId))
   })
 

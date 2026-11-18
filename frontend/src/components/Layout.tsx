@@ -12,6 +12,7 @@ import type { Config } from '../types'
 import Icone from './Icone'
 import { Carregando } from './Estado'
 import { LinksLegais } from './TelaAuth'
+import SessoesPendentes from './SessoesPendentes'
 
 const LINKS: { to: string; rotulo: string; fim?: boolean }[] = [
   { to: '/', rotulo: 'Início', fim: true },
@@ -26,6 +27,7 @@ const LINKS: { to: string; rotulo: string; fim?: boolean }[] = [
   { to: '/artigos', rotulo: 'Artigos' },
   { to: '/conquistas', rotulo: 'Conquistas' },
   { to: '/overall', rotulo: 'Overall' },
+  { to: '/evolucao', rotulo: 'Evolução' },
 ]
 
 // Barra de baixo do celular: os atalhos ao alcance do polegar, com a bola de gerar treino no meio.
@@ -34,7 +36,7 @@ const DOCA_ESQUERDA: AtalhoDoca[] = [
   { to: '/', rotulo: 'Início', icone: 'inicio', fim: true },
   { to: '/treinos', rotulo: 'Treinos', icone: 'treinos' },
 ]
-const DOCA_DIREITA: AtalhoDoca[] = [{ to: '/artigos', rotulo: 'Artigos', icone: 'prancheta' }]
+const DOCA_DIREITA: AtalhoDoca[] = [{ to: '/evolucao', rotulo: 'Evolução', icone: 'prancheta' }]
 
 function ItemDoca({ to, rotulo, icone, fim }: AtalhoDoca) {
   return (
@@ -157,12 +159,21 @@ export default function Layout() {
 
       <div id="menu-tela" className={`menu-tela ${menuAberto ? 'aberto' : ''}`}>
         <nav className="nav" aria-label="Principal" style={{ '--linhas': Math.ceil((LINKS.length + (usuario?.isAdmin ? 1 : 0)) / 2) } as CSSProperties}>
-          {LINKS.map((l, i) => (
-            <NavLink key={l.to} to={l.to} end={l.fim} className="nav-link" style={{ '--i': i } as CSSProperties} onClick={() => setMenuAberto(false)}>
-              <span aria-hidden>{String(i + 1).padStart(2, '0')}</span>
-              {l.rotulo}
-            </NavLink>
-          ))}
+          {[
+            { titulo: 'Treinar', caminhos: ['/', '/treinos', '/programas', '/jogue-como'] },
+            { titulo: 'Rotina', caminhos: ['/rotina'] },
+            { titulo: 'Evolução', caminhos: ['/evolucao', '/overall', '/conquistas'] },
+            { titulo: 'Explorar', caminhos: ['/nba', '/nbb', '/alimentacao', '/equipamentos', '/artigos'] },
+          ].map((grupo) => <section className="nav-grupo" key={grupo.titulo} aria-label={grupo.titulo}>
+            <h2>{grupo.titulo}</h2>
+            {grupo.caminhos.map((caminho) => {
+              const i = LINKS.findIndex((l) => l.to === caminho)
+              const l = LINKS[i]
+              return <NavLink key={l.to} to={l.to} end={l.fim} className="nav-link" style={{ '--i': i } as CSSProperties} onClick={() => setMenuAberto(false)}>
+                <span aria-hidden>{String(i + 1).padStart(2, '0')}</span>{l.rotulo}
+              </NavLink>
+            })}
+          </section>)}
           {usuario?.isAdmin && (
             <NavLink to="/admin" className="nav-link" style={{ '--i': LINKS.length } as CSSProperties} onClick={() => setMenuAberto(false)}>
               <span aria-hidden>{String(LINKS.length + 1).padStart(2, '0')}</span>
@@ -187,6 +198,7 @@ export default function Layout() {
       </div>
 
       <main className="conteudo" ref={conteudo}>
+        <SessoesPendentes />
         <Suspense fallback={<Carregando />}>
           <Outlet />
         </Suspense>

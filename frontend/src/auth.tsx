@@ -4,6 +4,7 @@ import { ApiError, aoTokenExpirar, api, definirToken, tokenAtual, type Usuario }
 import { AuthContext, type AuthValor } from './auth-context'
 import { limparCache } from './store'
 import { Carregando, ErroCarga } from './components/Estado'
+import { limparTreinosLocais, temTreinosLocais } from './lib/treino-local'
 
 /** Espera até conferir de novo a sessão depois de uma falha passageira. */
 export const REVERIFICAR_MS = 15_000
@@ -26,6 +27,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // A tela sai na hora, sem esperar a rede. O pedido já partiu com o token: o fetch monta os cabeçalhos ao ser chamado.
   // Sem conexão, o token não é revogado no servidor e vale até expirar, mas some deste navegador.
   const sair = useCallback(() => {
+    if (temTreinosLocais() && !window.confirm('Há um treino em andamento ou sessões aguardando envio neste aparelho. Sair apaga esses dados locais. Deseja sair mesmo assim?')) return
+    try { limparTreinosLocais() } catch { /* armazenamento indisponível */ }
     if (tokenAtual()) void api.sair().catch(() => {})
     encerrarLocal()
   }, [encerrarLocal])
@@ -55,6 +58,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!tokenAtual()) return
     conferirSessao().finally(() => setVerificando(false))
+  }, [conferirSessao])
+
+  useEffect(() => {
+    const aoConectar = () => { if (tokenAtual()) void conferirSessao() }
+    window.addEventListener('online', aoConectar)
+    return () => window.removeEventListener('online', aoConectar)
   }, [conferirSessao])
 
   // Cada falha traz um erro novo e rearma a espera, até a API voltar ou a pessoa sair.

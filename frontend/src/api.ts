@@ -44,6 +44,15 @@ function lerToken() {
 
 export const tokenAtual = () => token
 
+/** Identifica somente o armazenamento local; a autenticação continua sendo validada pela API. */
+export function contaLocal(): string | null {
+  if (token === 'demo') return '1'
+  try {
+    const sub = JSON.parse(atob(token!.split('.')[1].replace(/-/g, '+').replace(/_/g, '/'))).sub
+    return /^\d+$/.test(String(sub)) ? String(sub) : null
+  } catch { return null }
+}
+
 export function definirToken(novo: string | null) {
   token = novo
   try {
@@ -320,6 +329,9 @@ export const api = {
 
   async registrarSessao(s: NovaSessao) {
     const criada = await request<SessionApi>('POST', '/sessions', {
+      clientId: s.clientId,
+      program: s.programa ? { id: s.programa.id, day: s.programa.dia } : undefined,
+      tzOffset: s.tzOffset ?? (s.programa ? new Date().getTimezoneOffset() : undefined),
       workoutId: s.workoutId ?? null,
       performedAt: s.data,
       durationMinutes: s.duracaoMin || null,

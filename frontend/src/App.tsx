@@ -40,6 +40,7 @@ const Equipamentos = pagina(() => import('./pages/Equipamentos'), 'default')
 const Artigos = pagina(() => import('./pages/Artigos'), 'default')
 const ArtigoDetalhe = pagina(() => import('./pages/Artigos'), 'ArtigoDetalhe')
 const Conquistas = pagina(() => import('./pages/Conquistas'), 'default')
+const Evolucao = pagina(() => import('./pages/Evolucao'), 'default')
 const Overall = pagina(() => import('./pages/Overall'), 'default')
 const Programas = pagina(() => import('./pages/Programas'), 'default')
 const ProgramaDetalhe = pagina(() => import('./pages/Programas'), 'ProgramaDetalhe')
@@ -95,6 +96,7 @@ function Rotas() {
         <Route path="artigos" element={<Artigos />} />
         <Route path="artigos/:id" element={<ArtigoDetalhe />} />
         <Route path="conquistas" element={<Conquistas />} />
+        <Route path="evolucao" element={<Evolucao />} />
         <Route path="overall" element={<Overall />} />
         <Route path="configuracoes" element={<Configuracoes />} />
         <Route path="admin" element={<RequerAdmin senao={<NaoEncontrada />}><Admin /></RequerAdmin>} />

@@ -1,4 +1,4 @@
-import { act, screen, waitFor, within } from '@testing-library/react'
+import { act, cleanup, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import { definirToken } from '../api'
@@ -6,6 +6,7 @@ import { apiFalsa, configFalsa, Resposta, usuarioFalso } from '../test/api-falsa
 import { abrirApp } from '../test/renderizar'
 import type { BlocoPlano } from '../types'
 import type { PlanoGuiado } from './SessaoGuiada'
+import { lerLocal, pendentes } from '../lib/treino-local'
 
 // Sem Web Audio no jsdom: o som e a vibração viram espiões.
 vi.mock('../lib/audio', () => ({ bipe: vi.fn(), vibrar: vi.fn() }))
@@ -42,6 +43,66 @@ function abrirSessao(rotas: Parameters<typeof apiFalsa>[0] = {}, rota: Parameter
 const clicar = (user: ReturnType<typeof userEvent.setup>, nome: string | RegExp) => user.click(screen.getByRole('button', { name: nome }))
 
 describe('Sessão guiada', () => {
+  it('retoma contadores, bloco e diário após reabrir a página', async () => {
+    const user = userEvent.setup()
+    abrirSessao()
+    await user.click(await screen.findByRole('button', { name: 'Começar' }))
+    await clicar(user, /acertou/i)
+    await clicar(user, /errou/i)
+    cleanup()
+    abrirSessao({}, '/sessao')
+    await user.click(await screen.findByRole('button', { name: 'Retomar treino' }))
+    expect(screen.getByRole('button', { name: 'Continuar' })).toBeInTheDocument()
+    expect(screen.getByText('1/2')).toBeInTheDocument()
+    await clicar(user, 'Próximo exercício →')
+    await clicar(user, '+5')
+    cleanup()
+    abrirSessao({}, '/sessao')
+    await user.click(await screen.findByRole('button', { name: 'Retomar treino' }))
+    expect(screen.getByRole('heading', { name: 'Saltos na caixa' })).toBeInTheDocument()
+    expect(screen.getByText('5', { selector: '.contador-placar strong' })).toBeInTheDocument()
+    await clicar(user, 'Próximo exercício →')
+    await clicar(user, 'Concluir treino')
+    await user.type(screen.getByLabelText('Notas'), 'Treino recuperado')
+    cleanup()
+    abrirSessao({}, '/sessao')
+    await user.click(await screen.findByRole('button', { name: 'Retomar treino' }))
+    expect(screen.getByLabelText('Notas')).toHaveValue('Treino recuperado')
+  })
+
+  it('guarda na fila um envio com erro transitório e sincroniza ao recuperar conexão', async () => {
+    const user = userEvent.setup()
+    let falhar = true
+    const { chamadas } = abrirSessao({ 'POST /sessions': () => falhar ? new Resposta(503, { error: 'Indisponível' }) : sessaoSalva })
+    await user.click(await screen.findByRole('button', { name: 'Começar' }))
+    await clicar(user, 'Pular'); await clicar(user, 'Pular'); await clicar(user, 'Pular')
+    await clicar(user, 'Salvar sessão')
+    await waitFor(() => expect(pendentes('1')).toHaveLength(1))
+    expect(lerLocal('1', 'rascunho')).toBeNull()
+    expect(await screen.findByText(/aguardando sincronização/)).toBeInTheDocument()
+    falhar = false
+    act(() => window.dispatchEvent(new Event('online')))
+    await waitFor(() => expect(pendentes('1')).toHaveLength(0))
+    const envios = chamadas.filter((c) => c.metodo === 'POST' && c.caminho === '/sessions')
+    expect(envios).toHaveLength(2)
+    expect(envios[0].corpo).toEqual(envios[1].corpo)
+  })
+
+  it('atualiza tempo e alarme quando a aba retorna depois do limite do bloco', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true })
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime })
+    abrirSessao({}, { pathname: '/sessao', state: { titulo: 'Prancha', blocos: [bloco({ metrica: 'tempo', minutos: 1 })] } })
+    await user.click(await screen.findByRole('button', { name: 'Começar' }))
+    const agora = Date.now()
+    vi.setSystemTime(agora + 125_000)
+    act(() => document.dispatchEvent(new Event('visibilitychange')))
+    expect(screen.getByText('+01:05')).toBeInTheDocument()
+    expect(bipe).toHaveBeenCalledWith(990, 500, 0.4)
+    await clicar(user, 'Pausar')
+    vi.setSystemTime(agora + 200_000)
+    act(() => document.dispatchEvent(new Event('visibilitychange')))
+    expect(screen.getByText('+01:05')).toBeInTheDocument()
+  })
   it('mostra o plano antes de começar', async () => {
     abrirSessao()
     expect(await screen.findByRole('heading', { name: 'Treino gerado' })).toBeInTheDocument()
@@ -138,7 +199,7 @@ describe('Sessão guiada', () => {
     const user = userEvent.setup()
     let falhar = true
     const { chamadas } = abrirSessao({
-      'POST /sessions': () => (falhar ? new Resposta(500, { error: 'Banco fora do ar' }) : sessaoSalva),
+      'POST /sessions': () => (falhar ? new Resposta(400, { error: 'Banco fora do ar' }) : sessaoSalva),
     })
     await user.click(await screen.findByRole('button', { name: 'Começar' }))
     await clicar(user, /acertou/i)

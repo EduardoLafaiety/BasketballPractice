@@ -1,0 +1,470 @@
+/* ==== Celular: atalhos embaixo, ao alcance do polegar, toque com resposta e alvos do tamanho do dedo ==== */
+html { -webkit-tap-highlight-color: transparent; }
+/* Sem a barra de rolagem lateral: a página e o menu em tela cheia continuam rolando (mouse, teclado e toque), e a barra fina
+   no alto da página já mostra o quanto falta. As listas com rolagem própria mantêm a barra delas. */
+html, .menu-tela { scrollbar-width: none; }
+html::-webkit-scrollbar, .menu-tela::-webkit-scrollbar { display: none; }
+.doca { display: none; }
+/* A bola da marca dá uma girada no toque. */
+.marca .icone-svg { transition: transform 0.5s cubic-bezier(0.3, 1.5, 0.5, 1); }
+.marca:active .icone-svg { transform: rotate(-120deg) scale(0.9); }
+/* Ao abrir, as seções do menu entram uma atrás da outra. */
+.menu-tela.aberto .nav-link { animation: menu-entra 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) backwards; animation-delay: calc(0.15s + var(--i, 0) * 0.03s); }
+@keyframes menu-entra { from { opacity: 0; transform: translateY(26px); } }
+:root[data-movimento='reduzido'] .menu-tela.aberto .nav-link { animation: none; }
+
+@media (max-width: 860px) {
+  :root:has(.doca) { --doca: calc(64px + env(safe-area-inset-bottom, 0px)); }
+  /* Gerar treino e o menu descem para a barra; no alto fica só a marca. */
+  .topo { padding-top: calc(0.8rem + env(safe-area-inset-top, 0px)); }
+  .topo-menu { display: none; }
+  .doca {
+    position: fixed;
+    inset: auto 0 0;
+    z-index: 43;
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    height: var(--doca);
+    padding: 0 0.25rem env(safe-area-inset-bottom, 0px);
+    background: #101010;
+    color: #a3a3a3;
+    border-top: 1px solid #262626;
+  }
+  .doca-item {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
+    height: 64px;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: inherit;
+    font: inherit;
+    font-size: 0.6rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    text-decoration: none;
+    cursor: pointer;
+    touch-action: manipulation;
+    transition: color 0.2s, transform 0.3s cubic-bezier(0.3, 1.6, 0.5, 1);
+  }
+  .doca-item:active { transform: scale(0.88); transition-duration: 0.08s; }
+  .doca-item.active, .doca-item[aria-expanded='true'] { color: #f4f2ea; }
+  .doca-item.active .icone-svg { color: var(--laranja); }
+  .doca-item .topo-tracos { width: 22px; height: 10px; margin-block: 6px; }
+  .doca-item[aria-expanded='true'] .topo-tracos { height: 2px; margin-block: 10px; border-bottom: 0; }
+  /* A bolinha laranja cai e quica em cima da aba atual. */
+  .doca-item.active::before { content: ''; position: absolute; top: 5px; width: 6px; height: 6px; border-radius: 0; background: var(--laranja); animation: doca-quique 0.7s cubic-bezier(0.3, 0.7, 0.4, 1) both; }
+  @keyframes doca-quique {
+    0% { opacity: 0; transform: translateY(-16px); }
+    40% { opacity: 1; transform: translateY(0) scale(1.5, 0.6); }
+    65% { transform: translateY(-6px) scale(0.9, 1.1); }
+    85% { transform: translateY(0) scale(1.15, 0.85); }
+    100% { transform: none; }
+  }
+  /* Gerar treino: do tamanho das outras abas, com a bola sempre laranja, que gira no toque. */
+  .doca-gerar .icone-svg { color: var(--laranja); transition: transform 0.5s cubic-bezier(0.3, 1.6, 0.5, 1); }
+  .doca-gerar:active .icone-svg { transform: rotate(-90deg); transition-duration: 0.12s; }
+  .doca-gerar.active .icone-svg { animation: doca-gira 0.8s cubic-bezier(0.3, 1.3, 0.5, 1); }
+  @keyframes doca-gira { from { transform: rotate(-200deg); } }
+
+  .conteudo { padding-bottom: calc(6rem + var(--doca, 0px)); }
+  .rodape { padding-bottom: calc(2rem + var(--doca, 0px)); }
+  .aviso-cookies { bottom: calc(0.5rem + var(--doca, 0px)); inset-inline: 0.5rem; width: auto; padding: 0.8rem 0.9rem; gap: 0.55rem; }
+  .aviso-cookies p { font-size: 0.74rem; line-height: 1.4; }
+  .aviso-cookies-botoes .btn { padding-block: 0.55rem; }
+  .menu-tela { padding-bottom: calc(1.5rem + var(--doca, 0px)); overscroll-behavior: contain; }
+  .nav-link:active { color: var(--laranja); }
+}
+:root[data-movimento='reduzido'] .doca-item::before, :root[data-movimento='reduzido'] .doca-gerar .icone-svg { animation: none; }
+
+/* Telas de toque: o hover "grudado" sai, e cada toque responde com um aperto que volta quicando. */
+@media (hover: none) {
+  .drill-card:hover, .cartao-jogador:hover, .nivel-cartao:hover, .treino-linha:hover { transform: none; box-shadow: var(--sombra); }
+  .nav-link:hover { transform: none; }
+  .btn, .chip, .nivel-opcao, .artigo-cartao {
+    transition: transform 0.35s cubic-bezier(0.3, 1.6, 0.5, 1), color 0.3s, background-color 0.15s, border-color 0.3s, box-shadow 0.25s;
+  }
+  .drill-card, .cartao-jogador, .nivel-cartao, .treino-linha { transition: transform 0.35s cubic-bezier(0.3, 1.6, 0.5, 1), box-shadow 0.25s; }
+  .btn:active:not(:disabled), .chip:active:not(:disabled), .nivel-opcao:active { transform: scale(0.93); transition-duration: 0.08s; }
+  .drill-card:active, .cartao-jogador:active, .nivel-cartao:active, .treino-linha:active, .artigo-cartao:active { transform: scale(0.97); transition-duration: 0.08s; }
+}
+:root[data-movimento='reduzido'] :is(.btn, .chip, .nivel-opcao, .drill-card, .cartao-jogador, .nivel-cartao, .treino-linha, .artigo-cartao):active { transform: none; }
+
+/* Dedo, não mouse: chips, campos e o x de remover ganham altura de toque. */
+@media (pointer: coarse) {
+  .chip { min-height: 40px; padding-inline: 1rem; }
+  .input, select.input { min-height: 44px; }
+  .remover { min-width: 40px; min-height: 40px; }
+  .links-legais a, .links-legais button { padding-block: 0.45rem; }
+}
+@media (max-width: 560px) {
+  .niveis .nivel-opcao { padding-inline: 0.4rem; }
+  .niveis .nivel-opcao strong { letter-spacing: 0.02em; }
+}
+/* Menu no celular: as seções cabem quase todas na tela, sem rolar tanto. */
+@media (max-width: 560px) {
+  .menu-tela { padding-top: calc(76px + env(safe-area-inset-top, 0px)); }
+  .nav-link { gap: 0.9rem; padding-block: 0.12rem; font-size: clamp(1.75rem, 8.6vw, 2.4rem); line-height: 1.05; }
+  .nav-link span { min-width: 1.4rem; font-size: 0.7rem; }
+}
+
+/* Abertura no celular: a bola grande no meio da tela, "Bora pra" logo acima e "quadra." logo abaixo, sem encostar nela. */
+@media (max-width: 860px) {
+  .abertura-fixa { height: 100svh; }
+  .abertura-fixa { --bola: min(78vw, 44svh); --titulo: min(17vw, 9svh); }
+  .abertura-fixa .abertura-bola { width: var(--bola); }
+  .conteudo .abertura-titulo { font-size: var(--titulo); }
+  .abertura-a { top: calc(50% - var(--bola) / 2 - 1em); }
+  .abertura-b { top: calc(50% + var(--bola) / 2 + 0.12em); bottom: auto; }
+}
+/* ==== Páginas internas no computador: aproveitam a largura. Topo, menu, barras fixas, cores e fontes não mudam. ==== */
+
+/* Peças novas, em qualquer tela */
+.dia-hoje { margin-left: 0.5rem; padding: 0.1rem 0.45rem; border-radius: 0; background: var(--laranja); color: #111111; font-size: 0.6rem; font-weight: 800; letter-spacing: 0.1em; vertical-align: middle; }
+.dia-lista li[draggable='true'] { cursor: grab; }
+
+/*
+ * Rotina: cada dia é uma "jogada" na prancheta do técnico. Os treinos viram nós numerados, na cor da categoria, ligados
+ * por uma rota pontilhada; uma barra mostra o mix do dia e a meia quadra de fundo marca o descanso. No alto, o placar da
+ * semana mostra de relance quantos treinos há e o que falta.
+ */
+.dia {
+  --quadra: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 94' fill='none' stroke='%23808080' stroke-width='1.3'%3E%3Crect x='2' y='2' width='96' height='90' rx='2'/%3E%3Crect x='34' y='2' width='32' height='38'/%3E%3Ccircle cx='50' cy='40' r='12'/%3E%3Ccircle cx='50' cy='10' r='3'/%3E%3Cpath d='M42 5h16M10 2v22a40 40 0 0 0 80 0V2'/%3E%3C/svg%3E");
+  animation: aparecer-baixo 0.5s both;
+  animation-delay: calc(var(--i, 0) * 55ms);
+  transition: box-shadow 0.25s, transform 0.25s;
+}
+/* A meia quadra de fundo, discreta; no descanso ela aparece grande, como uma quadra vazia esperando o treino. */
+.dia::before { content: ''; position: absolute; z-index: -1; right: -14px; bottom: 44px; width: 120px; aspect-ratio: 100 / 94; background: var(--quadra) center / contain no-repeat; opacity: 0.14; pointer-events: none; }
+.dia-folga::before { right: 50%; bottom: 52px; width: 70%; max-width: 170px; transform: translateX(50%); opacity: 0.22; }
+.dia-sigla { position: absolute; z-index: -1; top: 0.25rem; right: 0.6rem; font-family: var(--fonte-display); font-weight: var(--peso-display); font-size: 3.6rem; line-height: 1; letter-spacing: 0.02em; color: transparent; -webkit-text-stroke: 1.5px var(--borda); pointer-events: none; user-select: none; }
+.dia.hoje { border-color: var(--laranja); box-shadow: 0 0 0 1px var(--laranja), 0 18px 40px -18px rgba(255, 106, 19, 0.65); transform: translateY(-3px); }
+.dia.hoje .dia-sigla { -webkit-text-stroke-color: color-mix(in srgb, var(--laranja) 55%, transparent); }
+.dia-hoje { margin-left: 0.5rem; padding: 0.1rem 0.45rem; border-radius: 0; background: var(--laranja); color: #111111; font-size: 0.6rem; font-weight: 800; letter-spacing: 0.1em; vertical-align: middle; }
+
+/* O mix do dia: um trecho por categoria, do tamanho de quantos treinos ela tem. */
+.dia-mix { display: flex; gap: 2px; height: 6px; border-radius: 0; overflow: hidden; background: var(--superficie-2); }
+.dia-mix i { display: block; background: var(--c); min-width: 6px; }
+
+/* A rota da jogada: nó numerado por treino, ligado ao próximo por uma linha pontilhada. */
+.rota { gap: 0.55rem; }
+.rota li { position: relative; display: grid; grid-template-columns: 24px minmax(0, 1fr) auto; align-items: start; gap: 0.6rem; }
+.rota li:not(:last-child)::after { content: ''; position: absolute; left: 11px; top: 28px; bottom: -0.55rem; border-left: 2px dotted color-mix(in srgb, var(--c) 55%, var(--borda)); }
+.rota-no { display: grid; place-items: center; width: 24px; height: 24px; border-radius: 0; background: var(--c); color: #111111; font-size: 0.72rem; font-weight: 800; line-height: 1; box-shadow: 0 0 0 3px color-mix(in srgb, var(--c) 22%, transparent); }
+.rota-texto { display: grid; gap: 0.1rem; min-width: 0; padding-top: 0.12rem; }
+.rota-nome { color: var(--texto); font-size: 0.78rem; font-weight: 800; letter-spacing: 0.04em; line-height: 1.25; text-decoration: none; text-transform: uppercase; overflow-wrap: break-word; hyphens: auto; }
+.rota-nome:hover { color: var(--laranja-texto); }
+.rota-sub { color: var(--muted); font-size: 0.62rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
+.rota .remover { opacity: 0.35; transition: opacity 0.15s; }
+.rota li:hover .remover, .rota .remover:focus-visible { opacity: 1; }
+
+/* Descanso: só a quadra vazia e o convite para arrastar um treino. */
+.dia-vazio { margin: 0; flex: 1; align-self: stretch; color: var(--muted); font-size: 0.66rem; font-weight: 700; letter-spacing: 0.08em; line-height: 1.5; text-transform: uppercase; }
+
+/* Adicionar: um botão fantasma em pílula, que vira laranja ao passar o mouse. */
+.dia select.input { width: 100%; padding-inline: 0.6rem; appearance: none; text-align: center; text-align-last: center; text-overflow: ellipsis; border: 1.5px dashed var(--borda); border-radius: 0; background: transparent; color: var(--muted); cursor: pointer; transition: border-color 0.2s, color 0.2s, background 0.2s; }
+.dia select.input:hover, .dia select.input:focus-visible { border-style: solid; border-color: var(--laranja); color: var(--laranja-texto); background: color-mix(in srgb, var(--laranja) 10%, transparent); }
+
+/* Arrastando: todos os dias mostram onde dá para soltar, e o que está sob o cursor se destaca. */
+.semana.em-arraste .dia:not(.alvo) { outline: 2px dashed color-mix(in srgb, var(--laranja) 50%, transparent); outline-offset: -6px; }
+.dia.alvo { box-shadow: inset 0 0 0 2px var(--laranja), var(--sombra); transform: translateY(-3px); }
+.dia.alvo::after { content: 'Solte aqui'; position: absolute; inset: 0; z-index: 2; display: grid; place-items: center; border-radius: 0; background: color-mix(in srgb, var(--superficie) 82%, transparent); color: var(--laranja-texto); font-size: 0.8rem; font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; pointer-events: none; }
+
+/*
+ * O placar da semana e o painel do gerador: no tema escuro, faixas pretas como o placar de um ginásio; no claro, superfícies
+ * claras, com o texto e o laranja do próprio tema (o laranja escuro, para ler bem sobre o fundo claro).
+ */
+:is(.gs, .placar-semana) {
+  --pl-painel: #0b0b0b;
+  --pl-fundo: #0b0b0b;
+  --pl-led: #151515;
+  --pl-led-aceso: color-mix(in srgb, var(--laranja) 16%, #151515);
+  --pl-linha: #2c2c2c;
+  --pl-texto: #ffffff;
+  --pl-muted: #a3a3a3;
+  --pl-suave: #d4d4d4;
+  --pl-apagado: #5b5b5b;
+  --pl-hover: #bbbbbb;
+  --pl-acento: var(--laranja);
+  --pl-anel: #ffffff;
+  --pl-erro: #ff8a8a;
+  --pl-borda: transparent;
+  --pl-brilho: 0 0 10px rgba(255, 106, 19, 0.7);
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme='dark']) :is(.gs, .placar-semana) {
+    --pl-painel: var(--superficie);
+    --pl-fundo: var(--superficie-2);
+    --pl-led: var(--superficie-2);
+    --pl-led-aceso: color-mix(in srgb, var(--laranja) 16%, var(--superficie));
+    --pl-linha: var(--borda);
+    --pl-texto: var(--texto);
+    --pl-muted: var(--muted);
+    --pl-suave: var(--texto);
+    --pl-apagado: color-mix(in srgb, var(--muted) 62%, var(--superficie-2));
+    --pl-hover: var(--texto);
+    --pl-acento: var(--laranja-texto);
+    --pl-anel: var(--texto);
+    --pl-erro: var(--erro);
+    --pl-borda: var(--borda);
+    --pl-brilho: none;
+  }
+}
+:root[data-theme='light'] :is(.gs, .placar-semana) {
+  --pl-painel: var(--superficie);
+  --pl-fundo: var(--superficie-2);
+  --pl-led: var(--superficie-2);
+  --pl-led-aceso: color-mix(in srgb, var(--laranja) 16%, var(--superficie));
+  --pl-linha: var(--borda);
+  --pl-texto: var(--texto);
+  --pl-muted: var(--muted);
+  --pl-suave: var(--texto);
+  --pl-apagado: color-mix(in srgb, var(--muted) 62%, var(--superficie-2));
+  --pl-hover: var(--texto);
+  --pl-acento: var(--laranja-texto);
+  --pl-anel: var(--texto);
+  --pl-erro: var(--erro);
+  --pl-borda: var(--borda);
+  --pl-brilho: none;
+}
+.placar-semana { display: grid; gap: 0.9rem; margin-top: 1.5rem; padding: 1.1rem 1.25rem; border-radius: 0; background: var(--pl-painel); color: var(--pl-texto); box-shadow: var(--sombra), 0 0 0 1px var(--pl-borda); }
+.placar-topo { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.9rem 2rem; }
+.placar-leds { display: flex; gap: 0.4rem; }
+.led { min-width: 2.9rem; padding: 0.4rem 0.35rem; border: 1px solid var(--pl-linha); border-radius: 0; background: var(--pl-led); color: var(--pl-apagado); font-family: var(--fonte-display); font-size: 1.05rem; font-weight: 800; letter-spacing: 0.08em; text-align: center; }
+.led.aceso { border-color: var(--laranja); background: var(--pl-led-aceso); color: var(--pl-acento); text-shadow: var(--pl-brilho); }
+.led.hoje { box-shadow: 0 0 0 2px var(--pl-anel); }
+.placar-numeros { display: flex; flex-wrap: wrap; gap: 0.4rem 1.6rem; color: var(--pl-muted); font-size: 0.7rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
+.placar-numeros b { margin-right: 0.15rem; color: var(--pl-texto); font-family: var(--fonte-display); font-size: 1.5rem; font-weight: 800; letter-spacing: 0.02em; vertical-align: -0.1em; }
+.placar-equilibrio { display: flex; flex-wrap: wrap; gap: 0.4rem 1.1rem; margin: 0; padding: 0; list-style: none; }
+.placar-equilibrio li { display: inline-flex; align-items: center; gap: 0.4rem; color: var(--pl-suave); font-size: 0.66rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
+.placar-equilibrio li::before { content: ''; width: 8px; height: 8px; border-radius: 0; background: var(--c); }
+.placar-equilibrio li b { color: var(--pl-texto); }
+.placar-equilibrio li.apagada { opacity: 0.38; }
+.placar-equilibrio li.apagada::before { background: transparent; box-shadow: inset 0 0 0 1.5px var(--c); }
+@media (min-width: 1500px) { .conteudo .semana { grid-template-columns: repeat(7, minmax(0, 1fr)); } }
+@media (max-width: 560px) { .led { min-width: 0; flex: 1; font-size: 0.85rem; padding: 0.35rem 0; } .placar-leds { width: 100%; } }
+@media (prefers-reduced-motion: reduce) { .dia { animation: none; transition: none; } .dia.hoje, .dia.alvo { transform: none; } }
+
+/*
+ * Gerador da rotina semanal: o único lugar do app que gera treino. Um painel só (dias, tempo, nível, foco e aquecimento)
+ * com a barra escura de ação embaixo; o resultado aparece como prévia nos cartões da rotina.
+ */
+.gs { display: grid; margin-top: 1.25rem; border: 1px solid var(--borda); border-radius: 0; background: var(--superficie); box-shadow: var(--sombra); overflow: hidden; }
+.gs-corpo { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr)); gap: 1.6rem 2.5rem; padding: 1.5rem 1.6rem; }
+.gs-coluna { display: grid; gap: 1.6rem; align-content: start; min-width: 0; }
+.gs-bloco { display: grid; gap: 0.6rem; align-content: start; min-width: 0; margin: 0; padding: 0; border: 0; }
+.gs-bloco > legend, .gs-titulo { display: flex; align-items: baseline; justify-content: space-between; gap: 0.75rem; width: 100%; padding: 0; }
+.gs-rotulo { color: var(--muted); font-size: 0.7rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; }
+.gs-dica { color: var(--muted); font-size: 0.66rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
+
+.gs-leds { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 0.4rem; }
+.gs-leds .led { min-width: 0; padding: 0.6rem 0; cursor: pointer; font-size: 1.15rem; transition: background 0.15s, color 0.15s, border-color 0.15s; }
+.gs-leds .led:hover { border-color: var(--laranja); color: var(--pl-hover); }
+.led[aria-pressed='true'] { border-color: var(--laranja); background: var(--pl-led-aceso); color: var(--pl-acento); text-shadow: var(--pl-brilho); }
+
+.gs-tempo { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 1.1rem; padding: 0.9rem 1.1rem; border-radius: 0; background: var(--pl-fundo); color: var(--pl-texto); }
+.gs-tempo .gs-minutos { color: var(--pl-acento); font-family: var(--fonte-display); font-weight: var(--peso-display); font-size: 3.2rem; line-height: 0.9; font-variant-numeric: tabular-nums; }
+.gs-tempo .gs-minutos small { margin-left: 0.25rem; color: var(--pl-muted); font-family: inherit; font-size: 0.7rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; }
+.gs-tempo input[type='range'] { flex: 1 1 160px; min-width: 0; accent-color: var(--laranja); }
+.gs-atalhos { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.gs-chip { padding: 0.4rem 0.8rem; border: 1px solid var(--borda); border-radius: 0; background: transparent; color: var(--muted); font-size: 0.7rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; transition: border-color 0.15s, color 0.15s, background 0.15s; }
+.gs-tempo .gs-chip { border-color: var(--pl-linha); color: var(--pl-muted); }
+.gs-chip:hover { border-color: var(--laranja); color: var(--laranja-texto); }
+.gs-chip[aria-pressed='true'] { border-color: var(--laranja); background: color-mix(in srgb, var(--laranja) 14%, transparent); color: var(--pl-acento); }
+
+.gs-niveis { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 150px), 1fr)); gap: 0.5rem; }
+.gs-nivel { display: grid; gap: 0.25rem; align-content: start; padding: 0.75rem 0.9rem; border: 1px solid var(--borda); border-radius: 0; background: transparent; color: inherit; text-align: left; cursor: pointer; transition: border-color 0.15s, background 0.15s; }
+.gs-nivel strong { font-size: 0.7rem; font-weight: 800; letter-spacing: 0.06em; line-height: 1.55; text-transform: uppercase; }
+/* A descrição segue o padrão do site para texto pequeno: maiúsculas, 0,7 rem. */
+.gs-nivel span { color: var(--muted); font-size: 0.7rem; font-weight: 700; line-height: 1.55; letter-spacing: 0.06em; text-transform: uppercase; }
+.gs-nivel:hover { border-color: var(--laranja); }
+.gs-nivel[aria-pressed='true'] { border-color: var(--laranja); background: color-mix(in srgb, var(--laranja) 12%, transparent); }
+
+.gs-focos { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.gs-foco { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.45rem 0.8rem; border: 1px solid var(--borda); border-radius: 0; background: transparent; color: var(--texto); font-size: 0.7rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; transition: border-color 0.15s, background 0.15s; }
+.gs-foco::before { content: ''; width: 9px; height: 9px; border-radius: 0; background: var(--c); }
+.gs-foco:hover { border-color: var(--c); }
+.gs-foco[aria-pressed='true'] { border-color: var(--c); background: color-mix(in srgb, var(--c) 20%, transparent); }
+.conteudo .gs-aquecimento { display: flex; align-items: center; gap: 0.6rem; cursor: pointer; }
+.gs-aquecimento input { width: 18px; height: 18px; accent-color: var(--laranja); }
+
+.gs-rodape { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.75rem 1.5rem; padding: 1rem 1.6rem; background: var(--pl-fundo); color: var(--pl-texto); border-top: 1px solid var(--pl-borda); }
+.conteudo .gs-resumo { margin: 0; min-width: 0; color: var(--pl-muted); font-size: 0.7rem; font-weight: 700; letter-spacing: 0.08em; line-height: 1.6; text-transform: uppercase; }
+.gs-resumo strong { color: var(--pl-texto); }
+.gs-acoes { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.gs-botao { padding: 0.75rem 1.4rem; border: 1.5px solid var(--laranja); border-radius: 0; background: transparent; color: var(--pl-acento); font-size: 0.74rem; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; transition: background 0.15s, color 0.15s; }
+.gs-botao:hover:not(:disabled) { background: color-mix(in srgb, var(--laranja) 16%, transparent); }
+.gs-botao.gs-primario { background: var(--laranja); color: #111111; }
+.gs-botao.gs-primario:hover:not(:disabled) { background: #ff7d33; }
+.gs-botao:disabled { opacity: 0.45; cursor: not-allowed; }
+.conteudo .gs-aviso { margin: 0; padding: 0.6rem 1.6rem 0.9rem; background: var(--pl-fundo); color: var(--pl-muted); font-size: 0.7rem; font-weight: 700; letter-spacing: 0.06em; line-height: 1.6; text-transform: uppercase; }
+.conteudo .gs-aviso.gs-erro { color: var(--pl-erro); }
+@media (max-width: 560px) {
+  .gs-corpo { padding: 1.1rem 1rem; }
+  .gs-rodape { padding: 0.9rem 1rem; }
+  .gs-aviso { padding-inline: 1rem; }
+  .gs-leds .led { font-size: 0.95rem; }
+  .gs-acoes, .gs-acoes .gs-botao { width: 100%; }
+}
+
+/* A prévia da semana gerada: cartões tracejados até virarem a rotina, com a duração de cada bloco. */
+.semana.em-previa .dia { border-style: dashed; }
+.rota-min { padding-top: 0.2rem; color: var(--muted); font-size: 0.68rem; font-weight: 800; letter-spacing: 0.04em; font-variant-numeric: tabular-nums; }
+.rota-aq .rota-no { background: var(--superficie); color: var(--c); box-shadow: inset 0 0 0 2px var(--c); font-size: 0.6rem; }
+.placar-item.placar-previa { padding: 0.15rem 0.7rem; border: 1px solid var(--laranja); border-radius: 0; color: var(--pl-acento); }
+
+
+
+
+.jogue-filtros { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; }
+.jogue-filtros .input { flex: 1 1 220px; max-width: 320px; }
+.estilo-comecar { margin-top: 1.25rem; }
+
+.contador-ultimas { list-style: none; margin: 0; padding: 0; display: flex; justify-content: center; gap: 6px; }
+.contador-ultimas li { width: 14px; height: 14px; border-radius: 0; background: var(--superficie-2); box-shadow: inset 0 0 0 1px var(--borda); }
+.contador-ultimas li.acerto { background: var(--verde); box-shadow: none; }
+.contador-ultimas li.erro { background: var(--vermelho); box-shadow: none; }
+
+/* Timer: o anel esvazia com a fase, na cor dela; em tela cheia, o relógio cresce. */
+.timer:fullscreen { display: grid; place-content: center; justify-items: center; gap: 1.5rem; border-radius: 0; }
+
+/* Calculadoras: menos e mais nas pontas de cada campo. */
+
+/* Artigo da semana em destaque, grande, no alto da lista. */
+.artigo-destaque { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); align-items: center; margin: 1.5rem 0; padding: 0; overflow: hidden; color: inherit; text-decoration: none; box-shadow: var(--sombra), inset 0 4px 0 var(--c); transition: transform 0.25s, box-shadow 0.25s; }
+.artigo-destaque:hover { transform: translateY(-4px); box-shadow: var(--sombra-alta), inset 0 4px 0 var(--c); }
+.artigo-destaque .artigo-imagem { height: 100%; border-radius: 0; }
+.artigo-destaque-texto { display: grid; gap: 0.7rem; justify-items: start; padding: clamp(1.25rem, 3vw, 2.5rem); }
+.artigo-destaque-titulo { font-family: var(--fonte-display); font-size: clamp(2rem, 3.6vw, 3.4rem); font-weight: var(--peso-display); line-height: 0.95; text-transform: uppercase; }
+.artigo-destaque-resumo { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.06em; line-height: 1.55; text-transform: uppercase; color: var(--muted); }
+.artigo-sumario { display: none; }
+.artigo-corpo section, .artigo-ciencia, .artigo-pratica { scroll-margin-top: 100px; }
+
+/* Prévia apagada atrás de um aviso (Desempenho e Cartão sem dados, Ranking e Time na demonstração). */
+.desempenho-vazio { display: grid; }
+.desempenho-vazio > * { grid-area: 1 / 1; }
+.desempenho-fantasma { display: grid; gap: 1rem; opacity: 0.35; filter: grayscale(0.4) blur(1.5px); pointer-events: none; user-select: none; }
+.desempenho-chamada { position: relative; z-index: 1; align-self: center; justify-self: center; width: min(560px, 100%); }
+
+
+.config-indice { display: none; }
+
+@media (max-width: 760px) {
+  .artigo-destaque { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* Computador */
+@media (min-width: 1024px) {
+  /* Títulos das páginas internas menores: o conteúdo aparece já na primeira tela. O Início e o Jogue como têm composição própria. */
+  .conteudo > h1 { font-size: clamp(3.6rem, 6.4vw, 6.6rem); margin-bottom: 0.8rem; }
+  .conteudo > h1 + .muted { max-width: 46em; }
+
+  /* Treinos: os cartões ficam em três colunas, uma sob cada nível, com o mesmo espaço entre elas. */
+  .treinos .niveis, .treinos .grade { gap: 1rem; }
+  .treinos .grade { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+  /* Rotina: a página usa mais largura que as outras, para os dias caberem com os nomes inteiros. */
+  .conteudo:has(.semana) { max-width: 1760px; }
+  .semana { grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 0.8rem; }
+  .semana .dia { min-height: 360px; padding: 1rem 0.9rem; }
+  .semana .dia-topo { flex-direction: column; align-items: flex-start; gap: 0.2rem; }
+  .semana .dia-lista li { align-items: flex-start; }
+
+
+  /* Jogador: o painel do treino fica preso ao rolar. */
+  .estilo-lado { position: sticky; top: 92px; }
+
+  /* Alimentação: posição e tipo de dia presos no alto ao rolar o cardápio. */
+  .dieta-seletores { position: sticky; top: 84px; z-index: 2; padding: 0.75rem 1.25rem; border-radius: 0; background: var(--superficie); box-shadow: var(--sombra); }
+
+  /* Artigo: sumário fixo à direita do texto. */
+  .artigo-leitura { display: grid; grid-template-columns: minmax(0, var(--largura)) 240px; gap: 3rem; align-items: start; }
+  .artigo-leitura > .artigo-corpo { grid-column: 1; grid-row: 1; }
+  .artigo-sumario { display: grid; gap: 0.6rem; grid-column: 2; grid-row: 1; position: sticky; top: 100px; margin-top: 2.25rem; padding: 1.25rem; border-radius: 0; background: var(--superficie); box-shadow: var(--sombra); }
+  .artigo-sumario ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.45rem; }
+  .artigo-sumario a { color: var(--texto); text-decoration: none; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.04em; line-height: 1.4; text-transform: uppercase; }
+  .artigo-sumario a:hover { color: var(--laranja-texto); }
+
+
+  /* Desempenho: gráficos em grade de duas colunas. */
+
+  /* Diário de jogos: a lista à esquerda, o registro e as médias à direita. */
+
+
+  /* Ferramentas: abas numa lista vertical à esquerda. */
+  /* Prancheta: a barra de ferramentas vira uma coluna colada à quadra. */
+  .prancheta { grid-template-columns: 190px minmax(0, 1fr); align-items: start; column-gap: 1.25rem; }
+  /* Quadras: mapa grande e a lista ao lado. */
+
+  /* Configurações: índice fixo à esquerda. */
+  .config-corpo { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 2rem; align-items: start; }
+  .config-indice { display: grid; gap: 0.25rem; position: sticky; top: 92px; padding: 1rem; border-radius: 0; background: var(--superficie); box-shadow: var(--sombra); }
+  .config-indice a { padding: 0.5rem 0.75rem; border-radius: 0; color: var(--texto); text-decoration: none; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; }
+  .config-indice a:hover { background: var(--superficie-2); color: var(--laranja-texto); }
+  .config-secoes { display: grid; gap: 1.25rem; }
+  .config-secoes > section { margin: 0; scroll-margin-top: 100px; }
+
+  /* Início: trechos presos à rolagem um pouco mais curtos no computador. */
+  .manifesto { min-height: 140vh; }
+  .escada { height: 320vh; }
+}
+
+/*
+ * ==== Texto pequeno do site inteiro: maiúsculas e 0,7rem. ====
+ * Ficam de fora os destaques grandes (títulos das páginas, "Bora pra quadra", números de placar, nomes dos jogadores)
+ * e os títulos de cartão, um degrau acima (0,85rem), também em maiúsculas.
+ */
+.meta, .link-forte, .faixa .stat span, .dieta-foco span, .dieta-quando .meta, .artigo-destaque-resumo, .nba-sigla, .dia-hoje, .doca-item, .auth-troca, .aviso-cookies p, .campo .meta {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+}
+.dieta-foco span, .dieta-quando .meta, .auth-troca, .aviso-cookies p { font-weight: 700; letter-spacing: 0.06em; }
+/* Na tela inicial (que usa iniciais maiúsculas), os nomes de artigo e de posição viram títulos de cartão. */
+/* Rótulos dos campos de entrar e cadastrar: o mesmo texto pequeno; ao subir, só trocam de lugar e de cor. */
+.campo-rotulo { top: 1.75rem; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
+.campo input:focus ~ .campo-rotulo,
+.campo input:not(:placeholder-shown) ~ .campo-rotulo { transform: translateY(-1.55rem); }
+
+
+/* ==== Ferramentas: tela de seleção de jogo. Um inventário com um espaço por ferramenta e, embaixo, a janela da escolhida ==== */
+/* Ao fundo, as linhas da quadra em pixel, as mesmas do resto do site. */
+
+/* O inventário: sete espaços lado a lado. */
+/* O mouse só troca cor: nada pula nem gira. */
+/* O espaço escolhido fica aceso, como uma conquista desbloqueada. */
+
+/* A janela da ferramenta: barra de título com o ícone grande, o nome e a posição no inventário. */
+/* Dentro da janela o cartão não precisa de moldura própria. */
+@media (max-width: 860px) {
+  /* No celular o inventário vira uma fileira que rola de lado. */
+}
+
+/* Todo texto pequeno em maiúsculas, inclusive o que a pessoa digita nos campos de busca e de nome (e-mail, senha e endereço ficam como foram escritos). */
+.conteudo input:not([type='email']):not([type='password']):not([type='url']):not([type='file']):not([type='checkbox']):not([type='radio']):not([type='range']):not([type='number']),
+.conteudo textarea { text-transform: uppercase; letter-spacing: 0.04em; }
+
+/* Movimento: o título e os espaços sobem em sequência, e a janela sobe de leve a cada ferramenta aberta. */
+@keyframes ferr-sobe { from { opacity: 0; transform: translateY(24px); } }
+
+/* Início: Treino de hoje, centralizado, com o link da rotina embaixo */
+.hoje-frente { display: flex; flex-direction: column; align-items: center; gap: 1.5rem; margin-bottom: 2.5rem; text-align: center; }
+.hoje-frente h2 { margin: 0; font-size: clamp(3rem, 9vw, 7rem); }
+.treino-hoje .lista-treino { max-width: 52rem; margin-inline: auto; }
+.hoje-rodape { display: flex; justify-content: center; margin-top: 2.5rem; }
+.hoje-descanso { display: grid; justify-items: center; gap: 1.25rem; text-align: center; }
+.hoje-descanso p { margin: 0; max-width: 28rem; }
+.hoje-descanso-acoes { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.75rem; }
+/* O treino de hoje abre a página: no celular, bem mais compacto, com o botão de começar à vista. */
+@media (max-width: 760px) {
+  .pagina-inicio > .treino-hoje { padding-top: 5.5rem; padding-bottom: 2rem; }
+  .pagina-inicio .hoje-frente { gap: 1rem; margin-bottom: 1.5rem; }
+  .pagina-inicio .hoje-frente h2 { font-size: 2.6rem; }
+  .pagina-inicio .hoje-frente .btn { width: 100%; justify-content: space-between; }
+  .pagina-inicio .hoje-rodape { margin-top: 1.5rem; }
+}
+

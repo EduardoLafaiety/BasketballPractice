@@ -64,6 +64,9 @@ export function PoliticaPrivacidade() {
           <strong>Necessários, sempre ligados:</strong> a sessão de acesso, o tema claro ou escuro, a escolha de animações, o
           dia do último lembrete, a sua resposta ao aviso de cookies e uma cópia temporária das estatísticas da NBA, apagada
           ao fechar a aba. Sem eles o site não funciona como deveria. Nenhum é usado para anúncios.
+          O rascunho do treino em andamento e as sessões aguardando sincronização também ficam neste aparelho,
+          separados por conta. São apagados ao sair explicitamente da conta ou ao limpar os dados do site.
+          Se o acesso expirar, esses treinos continuam guardados para retomar ao entrar na mesma conta.
         </li>
         <li>
           <strong>De anúncios personalizados, só com sua permissão:</strong> quando o site passar a exibir anúncios do Google

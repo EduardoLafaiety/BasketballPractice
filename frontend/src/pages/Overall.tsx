@@ -20,7 +20,7 @@ export default function Overall() {
   return (
     <>
       <h1>Overall</h1>
-      <p className="muted">A média dos seus cinco atributos. Cada treino registrado aumenta o atributo que ele trabalha.</p>
+      <p className="muted">Pontuação de atividade baseada nos treinos registrados e nos cinco atributos. Não é uma avaliação da sua habilidade real em quadra.</p>
 
       {!carregado ? (
         erro ? <ErroCarga erro={erro} tentarDeNovo={recarregar} /> : <Carregando texto="Calculando seu overall" />

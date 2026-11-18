@@ -94,6 +94,9 @@ export interface Entrada {
 }
 
 export interface NovaSessao {
+  clientId?: string
+  programa?: { id: string; dia: number }
+  tzOffset?: number
   data: string // ISO
   duracaoMin: number
   esforco?: number // 1–5
