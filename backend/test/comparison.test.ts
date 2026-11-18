@@ -26,4 +26,5 @@ it('compara no banco com janelas locais, pesos corretos, filtro e isolamento ent
   assert.equal(all.atual.frequencia, 3)
   assert.equal(all.atual.minutos, 60)
   assert.equal((await api('GET', '/sessions/comparison?days=14', undefined, token)).status, 400)
+  assert.equal((await api('GET', '/sessions/comparison?exerciseId=2147483648', undefined, token)).status, 400)
 })

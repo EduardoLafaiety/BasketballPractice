@@ -8,6 +8,7 @@ import { migrate } from '../src/db/migrations.js'
 import { caixaDeEmails, criarConta } from './caixa.js'
 import { seed } from '../src/db/seed.js'
 import { createBackupService } from '../src/modules/data/backup.service.js'
+import { createPushService, runReminders, dueReminders } from '../src/modules/push/push.service.js'
 
 // O que o PGlite não reproduz: conexões de verdade, travas entre conexões e os códigos de erro do Postgres.
 // Roda só com TEST_POSTGRES_URL, a URL de um banco de administração (o `postgres`, nunca o de desenvolvimento):
@@ -105,6 +106,42 @@ describe('Postgres de verdade', { skip: ADMIN_URL ? false : 'defina TEST_POSTGRE
     assert.equal(await quantasSessoes(id), 0)
     assert.equal((await api('POST', '/data/import', backup(sessoes(3)), token)).status, 200)
     assert.equal(await quantasSessoes(id), 3)
+  })
+
+  it('push coordena inscrições simultâneas sem ultrapassar dez aparelhos', async () => {
+    const user = await conta()
+    const push = createPushService(db, { publicKey: 'teste', send: async () => 'ok' })
+    const input = (i: number) => ({ endpoint: `https://push.exemplo.com/${user.id}/${i}`, keys: { p256dh: 'chave', auth: 'segredo' }, tzOffset: 180 })
+    for (let i = 0; i < 9; i++) await push.subscribe(user.id, input(i))
+    const results = await Promise.allSettled([9, 10].map((i) => push.subscribe(user.id, input(i))))
+    assert.equal(results.filter((r) => r.status === 'fulfilled').length, 1)
+    const rejected = results.find((r) => r.status === 'rejected') as PromiseRejectedResult
+    assert.equal(rejected.reason.status, 400)
+    assert.equal((await db.query('SELECT id FROM push_subscriptions WHERE user_id = $1', [user.id])).rows.length, 10)
+    await push.subscribe(user.id, input(0))
+    assert.equal((await db.query('SELECT id FROM push_subscriptions WHERE user_id = $1', [user.id])).rows.length, 10)
+  })
+
+  it('push coordena duas rodadas de lembrete sem enviar duas vezes ao mesmo aparelho', { timeout: 20_000 }, async () => {
+    const user = await conta()
+    const now = new Date('2026-11-10T21:05:00Z')
+    const push = createPushService(db, { publicKey: 'teste', send: async () => 'ok' })
+    await push.subscribe(user.id, { endpoint: `https://push.exemplo.com/rodada/${user.id}`, keys: { p256dh: 'chave', auth: 'segredo' }, tzOffset: 180 })
+    await api('PUT', '/settings', { reminders: { enabled: true, time: '18:00', days: [2] } }, user.token)
+    let signal!: () => void
+    let release!: () => void
+    const sending = new Promise<void>((resolve) => { signal = resolve })
+    const gate = new Promise<void>((resolve) => { release = resolve })
+    let calls = 0
+    const first = runReminders(db, async () => { calls++; signal(); await gate; return 'ok' }, now)
+    try {
+      await sending
+      const second = await runReminders(db, async () => { calls++; return 'ok' }, now)
+      assert.equal(second.sent, 0)
+    } finally { release() }
+    assert.equal((await first).sent, 1)
+    assert.equal(calls, 1)
+    assert.equal((await dueReminders(db, now)).filter((s) => s.userId === user.id).length, 0)
   })
 
   it('contas serializam mudanças cruzadas de administrador e revalidam o autor', { timeout: 20_000 }, async () => {

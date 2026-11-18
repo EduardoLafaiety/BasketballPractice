@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict'
 import { before, describe, it } from 'node:test'
-import { splitPercent, STYLES } from '../src/modules/styles/styles.routes.js'
+import { splitPercent } from '../src/modules/styles/style.model.js'
+import { STYLES } from '../src/modules/styles/style.catalog.js'
 import { startApi } from './http.js'
 
 const { api, db, register } = await startApi()

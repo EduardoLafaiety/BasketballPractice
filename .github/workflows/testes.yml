@@ -29,6 +29,7 @@ jobs:
       - run: npm ci
         working-directory: backend
       - run: node scripts/verificar-arquitetura.mjs
+      - run: npm run test:architecture
       - run: npm run typecheck
         working-directory: backend
       - run: npm test
@@ -97,7 +98,7 @@ jobs:
       - run: npx playwright test
         working-directory: e2e
       - name: Contratos e concorrência em PostgreSQL real
-        run: npx tsx --test --test-name-pattern 'mesmo backup enviado|backup mantém|trava da importação|programas serializam|contas serializam|recuperação em conexões|ativação em conexões|troca de senha trava|últimos administradores|sair em conexões' test/postgres.test.ts
+        run: npx tsx --test --test-name-pattern 'mesmo backup enviado|backup mantém|trava da importação|programas serializam|contas serializam|recuperação em conexões|ativação em conexões|troca de senha trava|últimos administradores|sair em conexões|push coordena' test/postgres.test.ts
         working-directory: backend
         env:
           TEST_POSTGRES_URL: postgres://basketball:basketball@localhost:5433/postgres
