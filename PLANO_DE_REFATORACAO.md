@@ -1,8 +1,8 @@
 # Plano de refatoração, desempenho e experiência
 
-Atualizado em **18/11/2026**. Estado: **backend integrado até a PR #173; primeiro ciclo de frontend (passos 1 a 4) implementado e publicado na PR #175**.
+Atualizado em **18/11/2026**. Estado: **backend integrado até a PR #173; primeiro ciclo integrado na PR #175; passos 5 a 8 implementados e validados localmente**.
 
-Prioridade atual: validar e integrar referência visual/métricas, recuperação de dados locais, arquitetura da sessão e preparação de um treino offline, nessa ordem autorizada pelo usuário. O fechamento estrutural dos 12 módulos do backend foi integrado na PR #173.
+Prioridade atual: consolidar contratos/acesso a dados, componentes retrô, acessibilidade/celular e caminhos principais, na ordem dos passos 5 a 8 autorizada pelo usuário. Backend estrutural e primeiro ciclo de frontend foram integrados nas PRs #173 e #175.
 
 Sequência do backend implementada:
 
@@ -161,6 +161,15 @@ As metas de LCP, INP e CLS seguem as recomendações de [Core Web Vitals](https:
 3. Separação da execução, relógio, contadores, montagem do registro, persistência e sincronização; estados explícitos e retomada pausada.
 4. Preparação explícita de um plano com catálogo mínimo/instruções e confirmação do cache estático; início após reabertura offline e envio posterior com identidade estável.
 
-Implementação concluída; integração condicionada aos testes. A referência visual permanece retrô e esta etapa não redesenha as páginas.
+Integrado na PR #175. A referência visual permanece retrô e esta etapa não redesenha as páginas.
 
 Cada PR deve indicar regras preservadas, mudança observável, validação e limitações. As fases anteriores contêm o histórico de oportunidades; itens já entregues não devem ser refeitos como trabalho novo. Datas e estimativas futuras serão definidas por ciclo.
+
+## Segundo ciclo autorizado — passos 5 a 8
+
+5. Contratos declarativos compartilhados, mapeamentos isolados e cancelamento de consultas compartilhadas com proteção contra respostas 401 antigas.
+6. Campo, mensagem, estado vazio e botão ocupado reutilizáveis, mantendo classes e tokens retrô.
+7. Menu com foco contido/Escape, atalho ao conteúdo, foco após navegação, controles de toque e movimento de exercício por seletor além do arraste.
+8. Caminho Treinos → Rotina → Iniciar treino de hoje; aplicação da semana confirmada pelo servidor e erros com ação de recarga.
+
+Implementação e limites em [SEGUNDO_CICLO_FRONTEND.md](SEGUNDO_CICLO_FRONTEND.md). Próxima etapa autorizável do plano: carregamento/demonstrações guiados por medição, depois histórico/evolução, operação e proteção contra regressões. Não iniciar esses ciclos como parte desta entrega.

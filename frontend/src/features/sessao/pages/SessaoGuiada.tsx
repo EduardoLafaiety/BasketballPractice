@@ -6,7 +6,7 @@ import { lerLocal, registrosComProblema, removerLocal } from '../model/treino-lo
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import Contador from '../components/Contador'
-import { Carregando, ErroCarga } from '../../../shared/ui/Estado'
+import { Carregando, ErroCarga, EstadoVazio } from '../../../shared/ui/Estado'
 import ComoFazer from '../../demonstracoes/ComoFazer'
 import { DIAS, ROTULO_METRICA } from '../../../shared/lib/formatacao'
 import { useDrills } from '../../treinos/model/usarExercicios'
@@ -100,10 +100,9 @@ function SemPlano({ hoje = false }: { hoje?: boolean }) {
   return (
     <>
       <h1>Sessão guiada</h1>
-      <div className="vazio">
+      <EstadoVazio acao={<Link to="/rotina" className="btn btn-primario">Gerar a rotina da semana</Link>}>
         {hoje ? 'Nenhum treino na rotina de hoje. ' : 'Escolha o que treinar primeiro. '}
-        <Link to="/rotina" className="link">Gerar a rotina da semana</Link>.
-      </div>
+      </EstadoVazio>
     </>
   )
 }

@@ -48,6 +48,26 @@ function abrirRotina(rotas: Parameters<typeof apiFalsa>[0]) {
 const cartaoDoDia = (dia: string) => screen.getByRole('heading', { name: new RegExp(`^${dia}`) }).closest('.dia') as HTMLElement
 
 describe('Rotina semanal', () => {
+  it('move pelo seletor sem arrastar e preserva a duração na gravação atômica', async () => {
+    const user = userEvent.setup()
+    const { rotas } = servidorDeRotina({ 3: { id: 3, name: 'Rotina de quarta', description: 'bp-rotina:3', exercises: [{ exerciseId: 1 }] } })
+    const { ultima } = abrirRotina({ ...rotas, 'PUT /routine': { ids: { 3: 3, 4: 4 } } })
+    await user.selectOptions(await screen.findByRole('combobox', { name: 'Mover Lance livre de Quarta, exercício 1' }), '4')
+    await waitFor(() => expect(ultima('PUT', '/routine')?.corpo).toMatchObject({ days: expect.arrayContaining([
+      { day: 3, exercises: [] }, { day: 4, exercises: [{ exerciseId: 1, minutes: 10 }] },
+    ]) }))
+  })
+
+  it('não anuncia uma aplicação recusada como sucesso e mantém a prévia para revisão', async () => {
+    const user = userEvent.setup()
+    const { rotas } = servidorDeRotina()
+    abrirRotina({ ...rotas, 'POST /plans/generate': { minutes: 45, blocks: [{ exerciseId: 1, name: 'Lance livre', category: 'arremesso', metric: 'acertos', minutes: 45 }] }, 'PUT /routine': new Resposta(503, { error: 'Tente depois' }) })
+    await user.click(await screen.findByRole('button', { name: 'Gerar semana' }))
+    await user.click(await screen.findByRole('button', { name: 'Aplicar à rotina' }))
+    expect(await screen.findByRole('alert')).toHaveTextContent('Tente depois')
+    expect(screen.getByRole('button', { name: 'Aplicar à rotina' })).toBeInTheDocument()
+    expect(screen.queryByText('Semana gerada aplicada à sua rotina.')).toBeNull()
+  })
   it('mostra os exercícios de cada dia salvos no servidor', async () => {
     const { rotas } = servidorDeRotina({
       3: { id: 3, name: 'Rotina de quarta', description: 'bp-rotina:3', exercises: [{ exerciseId: 2 }, { exerciseId: 1 }] },

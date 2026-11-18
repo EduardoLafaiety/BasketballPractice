@@ -7,13 +7,10 @@ import type {
   Nivel,
   Estilo,
   EstiloResumo,
-  FatiaEstilo,
   Metrica,
-  Posicao,
   NovaSessao,
   Rotina,
   Sessao,
-  Zona,
 } from '../types'
 import type { ComparacaoEvolucao } from '../../../../contracts/evolucao'
 
@@ -23,159 +20,11 @@ export { ApiError, tokenAtual, contaLocal, definirToken, aoTokenExpirar, request
 
 // ---------- Contratos do backend ----------
 
-type Num = number | string | null // agregados do Postgres podem vir como texto
-
-export interface Usuario {
-  id: number
-  name: string
-  email: string
-  isAdmin: boolean
-}
-
-/** Conta vista pelo painel admin, com o resumo de uso. */
-export interface UsuarioAdmin extends Usuario {
-  createdAt: string
-  workouts: number
-  sessions: number
-  lastSessionAt: string | null
-}
-
-/** Manchete da barra de notícias: automática (GNews) ou escrita por um admin (selo "Urgente"). */
-
-export interface AuthResposta {
-  token: string
-  user: Usuario
-}
-
-interface ExerciseApi {
-  id: number
-  name: string
-  category: string
-  metric: Metrica
-  description: string | null
-  level?: Nivel | null
-  warmup?: boolean
-  position?: number | null
-  custom: boolean
-}
-
-interface ShotApi {
-  zone: Zona
-  makes: number
-  attempts: number
-}
-
-interface SessionApi {
-  id: number
-  workoutName?: string | null
-  performedAt: string
-  durationMinutes: Num
-  rating: Num
-  fatigue?: Num
-  notes: string | null
-  entries: {
-    exerciseId: number
-    exerciseName: string
-    makes: Num
-    attempts: Num
-    reps: Num
-    seconds: Num
-    bestStreak?: Num
-  }[]
-  shots?: ShotApi[]
-}
-
-interface WorkoutResumoApi {
-  id: number
-  name: string
-  description: string | null
-}
-
-interface WorkoutApi extends WorkoutResumoApi {
-  exercises: { exerciseId: number; targetSeconds?: number | null }[]
-}
-
-interface SettingsApi {
-  theme: Config['tema']
-  reminders: { enabled: boolean; time: string; days: number[] }
-  metronomeBpm: number
-}
-
-export interface ResultadoImportacao {
-  created: Record<'exercises' | 'workouts' | 'sessions', number>
-  skipped: Record<'sessions', number>
-}
+export type { Usuario, UsuarioAdmin, AuthResposta, ResultadoImportacao } from '../../../../contracts/api'
+import type { Usuario, UsuarioAdmin, AuthResposta, ResultadoImportacao, ExerciseApi, SessionApi, SettingsApi, WorkoutApi, WorkoutResumoApi, EstiloResumoApi, EstiloApi, ExercicioEstiloApi } from '../../../../contracts/api'
+import { CATEGORIA, CATEGORIA_API, paraDrill, paraSessao, paraConfig, paraEstiloResumo } from './mapeamento'
 
 // ---------- Mapeamento backend → frontend ----------
-
-const CATEGORIA: Record<string, Categoria> = {
-  arremesso: 'Arremesso',
-  drible: 'Drible',
-  passe: 'Passe',
-  finalizacao: 'Finalização',
-  defesa: 'Defesa',
-  condicionamento: 'Condicionamento',
-}
-
-const CATEGORIA_API = Object.fromEntries(Object.entries(CATEGORIA).map(([api, front]) => [front, api])) as Record<
-  Categoria,
-  string
->
-
-const num = (v: Num | undefined) => (v === null || v === undefined || v === '' ? undefined : Number(v))
-
-const paraDrill = (e: ExerciseApi): Drill => ({
-  id: String(e.id),
-  nome: e.name,
-  categoria: CATEGORIA[e.category] ?? 'Condicionamento',
-  metrica: e.metric,
-  descricao: e.description ?? '',
-  personalizado: e.custom,
-  nivel: e.level ?? undefined,
-  aquecimento: e.warmup ?? false,
-  ordem: e.position ?? undefined,
-})
-
-function paraSessao(s: SessionApi): Sessao {
-  const entrada = s.entries[0]
-  const soma = (campo: 'makes' | 'attempts') =>
-    s.entries.some((e) => e[campo] != null) ? s.entries.reduce((t, e) => t + (num(e[campo]) ?? 0), 0) : undefined
-  const sequencias = s.entries.map((e) => num(e.bestStreak)).filter((n): n is number => n !== undefined)
-  const nome =
-    s.workoutName ??
-    (s.entries.length > 1 ? `${entrada.exerciseName} + ${s.entries.length - 1}` : entrada?.exerciseName)
-  return {
-    id: String(s.id),
-    drillId: entrada ? String(entrada.exerciseId) : undefined,
-    drillNome: nome,
-    data: s.performedAt,
-    duracaoMin: num(s.durationMinutes) ?? 0,
-    acertos: soma('makes'),
-    tentativas: soma('attempts'),
-    repeticoes: s.entries.length === 1 ? num(entrada.reps) : undefined,
-    segundos: s.entries.length === 1 ? num(entrada.seconds) : undefined,
-    esforco: num(s.rating),
-    cansaco: num(s.fatigue),
-    notas: s.notes ?? undefined,
-    sequencia: sequencias.length ? Math.max(...sequencias) : undefined,
-    entradas: s.entries.map((e) => ({
-      drillId: String(e.exerciseId),
-      drillNome: e.exerciseName,
-      acertos: num(e.makes),
-      tentativas: num(e.attempts),
-      repeticoes: num(e.reps),
-      segundos: num(e.seconds),
-      sequencia: num(e.bestStreak),
-    })),
-    zonas: (s.shots ?? []).map((z) => ({ zona: z.zone, acertos: z.makes, tentativas: z.attempts })),
-  }
-}
-
-const paraConfig = (s: SettingsApi): Config => ({
-  tema: s.theme,
-  lembretes: { ativo: s.reminders.enabled, horario: s.reminders.time, dias: s.reminders.days as DiaSemana[] },
-  metronomoBpm: s.metronomeBpm,
-})
 
 /** Data local no formato AAAA-MM-DD. */
 export function dataLocal(d: Date) {
@@ -189,7 +38,7 @@ export const fuso = () => `tzOffset=${new Date().getTimezoneOffset()}`
 // ---------- Endpoints ----------
 
 export const api = {
-  comparacao: (dias: number, exercicio = '') => request<ComparacaoEvolucao>('GET', `/sessions/comparison?${fuso()}&days=${dias}${exercicio ? `&exerciseId=${encodeURIComponent(exercicio)}` : ''}`),
+  comparacao: (dias: number, exercicio = '', signal?: AbortSignal) => request<ComparacaoEvolucao>('GET', `/sessions/comparison?${fuso()}&days=${dias}${exercicio ? `&exerciseId=${encodeURIComponent(exercicio)}` : ''}`, undefined, { signal }),
   cadastrar: (nome: string, email: string, senha: string) =>
     request<{ message: string }>('POST', '/auth/register', { name: nome, email, password: senha }),
 
@@ -214,8 +63,8 @@ export const api = {
   definirAdmin: (id: number, isAdmin: boolean) => request<UsuarioAdmin>('PATCH', `/admin/users/${id}`, { isAdmin }),
   excluirUsuario: (id: number) => request<null>('DELETE', `/admin/users/${id}`),
 
-  async drills() {
-    return (await request<ExerciseApi[]>('GET', '/exercises')).map(paraDrill)
+  async drills(signal?: AbortSignal) {
+    return (await request<ExerciseApi[]>('GET', '/exercises', undefined, { signal })).map(paraDrill)
   },
 
   async salvarDrill(d: Pick<Drill, 'nome' | 'categoria' | 'metrica' | 'descricao'>, id?: string) {
@@ -228,16 +77,16 @@ export const api = {
 
   removerDrill: (id: string) => request<null>('DELETE', `/exercises/${id}`),
 
-  async sessoes(): Promise<Sessao[]> {
+  async sessoes(signal?: AbortSignal): Promise<Sessao[]> {
     // A listagem já traz notas, entries e arremessos por zona de cada sessão.
-    return (await request<SessionApi[]>('GET', '/sessions?limit=50')).map(paraSessao)
+    return (await request<SessionApi[]>('GET', '/sessions?limit=50', undefined, { signal })).map(paraSessao)
   },
 
   /** Histórico completo, página por página (para exportar em CSV). */
-  async todasSessoes(): Promise<Sessao[]> {
+  async todasSessoes(signal?: AbortSignal): Promise<Sessao[]> {
     const todas: Sessao[] = []
     for (let offset = 0; ; offset += 200) {
-      const pagina = await request<SessionApi[]>('GET', `/sessions?limit=200&offset=${offset}`)
+      const pagina = await request<SessionApi[]>('GET', `/sessions?limit=200&offset=${offset}`, undefined, { signal })
       todas.push(...pagina.map(paraSessao))
       if (pagina.length < 200) return todas
     }
@@ -271,8 +120,8 @@ export const api = {
 
   removerSessao: (id: string) => request<null>('DELETE', `/sessions/${id}`),
 
-  async config() {
-    return paraConfig(await request<SettingsApi>('GET', '/settings'))
+  async config(signal?: AbortSignal) {
+    return paraConfig(await request<SettingsApi>('GET', '/settings', undefined, { signal }))
   },
 
   async salvarConfig(c: Config) {
@@ -308,12 +157,12 @@ export const api = {
     )
   },
 
-  async estilos(): Promise<EstiloResumo[]> {
-    return (await request<EstiloResumoApi[]>('GET', '/styles')).map(paraEstiloResumo)
+  async estilos(signal?: AbortSignal): Promise<EstiloResumo[]> {
+    return (await request<EstiloResumoApi[]>('GET', '/styles', undefined, { signal })).map(paraEstiloResumo)
   },
 
-  async estilo(id: string): Promise<Estilo> {
-    const r = await request<EstiloApi>('GET', `/styles/${encodeURIComponent(id)}`)
+  async estilo(id: string, signal?: AbortSignal): Promise<Estilo> {
+    const r = await request<EstiloApi>('GET', `/styles/${encodeURIComponent(id)}`, undefined, { signal })
     const bloco = (b: ExercicioEstiloApi) => ({
       drillId: String(b.exerciseId),
       nome: b.name,
@@ -344,13 +193,13 @@ export const api = {
 
   // A rotina semanal vira um modelo de treino (/workouts) por dia da semana,
   // identificado pela descrição "bp-rotina:<dia>".
-  async rotina(): Promise<{ rotina: Rotina; ids: Partial<Record<DiaSemana, number>>; duracoes: Record<DiaSemana, number[]> }> {
+  async rotina(signal?: AbortSignal): Promise<{ rotina: Rotina; ids: Partial<Record<DiaSemana, number>>; duracoes: Record<DiaSemana, number[]> }> {
     const rotina: Rotina = { 0: [], 1: [], 2: [], 3: [], 4: [], 5: [], 6: [] }
     const duracoes = { 0: [], 1: [], 2: [], 3: [], 4: [], 5: [], 6: [] } as Record<DiaSemana, number[]>
     const ids: Partial<Record<DiaSemana, number>> = {}
-    const lista = await request<WorkoutResumoApi[]>('GET', '/workouts')
+    const lista = await request<WorkoutResumoApi[]>('GET', '/workouts', undefined, { signal })
     const dosDias = lista.filter((w) => diaDaRotina(w.description) !== null)
-    const completos = await Promise.all(dosDias.map((w) => request<WorkoutApi>('GET', `/workouts/${w.id}`)))
+    const completos = await Promise.all(dosDias.map((w) => request<WorkoutApi>('GET', `/workouts/${w.id}`, undefined, { signal })))
     for (const w of completos) {
       const dia = diaDaRotina(w.description)!
       if (ids[dia] !== undefined) continue // duplicado: fica o mais recente
@@ -384,55 +233,6 @@ export const api = {
     return salvo.id
   },
 }
-
-interface EstiloResumoApi {
-  id: string
-  name: string
-  group: 'guard' | 'forward' | 'center'
-  archetype: string
-  minutes: number
-  mix: Record<string, number>
-  moveCount?: number
-  moves?: unknown[]
-}
-
-interface ExercicioEstiloApi {
-  exerciseId: number
-  name: string
-  category: string
-  metric: Metrica
-}
-
-interface EstiloApi extends EstiloResumoApi {
-  heightCm: number
-  pace: string
-  summary: string
-  mindset: string
-  moves: {
-    name: string
-    description: string
-    tip: string
-    dose: string
-    minutes: number
-    exercise: ExercicioEstiloApi | null
-  }[]
-  session: (ExercicioEstiloApi & { minutes: number; dose: string })[]
-}
-
-const POSICAO: Record<EstiloResumoApi['group'], Posicao> = { guard: 'Armador', forward: 'Ala', center: 'Pivô' }
-
-const paraEstiloResumo = (r: EstiloResumoApi): EstiloResumo => ({
-  id: r.id,
-  nome: r.name,
-  posicao: POSICAO[r.group] ?? 'Ala',
-  arquetipo: r.archetype,
-  // A lista traz só a contagem; o detalhe traz os movimentos.
-  totalMovimentos: r.moveCount ?? r.moves?.length ?? 0,
-  minutos: r.minutes,
-  divisao: Object.entries(r.mix).map(
-    ([c, porcentagem]): FatiaEstilo => ({ categoria: CATEGORIA[c] ?? 'Condicionamento', porcentagem }),
-  ),
-})
 
 const PREFIXO_ROTINA = 'bp-rotina:'
 

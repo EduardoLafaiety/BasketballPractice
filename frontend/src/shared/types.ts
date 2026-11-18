@@ -1,3 +1,4 @@
+import type { Metrica, Nivel, Zona } from '../../../contracts/primitivos'
 export type Categoria =
   | 'Arremesso'
   | 'Drible'
@@ -7,9 +8,9 @@ export type Categoria =
   | 'Condicionamento'
 
 /** Como o treino é medido: acertos/tentativas, repetições ou tempo. */
-export type Metrica = 'acertos' | 'repeticoes' | 'tempo'
+export type { Metrica } from '../../../contracts/primitivos'
 
-export type Nivel = 'iniciante' | 'intermediario' | 'avancado'
+export type { Nivel } from '../../../contracts/primitivos'
 
 export interface Drill {
   id: string
@@ -61,19 +62,7 @@ export type DiaSemana = 0 | 1 | 2 | 3 | 4 | 5 | 6
 export type Rotina = Record<DiaSemana, string[]>
 
 /** Zonas da meia-quadra do shot chart (mesmos ids do backend). */
-export type Zona =
-  | 'garrafao'
-  | 'lance_livre'
-  | 'media_canto_e'
-  | 'media_ala_e'
-  | 'media_topo'
-  | 'media_ala_d'
-  | 'media_canto_d'
-  | 'tres_canto_e'
-  | 'tres_ala_e'
-  | 'tres_topo'
-  | 'tres_ala_d'
-  | 'tres_canto_d'
+export type { Zona } from '../../../contracts/primitivos'
 
 export interface ArremessosZona {
   zona: Zona

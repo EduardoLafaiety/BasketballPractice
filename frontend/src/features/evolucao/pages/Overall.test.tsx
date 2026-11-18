@@ -2,7 +2,7 @@ import { screen, within } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import { definirToken } from '../../../shared/api/backend'
 import { apiFalsa, configFalsa, usuarioFalso } from '../../../test/api-falsa'
-import { abrirApp } from '../../../test/renderizar'
+import { abrirApp, abrirMenu } from '../../../test/renderizar'
 // A página é baixada sob demanda; já carregada, o primeiro teste não depende do tempo de leitura do módulo.
 import './Overall'
 
@@ -26,6 +26,7 @@ describe('aba Overall', () => {
   it('está no menu e começa em 40 em tudo', async () => {
     abrir([])
     expect(await screen.findByRole('heading', { name: 'Overall' })).toBeInTheDocument()
+    await abrirMenu()
     expect(within(screen.getByRole('navigation', { name: 'Principal' })).getByRole('link', { name: /Overall/ })).toHaveAttribute('href', '/overall')
     expect(await screen.findByLabelText('Overall 40')).toBeInTheDocument()
     expect(screen.getAllByText('Novato').length).toBe(2)

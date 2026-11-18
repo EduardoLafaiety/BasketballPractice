@@ -420,3 +420,18 @@ Validação local: suíte completa do frontend (1.090 testes) aprovada antes do 
 Limites: localStorage não oferece transação entre abas, então a comparação protege conflitos detectados, sem garantia de eliminar toda gravação exatamente simultânea. Preparação depende de suporte/armazenamento do navegador e pode ser removida pelo sistema ou logout. Snapshot não é atualizado automaticamente; referência removida ou programa indisponível pode exigir correção na sincronização. Exportação de recuperação preserva registros locais, sem importação automática ou equivalência ao backup v1. Animações e catálogo completo não fazem parte da promessa offline. As alterações de cursor feitas paralelamente não pertencem a esta implementação.
 
 Próximos passos: contratos e acesso aos dados, componentes retrô, acessibilidade/celular e navegação; desempenho, histórico e operação guiados por medição. Backend permanece com seus contratos e estrutura preservados.
+
+## Etapa atual — frontend: passos 5 a 8
+
+Estado: implementado e validado localmente na branch codex/frontend-contratos-experiencia, baseada na PR #175 integrada. Relatório: [SEGUNDO_CICLO_FRONTEND.md](SEGUNDO_CICLO_FRONTEND.md).
+
+5. Contratos declarativos de leitura e primitivos compartilhados; conversões isoladas da rede, mantendo a fachada existente. Exercícios/preferências verificam contratos também no backend. Consultas compartilham cache e cancelamento; último consumidor, invalidação e logout liberam pedidos. Um 401 antigo não encerra um login novo.
+6. Campo, mensagem, estado vazio e botão ocupado reutilizados nos fluxos centrais, com rótulos/ajuda/erros associados e estilos retrô preservados.
+7. Menu com foco contido, Escape e retorno ao acionador; menu fechado fora da navegação assistiva, atalho ao conteúdo e foco após rota. Controles móveis abrangidos e remoção com área de 44 px. Seletor de destino permite mover sem arrastar, preservando duração e ocorrência do exercício.
+8. Treinos oferece montar a rotina; Rotina oferece iniciar o treino de hoje após aguardar gravações. Aplicação de prévia só anuncia sucesso após resposta, mantém revisão em falha e oferece recarga. Sessão sem plano apresenta ação principal clara.
+
+Validações locais: 1.102 testes do frontend, 189 da API, 29 jornadas Chrome/PostgreSQL, sete testes das guardas e arquitetura aprovados. Builds TypeScript, backend, produção e demonstração aprovados. Auditoria: 20 capturas em dois tamanhos/temas, sem transbordamento horizontal, com inspeção visual da identidade retrô. Revalidações direcionadas não são somadas novamente à suíte. Testes de menu passaram a abri-lo antes de interagir; uma falha isolada da suíte de limites da API foi revalidada e a execução completa seguinte passou.
+
+Sem dependência, endpoint, tabela, fórmula ou migração nova. Tipos não substituem validação em runtime. Cancelamento de consulta não desfaz uma operação recebida pelo servidor. A semana é atômica no servidor atual; o fallback legado permanece sequencial. Componentes e acessibilidade foram aplicados aos fluxos deste ciclo, sem declaração de auditoria integral WCAG. Alterações paralelas em Início foram preservadas no checkout original.
+
+Próxima ordem: carregamento e demonstrações por medição (9), histórico/evolução (10), operação (11) e proteção contra regressões (12).

@@ -14,6 +14,23 @@ const botaoMenu = () => screen.findByRole('button', { name: /^(Menu|Fechar)$/ })
 const tela = () => document.getElementById('menu-tela') as HTMLElement
 
 describe('Menu em tela cheia', () => {
+  it('leva o foco ao menu, mantém Tab dentro dele e oferece fechar por teclado', async () => {
+    const user = userEvent.setup()
+    abrir()
+    const abrirMenu = await botaoMenu()
+    await user.click(abrirMenu)
+    const dialogo = screen.getByRole('dialog', { name: 'Menu principal' })
+    expect(dialogo).toContainElement(document.activeElement as HTMLElement)
+    const fechar = within(dialogo).getByRole('button', { name: 'Fechar navegação' })
+    fechar.focus()
+    await user.tab({ shift: true })
+    expect(within(dialogo).getByRole('button', { name: 'Sair' })).toHaveFocus()
+    await user.tab()
+    expect(fechar).toHaveFocus()
+    await user.click(fechar)
+    expect(abrirMenu).toHaveFocus()
+    expect(screen.queryByRole('dialog')).toBeNull()
+  })
   it('abre e fecha pelo botão, que informa o estado', async () => {
     const user = userEvent.setup()
     abrir()

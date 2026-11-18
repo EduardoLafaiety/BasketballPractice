@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import { definirToken } from '../../../shared/api/backend'
 import { apiFalsa, configFalsa, Resposta, usuarioFalso } from '../../../test/api-falsa'
-import { abrirApp } from '../../../test/renderizar'
+import { abrirApp, abrirMenu } from '../../../test/renderizar'
 
 // O download real não existe no jsdom: o teste confere o que seria baixado.
 vi.mock('../../../shared/lib/arquivo', async (original) => ({ ...(await original<typeof import('../../../shared/lib/arquivo')>()), baixarArquivo: vi.fn() }))
@@ -114,6 +114,7 @@ describe('Backup', () => {
     await screen.findByRole('heading', { name: 'Treinos' })
     await waitFor(() => expect(screen.queryByText('Carregando treinos')).toBeNull())
 
+    await abrirMenu()
     await user.click(screen.getByRole('link', { name: 'Configurações' }))
     await user.upload(await waitFor(() => seletorDeArquivo()), arquivoJson('{"format":"basketball-practice","version":1}'))
     await screen.findByRole('status')

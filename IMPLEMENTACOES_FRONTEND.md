@@ -58,3 +58,7 @@ Cache do service worker contém HTML e arquivos públicos, sem respostas autenti
 ## Sequência futura
 
 Após integrar este ciclo: consolidar contratos/acesso a dados; componentes retrô e estados de tela; acessibilidade e uso no celular; simplificação de navegação; otimizações guiadas por medição; histórico/evolução e operação conforme necessidade. Consulte [PLANO_DE_REFATORACAO.md](PLANO_DE_REFATORACAO.md).
+
+## Segundo ciclo — passos 5 a 8
+
+Contratos e consultas compartilhadas, componentes retrô, navegação por teclado/celular e caminho da rotina ao treino foram implementados no segundo ciclo. Relatório, testes e limites em [SEGUNDO_CICLO_FRONTEND.md](SEGUNDO_CICLO_FRONTEND.md). A recuperação local e a preparação offline deste primeiro ciclo permanecem preservadas.

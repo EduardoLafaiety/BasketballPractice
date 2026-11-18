@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import DrillCard from '../components/DrillCard'
 import { AvisoDesatualizado, Carregando, ErroCarga } from '../../../shared/ui/Estado'
 import { NIVEIS } from '../../../shared/lib/niveis'
@@ -24,6 +24,7 @@ export default function Treinos() {
     <div className="treinos">
       <h1>Treinos</h1>
       <p className="muted">Biblioteca de exercícios para treinar sozinho.</p>
+      <div className="acoes-principais"><Link className="btn btn-primario" to="/rotina">Montar minha rotina</Link></div>
 
       <div className="niveis" role="group" aria-label="Nível">
         {NIVEIS.map((n) => (

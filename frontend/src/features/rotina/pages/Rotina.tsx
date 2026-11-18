@@ -1,5 +1,7 @@
 import { useMemo, useRef, useState, type CSSProperties } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import Botao from '../../../shared/ui/Botao'
+import Mensagem from '../../../shared/ui/Mensagem'
 import { AvisoDesatualizado, Carregando, ErroCarga } from '../../../shared/ui/Estado'
 import { CATEGORIAS } from '../../treinos/components/FormExercicio'
 import { DIAS } from '../../../shared/lib/formatacao'
@@ -34,7 +36,9 @@ function mixDe(linhas: Linha[]): [Categoria, number][] {
 }
 
 export default function Rotina() {
-  const { rotina, duracoes, alterarDuracao, carregado, erro, recarregar, alterarDia, aplicarModelo, erroSalvar } = useRotina()
+  const { rotina, duracoes, alterarDuracao, carregado, erro, recarregar, alterarDia, aplicarModelo, erroSalvar, moverExercicio, salvando, aguardarSalvamentos } = useRotina()
+  const navigate = useNavigate()
+  const [iniciando, setIniciando] = useState(false)
   const drills = useDrills()
   const hoje = new Date().getDay()
 
@@ -56,8 +60,7 @@ export default function Rotina() {
     setAlvo(null)
     setEmArraste(false)
     if (!origem || origem.dia === dia) return
-    remover(origem.dia, origem.indice)
-    alterarDia(dia, (ids) => [...ids, origem.id], [...(duracoes?.[dia] ?? []), duracoes?.[origem.dia]?.[origem.indice] ?? 10])
+    moverExercicio(origem.dia, origem.indice, dia)
   }
 
   // A API devolve os exercícios ordenados por categoria; agrupar deixa a lista do select legível.
@@ -79,11 +82,11 @@ export default function Rotina() {
     return Object.fromEntries(ORDEM.map((d) => [d, dia(d)])) as Semana
   }, [previa, rotina, duracoes, drills])
 
-  const aplicarPrevia = () => {
-    if (!previa) return
+  const aplicarPrevia = async () => {
+    if (!previa || salvando) return
     const temRotina = ORDEM.some((d) => rotina[d].length > 0)
     if (temRotina && !window.confirm('Aplicar a semana gerada? Isso substitui toda a sua rotina semanal.')) return
-    aplicarModelo(previaComoRotina(previa), Object.fromEntries(ORDEM.map((d) => [d, (previa[d] ?? []).map((b) => b.minutos)])))
+    if (!await aplicarModelo(previaComoRotina(previa), Object.fromEntries(ORDEM.map((d) => [d, (previa[d] ?? []).map((b) => b.minutos)])))) return
     setPrevia(null)
     setAplicada(true)
   }
@@ -95,8 +98,14 @@ export default function Rotina() {
     <>
       <h1>Rotina semanal</h1>
       <p className="muted">Planeje o que treinar em cada dia da semana.</p>
+      {pronto && !previa && semana[hoje as DiaSemana].length > 0 && <div className="acoes-principais"><Botao className="btn btn-primario" ocupado={iniciando} disabled={salvando || !!erroCarga} onClick={async () => {
+        setIniciando(true)
+        if (await aguardarSalvamentos()) navigate('/sessao?hoje')
+        setIniciando(false)
+      }}>{iniciando ? 'Conferindo rotina' : 'Iniciar treino de hoje'}</Botao></div>}
 
-      {erroSalvar && <p className="erro" role="alert">Não foi possível salvar a rotina: {erroSalvar.message}</p>}
+      {erroSalvar && <Mensagem>Não foi possível salvar a rotina: {erroSalvar.message} <Botao className="link botao-link" onClick={recarregar}>Recarregar rotina</Botao></Mensagem>}
+      {salvando && <Mensagem tipo="informacao">Salvando alterações da rotina. Aguarde a confirmação para iniciar o treino.</Mensagem>}
 
       {pronto && (
         <AvisoDesatualizado erro={erroCarga} tentarDeNovo={() => { recarregar(); drills.recarregar() }} />
@@ -118,8 +127,9 @@ export default function Rotina() {
             }}
             aoDescartar={() => setPrevia(null)}
             aoAplicar={aplicarPrevia}
+            aplicando={salvando}
           />
-          {aplicada && <p className="sucesso" role="status">Semana gerada aplicada à sua rotina.</p>}
+          {aplicada && <Mensagem tipo="sucesso">Semana gerada aplicada à sua rotina.</Mensagem>}
           <Placar semana={semana} hoje={hoje} previa={previa !== null} />
           <div className={`semana ${emArraste ? 'em-arraste' : ''} ${previa ? 'em-previa' : ''}`}>
             {ORDEM.map((dia, posicao) => {
@@ -190,6 +200,7 @@ export default function Rotina() {
                               <span className="rota-min">{l.minutos} min</span>
                             ) : (
                               <div className="rotina-item-acoes"><label className="meta">Min<input type="number" min={1} max={180} aria-label={`Minutos: ${l.nome}, ${DIAS[dia]}, exercício ${l.indice + 1}`} defaultValue={l.minutos} key={`${l.id}:${l.indice}:${l.minutos}`} onBlur={(e) => { const n = Number(e.target.value); if (Number.isInteger(n) && n >= 1 && n <= 180 && n !== l.minutos) alterarDuracao(dia, l.indice, n); else e.target.value = String(l.minutos) }} /></label>
+                              <label className="meta">Mover<select aria-label={`Mover ${l.nome} de ${DIAS[dia]}, exercício ${l.indice + 1}`} value="" onChange={(e) => { if (e.target.value !== '') moverExercicio(dia, l.indice, Number(e.target.value) as DiaSemana) }}><option value="">Para outro dia</option>{ORDEM.filter((d) => d !== dia).map((d) => <option key={d} value={d}>{DIAS[d]}</option>)}</select></label>
                               <button className="remover" aria-label={`Remover ${l.nome}`} onClick={() => remover(dia, l.indice)}>×</button></div>
                             )}
                           </li>

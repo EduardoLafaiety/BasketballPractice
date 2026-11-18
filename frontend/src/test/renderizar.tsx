@@ -1,4 +1,5 @@
-import { render } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import { render, screen } from '@testing-library/react'
 import type { ComponentProps } from 'react'
 import { MemoryRouter, useLocation } from 'react-router-dom'
 import App from '../app/App'
@@ -24,4 +25,10 @@ export function abrirApp(rota: Rota = '/') {
       </AuthProvider>
     </MemoryRouter>,
   )
+}
+
+/** Interações com o menu seguem o mesmo caminho disponível no navegador. */
+export async function abrirMenu() {
+  if (document.getElementById('menu-tela')?.getAttribute('aria-hidden') === 'false') return
+  await userEvent.click(await screen.findByRole('button', { name: 'Menu' }))
 }

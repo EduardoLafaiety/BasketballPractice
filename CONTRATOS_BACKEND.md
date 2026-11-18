@@ -234,3 +234,9 @@ ID: uma a 60 letras minúsculas/hífens; formato inválido retorna 400, estilo i
 ## Ajuste final de comparação de sessões
 
 O filtro `exerciseId` de GET `/api/sessions/comparison` aceita inteiro positivo até 2.147.483.647, compatível com a chave PostgreSQL. Valores superiores retornam 400 antes de executar SQL. As janelas de sete/30 dias e o formato da resposta permanecem iguais.
+
+## Tipos compartilhados de leitura — frontend 5 a 8
+
+Os DTOs já consumidos pela fachada central estão em contracts/api.d.ts; métrica, nível e zona ficam em contracts/primitivos.d.ts. O frontend importa declarações e mantém suas conversões em shared/api/mapeamento.ts. Exercícios e preferências também verificam o contrato na compilação do backend. São tipos estáticos, sem biblioteca de runtime ou alteração das respostas HTTP.
+
+AbortSignal é uma opção do transporte do cliente para consultas. Não modifica endpoints, transações, idempotência ou política de repetição no servidor. A rotina continua usando PUT /api/routine e o fallback legado descrito neste documento. Movimentar um exercício usa a mesma escrita da semana e preserva seus minutos.

@@ -50,7 +50,9 @@ export function aoTokenExpirar(fn: (() => void) | null) {
 }
 
 /** Pedido à API (ou à API da demonstração, que roda no navegador). */
-export async function request<T>(metodo: string, caminho: string, corpo?: unknown): Promise<T> {
+export async function request<T>(metodo: string, caminho: string, corpo?: unknown, { signal }: { signal?: AbortSignal } = {}): Promise<T> {
+  const tokenDoPedido = token
+  signal?.throwIfAborted()
   let resposta: Response
   try {
     resposta = __DEMO__
@@ -58,18 +60,21 @@ export async function request<T>(metodo: string, caminho: string, corpo?: unknow
         await (await import('@demo/servidor')).responder(metodo, caminho, corpo)
       : await fetch(`${BASE}${caminho}`, {
           method: metodo,
+          signal,
           headers: {
             ...(corpo !== undefined ? { 'Content-Type': 'application/json' } : {}),
-            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+            ...(tokenDoPedido ? { Authorization: `Bearer ${tokenDoPedido}` } : {}),
           },
           body: corpo === undefined ? undefined : JSON.stringify(corpo),
         })
   } catch (erro) {
+    if (signal?.aborted) throw signal.reason ?? new DOMException('Pedido cancelado', 'AbortError')
     if (__DEMO__) console.error('Demonstração indisponível', erro)
     throw new ApiError(0, 'Não foi possível falar com o servidor. Verifique sua conexão.')
   }
 
   const texto = await resposta.text()
+  signal?.throwIfAborted()
   let dados: unknown = null
   try {
     dados = texto ? JSON.parse(texto) : null
@@ -79,7 +84,7 @@ export async function request<T>(metodo: string, caminho: string, corpo?: unknow
 
   if (!resposta.ok) {
     const erro = (dados ?? {}) as { error?: string; details?: ApiError['details'] }
-    if (resposta.status === 401 && token) aoExpirar?.()
+    if (resposta.status === 401 && tokenDoPedido && token === tokenDoPedido) aoExpirar?.()
     const mensagem =
       erro.error ?? (resposta.status >= 500 ? 'O servidor não respondeu. Tente de novo.' : `Erro ${resposta.status}`)
     throw new ApiError(resposta.status, mensagem, erro.details)

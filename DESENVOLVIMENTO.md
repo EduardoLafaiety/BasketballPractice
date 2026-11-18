@@ -95,3 +95,11 @@ A data de preparação é exibida. Mudanças posteriores na rotina/catalogo não
 O aviso de dados locais permite exportar registros antes de descartar dados incompatíveis. A exportação de recuperação não é o backup do servidor nem possui importação automática. Os JSON originais são preservados até decisão explícita.
 
 Validação direcionada: npm --prefix frontend test -- src/features/sessao src/shared/lib/service-worker.test.ts. Jornadas: npm --prefix e2e test -- treino-recuperavel.spec.ts. O teste inclui preparo antes de qualquer rascunho, reabertura offline, envio posterior e conflito entre abas. A auditoria produz 20 capturas e recursos-por-tela.json em diretório temporário; execute separada dos E2E e do build demo, que compartilham portas/banco/dist.
+
+### Segundo ciclo de frontend: contratos, controles e experiência
+
+Relatório: [SEGUNDO_CICLO_FRONTEND.md](SEGUNDO_CICLO_FRONTEND.md). Não foram adicionadas dependências. Campos e mensagens comuns ficam em shared/ui; DTOs declarativos em contracts; conversões em shared/api/mapeamento.ts.
+
+Para repetir a validação direcionada, execute npm --prefix frontend test -- src/shared src/app/layout/Layout.test.tsx src/features/rotina/pages/Rotina.test.tsx. Os testes de navegação abrem o menu antes de acessar suas opções, como no navegador real. Jornadas novas: npm --prefix e2e test -- experiencia.spec.ts.
+
+A auditoria aceita AUDIT_OUTPUT_DIR para separar as capturas de ciclos/trabalhos paralelos. E2E_DATABASE_URL pode apontar para um banco exclusivo cujo nome contenha e2e, conforme a trava do preparador. Nunca utilize dados pessoais/produção. Nesta etapa foi usado basketball_e2e_experiencia e as capturas ficaram no diretório temporário basketball-practice-audit-passos-5-8. Não executar build demo ao mesmo tempo que E2E/auditoria no mesmo checkout, pois compartilham frontend/dist.

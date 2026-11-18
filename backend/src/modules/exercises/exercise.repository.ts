@@ -1,10 +1,10 @@
 import { many, one, type Queryable } from '../../db/index.js'
 import { HttpError } from '../../lib/http-error.js'
 import type { ExerciseInput, ExerciseQuery } from './exercise.schema.js'
+import type { ExerciseApi } from '../../../../contracts/api.js'
 
-export interface ExerciseRow {
-  id: number; name: string; category: string; metric: string; description: string | null
-  level: string | null; warmup: boolean; position: number | null; ownerId: number | null
+export interface ExerciseRow extends Omit<ExerciseApi, 'custom'> {
+  level: NonNullable<ExerciseApi['level']> | null; warmup: boolean; position: number | null; ownerId: number | null
 }
 
 const COLUMNS = `id, name, category, metric, description, level, warmup, position, user_id AS "ownerId"`

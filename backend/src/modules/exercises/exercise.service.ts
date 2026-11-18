@@ -3,8 +3,9 @@ import { HttpError, notFound } from '../../lib/http-error.js'
 import { parse } from '../../lib/validate.js'
 import * as repository from './exercise.repository.js'
 import { exerciseSchema, type ExerciseInput, type ExerciseQuery } from './exercise.schema.js'
+import type { ExerciseApi } from '../../../../contracts/api.js'
 
-const toExercise = ({ ownerId, ...exercise }: repository.ExerciseRow) => ({ ...exercise, custom: ownerId !== null })
+const toExercise = ({ ownerId, ...exercise }: repository.ExerciseRow): ExerciseApi => ({ ...exercise, custom: ownerId !== null })
 
 export async function listExercises(db: Queryable, userId: number, query: ExerciseQuery) {
   return (await repository.listVisibleExercises(db, userId, query)).map(toExercise)
