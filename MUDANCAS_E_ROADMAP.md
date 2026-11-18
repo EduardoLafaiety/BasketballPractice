@@ -318,7 +318,7 @@ Próxima ordem sugerida após este complemento:
 
 ## Etapa atual — arquitetura do backend antes do frontend
 
-Estado: implementação validada localmente na branch `codex/arquitetura-backend-treinos`, partindo da PR #166 integrada, preparada para revisão no GitHub.
+Estado: implementação validada localmente e publicada no [PR #167](https://github.com/EduardoLafaiety/BasketballPractice/pull/167), branch `codex/arquitetura-backend-treinos`, partindo da PR #166 integrada. Commit de implementação: `6fc2376`.
 
 Direção autorizada: organizar e validar a base do backend antes de evoluir a recuperação local e a experiência offline no frontend.
 

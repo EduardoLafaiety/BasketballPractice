@@ -1,6 +1,6 @@
 # Plano de refatoração, desempenho e experiência
 
-Atualizado em **18/11/2026**. Estado: **PRs #165 e #166 integradas; etapa de arquitetura do backend em validação**.
+Atualizado em **18/11/2026**. Estado: **PRs #165 e #166 integradas; etapa de arquitetura do backend validada localmente e publicada no PR #167**.
 
 Prioridade atual: arquitetura do backend antes do frontend, conforme orientação do usuário. Sessões e rotina passam a separar transporte, casos de uso e persistência, com validação dos limites transacionais e contratos existentes. Recuperação local e preparação offline entram depois dessa base. A reorganização integral dos demais domínios continua incremental.
 
