@@ -136,6 +136,26 @@ export function momentoDaSoltura(c: Clipe, ev = toques(c)): number | null {
   return melhor && melhor.y > 1.75 ? melhor.t : null
 }
 
+/**
+ * Instante (ms) do passe de peito: o pico de velocidade, para a frente, das duas mãos juntas na altura do peito.
+ * Null se o clipe não tem esse empurrão.
+ */
+export function momentoDoPasse(c: Clipe): number | null {
+  const dt = 1000 / c.fps
+  let melhor: { t: number; v: number } | null = null
+  const passo = 3 * dt
+  for (let t = passo; t <= duracao(c); t += dt) {
+    const p = poseEm(c, t)
+    const a = poseEm(c, t - passo)
+    const meio = mix(p.RightHand, p.LeftHand, 0.5)
+    const meioA = mix(a.RightHand, a.LeftHand, 0.5)
+    const f = frenteDe(p)
+    const v = dot(sub(meio, meioA), f) / (passo / 1000)
+    if (distancia(p.RightHand, p.LeftHand) < 0.5 && meio.y > 1.0 && meio.y < 1.7 && v > 1.5 && (!melhor || v > melhor.v)) melhor = { t, v }
+  }
+  return melhor ? melhor.t : null
+}
+
 export interface BolaMocap {
   centro: V3
   presa: number
@@ -240,9 +260,12 @@ function girar(p: V3, a: number): V3 {
  * O referencial do clipe é girado por `yaw` em torno da pelve inicial e levado para `origem`.
  */
 export interface Arremesso {
-  /** Instante da soltura (ms) e posição da cesta no mundo. */
+  /** Instante da soltura (ms) e posição do alvo no mundo (a cesta, ou o ponto do passe). */
   t: number
   cesta: V3
+  /** Altura extra da parábola (m) e duração do voo (ms); padrão: arremesso à cesta. */
+  pico?: number
+  voo?: number
 }
 
 export function corpoMocap(
@@ -319,12 +342,12 @@ export function corpoMocap(
   if (b && arremesso && t > arremesso.t) {
     // Depois da soltura, a bola voa até a cesta (parábola) e cai pela rede, sem mais nenhuma mão nela.
     const sai = lugar(bola!(arremesso.t).centro)
-    const T = 850
+    const T = arremesso.voo ?? 850
     const u = (t - arremesso.t) / T
     const alvo = arremesso.cesta
     let centro: V3
     if (u <= 1) {
-      const pico = 0.9
+      const pico = arremesso.pico ?? 0.9
       centro = v3(sai.x + (alvo.x - sai.x) * u, sai.y + (alvo.y - sai.y) * u + pico * 4 * u * (1 - u), sai.z + (alvo.z - sai.z) * u)
     } else {
       const s = (t - arremesso.t - T) / 1000
