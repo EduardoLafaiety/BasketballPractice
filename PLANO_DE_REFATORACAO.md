@@ -1,6 +1,8 @@
 # Plano de refatoração, desempenho e experiência
 
-Atualizado em **18/11/2026**. Estado: **arquitetura e primeiro ciclo integrados pelo PR #165; complemento de revisão individual da fila em validação**.
+Atualizado em **18/11/2026**. Estado: **PRs #165 e #166 integradas; etapa de arquitetura do backend em validação**.
+
+Prioridade atual: arquitetura do backend antes do frontend, conforme orientação do usuário. Sessões e rotina passam a separar transporte, casos de uso e persistência, com validação dos limites transacionais e contratos existentes. Recuperação local e preparação offline entram depois dessa base. A reorganização integral dos demais domínios continua incremental.
 
 A estrutura entregue está em [ARQUITETURA.md](ARQUITETURA.md). Já foram aplicados cache compartilhado, antecipação seletiva de rotas, suspensão de animações invisíveis, fila local por item, revisão de pendências, duração por exercício, escrita atômica da semana e comparação agregada no servidor. As fases abaixo continuam sendo a visão de evolução; nem todos os seus itens estão concluídos. A nova auditoria automatiza capturas e contagens locais, sem substituir medições em aparelhos reais ou dados de campo.
 

@@ -63,6 +63,12 @@ export const sessionSchema = z.object({
     .default([]),
 })
 
+export const createSessionSchema = sessionSchema.extend({
+  clientId: z.string().uuid().optional(),
+  program: z.object({ id: z.string().max(60), day: z.number().int().min(1).max(366) }).optional(),
+  tzOffset: z.number().int().min(-840).max(840).default(0),
+})
+
 // Diferença do fuso do cliente em minutos, no formato de Date.getTimezoneOffset() (Brasília = 180).
 // Sem ela, "dia" e "semana" seriam contados em UTC e um treino às 22h cairia no dia seguinte.
 export const tzQuery = z.object({ tzOffset: z.coerce.number().int().min(-840).max(840).default(0) })
@@ -78,6 +84,8 @@ export const listQuery = dateRangeQuery.extend({
 })
 
 export type SessionInput = z.infer<typeof sessionSchema>
+export type CreateSessionInput = z.infer<typeof createSessionSchema>
+export type SessionListQuery = z.infer<typeof listQuery>
 
 const DATE_ONLY = /^\d{4}-\d{2}-\d{2}$/
 

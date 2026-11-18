@@ -13,7 +13,10 @@ if (ignorados.status === 0) for (const p of ignorados.stdout.trim().split('\n').
 for (const arquivo of ['frontend/src', 'backend/src'].flatMap((p) => arquivos(resolve(raiz, p))).filter((p) => /\.(ts|tsx)$/.test(p) && !/\.test\./.test(p))) {
   const origem = normalizar(arquivo)
   const texto = readFileSync(arquivo, 'utf8')
+  // Migração incremental: os módulos já separados não voltam a gravar SQL nas rotas.
+  if (/^backend\/src\/modules\/(sessions|routine)\/.*\.routes\.ts$/.test(origem) && /\.(?:query|transaction)\s*\(/.test(texto)) erros.push(`${origem}: persistência/transação deve ficar fora da rota HTTP`)
   for (const [, caminho] of texto.matchAll(/(?:from\s*|import\s*\()\s*['"]([^'"]+)['"]/g)) {
+    if (/\.(service|repository|schema)\.ts$/.test(origem) && /^(express|node:http|node:https)$/.test(caminho)) erros.push(`${origem}: domínio/persistência depende de transporte HTTP`)
     if (!caminho.startsWith('.')) continue
     const alvo = resolve(dirname(arquivo), caminho)
     const destino = normalizar(alvo)
@@ -23,6 +26,8 @@ for (const arquivo of ['frontend/src', 'backend/src'].flatMap((p) => arquivos(re
     if (origem.startsWith('frontend/src/features/') && destino.startsWith('frontend/src/app/')) erros.push(`${origem}: feature depende da composição app`)
     if (/\.(service|repository|generator|schema)\.ts$/.test(origem) && destino.endsWith('.routes.js')) erros.push(`${origem}: regra/persistência depende de rota HTTP`)
     if (origem.endsWith('.routes.ts') && destino.endsWith('.routes.js')) erros.push(`${origem}: rota depende de outra rota; extraia um contrato ou serviço`)
+    if (/^backend\/src\/modules\/(sessions|routine)\/.*\.routes\.ts$/.test(origem) && destino.endsWith('.repository.js')) erros.push(`${origem}: rota deve acessar o caso de uso, não o repositório`)
+    if (origem.endsWith('.repository.ts') && destino.endsWith('.service.js')) erros.push(`${origem}: persistência depende de serviço`)
     if (origem.endsWith('.generator.ts') && /from ['"](?:express|pg)['"]/.test(texto)) erros.push(`${origem}: gerador depende de infraestrutura`)
   }
 }

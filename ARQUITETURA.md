@@ -30,10 +30,10 @@ BasketballPractice/
 │   └── test/                 # Infraestrutura de testes do frontend
 ├── backend/src/
 │   ├── modules/              # Endpoints organizados por domínio
-│   │   ├── sessions/         # Rotas, schema, repositório e agregação
+│   │   ├── sessions/         # Rotas, schema, serviço, repositório e agregação
 │   │   ├── programs/         # Rotas e serviço de progressão
 │   │   ├── plans/            # Rotas, schema e gerador
-│   │   ├── routine/          # Salvamento atômico da semana
+│   │   ├── routine/          # Rotas, schema, serviço e persistência da semana
 │   │   └── ...
 │   ├── db/                   # Conexão, migrações, catálogo e dados iniciais
 │   ├── middleware/           # Autorização, limites e tratamento de erros
@@ -56,14 +56,16 @@ BasketballPractice/
 6. Serviços, repositórios e geradores não dependem dos arquivos de rota HTTP.
 7. Contratos compartilhados são declarações de tipos, sem dependências de React, Express ou PostgreSQL.
 
-`npm run check:architecture` verifica imports locais e as fronteiras acima. A mesma verificação está no CI. O script não substitui revisão de domínio ou detecta toda possível dependência dinâmica.
+`npm run check:architecture` verifica imports locais e as fronteiras acima. Em sessões e rotina, também impede SQL/transações e acesso direto a repositórios nas rotas. Schemas, serviços e repositórios não importam Express ou os módulos HTTP do Node; repositórios não importam serviços. A mesma verificação está no CI. O script não substitui revisão de domínio ou detecta toda possível dependência dinâmica.
 
 ## Decisões da refatoração
 
 - O antigo store foi dividido em infraestrutura de cache e hooks das funcionalidades. Pedidos em andamento para a mesma chave são compartilhados. Logout e invalidação impedem respostas antigas de repopular o cache.
 - O transporte HTTP é separado da adaptação dos endpoints. O arquivo `shared/api/backend.ts` continua sendo a fachada de integração; não é um componente de interface.
 - Rotas e testes foram atualizados para os caminhos novos, sem manter cópias dos módulos antigos.
-- Schemas e persistência de sessões e regras de programas foram extraídos das rotas. Os demais módulos podem aprofundar essa separação quando houver mudança concreta, sem criar camadas vazias.
+- Sessões e rotina seguem `rota → serviço → repositório`. Rotas validam entradas, obtêm a conta autenticada e devolvem HTTP; serviços coordenam regras e transações; repositórios executam SQL. Sessões mantêm a agregação de comparação em módulo próprio. Os demais módulos aprofundam essa separação por fluxo, sem criar camadas vazias.
+- A criação da sessão mantém validação, deduplicação e conclusão do programa na mesma transação. A edição bloqueia a sessão da conta e valida referências dentro da transação antes de substituir cabeçalho, entradas e zonas. O resultado é montado antes do commit; reenvios com chave estável não substituem o conteúdo confirmado.
+- A rotina possui schema, serviço e repositório próprios; o serviço confirma a semana inteira em uma transação, mantendo IDs e representação legados. Não há nova tabela nem controle otimista de versão nesta etapa.
 - A rotina ganhou um contrato de escrita de semana inteira. A persistência continua usando os treinos existentes para preservar backups, IDs e referências de sessões. A migração para tabelas exclusivas é uma decisão futura, não uma migração já realizada.
 - A comparação de evolução é calculada no servidor; a página não baixa todas as sessões. Conquistas e Overall ainda utilizam seu histórico completo.
 - A fila local guarda cada sessão em uma chave independente, em formato versionado. Lê a fila antiga e só remove o item confirmado. Quando disponível, Web Locks coordena envios entre abas; a deduplicação no servidor continua sendo a garantia final.
