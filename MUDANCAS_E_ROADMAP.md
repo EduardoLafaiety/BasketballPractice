@@ -355,7 +355,7 @@ A orientação vigente é concluir o backend antes do frontend. A fila restante 
 
 ## Etapa atual — exercícios, programas e planos
 
-Estado: implementação validada localmente na branch `codex/arquitetura-exercicios-programas-planos`, baseada na PR #168 integrada, preparada para revisão no GitHub.
+Estado: implementação validada localmente e publicada no [PR #169](https://github.com/EduardoLafaiety/BasketballPractice/pull/169), branch `codex/arquitetura-exercicios-programas-planos`, baseada na PR #168 integrada. Commit de implementação: `cf95857`.
 
 - Exercícios: consultas, gravações e exclusão movidas para repositório; serviço preserva visibilidade por conta, catálogo protegido e conflito de referência em uso. Edição/exclusão verificam propriedade dentro da transação e bloqueiam o registro.
 - Programas: validação de parâmetros/corpo em schema; status e data local em modelo próprio; leitura e escrita de progresso em repositório; serviço concentra lista, detalhe, início, saída e conclusão.
