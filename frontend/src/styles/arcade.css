@@ -105,3 +105,13 @@ body,
 body *:not(input):not(textarea):not(select):not(option) {
   text-transform: uppercase !important;
 }
+
+/* Botões e campos não herdam a fonte do navegador por padrão (ficavam em Arial, como os botões de tempo e foco da
+   Rotina). Seletor simples de propósito: quem já define a própria fonte numa classe continua vencendo. */
+button,
+input,
+select,
+textarea,
+optgroup {
+  font-family: var(--fonte-texto);
+}
