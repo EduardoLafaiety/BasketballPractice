@@ -41,9 +41,14 @@ const DOCA_ESQUERDA: AtalhoDoca[] = [
 ]
 const DOCA_DIREITA: AtalhoDoca[] = [{ to: '/evolucao', rotulo: 'Evolução', icone: 'prancheta' }]
 
+function voltarAoTopo(e: MouseEvent<HTMLAnchorElement>) {
+  if (e.button !== 0 || e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) return
+  window.scrollTo(0, 0)
+}
+
 function ItemDoca({ to, rotulo, icone, fim }: AtalhoDoca) {
   return (
-    <NavLink to={to} end={fim} className="doca-item">
+    <NavLink to={to} end={fim} className="doca-item" onClick={to === '/' ? voltarAoTopo : undefined}>
       <Icone nome={icone} tamanho={22} />
       {rotulo}
     </NavLink>
@@ -169,10 +174,17 @@ export default function Layout() {
       <a className="pular-conteudo" href="#conteudo">Pular para o conteúdo</a>
       <div className="progresso-pagina" aria-hidden><i ref={barra} /></div>
       <header className="topo">
-        <Link to="/" className="marca" aria-label="Basketball Practice, início">
+        <Link to="/" className="marca" aria-label="Basketball Practice, início" onClick={voltarAoTopo}>
           <Icone nome="bola" tamanho={34} />
         </Link>
-        {secao && <span className="topo-secao">{secao}</span>}
+        {secao && (pathname === '/'
+          ? <Link to="/" className="topo-secao" onClick={voltarAoTopo}>Início</Link>
+          : <span className="topo-secao">{secao}</span>)}
+        <nav className="topo-atalhos" aria-label="Navegação rápida">
+          {LINKS.filter((l) => ['/treinos', '/rotina', '/evolucao'].includes(l.to)).map((l) => (
+            <NavLink key={l.to} to={l.to}>{l.rotulo}</NavLink>
+          ))}
+        </nav>
         <button className="topo-menu" aria-expanded={menuAberto} aria-controls="menu-tela" onClick={alternarMenu}>
           <span className="topo-tracos" aria-hidden />
           {menuAberto ? 'Fechar' : 'Menu'}
@@ -183,8 +195,7 @@ export default function Layout() {
         <Botao className="btn menu-fechar" onClick={() => { setMenuAberto(false); botaoMenu.current?.focus() }}>Fechar navegação</Botao>
         <nav className="nav" aria-label="Principal" style={{ '--linhas': Math.ceil((LINKS.length + (usuario?.isAdmin ? 1 : 0)) / 2) } as CSSProperties}>
           {[
-            { titulo: 'Treinar', caminhos: ['/', '/treinos', '/programas', '/jogue-como'] },
-            { titulo: 'Rotina', caminhos: ['/rotina'] },
+            { titulo: 'Treinar', caminhos: ['/', '/treinos', '/rotina', '/programas', '/jogue-como'] },
             { titulo: 'Evolução', caminhos: ['/evolucao', '/overall', '/conquistas'] },
             { titulo: 'Explorar', caminhos: ['/nba', '/nbb', '/alimentacao', '/equipamentos', '/artigos'] },
           ].map((grupo) => <section className="nav-grupo" key={grupo.titulo} aria-label={grupo.titulo}>
@@ -192,14 +203,13 @@ export default function Layout() {
             {grupo.caminhos.map((caminho) => {
               const i = LINKS.findIndex((l) => l.to === caminho)
               const l = LINKS[i]
-              return <NavLink key={l.to} to={l.to} end={l.fim} className="nav-link" style={{ '--i': i } as CSSProperties} onClick={() => setMenuAberto(false)}>
-                <span aria-hidden>{String(i + 1).padStart(2, '0')}</span>{l.rotulo}
+              return <NavLink key={l.to} to={l.to} end={l.fim} className="nav-link" style={{ '--i': i } as CSSProperties} onClick={(e) => { setMenuAberto(false); if (l.to === '/') voltarAoTopo(e) }}>
+                {l.rotulo}
               </NavLink>
             })}
           </section>)}
           {usuario?.isAdmin && (
             <NavLink to="/admin" className="nav-link" style={{ '--i': LINKS.length } as CSSProperties} onClick={() => setMenuAberto(false)}>
-              <span aria-hidden>{String(LINKS.length + 1).padStart(2, '0')}</span>
               Admin
             </NavLink>
           )}
@@ -226,13 +236,22 @@ export default function Layout() {
           <Outlet />
         </Suspense></LimiteDeErro>
       </main>
-      <footer className="rodape"><LinksLegais /></footer>
+      <footer className="rodape">
+        <div className="rodape-principal">
+          <Link to="/" className="rodape-marca" onClick={voltarAoTopo}><Icone nome="bola" tamanho={28} /> Basketball Practice</Link>
+          <nav aria-label="Links do rodapé">
+            <Link to="/treinos">Treinos</Link><Link to="/rotina">Rotina</Link><Link to="/evolucao">Evolução</Link>
+          </nav>
+        </div>
+        <p className="rodape-creditos">Projeto independente, sem vínculo com os jogadores, a NBA ou os times. Fotos da Wikimedia Commons; autoria e licença na página de cada jogador.</p>
+        <LinksLegais />
+      </footer>
 
       <nav className="doca" aria-label="Atalhos" onClick={() => vibrar(8)}>
         {DOCA_ESQUERDA.map((l) => <ItemDoca key={l.to} {...l} />)}
-        <NavLink to="/rotina" className="doca-item doca-gerar" aria-label="Gerar rotina">
+        <NavLink to="/rotina" className="doca-item doca-gerar" aria-label="Rotina">
           <Icone nome="bola" tamanho={22} />
-          Gerar
+          Rotina
         </NavLink>
         {DOCA_DIREITA.map((l) => <ItemDoca key={l.to} {...l} />)}
         <button className="doca-item" aria-label="Mais seções" aria-expanded={menuAberto} aria-controls="menu-tela" onClick={alternarMenu}>

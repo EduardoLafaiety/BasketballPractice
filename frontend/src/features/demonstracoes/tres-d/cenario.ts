@@ -27,14 +27,14 @@ function tex(largura: number, altura: number, desenhar: (c: CanvasRenderingConte
 /** Tábuas de madeira, com veios e emendas. */
 function texturaPiso() {
   return tex(1024, 1024, (c) => {
-    const tons = ['#c89a64', '#c19259', '#cfa36f', '#b98a55', '#c69b66']
+    const tons = ['#cda778', '#c9a273', '#d1ab7b', '#c6a071', '#cea879']
     const larg = 1024 / 12
     for (let i = 0; i < 12; i++) {
       c.fillStyle = tons[i % tons.length]
       c.fillRect(i * larg, 0, larg, 1024)
       // veios
       for (let k = 0; k < 14; k++) {
-        c.strokeStyle = `rgba(80,45,15,${0.05 + (k % 3) * 0.03})`
+        c.strokeStyle = `rgba(80,45,15,${0.025 + (k % 3) * 0.015})`
         c.lineWidth = 1
         c.beginPath()
         const x = i * larg + 4 + ((k * 37) % (larg - 8))
@@ -43,7 +43,7 @@ function texturaPiso() {
         c.stroke()
       }
       // emendas das pontas das tábuas, desencontradas
-      c.fillStyle = 'rgba(60,32,10,0.45)'
+      c.fillStyle = 'rgba(60,32,10,0.18)'
       c.fillRect(i * larg, 0, 1.5, 1024)
       const desloc = (i * 211) % 512
       c.fillRect(i * larg, desloc, larg, 1.5)
@@ -130,11 +130,14 @@ export class Cenario {
     const { cena } = anim.coreografia
     const frente = anim.frente
     this.piso(frente)
+    this.ginasio()
+    this.quadraDeLado(cena.cesta === 'frente')
     if (cena.cesta === 'lado') {
-      this.quadraDeLado()
       this.cesta(ARO.lado.x * ESCALA, 0, -1)
     }
     if (cena.cesta === 'frente') this.cesta(ARO.frente.x * ESCALA, 3.4, 1, true)
+    if (!cena.cesta) this.cesta(ARO.lado.x * ESCALA, 0, -1)
+    if (cena.cesta !== 'frente') this.cesta(ARO.lado.x * ESCALA + 3.16 - 28, 0, 1)
     for (const x of cena.linhas ?? []) this.marcaNoChao(x * ESCALA)
     for (const c of cena.cones ?? []) this.cone(c.x * ESCALA, (c.prof ?? 0) * 0.9)
     if (cena.parede !== undefined) this.parede(cena.parede * ESCALA)
@@ -143,7 +146,7 @@ export class Cenario {
     for (let i = 0; i < 2; i++) {
       const b = new THREE.Mesh(
         new THREE.SphereGeometry(MEDIDAS.raioBola, 32, 24),
-        new THREE.MeshStandardMaterial({ map: this.texturaDaBola, roughness: 0.62, bumpMap: this.texturaDaBola, bumpScale: 0.6 }),
+        new THREE.MeshStandardMaterial({ map: this.texturaDaBola, roughness: 0.76, bumpMap: this.texturaDaBola, bumpScale: 0.0015 }),
       )
       b.castShadow = true
       b.visible = false
@@ -156,10 +159,10 @@ export class Cenario {
 
   private piso(frente: boolean) {
     const t = texturaPiso()
-    const largura = 34
-    const fundo = 20
-    t.repeat.set(largura / 2.4, fundo / 2.4)
-    const m = new THREE.Mesh(new THREE.PlaneGeometry(largura, fundo), new THREE.MeshStandardMaterial({ map: t, roughness: 0.55, metalness: 0.02 }))
+    const largura = 44
+    const fundo = 40
+    t.repeat.set(largura / 3.6, fundo / 3.6)
+    const m = new THREE.Mesh(new THREE.PlaneGeometry(largura, fundo), new THREE.MeshPhysicalMaterial({ map: t, roughness: 0.36, clearcoat: 0.38, clearcoatRoughness: 0.3 }))
     m.rotation.x = -Math.PI / 2
     m.position.set(frente ? 4.4 : 5.2, 0, 0)
     m.receiveShadow = true
@@ -167,10 +170,29 @@ export class Cenario {
   }
 
   /** Marcações de meia quadra, com a cesta à direita: garrafão, lance livre e linha de três. */
-  private quadraDeLado() {
+  private quadraDeLado(deFrente = false) {
+    const quadra = new THREE.Group()
     const aroX = ARO.lado.x * ESCALA
     const base = aroX + 0.38 + 1.2 // linha de fundo (a cesta fica 1,2 m dentro da quadra)
-    const L = (p: [number, number][], w = 0.05) => this.raiz.add(fita(p, w))
+    const L = (p: [number, number][], w = 0.05) => quadra.add(fita(p, w))
+    // Quadra inteira: linhas de fundo, laterais, círculo central e os dois garrafões.
+    L([[base, -7.5], [base - 28, -7.5], [base - 28, 7.5], [base, 7.5], [base, -7.5]])
+    L([[base - 14, -7.5], [base - 14, 7.5]])
+    L(arco(base - 14, 0, 1.8, 0, Math.PI * 2, 72))
+    const tinta = new THREE.MeshStandardMaterial({ color: 0x29434b, roughness: 0.48, transparent: true, opacity: 0.72, depthWrite: false })
+    for (const sinal of [1, -1]) {
+      const fundo = sinal === 1 ? base : base - 28
+      const area = new THREE.Mesh(new THREE.PlaneGeometry(5.8, 4.9), tinta)
+      area.rotation.x = -Math.PI / 2
+      area.position.set(fundo - sinal * 2.9, 0.001, 0)
+      area.receiveShadow = true
+      quadra.add(area)
+      if (sinal === -1) {
+        L([[fundo, -2.45], [fundo + 5.8, -2.45], [fundo + 5.8, 2.45], [fundo, 2.45]])
+        L(arco(fundo + 5.8, 0, 1.8, Math.PI / 2, Math.PI * 1.5))
+        L(arco(fundo + 1.58, 0, 6.75, -1.36, 1.36, 72))
+      }
+    }
     const lance = base - 5.8
     L([[base, -7.5], [base, 7.5]])
     L([[base, -2.45], [lance, -2.45], [lance, 2.45], [base, 2.45]])
@@ -184,11 +206,39 @@ export class Cenario {
     L(arco(aroX, 0, 6.75, Math.PI - a, Math.PI + a, 72))
     // semicírculo sob a cesta (área de não colisão)
     L(arco(aroX, 0, 1.25, Math.PI / 2, (3 * Math.PI) / 2, 24), 0.04)
+    if (deFrente) {
+      quadra.rotation.y = -Math.PI / 2
+      quadra.position.set(ARO.frente.x * ESCALA, 0, 3.4 - aroX)
+    }
+    this.raiz.add(quadra)
+  }
+
+  /** Ginásio sem objetos entre a câmera e o gesto: paredes, proteção e luminárias ao fundo. */
+  private ginasio() {
+    const parede = new THREE.MeshStandardMaterial({ color: 0xc9cdd0, roughness: 0.92 })
+    const protecao = new THREE.MeshStandardMaterial({ color: 0x233b46, roughness: 0.86 })
+    const metal = new THREE.MeshStandardMaterial({ color: 0x47515b, roughness: 0.5, metalness: 0.55 })
+    const luz = new THREE.MeshStandardMaterial({ color: 0xfff5de, emissive: 0xfff1d2, emissiveIntensity: 1.8 })
+    const bloco = (w: number, h: number, d: number, x: number, y: number, z: number, m: THREE.Material) => {
+      const p = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), m)
+      p.position.set(x, y, z)
+      p.receiveShadow = true
+      this.raiz.add(p)
+    }
+    // Somente o fundo do ginásio é fechado para permitir girar a câmera livremente.
+    bloco(44, 8, 0.25, 0, 4, -17, parede)
+    for (let x = -20; x <= 20; x += 2) bloco(1.94, 1.8, 0.12, x, 0.9, -16.8, protecao)
+    for (let x = -20; x <= 20; x += 5) {
+      bloco(0.16, 8, 0.3, x, 4, -16.6, metal)
+      bloco(0.14, 0.22, 28, x, 8, -3, metal)
+      for (const z of [-10, 0, 10]) bloco(2.5, 0.08, 0.45, x, 7.8, z, luz)
+    }
+    bloco(44, 0.12, 0.15, 0, 2.15, -16.75, metal)
   }
 
   private cesta(x: number, z: number, sentido: 1 | -1, deFrente = false) {
     const g = new THREE.Group()
-    const branco = new THREE.MeshStandardMaterial({ color: 0xf2f4f6, roughness: 0.3, transparent: true, opacity: 0.55 })
+    const branco = new THREE.MeshPhysicalMaterial({ color: 0xe5f0f5, roughness: 0.12, metalness: 0, transparent: true, opacity: 0.28, clearcoat: 1, depthWrite: false })
     const aro = new THREE.MeshStandardMaterial({ color: 0xe0561b, roughness: 0.35, metalness: 0.5 })
     const aco = new THREE.MeshStandardMaterial({ color: 0x4a4d52, roughness: 0.5, metalness: 0.6 })
     const tabela = new THREE.Mesh(new THREE.BoxGeometry(0.05, 1.07, 1.83), branco)
@@ -239,7 +289,7 @@ export class Cenario {
     g.add(braco)
     g.position.set(x, 3.05, z)
     // A tabela fica atrás do aro, vista pelo atleta: sentido -1 = atleta à esquerda (vai de +x para a cesta).
-    g.rotation.y = sentido === -1 ? 0 : Math.PI / 2
+    g.rotation.y = sentido === -1 ? 0 : Math.PI
     if (deFrente) g.rotation.y = -Math.PI / 2
     this.raiz.add(g)
   }
@@ -280,7 +330,7 @@ export class Cenario {
     const assento = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.04, 0.42), mat)
     assento.position.set(x, 0.46, 0)
     const encosto = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.4, 0.42), mat)
-    encosto.position.set(x + 0.19, 0.68, 0)
+    encosto.position.set(x - 0.19, 0.68, 0)
     this.raiz.add(assento, encosto)
     for (const dx of [-0.18, 0.18]) for (const dz of [-0.18, 0.18]) {
       const p = new THREE.Mesh(new THREE.CylinderGeometry(0.018, 0.018, 0.46, 8), mat)
@@ -371,13 +421,17 @@ export class Cenario {
   }
 
   liberar() {
+    const texturas = new Set<THREE.Texture>()
     this.raiz.traverse((o) => {
       const m = o as THREE.Mesh
       m.geometry?.dispose?.()
       const mat = m.material as THREE.Material | THREE.Material[] | undefined
-      if (Array.isArray(mat)) mat.forEach((x) => x.dispose())
-      else mat?.dispose?.()
+      if (mat) for (const material of Array.isArray(mat) ? mat : [mat]) {
+        for (const valor of Object.values(material)) if (valor instanceof THREE.Texture) texturas.add(valor)
+        material.dispose()
+      }
     })
-    this.texturaDaBola.dispose()
+    texturas.add(this.texturaDaBola)
+    texturas.forEach((t) => t.dispose())
   }
 }

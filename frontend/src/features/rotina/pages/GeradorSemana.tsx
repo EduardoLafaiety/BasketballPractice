@@ -216,7 +216,7 @@ export default function GeradorSemana({ rotina, previa, aoGerar, aoDescartar, ao
               <button type="button" className="gs-botao gs-primario" disabled={gerando || !nDias} onClick={aoAplicar}>Aplicar à rotina</button>
             </>
           ) : (
-            <button type="submit" className="gs-botao gs-primario" disabled={gerando || !nDias}>{gerando ? 'Montando' : 'Gerar semana'}</button>
+            <button type="submit" className="gs-botao gs-primario" disabled={gerando || !nDias}>{gerando ? 'Montando' : 'Gerar treino'}</button>
           )}
         </div>
       </div>

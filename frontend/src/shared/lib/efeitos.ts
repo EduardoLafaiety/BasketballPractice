@@ -1,18 +1,7 @@
-// Efeitos do site inteiro: os blocos aparecem ao entrar na tela e o mouse revela uma camada por baixo.
+// Entrada suave dos blocos, sem efeitos acompanhando o mouse.
 // Tudo é só visual: sem estes efeitos a página continua completa e legível.
 const SURGE = '.surge, .card, .treino-linha, .stat, .plano-item, .semana-dia'
-const SEM_SURGE = '.guiada, .menu-tela, .topo'
-// Só onde o mouse troca uma cor de verdade; cartões e listas com texto miúdo ficam de fora.
-const REVELA = '.foto-jogador, .cartao-jogador, .conteudo h1, .conteudo h2'
-const SEM_REVELA = '.guiada, .abertura, .menu-tela'
-const TEXTO = /^H[12]$/
-
-interface Revelando {
-  x: number
-  y: number
-  r: number
-}
-
+const SEM_SURGE = '.guiada, .menu-tela, .topo, .cartao-jogador, .foto-jogador, .detalhe > .painel'
 export function iniciarEfeitos(raiz: HTMLElement) {
   const esperando = new Set<HTMLElement>()
   const registrar = () => {
@@ -71,57 +60,11 @@ export function iniciarEfeitos(raiz: HTMLElement) {
   const garantia = window.setInterval(verificar, olho ? 1000 : 400)
   registrar()
 
-  // Mouse: cada elemento sob o ponteiro ganha um círculo que cresce, persegue o mouse e encolhe ao sair.
-  const ativos = new Map<HTMLElement, Revelando>()
-  const mouse = { x: 0, y: 0 }
-  let sob: HTMLElement | null = null
-  let quadro = 0
-
-  const passo = () => {
-    quadro = 0
-    ativos.forEach((a, el) => {
-      const caixa = el.getBoundingClientRect()
-      const alvo = el === sob ? Math.min(280, Math.max(120, Math.max(caixa.width, caixa.height) * 0.62)) : 0
-      a.r += (alvo - a.r) * 0.14
-      if (el === sob) {
-        a.x += (mouse.x - caixa.left - a.x) * 0.2
-        a.y += (mouse.y - caixa.top - a.y) * 0.2
-      }
-      if (alvo === 0 && a.r < 1) {
-        ativos.delete(el)
-        el.style.removeProperty('--r')
-        return
-      }
-      el.style.setProperty('--x', `${a.x.toFixed(1)}px`)
-      el.style.setProperty('--y', `${a.y.toFixed(1)}px`)
-      el.style.setProperty('--r', `${a.r.toFixed(1)}px`)
-    })
-    if (ativos.size) quadro = requestAnimationFrame(passo)
-  }
-
-  const aoMover = (e: PointerEvent) => {
-    if (e.pointerType === 'touch') return
-    mouse.x = e.clientX
-    mouse.y = e.clientY
-    const alvo = e.target instanceof Element ? e.target.closest<HTMLElement>(REVELA) : null
-    sob = alvo && !alvo.closest(SEM_REVELA) ? alvo : null
-    if (sob && !ativos.has(sob)) {
-      const caixa = sob.getBoundingClientRect()
-      ativos.set(sob, { x: mouse.x - caixa.left, y: mouse.y - caixa.top, r: 0 })
-      // innerText guarda as quebras dos <br>; sem elas a cópia laranja quebra as linhas em outro lugar.
-      if (TEXTO.test(sob.tagName)) sob.dataset.texto = sob.innerText
-    }
-    if (ativos.size && !quadro) quadro = requestAnimationFrame(passo)
-  }
-  window.addEventListener('pointermove', aoMover, { passive: true })
-
   return () => {
     mutacoes.disconnect()
     olho?.disconnect()
     window.removeEventListener('scroll', verificar)
     window.removeEventListener('resize', verificar)
-    window.removeEventListener('pointermove', aoMover)
     window.clearInterval(garantia)
-    cancelAnimationFrame(quadro)
   }
 }

@@ -9,7 +9,7 @@ const CENTRO = LADO / 2
 const RAIO = 19
 const COSTURA = '#1d0f05'
 // Do brilho (em cima, à esquerda) para a sombra: as faixas do couro.
-const COURO = ['#ffb37a', '#ff9a52', '#f97a26', '#ee6210', '#c24c08', '#a83d05']
+const COURO = ['#ed8c37', '#de741f', '#cc5e12', '#b94b09', '#9c3906', '#7d2b04']
 const TONS = COURO.length
 const LUZ = { x: 0.36 * LADO, y: 0.3 * LADO }
 

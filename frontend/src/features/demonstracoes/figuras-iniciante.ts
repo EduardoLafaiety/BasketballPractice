@@ -1,7 +1,7 @@
 // Figuras do nível iniciante: controle de bola e a forma certa de arremessar.
 import type { Coreografia } from './motor'
 import {
-  AGACHA, ANDA_A, armar, ARMAR, arremessoParado, ATERRISSA, BASE, CARGA, carga, ciclo, DEFESA, em, emVolta, oito, EM_PE, ex, F_BASE, F_DEFESA, F_PE, F_SOLTOS,
+  AGACHA, ANDA_A, armar, ARMAR, arremessoParado, ATERRISSA, BASE, CARGA, carga, ciclo, DEFESA, em, emVolta, oito, EM_PE, ex, F_AGACHA, F_BASE, F_DEFESA, F_PE, F_SOLTOS,
   FINAL, mao, MAO_LIVRE, passadas, passe, passoDois, passoUm, PEITO, PERNAS, PRONTO, quiques, receber, SALTO, SOLTAR, SOLTOS, soltura, subidaBandeja, trecho, trocar, voo,
 } from './pecas'
 
@@ -42,12 +42,12 @@ export const FIGURAS_INICIANTE: Record<string, Coreografia> = {
   'Drible parado com a mão direita': ex('frente', {}, [
     ['Base', 'Pés afastados, joelhos flexionados e a outra mão à frente.', [{ x: 340, pe: 'M', ...F_BASE, bP: 20, aP: 0, bL: -45, aL: -100, bola: mao(0) }]],
     ['Dedos, não palma', 'Empurre a bola com a ponta dos dedos, sem bater nela.', quiques('P', 4, { d: 300 })],
-    ['Abaixe', 'Desça o quadril e deixe o quique mais curto e mais rápido.', quiques('P', 5, { d: 190 })],
+    ['Abaixe', 'Desça o quadril e deixe o quique mais curto e mais rápido.', [{ d: 280, ...F_AGACHA }, ...quiques('P', 5, { d: 190 })]],
   ]),
   'Drible parado com a mão esquerda': ex('frente', {}, [
     ['Base', 'A mesma base, agora com a bola na outra mão.', [{ x: 340, pe: 'M', ...F_BASE, bL: -20, aL: 0, bP: 45, aP: 100, bola: mao(0, 'L') }]],
     ['Sem pressa', 'Devagar no começo: o que importa é não olhar para a bola.', quiques('L', 4, { d: 320 })],
-    ['Mais rápido', 'Acelere só quando a mão já estiver segura.', quiques('L', 5, { d: 210 })],
+    ['Mais rápido', 'Acelere só quando a mão já estiver segura.', [{ d: 280, ...F_AGACHA }, ...quiques('L', 5, { d: 210 })]],
   ]),
   'Drible ajoelhado': ex('lado', {}, [
     ['Um joelho no chão', 'Apoie um joelho e mantenha as costas retas.', [{ x: 340, pe: 'F', ...AJOELHADO, bP: 15, aP: 45, bL: 50, aL: 100, bola: mao(0) }]],

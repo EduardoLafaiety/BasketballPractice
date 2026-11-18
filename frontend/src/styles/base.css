@@ -785,13 +785,13 @@ section + section, .card + section { margin-top: 1.5rem; }
 .demo-longe { fill: #a9a7a0; }
 .demo-corpo path.demo-musculo { fill: var(--laranja); }
 .demo-corpo path.demo-longe.demo-musculo { fill: #c95a12; }
-/* Atleta: pele, uniforme azul com friso branco, meias e tênis brancos; o lado longe fica na sombra. */
+/* Atleta 2D: roupa cinza e bermuda escura, como o modelo 3D; o lado longe fica na sombra. */
 .demo-atleta path { stroke: #1d1b17; stroke-width: 1.1; }
 .demo-atleta .demo-pele { fill: #c68a5e; }
 .demo-atleta .demo-pele.demo-longe { fill: #9a6443; }
 .demo-atleta .demo-camisa, .demo-atleta .demo-short { fill: #2f5fd0; }
 .demo-atleta .demo-short.demo-longe { fill: #2349a6; }
-.demo-atleta .demo-friso { fill: #ffffff; stroke: none; }
+.demo-atleta .demo-friso { fill: #807c76; stroke: none; }
 .demo-atleta .demo-meia { fill: #f2f2f2; }
 .demo-atleta .demo-tenis { fill: #fafafa; }
 .demo-atleta .demo-meia.demo-longe, .demo-atleta .demo-tenis.demo-longe { fill: #cfcfcf; }
@@ -800,7 +800,9 @@ section + section, .card + section { margin-top: 1.5rem; }
 .demo-atleta .demo-rosto { fill: #1d1914; stroke: none; }
 .demo-atleta path.demo-musculo { fill: var(--laranja); }
 .demo-atleta path.demo-longe.demo-musculo { fill: #c95a12; }
-.demo-atleta path.demo-short.demo-musculo { fill: #2f5fd0; stroke: var(--laranja); stroke-width: 2.2; }
+.demo-atleta path.demo-short.demo-musculo { fill: #292d33; stroke: var(--laranja); stroke-width: 2.2; }
+.demo-atleta path[style]:not(.demo-musculo) { fill: var(--demo-material); }
+.demo-atleta path.demo-longe:not(.demo-musculo) { filter: brightness(0.8); }
 .demo-sombra { fill: #000; opacity: 0.25; }
 .demo-bola-gomo { fill: none; stroke: #5a2405; stroke-width: 0.9; }
 .demo-fantasma { transition: opacity 0.25s; }
@@ -839,10 +841,13 @@ section + section, .card + section { margin-top: 1.5rem; }
 .demo3d-palco { position: relative; width: 100%; aspect-ratio: 16 / 10; min-height: 300px; background: #24251f; border: 2px solid var(--borda); overflow: hidden; touch-action: pan-y; }
 .demo3d-canvas { width: 100%; height: 100%; display: block; cursor: grab; }
 .demo3d-canvas:active { cursor: grabbing; }
+.demo3d-carregando { position: absolute; inset: 40% 0 auto; z-index: 2; text-align: center; padding: 1rem; background: #17252de6; color: #fff; font-size: 1rem; }
 .demo3d-vistas { position: absolute; top: 0.5rem; left: 0.5rem; right: 5.5rem; display: flex; flex-wrap: wrap; gap: 0.3rem; z-index: 2; }
 .demo3d-vistas .chip, .demo3d-ampliar { font-size: 0.78rem; padding: 0.25rem 0.55rem; }
+.demo3d > .demo3d-vistas { position: static; margin-bottom: 0.6rem; gap: 0.35rem; }
+.demo3d > .demo3d-vistas .chip { font-size: 0.85rem; padding: 0.4rem 0.65rem; min-height: 42px; }
 .demo3d-ampliar { position: absolute; top: 0.5rem; right: 0.5rem; z-index: 2; }
-.demo3d-dica { position: absolute; bottom: 0.45rem; left: 0.6rem; right: 0.6rem; margin: 0; font-size: 0.72rem; color: #b5b3a6; pointer-events: none; z-index: 2; }
+.demo3d-dica { margin: 0.6rem 0 0.9rem; font-family: 'Trebuchet MS', 'Segoe UI', sans-serif; font-size: 1rem; line-height: 1.6; color: var(--texto); text-transform: none; letter-spacing: normal; }
 .demo3d.ampliado .demo3d-palco { aspect-ratio: auto; height: min(78vh, 760px); }
 .demo3d-carregando { min-height: 200px; display: grid; place-items: center; color: var(--muted); }
 .demo3d-linha { flex: 1 1 8rem; min-width: 6rem; accent-color: var(--laranja); }
@@ -859,7 +864,7 @@ section + section, .card + section { margin-top: 1.5rem; }
   .demo3d-palco { aspect-ratio: 4 / 5; }
   .demo3d-vistas { right: 0.5rem; top: auto; bottom: 0.5rem; gap: 0.2rem; }
   .demo3d-vistas .chip, .demo3d-ampliar { font-size: 0.62rem; padding: 0.12rem 0.35rem; }
-  .demo3d-dica { display: none; }
+  .demo3d-dica { font-size: 0.95rem; }
 }
 @media (max-width: 860px) {
   .guiada-treino .demo3d-palco { order: 1; }

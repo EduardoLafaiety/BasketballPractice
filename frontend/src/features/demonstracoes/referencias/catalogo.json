@@ -1,0 +1,2014 @@
+{
+  "consultadoEm": "2026-11-18",
+  "fontes": {
+    "arremesso": "https://jr.nba.com/shooting/",
+    "drible": "https://jr.nba.com/how-to-dribble-a-basketball",
+    "progressao": "https://jr.nba.com/basketball-practice-plans/starter/",
+    "bandeja": "https://www.usab.com/news/2014/01/the-stride-stop-layup",
+    "passe": "https://www.usab.com/news/2014/01/basketball-101-fundamentals-of-passing",
+    "fundamentos": "https://assets.fiba.basketball/image/upload/documents-corporate-wabc-start-coaching-eng-facilitator-handbook.pdf",
+    "aquecimento": "https://jr.nba.com/jrnbaathome/",
+    "agachamento": "https://www.acefitness.org/resources/everyone/exercise-library/135/bodyweight-squat/",
+    "afundo": "https://www.acefitness.org/resources/everyone/exercise-library/94/forward-lunge/",
+    "captura": "https://mocap.cs.cmu.edu/"
+  },
+  "principios": {
+    "arremesso": [
+      "Base equilibrada e flexão coordenada das pernas.",
+      "Mão dominante sustenta; apoio lateral não impulsiona.",
+      "Extensão do cotovelo seguida da soltura pelos dedos."
+    ],
+    "drible": [
+      "Olhar elevado e base estável.",
+      "Controle pelos dedos, contato por cima no quique vertical.",
+      "Transferência de mão acompanha a trajetória; não carregar a bola por baixo."
+    ],
+    "finalizacao": [
+      "Na bandeja convencional, impulsão na perna oposta à mão.",
+      "Recolher a bola antes da sequência de passos.",
+      "Variações com dois pés, reversa e finger roll precisam de revisão própria."
+    ],
+    "passe": [
+      "Receber com as mãos prontas e dedos abertos.",
+      "Coordenar passo, extensão dos braços e soltura.",
+      "A orientação da mão varia entre peito, picado, alto e passe de uma mão."
+    ],
+    "defesa": [
+      "Base estável com flexão de quadris e joelhos.",
+      "Passos laterais controlados, mantendo equilíbrio.",
+      "Frear antes de mudar de direção."
+    ],
+    "condicionamento": [
+      "Respeitar apoio, amplitude e alinhamento de cada exercício.",
+      "Aterrissar com flexão de quadril e joelhos.",
+      "Não aplicar uma mesma coreografia a todos os exercícios."
+    ]
+  },
+  "limites": "Fontes de fundamentos não equivalem a captura de todos os exercícios. O CMU não captura os dedos nem a bola. Testes geométricos não certificam execução humana.",
+  "exercicios": [
+    {
+      "nome": "Polichinelo leve",
+      "categoria": "condicionamento",
+      "familia": "condicionamento",
+      "descricao": "Polichinelos em ritmo tranquilo para acordar o corpo e subir os batimentos.",
+      "referencias": [
+        "aquecimento"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Círculos com os braços",
+      "categoria": "condicionamento",
+      "familia": "condicionamento",
+      "descricao": "Giros amplos com os braços para soltar os ombros antes de driblar e arremessar.",
+      "referencias": [
+        "aquecimento"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Balanço de pernas",
+      "categoria": "condicionamento",
+      "familia": "condicionamento",
+      "descricao": "Balanços controlados de uma perna de cada vez para soltar o quadril.",
+      "referencias": [
+        "aquecimento"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Caminhada com joelho alto",
+      "categoria": "condicionamento",
+      "familia": "condicionamento",
+      "descricao": "Caminhada puxando um joelho de cada vez até a altura do quadril.",
+      "referencias": [
+        "aquecimento"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Corrida leve na quadra",
+      "categoria": "condicionamento",
+      "familia": "condicionamento",
+      "descricao": "Corrida solta, sem bola, de uma linha à outra.",
+      "referencias": [
+        "aquecimento"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Quiques leves parado",
+      "categoria": "drible",
+      "familia": "drible",
+      "descricao": "Quiques altos e tranquilos com cada mão para sentir a bola nos dedos.",
+      "referencias": [
+        "drible",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Drible leve caminhando",
+      "categoria": "drible",
+      "familia": "drible",
+      "descricao": "Drible alto e sem pressa, caminhando em linha reta.",
+      "referencias": [
+        "drible",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Passe leve na parede",
+      "categoria": "passe",
+      "familia": "passe",
+      "descricao": "Passes curtos e suaves contra a parede, bem perto dela.",
+      "referencias": [
+        "passe",
+        "fundamentos"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Arremesso colado à cesta",
+      "categoria": "arremesso",
+      "familia": "arremesso",
+      "descricao": "O primeiro arremesso do dia: bem embaixo do aro, só para acertar o movimento.",
+      "referencias": [
+        "arremesso",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Arremesso um passo atrás",
+      "categoria": "arremesso",
+      "familia": "arremesso",
+      "descricao": "Um passo para trás da posição anterior, com a mesma mecânica e sem pular.",
+      "referencias": [
+        "arremesso",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Arremesso dois passos atrás",
+      "categoria": "arremesso",
+      "familia": "arremesso",
+      "descricao": "Mais um passo para trás, ainda perto da cesta, antes de começar o treino.",
+      "referencias": [
+        "arremesso",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Calcanhar no glúteo",
+      "categoria": "condicionamento",
+      "familia": "condicionamento",
+      "descricao": "Corrida curta levando os calcanhares em direção ao glúteo.",
+      "referencias": [
+        "aquecimento"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Afundo com giro do tronco",
+      "categoria": "condicionamento",
+      "familia": "condicionamento",
+      "descricao": "Passo longo à frente, descendo devagar, com o tronco girando para o lado da perna da frente.",
+      "referencias": [
+        "afundo",
+        "aquecimento"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Skipping",
+      "categoria": "condicionamento",
+      "familia": "condicionamento",
+      "descricao": "Corrida no lugar com joelhos altos e passadas rápidas.",
+      "referencias": [
+        "aquecimento"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Deslocamento lateral leve",
+      "categoria": "defesa",
+      "familia": "defesa",
+      "descricao": "Deslizamento em velocidade baixa, com a base mais alta que a do treino.",
+      "referencias": [
+        "fundamentos",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Drible em ritmo crescente",
+      "categoria": "drible",
+      "familia": "drible",
+      "descricao": "Atravessar a quadra driblando, começando devagar e acelerando aos poucos.",
+      "referencias": [
+        "drible",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Troca de mãos caminhando",
+      "categoria": "drible",
+      "familia": "drible",
+      "descricao": "Cruzados leves a cada passo, caminhando em linha reta.",
+      "referencias": [
+        "drible",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Passe e recebe em movimento leve",
+      "categoria": "passe",
+      "familia": "passe",
+      "descricao": "Passes na parede andando de lado, sem pressa.",
+      "referencias": [
+        "passe",
+        "fundamentos"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Bandeja sem salto",
+      "categoria": "finalizacao",
+      "familia": "finalizacao",
+      "descricao": "Passada de bandeja caminhando, deixando a bola na tabela quase sem sair do chão.",
+      "referencias": [
+        "bandeja",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Arremesso do garrafão curto",
+      "categoria": "arremesso",
+      "familia": "arremesso",
+      "descricao": "Arremessos parados perto do aro, com as pernas ainda frescas.",
+      "referencias": [
+        "arremesso",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Arremesso da linha de lance livre leve",
+      "categoria": "arremesso",
+      "familia": "arremesso",
+      "descricao": "Da linha de lance livre, sem salto, ainda sem cobrar acerto.",
+      "referencias": [
+        "arremesso",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Mobilidade de quadril em pé",
+      "categoria": "condicionamento",
+      "familia": "condicionamento",
+      "descricao": "Abrir o joelho para o lado e voltar, passando a perna por cima de uma barreira imaginária.",
+      "referencias": [
+        "aquecimento"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Agachamento com braços acima",
+      "categoria": "condicionamento",
+      "familia": "condicionamento",
+      "descricao": "Agachamento lento com os braços estendidos no alto, abrindo tornozelo, quadril e ombros.",
+      "referencias": [
+        "agachamento",
+        "aquecimento"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Saltos curtos de tornozelo",
+      "categoria": "condicionamento",
+      "familia": "condicionamento",
+      "descricao": "Saltitos curtos usando só os tornozelos, para preparar os tendões.",
+      "referencias": [
+        "aquecimento"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Aceleração progressiva",
+      "categoria": "condicionamento",
+      "familia": "condicionamento",
+      "descricao": "Corrida que começa em 50% e termina perto de 90% da velocidade.",
+      "referencias": [
+        "aquecimento"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Mudança de direção leve",
+      "categoria": "defesa",
+      "familia": "defesa",
+      "descricao": "Corre, freia e volta em velocidade média, ensaiando a frenagem.",
+      "referencias": [
+        "fundamentos",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Saltos com aterrissagem controlada",
+      "categoria": "condicionamento",
+      "familia": "condicionamento",
+      "descricao": "Saltos médios, segurando dois segundos na aterrissagem com os joelhos alinhados.",
+      "referencias": [
+        "aquecimento"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Duas bolas em ritmo leve",
+      "categoria": "drible",
+      "familia": "drible",
+      "descricao": "Drible simultâneo com duas bolas, parado e sem pressa.",
+      "referencias": [
+        "drible",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Finalização progressiva",
+      "categoria": "finalizacao",
+      "familia": "finalizacao",
+      "descricao": "Bandejas começando em velocidade baixa e acelerando a cada repetição.",
+      "referencias": [
+        "bandeja",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Escada de arremesso",
+      "categoria": "arremesso",
+      "familia": "arremesso",
+      "descricao": "Um arremesso de cada distância: colado à cesta, lance livre e só então a linha de três.",
+      "referencias": [
+        "arremesso",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Arremesso de três sem salto",
+      "categoria": "arremesso",
+      "familia": "arremesso",
+      "descricao": "Arremessos soltos de três, em ritmo de ajuste, antes dos exercícios em velocidade.",
+      "referencias": [
+        "arremesso",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Toques na ponta dos dedos",
+      "categoria": "drible",
+      "familia": "drible",
+      "descricao": "Passar a bola de uma mão para a outra só com a ponta dos dedos, com os braços estendidos à frente.",
+      "referencias": [
+        "drible",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Bola ao redor da cintura",
+      "categoria": "drible",
+      "familia": "drible",
+      "descricao": "Passar a bola em volta da cintura sem deixar cair, nos dois sentidos.",
+      "referencias": [
+        "drible",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Bola ao redor da cabeça",
+      "categoria": "drible",
+      "familia": "drible",
+      "descricao": "Passar a bola em volta da cabeça, com o olhar para a frente.",
+      "referencias": [
+        "drible",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Bola ao redor dos joelhos",
+      "categoria": "drible",
+      "familia": "drible",
+      "descricao": "Com os joelhos flexionados, passar a bola em volta das pernas juntas.",
+      "referencias": [
+        "drible",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Oito entre as pernas",
+      "categoria": "drible",
+      "familia": "drible",
+      "descricao": "Passar a bola entre as pernas desenhando um oito, sem quicar.",
+      "referencias": [
+        "drible",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Drible parado com a mão direita",
+      "categoria": "drible",
+      "familia": "drible",
+      "descricao": "Quiques com a mão direita, empurrando com os dedos e sem bater na bola.",
+      "referencias": [
+        "drible",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Drible parado com a mão esquerda",
+      "categoria": "drible",
+      "familia": "drible",
+      "descricao": "Os mesmos quiques com a mão esquerda, no ritmo que der para manter o controle.",
+      "referencias": [
+        "drible",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Drible ajoelhado",
+      "categoria": "drible",
+      "familia": "drible",
+      "descricao": "Com um joelho no chão, drible baixo do lado do corpo, trocando de mão.",
+      "referencias": [
+        "drible",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Drible sentado",
+      "categoria": "drible",
+      "familia": "drible-sentado",
+      "descricao": "Sentado no chão, quiques curtos ao lado do quadril com a ponta dos dedos.",
+      "referencias": [
+        "drible",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Drible estacionário",
+      "categoria": "drible",
+      "familia": "drible",
+      "descricao": "Drible baixo, alto, cruzado, entre as pernas e por trás, parado no lugar.",
+      "referencias": [
+        "drible",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Drible de proteção",
+      "categoria": "drible",
+      "familia": "drible",
+      "descricao": "Drible baixo com o corpo entre a bola e o defensor, usando o braço livre como escudo.",
+      "referencias": [
+        "drible",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Cruzado parado",
+      "categoria": "drible",
+      "familia": "drible",
+      "descricao": "Troca de mão pela frente do corpo, com um quique baixo e sem levantar o tronco.",
+      "referencias": [
+        "drible",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Drible caminhando com a mão forte",
+      "categoria": "drible",
+      "familia": "drible",
+      "descricao": "Atravessar a quadra caminhando, driblando sem olhar para a bola.",
+      "referencias": [
+        "drible",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Drible caminhando com a mão fraca",
+      "categoria": "drible",
+      "familia": "drible",
+      "descricao": "O mesmo caminho com a mão não dominante, sem pressa.",
+      "referencias": [
+        "drible",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Drible em linha reta",
+      "categoria": "drible",
+      "familia": "drible",
+      "descricao": "Trote de uma linha à outra, com a bola um pouco à frente do corpo.",
+      "referencias": [
+        "drible",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Parada em dois tempos",
+      "categoria": "drible",
+      "familia": "drible",
+      "descricao": "Drible em trote e parada um-dois, sem andar com a bola ao recolher.",
+      "referencias": [
+        "drible",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Troca de mão entre cones",
+      "categoria": "drible",
+      "familia": "drible",
+      "descricao": "Caminhar entre os cones trocando a mão em cada um deles.",
+      "referencias": [
+        "drible",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Mecânica do arremesso sem bola",
+      "categoria": "arremesso",
+      "familia": "arremesso",
+      "descricao": "Repetir o movimento completo sem bola: pernas, cotovelo alinhado, extensão e punho.",
+      "referencias": [
+        "arremesso",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Arremesso deitado para o alto",
+      "categoria": "arremesso",
+      "familia": "arremesso-deitado",
+      "descricao": "Deitado de costas, lançar a bola reto para cima com uma mão e pegar de volta.",
+      "referencias": [
+        "arremesso",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Arremesso sentado na cadeira",
+      "categoria": "arremesso",
+      "familia": "arremesso-sentado",
+      "descricao": "Sentado, usar só o braço e o punho para sentir a soltura correta.",
+      "referencias": [
+        "arremesso",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Arremesso de uma mão",
+      "categoria": "arremesso",
+      "familia": "arremesso",
+      "descricao": "Perto da cesta, soltar a bola só com a mão de arremesso, a outra longe da bola.",
+      "referencias": [
+        "arremesso",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Arremesso com a mão de apoio",
+      "categoria": "arremesso",
+      "familia": "arremesso",
+      "descricao": "A mesma distância com a mão de apoio ao lado da bola, sem empurrar.",
+      "referencias": [
+        "arremesso",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Arremesso a um metro",
+      "categoria": "arremesso",
+      "familia": "arremesso",
+      "descricao": "Bola no bolso, pernas e braço num movimento só, a um metro do aro.",
+      "referencias": [
+        "arremesso",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Arremesso a dois metros",
+      "categoria": "arremesso",
+      "familia": "arremesso",
+      "descricao": "A mesma mecânica mais longe, deixando as pernas darem a força.",
+      "referencias": [
+        "arremesso",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Arremesso na tabela",
+      "categoria": "arremesso",
+      "familia": "arremesso",
+      "descricao": "Em diagonal com a cesta, mirar no canto de cima do quadrado da tabela.",
+      "referencias": [
+        "arremesso",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Passo e arremesso",
+      "categoria": "arremesso",
+      "familia": "arremesso",
+      "descricao": "Um passo curto em direção à cesta para ganhar ritmo antes de soltar a bola.",
+      "referencias": [
+        "arremesso",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Lance livre",
+      "categoria": "arremesso",
+      "familia": "arremesso",
+      "descricao": "Arremessos da linha de lance livre, mantendo a mesma rotina antes de cada tentativa.",
+      "referencias": [
+        "arremesso",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Passadas da bandeja sem bola",
+      "categoria": "finalizacao",
+      "familia": "finalizacao",
+      "descricao": "Treinar direita, esquerda e sobe, sem bola, até virar automático.",
+      "referencias": [
+        "bandeja",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Bandeja de um passo",
+      "categoria": "finalizacao",
+      "familia": "finalizacao",
+      "descricao": "Partindo perto do aro, dar um passo, subir o joelho e soltar a bola na tabela.",
+      "referencias": [
+        "bandeja",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Bandeja com a mão forte",
+      "categoria": "finalizacao",
+      "familia": "finalizacao",
+      "descricao": "Dois passos a partir de dois dribles, em velocidade baixa, com a mão dominante.",
+      "referencias": [
+        "bandeja",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Bandeja com dois pés",
+      "categoria": "finalizacao",
+      "familia": "finalizacao",
+      "descricao": "Parada em dois tempos embaixo da cesta e subida com as duas pernas.",
+      "referencias": [
+        "bandeja",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Mikan drill",
+      "categoria": "finalizacao",
+      "familia": "finalizacao",
+      "descricao": "Bandejas alternadas embaixo da cesta, sem deixar a bola cair.",
+      "referencias": [
+        "bandeja",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Joga na tabela e finaliza",
+      "categoria": "finalizacao",
+      "familia": "finalizacao",
+      "descricao": "Jogar a bola na tabela, pegar no alto e finalizar sem deixar ela descer.",
+      "referencias": [
+        "bandeja",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Tripla ameaça",
+      "categoria": "passe",
+      "familia": "passe",
+      "descricao": "Receber e já ficar pronto para arremessar, driblar ou passar.",
+      "referencias": [
+        "passe",
+        "fundamentos"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Pivô de frente",
+      "categoria": "passe",
+      "familia": "passe",
+      "descricao": "Girar para a frente sobre o pé de apoio, sem tirá-lo do chão.",
+      "referencias": [
+        "passe",
+        "fundamentos"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Pivô de costas",
+      "categoria": "passe",
+      "familia": "passe",
+      "descricao": "Girar para trás sobre o pé de apoio, protegendo a bola com o corpo.",
+      "referencias": [
+        "passe",
+        "fundamentos"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Passe de peito no alvo",
+      "categoria": "passe",
+      "familia": "passe",
+      "descricao": "Passe de peito na altura de um alvo marcado na parede.",
+      "referencias": [
+        "passe",
+        "fundamentos"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Passe picado no alvo",
+      "categoria": "passe",
+      "familia": "passe",
+      "descricao": "Quicar a dois terços do caminho, para a bola chegar na cintura.",
+      "referencias": [
+        "passe",
+        "fundamentos"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Passe por cima no alvo",
+      "categoria": "passe",
+      "familia": "passe",
+      "descricao": "Passe por cima da cabeça, com a força vindo dos punhos.",
+      "referencias": [
+        "passe",
+        "fundamentos"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Passe na parede",
+      "categoria": "passe",
+      "familia": "passe",
+      "descricao": "Passes de peito, picados e por cima da cabeça contra a parede.",
+      "referencias": [
+        "passe",
+        "fundamentos"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Passa e recebe com parceiro",
+      "categoria": "passe",
+      "familia": "passe",
+      "descricao": "Passes parados com um parceiro, sempre com as mãos prontas para receber.",
+      "referencias": [
+        "passe",
+        "fundamentos"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Base defensiva",
+      "categoria": "defesa",
+      "familia": "defesa",
+      "descricao": "Segurar a posição: pés afastados, quadril baixo, costas retas e mãos ativas.",
+      "referencias": [
+        "fundamentos",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Mãos ativas",
+      "categoria": "defesa",
+      "familia": "defesa",
+      "descricao": "Na base baixa, alternar uma mão no alto e uma na linha do passe.",
+      "referencias": [
+        "fundamentos",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Deslizamento defensivo",
+      "categoria": "defesa",
+      "familia": "defesa",
+      "descricao": "Deslocamento lateral em base baixa, de lado a lado do garrafão.",
+      "referencias": [
+        "fundamentos",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Recuo defensivo",
+      "categoria": "defesa",
+      "familia": "defesa",
+      "descricao": "Correr de costas com a base baixa, sem cruzar os pés no fim do movimento.",
+      "referencias": [
+        "fundamentos",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Bloqueio de rebote parado",
+      "categoria": "defesa",
+      "familia": "defesa",
+      "descricao": "Girar, encostar o corpo no adversário e abrir os braços antes de pular.",
+      "referencias": [
+        "fundamentos",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Agachamento livre",
+      "categoria": "condicionamento",
+      "familia": "condicionamento",
+      "descricao": "Agachamento completo com o peso nos calcanhares e no meio do pé.",
+      "referencias": [
+        "agachamento",
+        "aquecimento"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Prancha frontal",
+      "categoria": "condicionamento",
+      "familia": "condicionamento",
+      "descricao": "Apoio nos antebraços com o corpo alinhado, sem deixar o quadril cair.",
+      "referencias": [
+        "aquecimento"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Pular corda",
+      "categoria": "condicionamento",
+      "familia": "condicionamento",
+      "descricao": "Saltos curtos na ponta dos pés, com os punhos girando uma corda real ou imaginária.",
+      "referencias": [
+        "aquecimento"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Corrida entre as linhas",
+      "categoria": "condicionamento",
+      "familia": "condicionamento",
+      "descricao": "Corridas leves entre duas linhas próximas, tocando a linha ao chegar.",
+      "referencias": [
+        "aquecimento"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Hesitação em linha reta",
+      "categoria": "drible",
+      "familia": "drible",
+      "descricao": "Drible de fundo a fundo alternando desaceleração e explosão no primeiro passo.",
+      "referencias": [
+        "drible",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Mudança de ritmo",
+      "categoria": "drible",
+      "familia": "drible",
+      "descricao": "Alternar trote e sprint driblando, sem perder o controle da bola.",
+      "referencias": [
+        "drible",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Cruzado em movimento",
+      "categoria": "drible",
+      "familia": "drible",
+      "descricao": "Atacar, plantar o pé e cruzar baixo pela frente do corpo, sem perder velocidade.",
+      "referencias": [
+        "drible",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Entre as pernas em movimento",
+      "categoria": "drible",
+      "familia": "drible",
+      "descricao": "Em passada longa, passar a bola entre as pernas para trocar de mão.",
+      "referencias": [
+        "drible",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Por trás das costas em movimento",
+      "categoria": "drible",
+      "familia": "drible",
+      "descricao": "Levar a bola por trás do corpo para a outra mão, sem diminuir a passada.",
+      "referencias": [
+        "drible",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Drible de recuo",
+      "categoria": "drible",
+      "familia": "drible",
+      "descricao": "Dois dribles recuando para ganhar espaço, com o corpo ainda virado para a frente.",
+      "referencias": [
+        "drible",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Finta de dentro para fora",
+      "categoria": "drible",
+      "familia": "drible",
+      "descricao": "Fingir o cruzado e trazer a bola de volta para a mesma mão, atacando por fora.",
+      "referencias": [
+        "drible",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Giro com a bola",
+      "categoria": "drible",
+      "familia": "drible",
+      "descricao": "Plantar o pé da frente e girar de costas, trocando de mão ao sair.",
+      "referencias": [
+        "drible",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Zigue-zague com mudança de direção",
+      "categoria": "drible",
+      "familia": "drible",
+      "descricao": "Deslocamento em zigue-zague pela quadra trocando de mão em cada cone.",
+      "referencias": [
+        "drible",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Drible com duas bolas",
+      "categoria": "drible",
+      "familia": "drible",
+      "descricao": "Drible simultâneo e alternado com duas bolas.",
+      "referencias": [
+        "drible",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Arremesso de média distância",
+      "categoria": "arremesso",
+      "familia": "arremesso",
+      "descricao": "Arremessos parados de 5 pontos ao redor do garrafão.",
+      "referencias": [
+        "arremesso",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Receber e arremessar",
+      "categoria": "arremesso",
+      "familia": "arremesso",
+      "descricao": "Receber com as mãos prontas e os pés virados para a cesta, subindo sem driblar.",
+      "referencias": [
+        "arremesso",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Parada em um tempo e arremesso",
+      "categoria": "arremesso",
+      "familia": "arremesso",
+      "descricao": "Chegar com os dois pés juntos no chão, em um salto curto, e subir sem pausa.",
+      "referencias": [
+        "arremesso",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Finta de arremesso e um drible",
+      "categoria": "arremesso",
+      "familia": "arremesso",
+      "descricao": "Mostrar a bola no alto, atacar com um drible e arremessar em seguida.",
+      "referencias": [
+        "arremesso",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Arremesso após drible",
+      "categoria": "arremesso",
+      "familia": "arremesso",
+      "descricao": "Um ou dois dribles e arremesso em pull-up.",
+      "referencias": [
+        "arremesso",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Arremesso saindo do bloqueio",
+      "categoria": "arremesso",
+      "familia": "arremesso",
+      "descricao": "Sair raspando um cone, receber e subir já de frente para a cesta.",
+      "referencias": [
+        "arremesso",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Volta ao mundo",
+      "categoria": "arremesso",
+      "familia": "arremesso",
+      "descricao": "Cinco arremessos, um de cada ponto do semicírculo, andando entre eles.",
+      "referencias": [
+        "arremesso",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Lance livre cansado",
+      "categoria": "arremesso",
+      "familia": "arremesso",
+      "descricao": "Uma corrida curta e dois lances livres, ainda com o coração acelerado.",
+      "referencias": [
+        "arremesso",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Arremesso de três",
+      "categoria": "arremesso",
+      "familia": "arremesso",
+      "descricao": "Arremessos de 3 pontos das cinco posições: zonas mortas, 45° e topo.",
+      "referencias": [
+        "arremesso",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Bandeja com a mão fraca",
+      "categoria": "finalizacao",
+      "familia": "finalizacao",
+      "descricao": "Bandejas partindo da linha de 3, sempre com a mão não dominante.",
+      "referencias": [
+        "bandeja",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Bandeja em velocidade",
+      "categoria": "finalizacao",
+      "familia": "finalizacao",
+      "descricao": "Sair do meio da quadra em drible rápido e subir sem diminuir.",
+      "referencias": [
+        "bandeja",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Bandeja reversa",
+      "categoria": "finalizacao",
+      "familia": "finalizacao-reversa",
+      "descricao": "Passar por baixo do aro e soltar a bola do outro lado, usando o aro como proteção.",
+      "referencias": [
+        "bandeja",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Subida com força",
+      "categoria": "finalizacao",
+      "familia": "finalizacao",
+      "descricao": "Um drible forte, parada com os dois pés e subida protegendo a bola.",
+      "referencias": [
+        "bandeja",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Gancho curto",
+      "categoria": "finalizacao",
+      "familia": "gancho",
+      "descricao": "De lado para a cesta, levantar a bola com o braço estendido e soltar por cima do defensor.",
+      "referencias": [
+        "bandeja",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Finta e passo por baixo",
+      "categoria": "finalizacao",
+      "familia": "finalizacao-por-baixo",
+      "descricao": "Fingir o arremesso no poste, cruzar a perna por baixo e finalizar.",
+      "referencias": [
+        "bandeja",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Trabalho de pés no poste baixo",
+      "categoria": "finalizacao",
+      "familia": "finalizacao",
+      "descricao": "Drop step e meia-volta dos dois lados do garrafão, terminando com bandeja ou gancho.",
+      "referencias": [
+        "bandeja",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Mikan reverso",
+      "categoria": "finalizacao",
+      "familia": "finalizacao-reversa",
+      "descricao": "O Mikan de costas para a tabela, com bandejas reversas alternadas.",
+      "referencias": [
+        "bandeja",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Passe de peito em movimento",
+      "categoria": "passe",
+      "familia": "passe",
+      "descricao": "Passes de peito andando de lado, recebendo e soltando sem parar os pés.",
+      "referencias": [
+        "passe",
+        "fundamentos"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Passe picado com uma mão",
+      "categoria": "passe",
+      "familia": "passe",
+      "descricao": "Dar um passo para o lado e passar picado com uma mão, passando o defensor.",
+      "referencias": [
+        "passe",
+        "fundamentos"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Passe de beisebol",
+      "categoria": "passe",
+      "familia": "passe",
+      "descricao": "Passe longo com uma mão, armando atrás da orelha como um arremessador de beisebol.",
+      "referencias": [
+        "passe",
+        "fundamentos"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Finta de passe",
+      "categoria": "passe",
+      "familia": "passe",
+      "descricao": "Mostrar o passe de um lado e soltar do outro, sem mudar o olhar.",
+      "referencias": [
+        "passe",
+        "fundamentos"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Passe após o drible",
+      "categoria": "passe",
+      "familia": "passe",
+      "descricao": "Dois dribles em velocidade e passe certeiro no alvo, sem parar antes.",
+      "referencias": [
+        "passe",
+        "fundamentos"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Passa e corta",
+      "categoria": "passe",
+      "familia": "passe",
+      "descricao": "Passar para o parceiro, cortar para a cesta e receber de volta.",
+      "referencias": [
+        "passe",
+        "fundamentos"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Corta-luz com cadeira",
+      "categoria": "passe",
+      "familia": "passe-sentado",
+      "descricao": "Uma cadeira faz o papel do pivô: sair raspando o bloqueio e escolher entre arremesso, bandeja ou passe na parede.",
+      "referencias": [
+        "passe",
+        "fundamentos"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Closeout",
+      "categoria": "defesa",
+      "familia": "defesa",
+      "descricao": "Sair do garrafão até a linha de 3 e fechar o arremessador com passos curtos.",
+      "referencias": [
+        "fundamentos",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Corta o caminho do drible",
+      "categoria": "defesa",
+      "familia": "defesa",
+      "descricao": "Deslizar e chegar antes do drible, com o peito na frente da bola.",
+      "referencias": [
+        "fundamentos",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Zigue-zague defensivo",
+      "categoria": "defesa",
+      "familia": "defesa",
+      "descricao": "Deslizar em diagonal, virar o quadril e deslizar para o outro lado.",
+      "referencias": [
+        "fundamentos",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Contestar o arremesso",
+      "categoria": "defesa",
+      "familia": "defesa",
+      "descricao": "Subir com a mão no rosto da bola, sem saltar para a frente e sem fazer falta.",
+      "referencias": [
+        "fundamentos",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Negar a linha de passe",
+      "categoria": "defesa",
+      "familia": "defesa",
+      "descricao": "Ficar entre o atacante e a bola, com o braço estendido na linha do passe.",
+      "referencias": [
+        "fundamentos",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Ajuda e recuperação",
+      "categoria": "defesa",
+      "familia": "defesa",
+      "descricao": "Fechar o garrafão em dois passos e voltar correndo até o seu atacante.",
+      "referencias": [
+        "fundamentos",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Bloqueio de rebote com parceiro",
+      "categoria": "defesa",
+      "familia": "defesa",
+      "descricao": "Encostar, segurar o parceiro nas costas e só então buscar a bola.",
+      "referencias": [
+        "fundamentos",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Rebote ofensivo",
+      "categoria": "defesa",
+      "familia": "defesa",
+      "descricao": "Dar a volta no defensor, subir e devolver a bola para a cesta sem descer.",
+      "referencias": [
+        "fundamentos",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Suicídio",
+      "categoria": "condicionamento",
+      "familia": "condicionamento",
+      "descricao": "Corridas de ida e volta às linhas da quadra.",
+      "referencias": [
+        "aquecimento"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Saltos na caixa",
+      "categoria": "condicionamento",
+      "familia": "condicionamento",
+      "descricao": "Saltos explosivos para melhorar a impulsão.",
+      "referencias": [
+        "aquecimento"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Afundo caminhando",
+      "categoria": "condicionamento",
+      "familia": "condicionamento",
+      "descricao": "Passos longos à frente, descendo até o joelho quase tocar o chão.",
+      "referencias": [
+        "afundo",
+        "aquecimento"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Burpee",
+      "categoria": "condicionamento",
+      "familia": "condicionamento",
+      "descricao": "Agachar, jogar as pernas para trás, voltar e saltar, em um movimento contínuo.",
+      "referencias": [
+        "aquecimento"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Saltos laterais",
+      "categoria": "condicionamento",
+      "familia": "condicionamento",
+      "descricao": "Saltar de um lado para o outro de uma linha, com os pés juntos.",
+      "referencias": [
+        "aquecimento"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Escada de agilidade",
+      "categoria": "condicionamento",
+      "familia": "condicionamento",
+      "descricao": "Passos rápidos entre marcas no chão, um pé em cada espaço.",
+      "referencias": [
+        "aquecimento"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Corrida de 17 linhas",
+      "categoria": "condicionamento",
+      "familia": "condicionamento",
+      "descricao": "Atravessar a largura da quadra várias vezes, em ritmo forte e constante.",
+      "referencias": [
+        "aquecimento"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Prancha lateral",
+      "categoria": "condicionamento",
+      "familia": "condicionamento",
+      "descricao": "Apoio em um antebraço com o corpo reto, trabalhando a lateral do tronco.",
+      "referencias": [
+        "aquecimento"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Cruzado rápido duplo",
+      "categoria": "drible",
+      "familia": "drible",
+      "descricao": "Dois cruzados seguidos e baixos, levando o defensor para um lado e saindo pelo outro.",
+      "referencias": [
+        "drible",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Hesitação com cruzado",
+      "categoria": "drible",
+      "familia": "drible",
+      "descricao": "Erguer o tronco como quem vai parar e, na mesma hora, cruzar e explodir.",
+      "referencias": [
+        "drible",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Sequência de três trocas",
+      "categoria": "drible",
+      "familia": "drible",
+      "descricao": "Cruzado, entre as pernas e por trás, sem parar e sem olhar para a bola.",
+      "referencias": [
+        "drible",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Recuo e cruzado",
+      "categoria": "drible",
+      "familia": "drible",
+      "descricao": "Dois dribles recuando e um cruzado explosivo na saída.",
+      "referencias": [
+        "drible",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Drible Shammgod",
+      "categoria": "drible",
+      "familia": "drible",
+      "descricao": "Empurrar a bola para a frente com uma mão e puxar de volta com a outra, passando o defensor.",
+      "referencias": [
+        "drible",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Duas bolas em movimento",
+      "categoria": "drible",
+      "familia": "drible",
+      "descricao": "Atravessar a quadra driblando duas bolas no mesmo ritmo.",
+      "referencias": [
+        "drible",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Duas bolas com cruzado",
+      "categoria": "drible",
+      "familia": "drible",
+      "descricao": "Parado, driblar duas bolas e trocar as duas de mão no mesmo quique.",
+      "referencias": [
+        "drible",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Drible e toque na bolinha",
+      "categoria": "drible",
+      "familia": "drible",
+      "descricao": "Driblar com uma mão e jogar uma bolinha para cima com a outra, sem olhar para a bola.",
+      "referencias": [
+        "drible",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Step-back de três",
+      "categoria": "arremesso",
+      "familia": "arremesso",
+      "descricao": "Dois dribles para a frente, recuo empurrando com o pé da frente e arremesso de três em base larga.",
+      "referencias": [
+        "arremesso",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Corre e arremessa",
+      "categoria": "arremesso",
+      "familia": "arremesso",
+      "descricao": "Corridas entre dois cones com um arremesso de três cada vez que chegar na linha.",
+      "referencias": [
+        "arremesso",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Pull-up de três",
+      "categoria": "arremesso",
+      "familia": "arremesso",
+      "descricao": "Atacar em drible rápido e parar atrás da linha para subir sem hesitar.",
+      "referencias": [
+        "arremesso",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Passo lateral de três",
+      "categoria": "arremesso",
+      "familia": "arremesso",
+      "descricao": "Um drible para o lado, recolhendo a bola fora da linha do defensor, e arremesso.",
+      "referencias": [
+        "arremesso",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Três em transição",
+      "categoria": "arremesso",
+      "familia": "arremesso",
+      "descricao": "Correr de fundo a fundo, frear na linha de três e arremessar com o corpo em equilíbrio.",
+      "referencias": [
+        "arremesso",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Fadeaway do cotovelo",
+      "categoria": "arremesso",
+      "familia": "arremesso",
+      "descricao": "De costas para a cesta no cotovelo do garrafão, giro sobre o pé de apoio e arremesso caindo para trás.",
+      "referencias": [
+        "arremesso",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Fadeaway em uma perna",
+      "categoria": "arremesso",
+      "familia": "arremesso",
+      "descricao": "Subir de um pé só, caindo para trás, com o joelho da outra perna à frente.",
+      "referencias": [
+        "arremesso",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Meia-volta do poste",
+      "categoria": "arremesso",
+      "familia": "arremesso",
+      "descricao": "De costas para a cesta, sentir o defensor, girar e subir de frente.",
+      "referencias": [
+        "arremesso",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Arremesso contestado",
+      "categoria": "arremesso",
+      "familia": "arremesso",
+      "descricao": "Arremessar por cima da mão alta de um parceiro, sem mudar o movimento.",
+      "referencias": [
+        "arremesso",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Arremesso saindo em curva",
+      "categoria": "arremesso",
+      "familia": "arremesso",
+      "descricao": "Sair em curva raspando o cone e arremessar girando o corpo no ar para a cesta.",
+      "referencias": [
+        "arremesso",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Arremesso com finta e passo lateral",
+      "categoria": "arremesso",
+      "familia": "arremesso",
+      "descricao": "Finta alta, o defensor sobe, passo para o lado e arremesso limpo.",
+      "referencias": [
+        "arremesso",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Três pontos em série",
+      "categoria": "arremesso",
+      "familia": "arremesso",
+      "descricao": "Arremessar e correr para o próximo ponto da linha, sem descanso entre as bolas.",
+      "referencias": [
+        "arremesso",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Lance livre decisivo",
+      "categoria": "arremesso",
+      "familia": "arremesso",
+      "descricao": "Depois de um sprint completo, dois lances livres como se o jogo dependesse deles.",
+      "referencias": [
+        "arremesso",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Floater em uma perna",
+      "categoria": "finalizacao",
+      "familia": "finalizacao",
+      "descricao": "Saída com um pé só a dois passos do aro, soltando a bola alta com a ponta dos dedos.",
+      "referencias": [
+        "bandeja",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Bandeja com contato",
+      "categoria": "finalizacao",
+      "familia": "finalizacao",
+      "descricao": "Bandejas absorvendo contato de uma almofada ou de um parceiro, protegendo a bola com as duas mãos.",
+      "referencias": [
+        "bandeja",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Eurostep entre cones",
+      "categoria": "finalizacao",
+      "familia": "eurostep",
+      "descricao": "Dois passos em direções opostas entre os cones e bandeja longe do defensor.",
+      "referencias": [
+        "bandeja",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Passo de canguru",
+      "categoria": "finalizacao",
+      "familia": "finalizacao",
+      "descricao": "Salto de um pé para os dois, parando forte embaixo da cesta e subindo.",
+      "referencias": [
+        "bandeja",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Finger roll",
+      "categoria": "finalizacao",
+      "familia": "finalizacao-por-baixo",
+      "descricao": "Bandeja em velocidade com o braço estendido, deixando a bola rolar pelos dedos.",
+      "referencias": [
+        "bandeja",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Bandeja por baixo",
+      "categoria": "finalizacao",
+      "familia": "finalizacao-por-baixo",
+      "descricao": "Soltar a bola com a palma para cima, por baixo do braço do defensor.",
+      "referencias": [
+        "bandeja",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Reversa em velocidade",
+      "categoria": "finalizacao",
+      "familia": "finalizacao-reversa",
+      "descricao": "Atacar pela linha de fundo em sprint e terminar do outro lado do aro.",
+      "referencias": [
+        "bandeja",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Giro e bandeja",
+      "categoria": "finalizacao",
+      "familia": "finalizacao",
+      "descricao": "Girar de costas no meio do caminho e terminar com a mão de fora.",
+      "referencias": [
+        "bandeja",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Duas subidas na tabela",
+      "categoria": "finalizacao",
+      "familia": "finalizacao",
+      "descricao": "Finta no ar: subir, abaixar a bola e soltar já na descida.",
+      "referencias": [
+        "bandeja",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Toque de rebote",
+      "categoria": "finalizacao",
+      "familia": "finalizacao",
+      "descricao": "Jogar na tabela, subir e empurrar a bola de volta ainda no ar, várias vezes seguidas.",
+      "referencias": [
+        "bandeja",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Pega no alto e finaliza",
+      "categoria": "finalizacao",
+      "familia": "finalizacao",
+      "descricao": "Receber uma bola alta perto da tabela e soltar antes de voltar ao chão.",
+      "referencias": [
+        "bandeja",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Passe sem olhar",
+      "categoria": "passe",
+      "familia": "passe",
+      "descricao": "Olhar para um lado e passar para o outro, com a bola saindo rápido do peito.",
+      "referencias": [
+        "passe",
+        "fundamentos"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Passe por trás das costas",
+      "categoria": "passe",
+      "familia": "passe",
+      "descricao": "Em drible, levar a bola por trás do corpo e soltar com o punho.",
+      "referencias": [
+        "passe",
+        "fundamentos"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Passe curto no bloqueio",
+      "categoria": "passe",
+      "familia": "passe",
+      "descricao": "Sair do bloqueio e passar picado, curto, para o pivô que corta.",
+      "referencias": [
+        "passe",
+        "fundamentos"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Passe de saída rápida",
+      "categoria": "passe",
+      "familia": "passe",
+      "descricao": "Pegar o rebote no alto e soltar o passe longo antes de descer os braços.",
+      "referencias": [
+        "passe",
+        "fundamentos"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Passe alto para o pivô",
+      "categoria": "passe",
+      "familia": "passe",
+      "descricao": "Colocar a bola alta, onde só o companheiro alcança.",
+      "referencias": [
+        "passe",
+        "fundamentos"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Passe longo em corrida",
+      "categoria": "passe",
+      "familia": "passe",
+      "descricao": "Em plena corrida, soltar com uma mão para um alvo longe, sem parar.",
+      "referencias": [
+        "passe",
+        "fundamentos"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Closeout com saída",
+      "categoria": "defesa",
+      "familia": "defesa",
+      "descricao": "Fechar o arremessador e, na finta, deslizar para cortar o drible.",
+      "referencias": [
+        "fundamentos",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Toco na perseguição",
+      "categoria": "defesa",
+      "familia": "defesa",
+      "descricao": "Correr atrás do atacante e subir no último passo para bater na bola contra a tabela.",
+      "referencias": [
+        "fundamentos",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Defesa do bloqueio",
+      "categoria": "defesa",
+      "familia": "defesa",
+      "descricao": "Passar por cima do corta-luz, colado no atacante, e voltar para a frente dele.",
+      "referencias": [
+        "fundamentos",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Tomar a falta de ataque",
+      "categoria": "defesa",
+      "familia": "defesa",
+      "descricao": "Chegar antes, parar com os pés firmes e cair para trás no contato.",
+      "referencias": [
+        "fundamentos",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Roubo no drible",
+      "categoria": "defesa",
+      "familia": "defesa",
+      "descricao": "Deslizar ao lado do atacante e tocar a bola de baixo para cima na subida.",
+      "referencias": [
+        "fundamentos",
+        "progressao"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Salto de profundidade",
+      "categoria": "condicionamento",
+      "familia": "condicionamento",
+      "descricao": "Descer da caixa e, assim que tocar o chão, saltar o mais alto possível.",
+      "referencias": [
+        "aquecimento"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Agachamento com salto",
+      "categoria": "condicionamento",
+      "familia": "condicionamento",
+      "descricao": "Agachar fundo e saltar com tudo, aterrissando macio para a próxima repetição.",
+      "referencias": [
+        "agachamento",
+        "aquecimento"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Saltos em uma perna",
+      "categoria": "condicionamento",
+      "familia": "condicionamento",
+      "descricao": "Saltos longos seguidos no mesmo pé, segurando a última aterrissagem.",
+      "referencias": [
+        "aquecimento"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Skipping explosivo",
+      "categoria": "condicionamento",
+      "familia": "condicionamento",
+      "descricao": "Skipping subindo o máximo possível a cada impulsão, com o braço puxando para cima.",
+      "referencias": [
+        "aquecimento"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Prancha com toque no ombro",
+      "categoria": "condicionamento",
+      "familia": "condicionamento",
+      "descricao": "Em posição de flexão, tocar um ombro de cada vez sem girar o quadril.",
+      "referencias": [
+        "aquecimento"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Desliza e arranca",
+      "categoria": "condicionamento",
+      "familia": "condicionamento",
+      "descricao": "Três deslizamentos, plantar o pé e arrancar em sprint até a outra linha.",
+      "referencias": [
+        "aquecimento"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    },
+    {
+      "nome": "Sprint com salto no final",
+      "categoria": "condicionamento",
+      "familia": "condicionamento",
+      "descricao": "Sprint de meia quadra terminando em um salto máximo, como numa disputa de rebote.",
+      "referencias": [
+        "aquecimento"
+      ],
+      "revisao": "Fundamentos de família registrados; validação técnica e visual individual pendente."
+    }
+  ]
+}

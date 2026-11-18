@@ -5,10 +5,9 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { menosMovimento } from '../../shared/lib/movimento'
 import { corpoDoParceiro, corpoNoTempo, ESCALA, type Corpo3D } from './corpo3d'
 import { instante, preparar, type Coreografia } from './motor'
-import { Boneco, CORES_ATLETA, CORES_PARCEIRO } from './tres-d/boneco'
+import { CORES_ATLETA, CORES_PARCEIRO } from './tres-d/boneco'
+import { AtletaRealista } from './tres-d/atletaRealista'
 import { Cenario } from './tres-d/cenario'
-import { corpoMocap } from './mocap'
-import { carregarClipe, CREDITO_MOCAP, MOCAP_DE_EXERCICIO, prepararCena, type CenaMocap } from './mocapExercicios'
 
 /** Fundo de estúdio: escuro em cima, mais claro no horizonte. */
 function fundoDegrade() {
@@ -31,8 +30,9 @@ function fundoDegrade() {
 
 const VELOCIDADES = [0.1, 0.25, 0.5, 1]
 
-type Vista = 'padrao' | 'perfil' | 'frente' | 'costas' | 'cima' | 'tres-quartos'
+type Vista = 'padrao' | 'perfil' | 'frente' | 'costas' | 'cima' | 'tres-quartos' | 'quadra'
 const VISTAS: { id: Vista; rotulo: string }[] = [
+  { id: 'quadra', rotulo: 'Quadra' },
   { id: 'padrao', rotulo: 'Padrão' },
   { id: 'perfil', rotulo: 'Perfil' },
   { id: 'frente', rotulo: 'Frente' },
@@ -41,9 +41,10 @@ const VISTAS: { id: Vista; rotulo: string }[] = [
   { id: 'cima', rotulo: 'Cima' },
 ]
 
-type Foco = 'corpo' | 'pernas' | 'tronco' | 'maos' | 'pes'
+type Foco = 'corpo' | 'pernas' | 'tronco' | 'maos' | 'pes' | 'rosto'
 const FOCOS: { id: Foco; rotulo: string; distancia: number }[] = [
   { id: 'corpo', rotulo: 'Corpo', distancia: 6 },
+  { id: 'rosto', rotulo: 'Rosto', distancia: 1.15 },
   { id: 'pernas', rotulo: 'Pernas', distancia: 2.7 },
   { id: 'tronco', rotulo: 'Tronco', distancia: 2.4 },
   { id: 'maos', rotulo: 'Mãos', distancia: 1.3 },
@@ -65,21 +66,9 @@ interface Props {
 
 /** Demonstração em 3D: gire, aproxime, mova e veja por dentro (músculos e esqueleto). */
 export default function Demonstracao3D({ coreografia, nome, aoFalhar, aoVer2D }: Props) {
-  const animBase = useMemo(() => preparar(coreografia), [coreografia])
-  // Movimento real (captura de movimento), quando o exercício tem: carrega o clipe à parte e troca ao chegar.
-  const [mocap, setMocap] = useState<CenaMocap | null>(null)
-  useEffect(() => {
-    const id = MOCAP_DE_EXERCICIO[nome]
-    setMocap(null)
-    if (!id) return
-    let vivo = true
-    carregarClipe(id).then((c) => vivo && setMocap(prepararCena(c, id, coreografia.vista === 'frente'))).catch(() => {})
-    return () => { vivo = false }
-  }, [nome])
-  const anim = useMemo(
-    () => (mocap ? { ...animBase, total: mocap.total, inicioFase: coreografia.fases.map((_, i) => (i * mocap.total) / coreografia.fases.length) } : animBase),
-    [animBase, mocap, coreografia.fases],
-  )
+  // O corpo, a bola, as pegadas e os passos usam a mesma coreografia.
+  // Clipes genéricos não substituem a técnica específica de outro exercício.
+  const anim = useMemo(() => preparar(coreografia), [coreografia])
   const [tocando, setTocando] = useState(() => !menosMovimento())
   const [fase, setFase] = useState(0)
   const [velocidade, setVelocidade] = useState(0.5)
@@ -90,6 +79,7 @@ export default function Demonstracao3D({ coreografia, nome, aoFalhar, aoVer2D }:
   const [seguir, setSeguir] = useState(true)
   const [foco, setFoco] = useState<Foco>('corpo')
   const [ampliado, setAmpliado] = useState(false)
+  const [carregandoModelo, setCarregandoModelo] = useState(true)
 
   const palco = useRef<HTMLDivElement>(null)
   const tempo = useRef(0)
@@ -134,10 +124,10 @@ export default function Demonstracao3D({ coreografia, nome, aoFalhar, aoVer2D }:
 
     const cena = new THREE.Scene()
     cena.background = fundoDegrade()
-    cena.fog = new THREE.Fog(0x2b2c26, 18, 42)
+    cena.fog = new THREE.Fog(0x9ca8af, 26, 65)
     const camera = new THREE.PerspectiveCamera(32, largura() / altura(), 0.05, 120)
 
-    cena.add(new THREE.HemisphereLight(0xffffff, 0x4a4332, 1.05))
+    cena.add(new THREE.HemisphereLight(0xeaf3ff, 0x806447, 1.55))
     const sol = new THREE.DirectionalLight(0xfff4e0, 2.4)
     sol.position.set(3, 9, 6)
     sol.castShadow = true
@@ -155,21 +145,17 @@ export default function Demonstracao3D({ coreografia, nome, aoFalhar, aoVer2D }:
     contra.position.set(-5, 4, -6)
     cena.add(contra)
 
-    const corpoEm = (t: number): Corpo3D =>
-      mocap ? corpoMocap(mocap.clipe, t, mocap.colocacao, mocap.bola, mocap.arremesso) : corpoNoTempo(anim, t, coreografia.cena)
-    const faseEm = (t: number) => {
-      if (!mocap) return instante(anim, t).fase
-      let f = 0
-      anim.inicioFase.forEach((ini, i) => { if (t >= ini) f = i })
-      return f
-    }
-    const cenario = new Cenario(anim, mocap ? corpoEm : undefined)
+    const corpoEm = (t: number): Corpo3D => corpoNoTempo(anim, t, coreografia.cena)
+    const faseEm = (t: number) => instante(anim, t).fase
+    const cenario = new Cenario(anim)
     cena.add(cenario.raiz)
-    const atleta = new Boneco(CORES_ATLETA)
+    setCarregandoModelo(true)
+    const pronto = () => { setCarregandoModelo(false); sujo = true }
+    const atleta = new AtletaRealista(CORES_ATLETA, pronto, aoFalhar)
     cena.add(atleta.raiz)
-    let parceiro: Boneco | null = null
-    if (coreografia.cena.parceiro && !mocap) {
-      parceiro = new Boneco(CORES_PARCEIRO)
+    let parceiro: AtletaRealista | null = null
+    if (coreografia.cena.parceiro) {
+      parceiro = new AtletaRealista(CORES_PARCEIRO, pronto, aoFalhar)
       parceiro.atualizar(corpoDoParceiro(coreografia.cena.parceiro.pose, coreografia.cena.parceiro.dir, 0))
       cena.add(parceiro.raiz)
     }
@@ -191,7 +177,7 @@ export default function Demonstracao3D({ coreografia, nome, aoFalhar, aoVer2D }:
     const olhando = anim.frente ? new THREE.Vector3(0, 0, 1) : new THREE.Vector3(1, 0, 0)
     const lateral = anim.frente ? new THREE.Vector3(1, 0, 0) : new THREE.Vector3(0, 0, 1)
     // Câmera começa como o 2D: de lado (ou de frente), um pouco acima, afastada.
-    const posicaoPadrao = () => new THREE.Vector3(0.0, 0.55, 6)
+    const posicaoPadrao = () => new THREE.Vector3(2.3, 1.25, 6.4)
     camera.position.copy(controles.target).add(posicaoPadrao())
 
     let sujo = true
@@ -203,11 +189,17 @@ export default function Demonstracao3D({ coreografia, nome, aoFalhar, aoVer2D }:
     const pontoDoFoco = (f: Foco, c: Corpo3D) => {
       const v = (p: { x: number; y: number; z: number }) => new THREE.Vector3(p.x, p.y, p.z)
       switch (f) {
+        case 'rosto': return v(c.cabeca)
         case 'pernas': return v(c.perna.F.meio).add(v(c.perna.T.meio)).multiplyScalar(0.5).setY(0.55)
         case 'tronco': return v(c.pelve).add(v(c.pescoco)).multiplyScalar(0.5)
         case 'maos': {
-          const comBola = c.bolas.find((b) => b.presa > 0.3)
-          return comBola ? v(comBola.centro) : v(c.braco.P.ponta)
+          const bola = c.bolas[0]
+          if (!bola) return v(c.braco.P.ponta).lerp(v(c.braco.L.ponta), 0.5)
+          const p = v(c.braco.P.ponta)
+          const l = v(c.braco.L.ponta)
+          const centro = v(bola.centro)
+          const mao = p.distanceToSquared(centro) < l.distanceToSquared(centro) ? p : l
+          return mao.lerp(centro, 0.2)
         }
         case 'pes': return v(c.pe.F.tornozelo).add(v(c.pe.T.tornozelo)).multiplyScalar(0.5).setY(0.15)
         default: return v(c.pelve).setY(1.12)
@@ -215,7 +207,7 @@ export default function Demonstracao3D({ coreografia, nome, aoFalhar, aoVer2D }:
     }
 
     const desenhar = (t: number, dt = 0) => {
-      const inst = mocap ? null : instante(anim, t)
+      const inst = instante(anim, t)
       corpo = corpoEm(t)
       atleta.atualizar(corpo, t)
       cenario.pousarBola(0, corpo.bolas[0])
@@ -230,7 +222,7 @@ export default function Demonstracao3D({ coreografia, nome, aoFalhar, aoVer2D }:
       if (linha.current && document.activeElement !== linha.current) linha.current.value = String(Math.round(t))
       if (angulos.current) {
         angulos.current.querySelectorAll('li').forEach((li, i) => {
-          const chave = ROTULOS_ANGULOS(anim.frente && !mocap)[i][0]
+          const chave = ROTULOS_ANGULOS(anim.frente)[i][0]
           const v = corpo.angulos[chave]
           const b = li.querySelector('b')
           if (b) b.textContent = `${Math.round(v)}°`
@@ -261,15 +253,16 @@ export default function Demonstracao3D({ coreografia, nome, aoFalhar, aoVer2D }:
       },
       vista: (v) => {
         const alvo = controles.target.clone()
-        const d = Math.max(3.5, camera.position.distanceTo(controles.target))
+        const d = v === 'quadra' ? 16 : v === 'padrao' ? 6.8 : Math.max(3.5, camera.position.distanceTo(controles.target))
         let dir: THREE.Vector3
         switch (v) {
+          case 'quadra': dir = new THREE.Vector3(0.85, 0.5, 1); break
           case 'perfil': dir = anim.frente ? new THREE.Vector3(1, 0.1, 0) : new THREE.Vector3(0, 0.1, 1); break
           case 'frente': dir = olhando.clone().setY(0.1); break
           case 'costas': dir = olhando.clone().multiplyScalar(-1).setY(0.1); break
           case 'cima': dir = new THREE.Vector3(0.001, 1, 0.001); break
           case 'tres-quartos': dir = olhando.clone().add(lateral).setY(0.45); break
-          default: dir = new THREE.Vector3(0, 0.09, 1)
+          default: dir = posicaoPadrao()
         }
         tweenCamera = { de: camera.position.clone(), para: alvo.add(dir.normalize().multiplyScalar(d)), t: 0 }
       },
@@ -345,7 +338,7 @@ export default function Demonstracao3D({ coreografia, nome, aoFalhar, aoVer2D }:
       renderer.domElement.remove()
       api.current = null
     }
-  }, [anim, mocap, coreografia.cena, coreografia.fases, nome, aoFalhar])
+  }, [anim, coreografia.cena, coreografia.fases, nome, aoFalhar])
 
   // Camadas e opções: redesenha o quadro atual.
   useEffect(() => {
@@ -374,22 +367,23 @@ export default function Demonstracao3D({ coreografia, nome, aoFalhar, aoVer2D }:
   }
 
   const { fases } = coreografia
-  // Com movimento real o jogador usa sempre a própria direita/esquerda: rótulos por lado do corpo, não da tela.
-  const rotulos = ROTULOS_ANGULOS(anim.frente && !mocap)
+  // Os rótulos acompanham os mesmos lados da coreografia exibida.
+  const rotulos = ROTULOS_ANGULOS(anim.frente)
 
   return (
     <section className={`demo demo3d ${ampliado ? 'ampliado' : ''}`} aria-label={`Demonstração em 3D: ${nome}`}>
-      <div className="demo3d-palco" ref={palco}>
-        <div className="demo3d-vistas" role="group" aria-label="Pontos de vista">
+      <div className="demo3d-vistas" role="group" aria-label="Pontos de vista">
           {VISTAS.map((v) => (
             <button key={v.id} type="button" className="chip" onClick={() => api.current?.vista(v.id)}>{v.rotulo}</button>
           ))}
-        </div>
-        <p className="demo3d-dica" aria-hidden>Arraste para girar · role para aproximar · botão direito para mover</p>
+      </div>
+      <div className="demo3d-palco" ref={palco}>
+        {carregandoModelo && <p className="demo3d-carregando" role="status">Carregando atleta…</p>}
         <button type="button" className="chip demo3d-ampliar" onClick={() => setAmpliado((a) => !a)} aria-pressed={ampliado}>
           {ampliado ? 'Reduzir' : 'Ampliar'}
         </button>
       </div>
+      <p className="demo3d-dica">Arraste para girar · role para aproximar · botão direito para mover</p>
 
       <div className="demo-controles">
         <button type="button" className="chip" onClick={anterior} aria-label="Passo anterior">⏮</button>
@@ -458,7 +452,6 @@ export default function Demonstracao3D({ coreografia, nome, aoFalhar, aoVer2D }:
           </li>
         ))}
       </ol>
-      {mocap && <p className="muted demo3d-credito">{CREDITO_MOCAP}</p>}
       <p className="demo3d-rodape">
         <button type="button" className="link botao-link" onClick={aoVer2D}>Ver em 2D</button>
       </p>

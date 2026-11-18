@@ -68,7 +68,7 @@ function abrirInicio(rotas: Parameters<typeof apiFalsa>[0] = {}) {
 describe('Início', () => {
   it('a abertura fica só com o título: sem o cartão de convite, sequência ou meta', async () => {
     abrirInicio({ 'GET /goals': [meta({ id: 2, title: '100 cestas', kind: 'cestas_total', target: 100, current: 42 })] })
-    expect(await screen.findByRole('heading', { name: 'Treino de hoje' })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: 'Treine no seu ritmo. Evolua a cada jogada.' })).toBeInTheDocument()
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Bora pra quadra.')
     expect(screen.queryByText(/dias? seguidos?/)).toBeNull()
     expect(screen.queryByRole('link', { name: /Meta:/ })).toBeNull()
@@ -76,7 +76,7 @@ describe('Início', () => {
     expect(screen.queryByRole('link', { name: 'Gerar treino rápido' })).toBeNull()
   })
 
-  it('a página mostra os níveis com a contagem real, a rotina da semana e todos os jogadores', async () => {
+  it('a página mostra os níveis e os jogadores e termina antes das antigas seções', async () => {
     const estilo = (id: string, name: string) => ({ id, name, group: 'guard', archetype: 'Estilo', moveCount: 3, minutes: 40, mix: { arremesso: 100 } })
     const doNivel = (id: number, level: string, warmup = false) => ({ id, name: `Exercício ${id}`, category: 'drible', metric: 'tempo', description: null, custom: false, level, warmup })
     abrirInicio({
@@ -99,21 +99,20 @@ describe('Início', () => {
     expect(nomes).toHaveAttribute('aria-hidden', 'true')
     expect(nomes.querySelector('a')).toBeNull()
 
-    const segunda = (await screen.findByRole('heading', { name: 'Seg' })).closest('article') as HTMLElement
-    await within(segunda).findByText('Exercício 1')
-    expect(screen.getByRole('heading', { name: 'Ter' }).closest('article')).toHaveTextContent('Descanso')
+    expect(within(document.querySelector('.pagina-inicio') as HTMLElement).queryByRole('heading', { name: 'Rotina' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: 'Coma como quem joga' })).not.toBeInTheDocument()
   })
 
   it('sem resposta dos jogadores, o resto da página continua', async () => {
     abrirInicio({ 'GET /styles': new Resposta(500) })
-    expect(await screen.findByRole('heading', { name: 'Treino de hoje' })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: 'Treine no seu ritmo. Evolua a cada jogada.' })).toBeInTheDocument()
     expect(screen.queryByRole('heading', { name: 'Jogue como' })).toBeNull()
   })
 
   it('lista o treino da rotina de hoje e leva à sessão do dia', async () => {
     abrirInicio(rotinaDe({ 3: [3, 1], 4: [2] }))
 
-    const hoje = (await screen.findByRole('heading', { name: 'Treino de hoje' })).closest('section') as HTMLElement
+    const hoje = (await screen.findByRole('heading', { name: 'Treine no seu ritmo. Evolua a cada jogada.' })).closest('section') as HTMLElement
     const cartoes = await within(hoje).findAllByRole('link', { name: /Crossover|Lance livre|Suicídio/ })
     expect(cartoes.map((c) => c.querySelector('h3')?.textContent)).toEqual(['Crossover', 'Lance livre'])
     expect(cartoes[1]).toHaveAttribute('href', '/treinos/1')
@@ -123,7 +122,7 @@ describe('Início', () => {
   it('sem treino planejado para hoje, deixa só o link da rotina', async () => {
     abrirInicio(rotinaDe({ 4: [2] }))
 
-    expect(await screen.findByRole('heading', { name: 'Treino de hoje' })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: 'Treine no seu ritmo. Evolua a cada jogada.' })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Editar rotina' })).toHaveAttribute('href', '/rotina')
     expect(screen.queryByRole('link', { name: /Adicione à rotina/ })).toBeNull()
     expect(screen.queryByRole('link', { name: /Começar treino de hoje/ })).toBeNull()
@@ -132,18 +131,19 @@ describe('Início', () => {
   it('no dia de descanso oferece montar a rotina ou treinar mesmo assim', async () => {
     abrirInicio(rotinaDe({ 4: [2] }))
 
-    const hoje = (await screen.findByRole('heading', { name: 'Treino de hoje' })).closest('section') as HTMLElement
-    expect(await within(hoje).findByText(/dia de descanso/)).toBeInTheDocument()
-    expect(within(hoje).getByRole('link', { name: /Montar a rotina/ })).toHaveAttribute('href', '/rotina')
+    const hoje = (await screen.findByRole('heading', { name: 'Treine no seu ritmo. Evolua a cada jogada.' })).closest('section') as HTMLElement
+    expect(within(hoje).queryByText(/Hoje é dia de descanso/)).not.toBeInTheDocument()
+    expect(await within(hoje).findByRole('link', { name: /Montar a rotina/ })).toHaveAttribute('href', '/rotina')
     expect(within(hoje).getByRole('link', { name: 'Treinar mesmo assim' })).toHaveAttribute('href', '/treinos')
   })
 
-  it('o treino de hoje vem antes da abertura animada', async () => {
+  it('a abertura com a bola inclui o bloco do treino de hoje após o convite', async () => {
     abrirInicio(rotinaDe({ 3: [3] }))
 
-    const hoje = await screen.findByRole('heading', { name: 'Treino de hoje' })
+    const hoje = await screen.findByRole('heading', { name: 'Treine no seu ritmo. Evolua a cada jogada.' })
     const abertura = screen.getByRole('heading', { level: 1 })
-    expect(hoje.compareDocumentPosition(abertura) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(hoje.closest('.abertura')).toBeNull()
+    expect(abertura.compareDocumentPosition(hoje) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
   })
 
 })

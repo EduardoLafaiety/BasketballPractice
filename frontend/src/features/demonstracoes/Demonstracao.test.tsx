@@ -21,7 +21,7 @@ it('começa em 2D sem testar WebGL e mantém a cena quando o navegador não supo
 it('respeita preferência 3D e contém falhas do módulo sem derrubar o restante da tela', async () => {
   localStorage.setItem('bp-demo-vista', '3d')
   vi.spyOn(navigator, 'userAgent', 'get').mockReturnValue('Chrome')
-  const contexto = vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue({} as WebGLRenderingContext)
+  const contexto = vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockImplementation((() => ({})) as unknown as HTMLCanvasElement['getContext'])
   vi.spyOn(console, 'error').mockImplementation(() => {})
   render(<><h1>Treino em andamento</h1><Demonstracao coreografia={coreografia} nome="Teste" /></>)
   expect(await screen.findByRole('region', { name: 'Cena 2D' })).toBeVisible()

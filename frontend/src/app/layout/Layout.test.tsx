@@ -1,6 +1,6 @@
 import { screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { definirToken } from '../../shared/api/backend'
 import { apiFalsa, configFalsa, usuarioFalso } from '../../test/api-falsa'
 import { abrirApp } from '../../test/renderizar'
@@ -12,6 +12,7 @@ function abrir(rota = '/treinos') {
 }
 const botaoMenu = () => screen.findByRole('button', { name: /^(Menu|Fechar)$/ })
 const tela = () => document.getElementById('menu-tela') as HTMLElement
+beforeEach(() => { vi.spyOn(window, 'scrollTo').mockImplementation(() => {}) })
 
 describe('Menu em tela cheia', () => {
   it('leva o foco ao menu, mantém Tab dentro dele e oferece fechar por teclado', async () => {
@@ -30,6 +31,16 @@ describe('Menu em tela cheia', () => {
     await user.click(fechar)
     expect(abrirMenu).toHaveFocus()
     expect(screen.queryByRole('dialog')).toBeNull()
+  })
+  it('a bola e o rótulo Início voltam ao topo mesmo na página inicial', async () => {
+    const user = userEvent.setup()
+    abrir('/')
+    await botaoMenu()
+    const topo = within(document.querySelector('.topo') as HTMLElement)
+    await user.click(topo.getByRole('link', { name: 'Basketball Practice, início' }))
+    await user.click(topo.getByRole('link', { name: 'Início' }))
+    expect(window.scrollTo).toHaveBeenCalledTimes(2)
+    expect(window.scrollTo).toHaveBeenLastCalledWith(0, 0)
   })
   it('abre e fecha pelo botão, que informa o estado', async () => {
     const user = userEvent.setup()
@@ -99,9 +110,9 @@ describe('Barra de atalhos do celular', () => {
     await botaoMenu()
     expect(doca().getByRole('link', { name: 'Treinos' })).toHaveClass('active')
 
-    await user.click(doca().getByRole('link', { name: 'Gerar rotina' }))
+    await user.click(doca().getByRole('link', { name: 'Rotina' }))
     await waitFor(() => expect(screen.getByTestId('caminho')).toHaveTextContent('/rotina'))
-    expect(doca().getByRole('link', { name: 'Gerar rotina' })).toHaveClass('active')
+    expect(doca().getByRole('link', { name: 'Rotina' })).toHaveClass('active')
     expect(doca().getByRole('link', { name: 'Treinos' })).not.toHaveClass('active')
   })
 
@@ -138,7 +149,7 @@ describe('Desafio do dia e quiz do dia saíram do app', () => {
     expect(menu.queryByRole('link', { name: /Quiz do dia/ })).toBeNull()
 
     const doca = within(screen.getByRole('navigation', { name: 'Atalhos' }))
-    expect(doca.getAllByRole('link').map((l) => l.textContent?.trim())).toEqual(['Início', 'Treinos', 'Gerar', 'Evolução'])
+    expect(doca.getAllByRole('link').map((l) => l.textContent?.trim())).toEqual(['Início', 'Treinos', 'Rotina', 'Evolução'])
     expect(doca.queryByRole('link', { name: /Desafio/ })).toBeNull()
   })
 })

@@ -108,15 +108,20 @@ describe('Biblioteca de treinos', () => {
     expect(within(screen.getByRole('link', { name: /Bandeja/ })).getByText('Finalização')).toBeInTheDocument()
   })
 
-  it('não tem busca, filtros por categoria ou registro, nem o botão de novo exercício', async () => {
+  it('combina busca sem acentos e fundamento, e permite limpar os filtros', async () => {
+    const user = userEvent.setup()
     abrir(servidorDeExercicios().rotas)
-    await screen.findByRole('heading', { name: 'Treinos', level: 1 })
-
-    expect(screen.queryByPlaceholderText('Buscar treino')).toBeNull()
-    expect(screen.queryByRole('combobox')).toBeNull()
-    for (const nome of ['Todas', 'Arremesso', 'Drible', 'Passe', 'Finalização', 'Defesa', 'Condicionamento']) {
-      expect(screen.queryByRole('button', { name: nome })).toBeNull()
-    }
+    await screen.findByRole('heading', { name: 'Lance livre' })
+    await user.type(screen.getByRole('searchbox'), 'media')
+    expect(nomesNaTela()).toEqual(['Arremesso de média'])
+    await user.selectOptions(screen.getByLabelText('Fundamento'), 'Drible')
+    expect(screen.getByText(/Nenhum treino encontrado/)).toBeInTheDocument()
+    await user.clear(screen.getByRole('searchbox'))
+    expect(nomesNaTela()).toEqual(['Crossover'])
+    await user.click(screen.getByRole('button', { name: /Intermediário/ }))
+    expect(screen.getByLabelText('Fundamento')).toHaveValue('Drible')
+    await user.click(screen.getByRole('button', { name: 'Limpar filtros' }))
+    expect(nomesNaTela()).toHaveLength(5)
     expect(screen.queryByRole('button', { name: '+ Novo exercício' })).toBeNull()
   })
 

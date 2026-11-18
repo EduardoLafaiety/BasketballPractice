@@ -27,6 +27,67 @@ function lathe(perfil: [number, number][], L: number, segmentos = 20, aberto = f
   return g
 }
 
+/** Trama discreta da roupa, compartilhada pelas peças do uniforme. */
+function tecido() {
+  const canvas = document.createElement('canvas')
+  canvas.width = canvas.height = 128
+  const ctx = canvas.getContext('2d')
+  if (ctx) {
+    ctx.fillStyle = '#b8b8b8'
+    ctx.fillRect(0, 0, 128, 128)
+    for (let y = 0; y < 128; y += 4) for (let x = 0; x < 128; x += 4) {
+      ctx.fillStyle = (x + y) % 8 === 0 ? '#dddddd' : '#999999'
+      ctx.fillRect(x, y, 1, 2)
+    }
+  }
+  const t = new THREE.CanvasTexture(canvas)
+  t.wrapS = t.wrapT = THREE.RepeatWrapping
+  t.repeat.set(3, 3)
+  return t
+}
+
+/** Cabeça contínua: crânio, maçãs do rosto, mandíbula e nariz na mesma superfície. */
+function cabecaHumana() {
+  // altura, frente, nuca, meia largura
+  const secoes = [
+    [-0.108, 0.056, -0.018, 0.023], [-0.093, 0.073, -0.044, 0.043],
+    [-0.07, 0.082, -0.067, 0.062], [-0.045, 0.086, -0.081, 0.069],
+    [-0.005, 0.088, -0.09, 0.077], [0.035, 0.084, -0.09, 0.078],
+    [0.075, 0.074, -0.079, 0.072], [0.105, 0.049, -0.052, 0.049],
+    [0.124, 0.002, -0.005, 0.003],
+  ]
+  const curvas = [1, 2, 3].map((i) => new THREE.SplineCurve(secoes.map((s) => new THREE.Vector2(s[0], s[i]))).getPoints(48))
+  const vertices: number[] = []
+  const indices: number[] = []
+  const lados = 64
+  for (let i = 0; i <= 48; i++) {
+    const y = curvas[0][i].x
+    const frente = curvas[0][i].y
+    const nuca = curvas[1][i].y
+    const largura = curvas[2][i].y
+    for (let j = 0; j <= lados; j++) {
+      const a = j / lados * Math.PI * 2
+      const z = Math.sin(a) * largura
+      let x = (frente + nuca) / 2 + Math.cos(a) * (frente - nuca) / 2
+      if (Math.cos(a) > 0) {
+        const ponte = 0.021 * Math.exp(-Math.pow((y + 0.006) / 0.029, 2)) * Math.exp(-Math.pow(z / 0.012, 2))
+        const olhos = 0.003 * Math.exp(-Math.pow((y - 0.025) / 0.012, 2)) * Math.exp(-Math.pow((Math.abs(z) - 0.031) / 0.014, 2))
+        x += ponte - olhos
+      }
+      vertices.push(x, y, z)
+      if (i < 48 && j < lados) {
+        const n = i * (lados + 1) + j
+        indices.push(n, n + lados + 1, n + 1, n + 1, n + lados + 1, n + lados + 2)
+      }
+    }
+  }
+  const g = new THREE.BufferGeometry()
+  g.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3))
+  g.setIndex(indices)
+  g.computeVertexNormals()
+  return g
+}
+
 interface Secao {
   t: number
   rx: number
@@ -216,15 +277,18 @@ class Dedos {
   }
 }
 
-class Tenis {
+export class Tenis {
   readonly grupo = new THREE.Group()
   constructor(cores: Cores) {
     const branco = material(0xf4f4f4, 0.55)
     const sola = material(0x1e1e1e, 0.9)
     const faixa = material(cores.camisa, 0.6)
     const g = this.grupo
-    g.add(malha(new THREE.BoxGeometry(0.29, 0.03, 0.108), sola)).position.set(0.04, -0.077, 0)
-    g.add(malha(new THREE.BoxGeometry(0.28, 0.026, 0.104), branco)).position.set(0.04, -0.052, 0)
+    const base = malha(new THREE.BoxGeometry(0.29, 0.03, 0.108), sola)
+    base.position.set(0.04, -0.073, 0)
+    const entressola = malha(new THREE.BoxGeometry(0.28, 0.026, 0.104), branco)
+    entressola.position.set(0.04, -0.052, 0)
+    g.add(base, entressola)
     g.add(elipsoide(branco, 0.13, 0.05, 0.05, 0.075, -0.026, 0))
     g.add(elipsoide(branco, 0.06, 0.062, 0.052, -0.045, -0.012, 0))
     g.add(elipsoide(faixa, 0.045, 0.012, 0.052, 0.07, -0.001, 0))
@@ -258,10 +322,14 @@ export class Boneco {
 
   constructor(cores: Cores = CORES_ATLETA) {
     this.cores = cores
-    const base = material(cores.pele, 0.68)
+    const base = new THREE.MeshPhysicalMaterial({ color: cores.pele, roughness: 0.57, clearcoat: 0.12, clearcoatRoughness: 0.7 })
     this.pele = { base, F: base.clone(), T: base.clone(), P: base.clone(), L: base.clone() }
     const camisa = material(cores.camisa, 0.8)
     const short = material(cores.short, 0.85)
+    const trama = tecido()
+    camisa.bumpMap = short.bumpMap = trama
+    camisa.bumpScale = short.bumpScale = 0.0008
+    camisa.roughness = 0.82
     const detalhe = material(cores.detalhe, 0.7)
     const cabelo = material(cores.cabelo, 0.9)
 
@@ -280,7 +348,7 @@ export class Boneco {
     const numero = this.texturaNumero(cores)
     for (const lado of [1, -1]) {
       const decal = new THREE.Mesh(new THREE.PlaneGeometry(0.17, 0.17), new THREE.MeshStandardMaterial({ map: numero, transparent: true, roughness: 0.8, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2 }))
-      decal.position.set(lado * 0.1245, 0.375, 0)
+      decal.position.set(lado * 0.138, 0.375, 0)
       decal.rotation.y = lado === 1 ? Math.PI / 2 : -Math.PI / 2
       torso.add(decal)
     }
@@ -288,7 +356,7 @@ export class Boneco {
     const pelvis = elipsoide(short, 0.118, 0.105, 0.172, 0, -0.025, 0)
     this.partes.pelve = pelvis
     this.roupa.add(pelvis)
-    const pescoco = malha(new THREE.CylinderGeometry(0.047, 0.055, 1, 14), this.pele.base)
+    const pescoco = malha(new THREE.CylinderGeometry(0.046, 0.066, 1, 24), this.pele.base)
     this.partes.pescoco = pescoco
     this.raiz.add(pescoco)
 
@@ -300,27 +368,32 @@ export class Boneco {
     // --- Cabeça ---
     const cabeca = new THREE.Group()
     this.partes.cabeca = cabeca
-    cabeca.add(elipsoide(this.pele.base, 0.098, 0.118, 0.081, 0.008, 0, 0))
-    cabeca.add(elipsoide(this.pele.base, 0.06, 0.05, 0.062, 0.05, -0.07, 0))
-    cabeca.add(elipsoide(this.pele.base, 0.018, 0.026, 0.016, 0.098, -0.012, 0))
-    const cap = elipsoide(cabelo, 0.104, 0.118, 0.087, -0.004, 0.012, 0)
-    cap.scale.set(0.104, 0.12, 0.087)
+    cabeca.add(malha(cabecaHumana(), this.pele.base))
+    // Cabelo curto só no topo: a esfera inteira escondia têmporas e parte do rosto.
+    const cap = malha(new THREE.SphereGeometry(1, 32, 20, 0, Math.PI * 2, 0, Math.PI * 0.53), cabelo)
+    cap.scale.set(0.088, 0.092, 0.079)
+    cap.position.set(-0.008, 0.035, 0)
     cabeca.add(cap)
     this.vestes.push(cap)
     for (const lado of [1, -1]) {
-      cabeca.add(elipsoide(cabelo, 0.012, 0.013, 0.012, 0.073, 0.015, lado * 0.036))
-      cabeca.add(elipsoide(this.pele.base, 0.012, 0.024, 0.008, -0.005, -0.012, lado * 0.082))
+      cabeca.add(elipsoide(this.pele.base, 0.011, 0.019, 0.006, -0.009, -0.005, lado * 0.079))
+      cabeca.add(elipsoide(material(0x9b6147, 0.8), 0.005, 0.01, 0.002, -0.005, -0.005, lado * 0.084))
     }
     const rosto = material(0x120e0b, 0.5)
     const branco = material(0xf6f2ea, 0.4)
     for (const lado of [1, -1]) {
-      cabeca.add(elipsoide(branco, 0.0085, 0.0075, 0.012, 0.087, 0.022, lado * 0.034))
-      cabeca.add(elipsoide(rosto, 0.005, 0.0055, 0.0055, 0.094, 0.022, lado * 0.034))
-      const sobrancelha = elipsoide(cabelo, 0.006, 0.0045, 0.019, 0.091, 0.044, lado * 0.036)
+      // Olhos encaixados no rosto; pálpebras recobrem o globo e deixam uma abertura estreita.
+      cabeca.add(elipsoide(this.pele.base, 0.004, 0.008, 0.013, 0.074, 0.025, lado * 0.031))
+      cabeca.add(elipsoide(branco, 0.002, 0.002, 0.008, 0.078, 0.025, lado * 0.031))
+      cabeca.add(elipsoide(material(0x634432, 0.62), 0.0015, 0.002, 0.0028, 0.08, 0.025, lado * 0.031))
+      cabeca.add(elipsoide(rosto, 0.001, 0.0016, 0.0016, 0.081, 0.025, lado * 0.031))
+      const sobrancelha = elipsoide(cabelo, 0.002, 0.0015, 0.011, 0.078, 0.037, lado * 0.032)
       cabeca.add(sobrancelha)
       this.vestes.push(sobrancelha)
     }
-    cabeca.add(elipsoide(material(0x7a3b2e, 0.6), 0.005, 0.004, 0.02, 0.088, -0.046, 0))
+    const labios = material(0xa06851, 0.75)
+    cabeca.add(elipsoide(labios, 0.003, 0.003, 0.016, 0.087, -0.058, 0))
+    cabeca.add(elipsoide(material(0x684237, 0.85), 0.0015, 0.0008, 0.014, 0.09, -0.058, 0))
     this.raiz.add(cabeca)
 
     // --- Pernas ---
@@ -557,7 +630,7 @@ export class Boneco {
   }
 
   /** Move e gira todas as peças para o corpo de um instante. */
-  atualizar(c: Corpo3D, t = 0) {
+  atualizar(c: Corpo3D, _tempo = 0) {
     this.atual = c
     const p = this.partes
     const frente = c.torax.frente
@@ -594,8 +667,8 @@ export class Boneco {
     orientarEixos(p.pelveM, c.pelve, c.pelvia)
     p.torso.scale.y = c.pescoco.y > 0 ? vec(c.pescoco).sub(vec(c.pelve)).length() / 0.631 : 1
     p.peleTorso.scale.y = p.torso.scale.y
-    // Respiração: o peito sobe e desce um pouco, mesmo parado.
-    const ar = 1 + 0.011 * Math.sin((t / 3400) * Math.PI * 2)
+    // A escala do corpo permanece estável; só a coreografia move as articulações.
+    const ar = 1
     p.torso.scale.x = ar
     p.torso.scale.z = ar
     p.peleTorso.scale.x = ar
@@ -654,6 +727,10 @@ export class Boneco {
       const d = vec(b.centro).distanceTo(punho)
       if (d < 0.7) solta = Math.max(solta, 1 - d / 0.7)
     }
+    // Mantém o punho relaxado à frente após o arremesso, mesmo com a bola distante.
+    const braco = c.braco[qual]
+    const estendido = vec(braco.meio).sub(vec(braco.raiz)).normalize().dot(dir) > 0.88
+    if (abraco < 0.05 && punho.y > c.cabeca.y && estendido && c.bolas.some((b) => b.presa < 0.05)) solta = Math.max(solta, 0.85)
     const flexao = abraco > 0.3 ? 0 : solta * 0.9 - 0.08
     mao.rotateX(-flexao)
     this.maos[qual].ajustar(Math.max(abraco, solta * 0.6))
@@ -682,10 +759,18 @@ export class Boneco {
   static readonly GRUPOS_MUSCULARES = ['Quadríceps', 'Posteriores da coxa', 'Panturrilha', 'Glúteos', 'Deltoide', 'Bíceps', 'Tríceps', 'Peitoral', 'Abdômen', 'Dorsais']
 
   liberar() {
+    const materiais = new Set<THREE.Material>()
+    const texturas = new Set<THREE.Texture>()
     this.raiz.traverse((o) => {
       const m = o as THREE.Mesh
       m.geometry?.dispose?.()
+      if (m.material) for (const mat of Array.isArray(m.material) ? m.material : [m.material]) materiais.add(mat)
     })
+    for (const mat of materiais) {
+      for (const valor of Object.values(mat)) if (valor instanceof THREE.Texture) texturas.add(valor)
+      mat.dispose()
+    }
+    texturas.forEach((t) => t.dispose())
   }
 }
 

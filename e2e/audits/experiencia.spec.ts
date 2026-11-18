@@ -34,7 +34,7 @@ test('registra aparência retrô e recursos das cinco telas principais', async (
     await page.setViewportSize({ width: largura, height: altura })
     for (const theme of ['claro', 'escuro']) {
       await request.put('/api/settings', { headers: autorizacao(token), data: { theme } })
-      for (const [nome, rota, titulo] of [['inicio', '/', 'Treino de hoje'], ['treinos', '/treinos', 'Treinos'], ['rotina', '/rotina', 'Rotina semanal'], ['sessao', '/sessao?hoje', 'Treino de'], ['evolucao', '/evolucao', 'Evolução']]) {
+      for (const [nome, rota, titulo] of [['inicio', '/', 'Treine no seu ritmo'], ['treinos', '/treinos', 'Treinos'], ['rotina', '/rotina', 'Rotina semanal'], ['sessao', '/sessao?hoje', 'Treino de'], ['evolucao', '/evolucao', 'Evolução']]) {
         await page.goto(rota)
         await expect(page.getByRole('heading', { name: new RegExp(titulo) }).first()).toBeVisible()
         if (nome === 'inicio') await expect(page.locator('.lista-treino').first()).toBeVisible()
@@ -43,7 +43,10 @@ test('registra aparência retrô e recursos das cinco telas principais', async (
         if (nome === 'sessao') await expect(page.getByRole('button', { name: 'Começar', exact: true })).toBeVisible()
         if (nome === 'evolucao') await expect(page.getByRole('table')).toBeVisible()
         await page.evaluate(() => document.fonts.ready)
-        expect(await page.evaluate(() => Array.from(document.fonts).some((f) => /Arcade/.test(f.family) && f.status === 'loaded'))).toBeTruthy()
+        expect(await page.getByRole('heading', { name: new RegExp(titulo) }).first().evaluate((el) => {
+          const familia = getComputedStyle(el).fontFamily.split(',')[0].replace(/['"]/g, '').trim()
+          return Array.from(document.fonts).some(f => f.family.replace(/['"]/g, '').trim() === familia && f.status === 'loaded')
+        })).toBeTruthy()
         expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBeTruthy()
         await page.screenshot({ path: info.outputPath(`${nome}-${largura}-${theme}.png`), fullPage: false, animations: 'disabled' })
         const recursos = await page.evaluate(() => {
