@@ -1,8 +1,18 @@
 # Plano de refatoração, desempenho e experiência
 
-Atualizado em **18/11/2026**. Estado: **PRs #165 e #166 integradas; etapa de arquitetura do backend validada localmente e publicada no PR #167**.
+Atualizado em **18/11/2026**. Estado: **PRs #165, #166 e #167 integradas; contratos de treinos e backup validados localmente**.
 
-Prioridade atual: arquitetura do backend antes do frontend, conforme orientação do usuário. Sessões e rotina passam a separar transporte, casos de uso e persistência, com validação dos limites transacionais e contratos existentes. Recuperação local e preparação offline entram depois dessa base. A reorganização integral dos demais domínios continua incremental.
+Prioridade atual: concluir a arquitetura do backend antes de alterar o frontend, conforme orientação do usuário. Sessões, rotina, treinos e backup separam transporte, casos de uso e persistência, com validação dos limites transacionais e contratos existentes. Recuperação local e preparação offline ficam depois do fechamento dessa etapa de backend.
+
+Fila para concluir o backend, em PRs por fluxo:
+
+1. Concluir os contratos de treinos e backup, documentar compatibilidade e validar concorrência e rollback.
+2. Revisar exercícios, programas e planos: separar regras e persistência que ainda estão nas rotas e manter catálogo e progressão.
+3. Revisar autenticação, administração e preferências: explicitar contratos e dependências, preservando revogação, tokens de uso único e isolamento por conta.
+4. Revisar notificações e estilos de jogo, limites de concorrência e tratamento das falhas externas.
+5. Fechar verificações de arquitetura e compatibilidade dos endpoints, testes e documentação dos domínios migrados. Só então iniciar mudanças no frontend.
+
+Não criar camadas vazias para preencher pastas; cada separação corresponde a uma operação real. Diretórios por domínio não significam que todas as rotas já foram migradas.
 
 A estrutura entregue está em [ARQUITETURA.md](ARQUITETURA.md). Já foram aplicados cache compartilhado, antecipação seletiva de rotas, suspensão de animações invisíveis, fila local por item, revisão de pendências, duração por exercício, escrita atômica da semana e comparação agregada no servidor. As fases abaixo continuam sendo a visão de evolução; nem todos os seus itens estão concluídos. A nova auditoria automatiza capturas e contagens locais, sem substituir medições em aparelhos reais ou dados de campo.
 

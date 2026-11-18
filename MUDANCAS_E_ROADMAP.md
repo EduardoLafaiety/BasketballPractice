@@ -318,7 +318,7 @@ Próxima ordem sugerida após este complemento:
 
 ## Etapa atual — arquitetura do backend antes do frontend
 
-Estado: implementação validada localmente e publicada no [PR #167](https://github.com/EduardoLafaiety/BasketballPractice/pull/167), branch `codex/arquitetura-backend-treinos`, partindo da PR #166 integrada. Commit de implementação: `6fc2376`.
+Estado: integrado pelo [PR #167](https://github.com/EduardoLafaiety/BasketballPractice/pull/167), commit `1f5e9f8`, com todos os checks aprovados. Commit de implementação: `6fc2376`.
 
 Direção autorizada: organizar e validar a base do backend antes de evoluir a recuperação local e a experiência offline no frontend.
 
@@ -334,3 +334,21 @@ Limites: etapa concentrada em sessões e rotina, sem reorganização automática
 Validações desta etapa: 175 testes da API aprovados; 24 testes ponta a ponta com Chrome e PostgreSQL real aprovados, incluindo duas edições simultâneas; 15 testes dos adaptadores HTTP/demonstração aprovados; build do backend, build de produção do site e build da demonstração aprovados. Verificação de arquitetura aprovada; sondas temporárias confirmaram a rejeição de consulta na rota, importação direta de repositório e Express no serviço, e foram removidas após a verificação. A suíte opcional de infraestrutura PostgreSQL não foi executada; os 24 testes ponta a ponta utilizaram o banco real.
 
 Sequência seguinte: concluir a revisão de contratos e persistência dos domínios que suportam recuperação/offline; depois validar e recuperar formatos locais no frontend; preparar treino offline; revisar disponibilidade da API; medir desempenho e acessibilidade. Mudanças de plano de hospedagem dependem da confirmação da infraestrutura real e do custo.
+
+## Etapa atual — contratos de treinos e backup
+
+Estado: implementação validada localmente, branch `codex/contratos-treinos-backup`, baseada na PR #167 integrada.
+
+- Treinos: rotas delegam consulta, criação, edição e exclusão ao serviço; SQL e substituição ordenada de itens ficam no repositório. Validação e resposta de escrita pertencem à mesma transação; edição bloqueia o treino da conta.
+- Schema de exercício de treino unificado entre API e importação. A escrita de itens é compartilhada por treinos, rotina e backup, preservando séries, metas, notas, posições e IDs legados.
+- Backup: contrato v1 extraído para schema próprio, regra de identidade isolada, SQL em repositório e importação/exportação em serviço. O limite de importações por instância e a trava por conta continuam ativos, com `Retry-After` e liberação da vaga em caso de falha.
+- Exportação com snapshot transacional `REPEATABLE READ READ ONLY`, incluindo preferências e extras, evitando misturar dados durante edições concorrentes.
+- Schema de preferências separado do serviço para reuso nos contratos, com reexports compatíveis e leitura pela conexão da transação.
+- [Contratos de treinos e backup](CONTRATOS_BACKEND.md) documentados: campos, limites, identidade, multiplicidade, remapeamento, homônimos e partes não restauradas pelo formato atual.
+- Verificações de arquitetura ampliadas para treinos e backup; schemas não dependem de serviços ou repositórios. CI verifica três cenários de backup em PostgreSQL real, além das jornadas existentes.
+
+Validações locais: 178 testes da API, três cenários de concorrência de backup em PostgreSQL real, 24 testes ponta a ponta e 15 testes dos adaptadores HTTP/demonstração aprovados. Builds do backend, do site de produção e da demonstração aprovados. Arquitetura verificada. A revalidação específica de contratos é subconjunto da suíte, sem somar contagens duplicadas.
+
+Limites: sem mudança de versão do backup, tabela, endpoint, dependência ou interface. A exportação usa uma conexão durante sua execução; não há streaming nem paginação do arquivo. Não implementa restauração de extras, conflitos por versão ou sincronização entre backup e gravações normais da conta. Importações da mesma conta continuam serializadas entre si.
+
+A orientação vigente é concluir o backend antes do frontend. A fila restante está no [plano de refatoração](PLANO_DE_REFATORACAO.md): exercícios/programas/planos; autenticação/administração/preferências; notificações/estilos; fechamento das verificações e documentação. Somente depois entram recuperação local e preparação offline na interface.

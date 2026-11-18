@@ -14,7 +14,7 @@ for (const arquivo of ['frontend/src', 'backend/src'].flatMap((p) => arquivos(re
   const origem = normalizar(arquivo)
   const texto = readFileSync(arquivo, 'utf8')
   // Migração incremental: os módulos já separados não voltam a gravar SQL nas rotas.
-  if (/^backend\/src\/modules\/(sessions|routine)\/.*\.routes\.ts$/.test(origem) && /\.(?:query|transaction)\s*\(/.test(texto)) erros.push(`${origem}: persistência/transação deve ficar fora da rota HTTP`)
+  if (/^backend\/src\/modules\/(sessions|routine|workouts|data)\/.*\.routes\.ts$/.test(origem) && /\.(?:query|transaction)\s*\(/.test(texto)) erros.push(`${origem}: persistência/transação deve ficar fora da rota HTTP`)
   for (const [, caminho] of texto.matchAll(/(?:from\s*|import\s*\()\s*['"]([^'"]+)['"]/g)) {
     if (/\.(service|repository|schema)\.ts$/.test(origem) && /^(express|node:http|node:https)$/.test(caminho)) erros.push(`${origem}: domínio/persistência depende de transporte HTTP`)
     if (!caminho.startsWith('.')) continue
@@ -26,7 +26,8 @@ for (const arquivo of ['frontend/src', 'backend/src'].flatMap((p) => arquivos(re
     if (origem.startsWith('frontend/src/features/') && destino.startsWith('frontend/src/app/')) erros.push(`${origem}: feature depende da composição app`)
     if (/\.(service|repository|generator|schema)\.ts$/.test(origem) && destino.endsWith('.routes.js')) erros.push(`${origem}: regra/persistência depende de rota HTTP`)
     if (origem.endsWith('.routes.ts') && destino.endsWith('.routes.js')) erros.push(`${origem}: rota depende de outra rota; extraia um contrato ou serviço`)
-    if (/^backend\/src\/modules\/(sessions|routine)\/.*\.routes\.ts$/.test(origem) && destino.endsWith('.repository.js')) erros.push(`${origem}: rota deve acessar o caso de uso, não o repositório`)
+    if (/^backend\/src\/modules\/(sessions|routine|workouts|data)\/.*\.routes\.ts$/.test(origem) && destino.endsWith('.repository.js')) erros.push(`${origem}: rota deve acessar o caso de uso, não o repositório`)
+    if (origem.endsWith('.schema.ts') && /\.(service|repository)\.js$/.test(destino)) erros.push(`${origem}: contrato depende de serviço/persistência`)
     if (origem.endsWith('.repository.ts') && destino.endsWith('.service.js')) erros.push(`${origem}: persistência depende de serviço`)
     if (origem.endsWith('.generator.ts') && /from ['"](?:express|pg)['"]/.test(texto)) erros.push(`${origem}: gerador depende de infraestrutura`)
   }

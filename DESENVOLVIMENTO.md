@@ -45,6 +45,8 @@ Os testes da API usam PGlite; os testes ponta a ponta usam Postgres real, um ban
 
 ### Organização
 
+Os [contratos de treinos e backup](CONTRATOS_BACKEND.md) descrevem compatibilidade, limites e restauração. O CI também executa três cenários de concorrência de backup contra PostgreSQL real. Para repeti-los localmente, configure `TEST_POSTGRES_URL` para o banco administrativo de testes e rode, em `backend`, `npx tsx --test --test-name-pattern 'mesmo backup enviado|backup mantém|trava da importação' test/postgres.test.ts`. A suíte cria e remove seu próprio banco temporário.
+
 - backend/src/modules: endpoints, schemas, serviços e persistência por domínio; backend/src/db: conexão, migrações e catálogo.
 - frontend/src/app: composição e layout; features: telas, modelos e testes por funcionalidade; shared: API, cache, tipos e componentes reutilizáveis.
 - frontend/src/features/sessao/model/treino-local.ts: rascunhos e fila por conta; frontend/src/shared/lib/relogio.ts: cálculo do tempo.
