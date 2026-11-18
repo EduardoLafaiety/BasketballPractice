@@ -3,21 +3,23 @@
  * (pixel grosso, faixas horizontais de amarelo a vermelho e a "espessura" azul atrás da letra).
  *
  * Três camadas, sempre as mesmas em todas as páginas:
- *  1. Fonte  : a face "Arcade" (Press Start 2P) é a fonte de TODO texto de destaque (--fonte-display).
+ *  1. Fonte  : a face "Arcade" (a fonte própria Quadra 8) é a fonte de TODO texto de destaque (--fonte-display).
  *  2. Extrusão: h2 e os números grandes ganham a profundidade azul (--arcade-extrusao), na cor que já tinham.
  *  3. Letreiro: h1 e os títulos de abertura ganham as faixas coloridas + a profundidade (.arcade-letreiro).
  * Texto corrido, botões e rótulos pequenos continuam na fonte de texto: letra tão larga não se lê em corpo pequeno.
  */
 
-/* Press Start 2P é bem mais larga e alta que a Jersey 10 que os títulos usavam. O size-adjust encolhe a face
-   para que todos os tamanhos que já existem no CSS continuem cabendo, sem mexer um por um. */
+/* "Quadra 8": fonte própria, desenhada em grade 5×7 (scripts/gerar-fonte-quadra8.mjs). Maiúsculas de 0,7em, traço
+   grosso, acentos do português e minúsculas que repetem as maiúsculas. É mais larga que a Jersey 10 que os títulos
+   usavam: o size-adjust a encolhe para que os tamanhos que já existem no CSS continuem cabendo. Caracteres que ela não
+   tem caem na Jersey 10 (ver --fonte-display). */
 @font-face {
   font-family: 'Arcade';
   font-style: normal;
   font-weight: 400;
   font-display: swap;
-  size-adjust: 46%;
-  src: url('../../node_modules/@fontsource/press-start-2p/files/press-start-2p-latin-400-normal.woff2') format('woff2');
+  size-adjust: 62%;
+  src: url('../assets/fonts/quadra-8.woff') format('woff');
 }
 
 :root {
