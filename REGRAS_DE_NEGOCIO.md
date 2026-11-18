@@ -212,3 +212,11 @@ Cada migração de módulo deve citar as regras afetadas, manter ou adicionar os
 - **RN-UX-07 — Confirmação:** aplicar uma prévia só mostra sucesso após confirmação da API. Falha mantém a prévia para revisão e oferece recarga. O atalho Iniciar treino de hoje aguarda salvamentos e só navega na mesma sessão; não anuncia gravação otimista como confirmação remota.
 
 Controles de remoção e os controles móveis abrangidos por este ciclo têm área mínima de 44 px onde aplicada. Isso é uma meta de interação do produto, não uma declaração de auditoria integral de acessibilidade.
+
+## Desempenho e operação — passos 9 a 12
+
+- **RN-UX-08 — Demonstração:** nova preferência começa em 2D. Escolha 3D salva é respeitada quando suportada; falha local retorna à demonstração 2D sem apagar contadores/notas. O relógio não depende da visualização.
+- **RN-EV-02 — Histórico e pontuação:** paginação da lista não limita o histórico usado em Overall/conquistas. A projeção compacta preserva datas, duração, soma dos acertos, maior sequência, todas as entradas (inclusive repetidas) e zonas. Fórmulas, faixas e critérios de conquistas permanecem os mesmos.
+- **RN-EV-03 — Atualização:** criação de sessão invalida comparação, histórico e progresso na autenticação atual. Dados disponíveis podem permanecer visíveis durante falha de atualização, acompanhados de aviso. Paginação por offset pode se deslocar durante escritas concorrentes.
+- **RN-OP-01 — Privacidade operacional:** identificadores de pedidos são gerados pelo servidor. Eventos HTTP contêm domínio conhecido, método, status e duração; falhas usam categoria/código sanitizados. Não registrar corpo, query, token, e-mail, notas, SQL ou exceção completa neste fluxo.
+- **RN-OP-02 — Recuperação:** importação v1 continua remapeando referências e deduplicando sessões conforme os contratos existentes. Exportação local de recuperação não se torna backup v1. Extras e credenciais não recebem garantia nova de restauração; ensaios usam conta/banco separado.

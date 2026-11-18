@@ -62,3 +62,9 @@ Após integrar este ciclo: consolidar contratos/acesso a dados; componentes retr
 ## Segundo ciclo — passos 5 a 8
 
 Contratos e consultas compartilhadas, componentes retrô, navegação por teclado/celular e caminho da rotina ao treino foram implementados no segundo ciclo. Relatório, testes e limites em [SEGUNDO_CICLO_FRONTEND.md](SEGUNDO_CICLO_FRONTEND.md). A recuperação local e a preparação offline deste primeiro ciclo permanecem preservadas.
+
+## Passos 9 a 12 — carregamento e continuidade
+
+Demonstração começa em 2D e mantém escolha/preferência 3D com fallback local. Registrar sessão não baixa histórico. Evolução exibe histórico paginado; Overall/conquistas usam projeção compacta, cálculos memoizados e avisos de atualização, com fórmulas intactas. Conquistas não solicita catálogo sem necessidade.
+
+CI inclui orçamentos gzip e capturas nos temas/tamanhos existentes. Ferramentas de build/teste/imagem foram atualizadas, mantendo fontes e target de navegadores anterior. Detalhes e limites em [TERCEIRO_CICLO_FRONTEND.md](TERCEIRO_CICLO_FRONTEND.md).

@@ -25,7 +25,7 @@ test('abrir Evolução não baixa o histórico completo nem antecipa outras pág
   await expect(page.getByRole('table')).toBeVisible()
   // A versão anterior iniciava a antecipação global depois de 1,5 s de ociosidade.
   await page.waitForTimeout(2200)
-  expect(pedidos.some((p) => /\/api\/sessions\?/.test(p))).toBeFalsy()
+  expect(pedidos.filter((p) => /\/api\/sessions\?/.test(p)).every((p) => new URL(p).searchParams.get('limit') === '21')).toBeTruthy()
   expect(pedidos.some((p) => /\/(Artigos|Demonstracao3D|Inicio)-.*\.js/.test(p))).toBeFalsy()
   expect(pedidos.some((p) => /\/api\/sessions\/comparison/.test(p))).toBeTruthy()
 })

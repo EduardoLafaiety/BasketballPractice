@@ -6,7 +6,7 @@ import { salvarOuEnfileirar } from '../model/salvar-sessao'
 import { minutosDaSessao, montarSessao } from '../model/execucao'
 import type { DadosZonas } from '../model/contador'
 import type { Entrada } from '../../../shared/types'
-import type { useSessoes } from '../model/usarSessoes'
+import type { registrarSessao } from '../model/registrarSessao'
 import type { PlanoGuiado, Rascunho } from '../model/sessao'
 export default function Final({
   conta, clientId, diario, setDiario, erroLocal,
@@ -29,7 +29,7 @@ export default function Final({
   zonas: DadosZonas
   segundos: number
   inicio: string
-  salvar: ReturnType<typeof useSessoes>['adicionar']
+  salvar: typeof registrarSessao
   aoSalvar: () => void
   aoGuardar: () => void
 }) {

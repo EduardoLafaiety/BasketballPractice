@@ -9,7 +9,7 @@ import './Evolucao'
 it('compara registros e filtra um exercício sem inventar minutos individuais', async () => {
   definirToken('tk')
   const resumo = { frequencia: 1, diasAtivos: 1, minutos: 20, acertos: 3, tentativas: 4, repeticoes: 0, segundos: 0, aproveitamento: 75 }
-  const { chamadas } = apiFalsa({ 'GET /auth/me': usuarioFalso(), 'GET /settings': configFalsa,
+  const { chamadas } = apiFalsa({ 'GET /sessions': [], 'GET /auth/me': usuarioFalso(), 'GET /settings': configFalsa,
     'GET /sessions/comparison': { atual: resumo, anterior: { ...resumo, frequencia: 0, aproveitamento: null }, exercicios: [{ id: '1', nome: 'Lance livre' }] },
   })
   abrirApp('/evolucao')
@@ -23,5 +23,5 @@ it('compara registros e filtra um exercício sem inventar minutos individuais', 
   await user.selectOptions(screen.getByLabelText('Período'), '30')
   expect(screen.getByText(/Atual: últimos 30 dias/)).toBeInTheDocument()
   expect(await screen.findByRole('link', { name: 'Planejar na rotina' })).toHaveAttribute('href', '/rotina')
-  expect(chamadas.filter((c) => c.caminho === '/sessions')).toHaveLength(0)
+  expect(chamadas.filter((c) => c.caminho === '/sessions').every((c) => c.url.searchParams.get('limit') === '21')).toBe(true)
 })

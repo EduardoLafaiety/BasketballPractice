@@ -4,7 +4,7 @@ import { idParam, parse } from '../../lib/validate.js'
 import { currentUser } from '../../middleware/auth.js'
 import { compareSessions } from './session.comparison.js'
 import { comparisonQuery, createSessionSchema, listQuery, sessionSchema } from './session.schema.js'
-import { createSession, deleteSession, getSession, listSessions, updateSession } from './session.service.js'
+import { createSession, deleteSession, getSession, listSessions, listProgress, updateSession } from './session.service.js'
 
 export function sessionsRouter(db: Database) {
   const router = Router()
@@ -15,6 +15,10 @@ export function sessionsRouter(db: Database) {
 
   router.get('/comparison', async (req, res) => {
     res.json(await compareSessions(db, currentUser(req), parse(comparisonQuery, req.query)))
+  })
+
+  router.get('/progress', async (req, res) => {
+    res.json(await listProgress(db, currentUser(req), parse(listQuery, req.query)))
   })
 
   router.get('/:id', async (req, res) => {

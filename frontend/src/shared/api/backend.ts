@@ -21,8 +21,8 @@ export { ApiError, tokenAtual, contaLocal, definirToken, aoTokenExpirar, request
 // ---------- Contratos do backend ----------
 
 export type { Usuario, UsuarioAdmin, AuthResposta, ResultadoImportacao } from '../../../../contracts/api'
-import type { Usuario, UsuarioAdmin, AuthResposta, ResultadoImportacao, ExerciseApi, SessionApi, SettingsApi, WorkoutApi, WorkoutResumoApi, EstiloResumoApi, EstiloApi, ExercicioEstiloApi } from '../../../../contracts/api'
-import { CATEGORIA, CATEGORIA_API, paraDrill, paraSessao, paraConfig, paraEstiloResumo } from './mapeamento'
+import type { Usuario, UsuarioAdmin, AuthResposta, ResultadoImportacao, ProgressSessionApi, ExerciseApi, SessionApi, SettingsApi, WorkoutApi, WorkoutResumoApi, EstiloResumoApi, EstiloApi, ExercicioEstiloApi } from '../../../../contracts/api'
+import { CATEGORIA, CATEGORIA_API, paraDrill, paraSessao, paraProgresso, paraConfig, paraEstiloResumo } from './mapeamento'
 
 // ---------- Mapeamento backend → frontend ----------
 
@@ -89,6 +89,25 @@ export const api = {
       const pagina = await request<SessionApi[]>('GET', `/sessions?limit=200&offset=${offset}`, undefined, { signal })
       todas.push(...pagina.map(paraSessao))
       if (pagina.length < 200) return todas
+    }
+  },
+
+  async paginaSessoes(pagina: number, signal?: AbortSignal) {
+    return (await request<SessionApi[]>('GET', `/sessions?limit=21&offset=${pagina * 20}`, undefined, { signal })).map(paraSessao)
+  },
+
+  async sessoesProgresso(signal?: AbortSignal): Promise<Sessao[]> {
+    const todas: Sessao[] = []
+    try {
+      for (let offset = 0; ; offset += 200) {
+        const pagina = await request<ProgressSessionApi[]>('GET', `/sessions/progress?limit=200&offset=${offset}`, undefined, { signal })
+        todas.push(...pagina.map(paraProgresso))
+        if (pagina.length < 200) return todas
+      }
+    } catch (erro) {
+      // Compatibilidade durante a atualização gradual da API e da demonstração.
+      if (erro instanceof ApiError && erro.status === 404) return api.todasSessoes(signal)
+      throw erro
     }
   },
 

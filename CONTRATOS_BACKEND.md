@@ -240,3 +240,9 @@ O filtro `exerciseId` de GET `/api/sessions/comparison` aceita inteiro positivo 
 Os DTOs já consumidos pela fachada central estão em contracts/api.d.ts; métrica, nível e zona ficam em contracts/primitivos.d.ts. O frontend importa declarações e mantém suas conversões em shared/api/mapeamento.ts. Exercícios e preferências também verificam o contrato na compilação do backend. São tipos estáticos, sem biblioteca de runtime ou alteração das respostas HTTP.
 
 AbortSignal é uma opção do transporte do cliente para consultas. Não modifica endpoints, transações, idempotência ou política de repetição no servidor. A rotina continua usando PUT /api/routine e o fallback legado descrito neste documento. Movimentar um exercício usa a mesma escrita da semana e preserva seus minutos.
+
+## Acréscimos — progresso e operação
+
+GET /api/sessions/progress exige autenticação e reutiliza listQuery (limit até 200, offset e intervalo de datas). Resposta ProgressSessionApi[]: id, performedAt ISO, durationMinutes, makes agregado (zero sem acertos), bestStreak (zero sem sequência), entries com exerciseId em ordem e shots com zone/makes/attempts. IDs repetidos não são removidos. Nunca inclui dados de outra conta nem notas. Usa serviço/repositório, sem SQL na rota. Não é um snapshot entre páginas.
+
+GET /api/live retorna 200 {status: ok} sem banco. GET /api/health preserva 200 {status: ok} ou 503 {status: unavailable, error: Banco de dados indisponível}. Ambos no-store. Todas as respostas recebem X-Request-Id gerado pelo servidor. Telemetria não muda payloads de negócio.

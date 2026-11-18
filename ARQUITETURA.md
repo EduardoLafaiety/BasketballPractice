@@ -146,3 +146,11 @@ Método, resultados e limites em [REFERENCIA_FRONTEND.md](REFERENCIA_FRONTEND.md
 - useRotina coordena movimentação por seletor/arraste pela gravação da semana, preservando ordem e duração. aplicarModelo retorna confirmação booleana; a prévia só vira sucesso após resposta. Iniciar treino de hoje aguarda a fila e verifica a conta antes de navegar.
 
 Os contratos de leitura não substituem validação de respostas em runtime. As garantias de atomicidade pertencem ao servidor atual; o fallback legado de rotina continua sequencial. Não foi adicionada dependência, migração, tabela ou alteração de endpoint.
+
+## Carregamento e operação — passos 9 a 12
+
+A escrita de sessão é uma ação de modelo independente da leitura do histórico. O cache só publica atualização de lista já carregada e invalida derivados na mesma autenticação. Demonstração 3D usa importação dinâmica e limite de erro local; 2D não testa WebGL na abertura.
+
+Sessions mantém rota → serviço → repositório na projeção /sessions/progress. Consulta autenticada, paginada e compacta fornece os insumos das fórmulas existentes; comparação agregada e exportação completa continuam separadas. Histórico visível usa páginas de 20 + sentinela.
+
+Observabilidade HTTP fica em middleware, sanitização de falhas em lib/operacao. Liveness independe do banco; readiness o consulta. CI verifica o grafo estático do manifesto do build e mantém auditoria visual como artefato temporário. Ver [TERCEIRO_CICLO_FRONTEND.md](TERCEIRO_CICLO_FRONTEND.md) e [OPERACAO_E_RECUPERACAO.md](OPERACAO_E_RECUPERACAO.md).

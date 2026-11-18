@@ -1,5 +1,5 @@
 import type { Categoria, Drill, Config, DiaSemana, Sessao, Posicao, EstiloResumo, FatiaEstilo } from '../types'
-import type { Num, ExerciseApi, SessionApi, SettingsApi, EstiloResumoApi } from '../../../../contracts/api'
+import type { Num, ProgressSessionApi, ExerciseApi, SessionApi, SettingsApi, EstiloResumoApi } from '../../../../contracts/api'
 
 export const CATEGORIA: Record<string, Categoria> = {
   arremesso: 'Arremesso',
@@ -85,3 +85,12 @@ export const paraEstiloResumo = (r: EstiloResumoApi): EstiloResumo => ({
   ),
 })
 
+
+export function paraProgresso(s: ProgressSessionApi): Sessao {
+  return {
+    id: String(s.id), data: s.performedAt, duracaoMin: Number(s.durationMinutes ?? 0),
+    acertos: Number(s.makes), sequencia: Number(s.bestStreak),
+    entradas: s.entries.map((e) => ({ drillId: String(e.exerciseId) })),
+    zonas: s.shots.map((z) => ({ zona: z.zone, acertos: z.makes, tentativas: z.attempts })),
+  }
+}

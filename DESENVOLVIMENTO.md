@@ -103,3 +103,13 @@ Relatório: [SEGUNDO_CICLO_FRONTEND.md](SEGUNDO_CICLO_FRONTEND.md). Não foram a
 Para repetir a validação direcionada, execute npm --prefix frontend test -- src/shared src/app/layout/Layout.test.tsx src/features/rotina/pages/Rotina.test.tsx. Os testes de navegação abrem o menu antes de acessar suas opções, como no navegador real. Jornadas novas: npm --prefix e2e test -- experiencia.spec.ts.
 
 A auditoria aceita AUDIT_OUTPUT_DIR para separar as capturas de ciclos/trabalhos paralelos. E2E_DATABASE_URL pode apontar para um banco exclusivo cujo nome contenha e2e, conforme a trava do preparador. Nunca utilize dados pessoais/produção. Nesta etapa foi usado basketball_e2e_experiencia e as capturas ficaram no diretório temporário basketball-practice-audit-passos-5-8. Não executar build demo ao mesmo tempo que E2E/auditoria no mesmo checkout, pois compartilham frontend/dist.
+
+### Terceiro ciclo: desempenho, histórico e operação
+
+Instale com npm ci no frontend: a fonte arcade está no lock e precisa existir para a referência visual. Node mínimo permanece 22.13. Ferramentas verificadas neste ciclo: Vite 7.3.8 e Vitest 4.1.12.
+
+Execute npm run test:bundles e, depois de npm run build:site, npm run check:bundles. O segundo gera frontend/dist/pacotes.json e verifica entrada estática até 110.000 bytes gzip e 3D separado até 180.000. Execute antes de build:demo, que substitui dist. CI publica o JSON.
+
+A auditoria npm run audit em e2e agora também verifica ausência de consulta de histórico/3D inicial e recuperação quando o pacote 3D falha. Use AUDIT_OUTPUT_DIR e E2E_DATABASE_URL isolados conforme acima; CI publica capturas/JSON por sete dias. Não executar auditoria, E2E e build demo simultaneamente no mesmo checkout.
+
+Testes de operação/projeção/recuperação: backend/test/operacao-progresso.test.ts. Relatório em [TERCEIRO_CICLO_FRONTEND.md](TERCEIRO_CICLO_FRONTEND.md); runbook em [OPERACAO_E_RECUPERACAO.md](OPERACAO_E_RECUPERACAO.md).

@@ -1,18 +1,25 @@
-import type { CSSProperties } from 'react'
-import { Carregando, ErroCarga } from '../../../shared/ui/Estado'
+import { useMemo, type CSSProperties } from 'react'
+import { Carregando, ErroCarga, AvisoDesatualizado } from '../../../shared/ui/Estado'
 import { useAuth } from '../../autenticacao/model/auth'
 import { atributos as calcular, estiloDeJogador, faixaDaNota, faixaDoOverall, overall as media, TETO } from '../model/calculos'
 import JogadorPixel from '../model/JogadorPixel'
 import Radar from '../model/Radar'
 import { useHistorico } from '../model/usarSessoes'
+import { useDrills } from '../../treinos/model/usarExercicios'
 
 const BLOCOS = 20
 
 export default function Overall() {
   const { usuario } = useAuth()
-  const { sessoes, drillPorId, carregado, erro, recarregar } = useHistorico()
+  const historico = useHistorico()
+  const drills = useDrills()
+  const { sessoes } = historico
+  const { drillPorId } = drills
+  const carregado = historico.carregado && drills.carregado
+  const erro = historico.erro ?? drills.erro
+  const recarregar = () => { historico.recarregar(); drills.recarregar() }
 
-  const lista = sessoes ? calcular(sessoes, drillPorId) : []
+  const lista = useMemo(() => sessoes ? calcular(sessoes, drillPorId) : [], [sessoes, drillPorId])
   const ovr = media(lista)
   const faixa = faixaDaNota(ovr)
   const { build, forte, fraco } = estiloDeJogador(lista)
@@ -26,6 +33,7 @@ export default function Overall() {
         erro ? <ErroCarga erro={erro} tentarDeNovo={recarregar} /> : <Carregando texto="Calculando seu overall" />
       ) : (
         <>
+          <AvisoDesatualizado erro={erro} tentarDeNovo={recarregar} />
           <section className="ficha-2k" aria-label="Ficha do jogador" style={{ '--faixa': faixa.cor } as CSSProperties}>
             <div className="ficha-jogador">
               <JogadorPixel cor={faixa.cor} />

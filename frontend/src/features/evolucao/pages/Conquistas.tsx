@@ -1,6 +1,6 @@
-import { useState, type CSSProperties } from 'react'
+import { useMemo, useState, type CSSProperties } from 'react'
 import BarraProgresso from '../../../shared/ui/BarraProgresso'
-import { Carregando, ErroCarga } from '../../../shared/ui/Estado'
+import { Carregando, ErroCarga, AvisoDesatualizado } from '../../../shared/ui/Estado'
 import Icone from '../../../shared/ui/Icone'
 import { conquistas as calcular, ordenarConquistas } from '../model/calculos'
 import IconeConquista, { fundoDaConquista, temSprite } from '../model/IconeConquista'
@@ -23,7 +23,7 @@ export default function Conquistas() {
   const { sessoes, erro, recarregar } = useHistorico()
   const [filtro, setFiltro] = useState<Filtro>('todas')
 
-  const lista = sessoes ? calcular(sessoes) : []
+  const lista = useMemo(() => sessoes ? calcular(sessoes) : [], [sessoes])
   const total = lista.length
   const feitas = lista.filter((c) => c.desbloqueada).length
   const pct = total ? Math.round((feitas / total) * 100) : 0
@@ -47,6 +47,7 @@ export default function Conquistas() {
       {!sessoes ? (
         erro ? <ErroCarga erro={erro} tentarDeNovo={recarregar} /> : <Carregando texto="Contando suas conquistas" />
       ) : (
+        <><AvisoDesatualizado erro={erro} tentarDeNovo={recarregar} />
         <section className="conquistas-painel" aria-labelledby="titulo-conquistas">
           <aside className="conquistas-lateral card">
             <div className="conquistas-anel" style={{ '--pct': `${pct}%` } as CSSProperties} role="img" aria-label={`${pct}% das conquistas`}>
@@ -113,7 +114,7 @@ export default function Conquistas() {
               </section>
             ))}
           </div>
-        </section>
+        </section></>
       )}
     </>
   )

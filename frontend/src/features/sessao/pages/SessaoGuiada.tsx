@@ -11,7 +11,7 @@ import ComoFazer from '../../demonstracoes/ComoFazer'
 import { DIAS, ROTULO_METRICA } from '../../../shared/lib/formatacao'
 import { useDrills } from '../../treinos/model/usarExercicios'
 import { useRotina } from '../../rotina/model/usarRotina'
-import { useSessoes } from '../model/usarSessoes'
+import { registrarSessao } from '../model/registrarSessao'
 import type { BlocoPlano, DiaSemana, Drill } from '../../../shared/types'
 
 import type { PlanoGuiado, Rascunho } from '../model/sessao'
@@ -109,7 +109,6 @@ function SemPlano({ hoje = false }: { hoje?: boolean }) {
 
 function Execucao({ plano, conta, rascunho, offline, catalogo }: { plano: PlanoGuiado; conta: string; rascunho?: Rascunho; offline: ReturnType<typeof useTreinoOffline>; catalogo: Drill[] }) {
   const navigate = useNavigate()
-  const { adicionar } = useSessoes()
   const { blocos } = plano
   const { indice, restante, rodando, reps, setReps, setRestante, entradas, zonas, total, inicio, clientId, diario, setDiario, erroLocal,
     contador, bloco, comecar, concluir, alternarRelogio, aoGuardar } = useExecucao(plano, conta, rascunho)
@@ -146,7 +145,7 @@ function Execucao({ plano, conta, rascunho, offline, catalogo }: { plano: PlanoG
     )
   }
 
-  if (!bloco) return <Final aoGuardar={aoGuardar} conta={conta} clientId={clientId} diario={diario} setDiario={setDiario} erroLocal={erroLocal} plano={plano} entradas={entradas} zonas={zonas} segundos={total} inicio={inicio} salvar={adicionar} aoSalvar={() => { aoGuardar(); navigate(plano.programa ? `/programas/${plano.programa.id}` : '/') }} />
+  if (!bloco) return <Final aoGuardar={aoGuardar} conta={conta} clientId={clientId} diario={diario} setDiario={setDiario} erroLocal={erroLocal} plano={plano} entradas={entradas} zonas={zonas} segundos={total} inicio={inicio} salvar={registrarSessao} aoSalvar={() => { aoGuardar(); navigate(plano.programa ? `/programas/${plano.programa.id}` : '/') }} />
 
   const acabou = restante <= 0
   return (

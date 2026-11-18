@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { Carregando, ErroCarga, AvisoDesatualizado } from '../../../shared/ui/Estado'
 import { api } from '../../../shared/api/backend'
 import { useRecurso } from '../../../shared/data/recursos'
+import Historico from './Historico'
 
 export default function Evolucao() {
   const [dias, setDias] = useState(7)
@@ -42,5 +43,6 @@ export default function Evolucao() {
         <Link className="btn btn-primario" to="/rotina">Planejar na rotina</Link>
       </section>
     </>}
+    <Historico />
   </>
 }

@@ -1,6 +1,7 @@
 import pg from 'pg'
 import { migrate } from './migrations.js'
 import { seed } from './seed.js'
+import { registrarFalha } from '../lib/operacao.js'
 
 export type QueryResult<T> = { rows: T[]; rowCount: number }
 
@@ -52,7 +53,7 @@ async function withClient<R>(pool: pg.Pool, fn: (client: pg.PoolClient, lose: (e
   }
   const onConnectionError = (error: Error) => {
     lose(error)
-    console.error('Conexão com o Postgres caiu durante o uso', error)
+    registrarFalha('postgres_connection_lost', error)
   }
   client.on('error', onConnectionError)
   try {
@@ -117,7 +118,7 @@ async function warmUp(pool: pg.Pool) {
   for (const result of opened) {
     if (result.status === 'fulfilled') result.value.release()
     // A API sobe assim mesmo: a conexão que faltou é aberta quando for preciso.
-    else console.warn('Conexão não aberta ao aquecer o pool', result.reason)
+    else registrarFalha('postgres_warmup_failed', result.reason)
   }
 }
 
@@ -135,7 +136,7 @@ export async function openDatabase(connectionString: string) {
     statement_timeout: 30_000,
     idle_in_transaction_session_timeout: 60_000,
   })
-  pool.on('error', (error) => console.error('Erro em conexão ociosa do Postgres', error))
+  pool.on('error', (error) => registrarFalha('postgres_idle_connection_failed', error))
   const db = await prepareDatabase(fromPool(pool))
   await warmUp(pool)
   return db

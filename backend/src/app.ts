@@ -21,8 +21,10 @@ import { settingsRouter } from './modules/settings/settings.routes.js'
 import { stylesRouter } from './modules/styles/styles.routes.js'
 import { workoutsRouter } from './modules/workouts/workouts.routes.js'
 import { routineRouter } from './modules/routine/routine.routes.js'
+import { observabilidade, type ObservarHttp } from './middleware/observabilidade.js'
 
 export interface AppOptions {
+  observarHttp?: ObservarHttp
   limiteTentativas?: LimiteTentativas
   limiteConta?: LimiteTentativas
   limiteCadastros?: LimiteTentativas
@@ -47,6 +49,7 @@ export function createApp(
     maxImports = config.maxImports,
     emails = createEmailSender(config.email),
     segundoPlano,
+    observarHttp = process.env.NODE_ENV === 'production' ? (evento) => console.info(JSON.stringify(evento)) : undefined,
     push = { publicKey: config.push.publicKey, send: createPushSender(config.push), cronSecret: config.push.cronSecret },
   }: AppOptions = {},
 ) {
@@ -55,6 +58,7 @@ export function createApp(
 
   app.disable('x-powered-by')
   app.set('trust proxy', config.trustProxy)
+  app.use(observabilidade(observarHttp))
   // Cabeçalhos de segurança; a API só responde JSON, então a política de conteúdo pode ser a mais fechada.
   app.use(helmet({ contentSecurityPolicy: { directives: { defaultSrc: ["'none'"], frameAncestors: ["'none'"] } } }))
   // Respostas comprimidas (gzip/brotli): desempenho, backup e listas chegam bem menores.
@@ -64,7 +68,13 @@ export function createApp(
   app.use('/api/data/import', express.json({ limit: '10mb' }))
   app.use(express.json({ limit: '100kb' }))
 
+  app.get('/api/live', (_req, res) => {
+    res.setHeader('Cache-Control', 'no-store')
+    res.json({ status: 'ok' })
+  })
+
   app.get('/api/health', async (_req, res) => {
+    res.setHeader('Cache-Control', 'no-store')
     try {
       await db.query('SELECT 1')
       res.json({ status: 'ok' })

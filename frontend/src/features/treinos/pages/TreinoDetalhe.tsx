@@ -9,7 +9,7 @@ import { ROTULO_NIVEL } from '../../../shared/lib/niveis'
 import { useTelaLigada } from '../../../shared/lib/telaLigada'
 import { ROTULO_METRICA } from '../../../shared/lib/formatacao'
 import { useDrills } from '../model/usarExercicios'
-import { useSessoes } from '../../sessao/model/usarSessoes'
+import { registrarSessao } from '../../sessao/model/registrarSessao'
 
 const COMO_REGISTRAR = {
   acertos: 'Use o contador ao vivo (ou digite no fim) para anotar quantos arremessos caíram.',
@@ -23,7 +23,6 @@ export default function TreinoDetalhe() {
   const { drillPorId, carregado, erro, recarregar } = drills
   const drill = drillPorId(id)
   const navigate = useNavigate()
-  const { adicionar } = useSessoes()
   const contador = useContador()
 
   const [segundos, setSegundos] = useState(0)
@@ -77,7 +76,7 @@ export default function TreinoDetalhe() {
     setErroSalvar(null)
     setRodando(false)
     try {
-      await adicionar({
+      await registrarSessao({
         data: new Date().toISOString(),
         duracaoMin,
         esforco,

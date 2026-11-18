@@ -34,6 +34,10 @@ function publicar(chave: string, valor: unknown) {
   ouvintes.get(chave)?.forEach((ouvir) => ouvir(valor))
 }
 
+export function atualizarSeCarregado<T>(chave: string, atualizar: (atual: T) => T) {
+  if (cache.has(chave)) publicar(chave, atualizar(cache.get(chave) as T))
+}
+
 /** Componentes que pedem o mesmo recurso compartilham a requisição em andamento. */
 export function carregarRecurso<T>(chave: string, carregar: (signal: AbortSignal) => Promise<T>): Promise<T> {
   const existente = pedidos.get(chave)
