@@ -129,5 +129,22 @@ describe('Início', () => {
     expect(screen.queryByRole('link', { name: /Começar treino de hoje/ })).toBeNull()
   })
 
+  it('no dia de descanso oferece montar a rotina ou treinar mesmo assim', async () => {
+    abrirInicio(rotinaDe({ 4: [2] }))
+
+    const hoje = (await screen.findByRole('heading', { name: 'Treino de hoje' })).closest('section') as HTMLElement
+    expect(await within(hoje).findByText(/dia de descanso/)).toBeInTheDocument()
+    expect(within(hoje).getByRole('link', { name: /Montar a rotina/ })).toHaveAttribute('href', '/rotina')
+    expect(within(hoje).getByRole('link', { name: 'Treinar mesmo assim' })).toHaveAttribute('href', '/treinos')
+  })
+
+  it('o treino de hoje vem antes da abertura animada', async () => {
+    abrirInicio(rotinaDe({ 3: [3] }))
+
+    const hoje = await screen.findByRole('heading', { name: 'Treino de hoje' })
+    const abertura = screen.getByRole('heading', { level: 1 })
+    expect(hoje.compareDocumentPosition(abertura) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+  })
+
 })
 

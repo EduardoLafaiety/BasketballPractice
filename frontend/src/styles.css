@@ -498,12 +498,15 @@ p { margin: 0 0 1rem; }
 
 @media (max-width: 900px) {
   .auth { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto 1fr; }
-  .auth-palco { min-height: 52vh; }
-  .auth-palco .abertura-bola { width: min(38vh, 72vw); }
-  .auth-titulo { font-size: min(21vw, 13vh); }
-  .auth-titulo-a { top: 4.2rem; }
-  .auth-titulo-b { bottom: 0.8rem; }
-  .auth-lado.com-listra { align-content: start; }
+  /* No celular o formulário é o que importa: a quadra vira só uma faixa e o login aparece sem rolar. */
+  .auth-palco { min-height: 28vh; max-height: 15rem; }
+  .auth-palco .abertura-bola { width: min(24vh, 52vw); }
+  .auth-titulo { font-size: min(16vw, 8.5vh); }
+  .auth-titulo-a { top: 3.2rem; }
+  .auth-titulo-b { bottom: 0.4rem; }
+  .auth-lado.com-listra { align-content: start; gap: 1.5rem; padding-top: calc(var(--listra) + 1.25rem); }
+  .auth-card { gap: 1.1rem; }
+  .auth-card h1 { font-size: 2.8rem; }
 }
 :root[data-movimento='reduzido'] .auth-card { animation: none; }
 :root[data-movimento='reduzido'] .campo input, :root[data-movimento='reduzido'] .campo-rotulo { transition: none; }
@@ -1693,7 +1696,9 @@ html::-webkit-scrollbar, .menu-tela::-webkit-scrollbar { display: none; }
 
   .conteudo { padding-bottom: calc(6rem + var(--doca, 0px)); }
   .rodape { padding-bottom: calc(2rem + var(--doca, 0px)); }
-  .aviso-cookies { bottom: calc(1rem + var(--doca, 0px)); }
+  .aviso-cookies { bottom: calc(0.5rem + var(--doca, 0px)); inset-inline: 0.5rem; width: auto; padding: 0.8rem 0.9rem; gap: 0.55rem; }
+  .aviso-cookies p { font-size: 0.74rem; line-height: 1.4; }
+  .aviso-cookies-botoes .btn { padding-block: 0.55rem; }
   .menu-tela { padding-bottom: calc(1.5rem + var(--doca, 0px)); overscroll-behavior: contain; }
   .nav-link:active { color: var(--laranja); }
 }
@@ -2073,5 +2078,16 @@ html::-webkit-scrollbar, .menu-tela::-webkit-scrollbar { display: none; }
 .hoje-frente h2 { margin: 0; font-size: clamp(3rem, 9vw, 7rem); }
 .treino-hoje .lista-treino { max-width: 52rem; margin-inline: auto; }
 .hoje-rodape { display: flex; justify-content: center; margin-top: 2.5rem; }
+.hoje-descanso { display: grid; justify-items: center; gap: 1.25rem; text-align: center; }
+.hoje-descanso p { margin: 0; max-width: 28rem; }
+.hoje-descanso-acoes { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.75rem; }
+/* O treino de hoje abre a página: no celular, bem mais compacto, com o botão de começar à vista. */
+@media (max-width: 760px) {
+  .pagina-inicio > .treino-hoje { padding-top: 5.5rem; padding-bottom: 2rem; }
+  .pagina-inicio .hoje-frente { gap: 1rem; margin-bottom: 1.5rem; }
+  .pagina-inicio .hoje-frente h2 { font-size: 2.6rem; }
+  .pagina-inicio .hoje-frente .btn { width: 100%; justify-content: space-between; }
+  .pagina-inicio .hoje-rodape { margin-top: 1.5rem; }
+}
 
 /* Ficha do jogador (boneco + notas), no estilo dos jogos de basquete */

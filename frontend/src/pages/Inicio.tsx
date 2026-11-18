@@ -46,17 +46,6 @@ export default function Inicio() {
 
   return (
     <div className="pagina-larga pagina-inicio">
-      <AberturaBola
-        titulo={
-          <h1 className="abertura-titulo">
-            <span className="abertura-a">Bora pra </span>
-            <span className="abertura-b">quadra<span className="ponto">.</span></span>
-          </h1>
-        }
-      />
-
-      <FraseRolagem texto="Ninguém começa arremessando de três. Primeiro vem a bola na mão, depois o arremesso colado à cesta, e só então a distância." />
-
       <section className="faixa-clara banda treino-hoje">
         <div className="hoje-frente">
           <h2>Treino de hoje</h2>
@@ -91,11 +80,30 @@ export default function Inicio() {
               </li>
             ))}
           </ol>
-        ) : null}
+        ) : (
+          <div className="hoje-descanso">
+            <p className="frase-destaque">Hoje é dia de descanso. Músculo cresce na folga.</p>
+            <div className="hoje-descanso-acoes">
+              <Link to="/rotina" className="btn btn-primario">Montar a rotina <Icone nome="seta" /></Link>
+              <Link to="/treinos" className="btn">Treinar mesmo assim</Link>
+            </div>
+          </div>
+        )}
         <div className="hoje-rodape">
           <Link to="/rotina" className="link-forte">Editar rotina</Link>
         </div>
       </section>
+
+      <AberturaBola
+        titulo={
+          <h1 className="abertura-titulo">
+            <span className="abertura-a">Bora pra </span>
+            <span className="abertura-b">quadra<span className="ponto">.</span></span>
+          </h1>
+        }
+      />
+
+      <FraseRolagem texto="Ninguém começa arremessando de três. Primeiro vem a bola na mão, depois o arremesso colado à cesta, e só então a distância." />
 
       <section className="faixa-preta banda">
         <div className="secao-topo">
