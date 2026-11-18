@@ -1,6 +1,6 @@
 # Plano de refatoração, desempenho e experiência
 
-Atualizado em **18/11/2026**. Estado: **backend integrado até a PR #173; primeiro ciclo de frontend (passos 1 a 4) implementado, em validação final**.
+Atualizado em **18/11/2026**. Estado: **backend integrado até a PR #173; primeiro ciclo de frontend (passos 1 a 4) implementado e publicado na PR #175**.
 
 Prioridade atual: validar e integrar referência visual/métricas, recuperação de dados locais, arquitetura da sessão e preparação de um treino offline, nessa ordem autorizada pelo usuário. O fechamento estrutural dos 12 módulos do backend foi integrado na PR #173.
 

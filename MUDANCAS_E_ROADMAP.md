@@ -408,7 +408,7 @@ O ciclo estrutural do backend encerra-se com a integração desta entrega. Próx
 
 ## Etapa atual — frontend: referência, recuperação, arquitetura e offline
 
-Estado: quatro passos implementados na ordem autorizada, documentados em [IMPLEMENTACOES_FRONTEND.md](IMPLEMENTACOES_FRONTEND.md). Validação local concluída; publicação e integração condicionadas aos checks do GitHub.
+Entrega: [PR #175](https://github.com/EduardoLafaiety/BasketballPractice/pull/175). Quatro passos implementados na ordem autorizada, documentados em [IMPLEMENTACOES_FRONTEND.md](IMPLEMENTACOES_FRONTEND.md). Commits de implementação: `15ff9b8` e `9722e3a`. Validação local concluída; integração após aprovação dos checks.
 
 1. Referência das cinco telas em celular/desktop e claro/escuro: 20 capturas e medições locais. Resultados e limites em [REFERENCIA_FRONTEND.md](REFERENCIA_FRONTEND.md), sem alegação de melhora de performance de campo.
 2. Validação estrutural de dados locais, migração compatível do rascunho, recuperação dos itens válidos da fila legada, preservação/exportação de registros incompatíveis e descarte explícito por conta. Conflitos detectados entre abas não sobrescrevem/apagam a versão mais recente.

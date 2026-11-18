@@ -1,6 +1,6 @@
 # Primeiro ciclo de frontend — implementação e próximos passos
 
-Data: 18/11/2026. Escopo autorizado: passos 1 a 4, nessa ordem, preservando identidade retrô, documentação e integração após os testes. Backend estrutural integrado na PR #173.
+Data: 18/11/2026. Escopo autorizado: passos 1 a 4, nessa ordem, preservando identidade retrô, documentação e integração após os testes. Backend estrutural integrado na PR #173. Entrega deste ciclo: [PR #175](https://github.com/EduardoLafaiety/BasketballPractice/pull/175).
 
 ## 1. Referência antes das mudanças
 
