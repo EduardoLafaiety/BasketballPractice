@@ -1,5 +1,6 @@
 // Peças das coreografias: poses prontas e trechos de movimento que se combinam em cada exercício.
 import { esqueleto, POSE_NEUTRA, type Bola, type Cena, type Coreografia, type Lado, type Musculo, type Ponto, type Pose, type Quadro } from './motor'
+import { bracosDoArremesso } from './referenciaHumana'
 
 export type P = Partial<Pose>
 export type Q = Partial<Quadro>
@@ -25,9 +26,10 @@ export const JOELHO_B: P = { t: 4, cF: -4, kF: -6, cT: 85, kT: 5 }
 export const DRIBLE: P = { bP: 25, aP: 70, bL: 40, aL: 100 }
 export const PEITO: P = { bP: 30, aP: 120, bL: 35, aL: 115 }
 export const PRONTO: P = { bP: 50, aP: 95, bL: 55, aL: 95 }
-export const ARMAR: P = { bP: 150, aP: 180, bL: 140, aL: 170 }
-export const SOLTAR: P = { bP: 165, aP: 165, bL: 160, aL: 160 }
-export const FINAL: P = { bP: 160, aP: 110, bL: 150, aL: 140 }
+export const ARMAR: P = bracosDoArremesso(2700)
+export const SOLTAR: P = bracosDoArremesso(2900)
+// Sustente o braço de arremesso estendido após a soltura; o apoio não empurra a bola.
+export const FINAL: P = { bP: 165, aP: 175, bL: 85, aL: 110 }
 export const SOLTOS: P = { bP: 5, aP: 20, bL: -5, aL: 10 }
 export const CORRIDA_A: P = { bP: -35, aP: 10, bL: 40, aL: 110 }
 export const CORRIDA_B: P = { bP: 40, aP: 110, bL: -35, aL: 10 }
@@ -192,9 +194,13 @@ export const receber = (x: number, de: Ponto = { x: Math.min(x + 180, 640), y: 2
 export const passoUm = (x: number): Q => ({ d: 220, x, t: 12, cF: 30, kF: 5, cT: -30, kT: -70, ...PEITO, bola: { m: 'peito' }, hl: ['pF'] })
 export const passoDois = (x: number): Q => ({ d: 220, x, t: 8, cT: 30, kT: 5, cF: -30, kF: -70, ...PEITO, bola: { m: 'peito' }, hl: ['pT'] })
 export function subidaBandeja(x: number, { ar = 38, alt = 30, lado = 'P' as Lado, extra = {} as Q } = {}): Q[] {
+  const esquerda = lado === 'L'
+  const subida: P = esquerda
+    ? { cF: -10, kF: -15, cT: 95, kT: 5, bL: 165, aL: 160, bP: 60, aP: 100 }
+    : { cT: -10, kT: -15, cF: 95, kF: 5, bP: 165, aP: 160, bL: 60, aL: 100 }
   return [
-    { d: 260, x, ar, t: 0, cT: -10, kT: -15, cF: 95, kF: 5, bP: 165, aP: 160, bL: 60, aL: 100, bola: { m: 'cima', lado }, hl: ['pT', lado === 'L' ? 'bL' : 'bP'], ...extra },
-    { d: 180, x: x + 18, ar: ar + 4, bola: voo(0.5, alt), hl: ['bP'], ...extra },
+    { d: 260, x, ar, t: 0, ...subida, bola: { m: 'cima', lado }, hl: [esquerda ? 'pF' : 'pT', esquerda ? 'bL' : 'bP'], ...extra },
+    { d: 180, x: x + 18, ar: ar + 4, bola: voo(0.5, alt), hl: [esquerda ? 'bL' : 'bP'], ...extra },
     { d: 220, x: x + 30, ar: Math.round(ar * 0.6), bola: voo(1, alt), ...extra },
     { d: 320, x: x + 38, ar: 0, ...ATERRISSA, ...SOLTOS, bola: voo(1.4, alt), ...extra },
     { d: 700, x: x + 38, bola: voo(1.94, alt), ...extra },
@@ -235,8 +241,8 @@ export function passe(x: number, alvo: Ponto, tipo: 'peito' | 'picado' | 'cima' 
 
 // Manejo de bola de frente.
 const BRACOS_DRIBLE: Record<Lado, { baixo: P; alto: P }> = {
-  P: { baixo: { bP: 20, aP: 0, bL: -45, aL: -100 }, alto: { bP: 25, aP: 115, bL: -45, aL: -100 } },
-  L: { baixo: { bL: -20, aL: 0, bP: 45, aP: 100 }, alto: { bL: -25, aL: -115, bP: 45, aP: 100 } },
+  P: { baixo: { bP: 12, aP: 25, bL: -18, aL: -65 }, alto: { bP: 12, aP: 65, bL: -18, aL: -65 } },
+  L: { baixo: { bL: -12, aL: -25, bP: 18, aP: 65 }, alto: { bL: -12, aL: -65, bP: 18, aP: 65 } },
 }
 
 /** Quiques parados de frente, com uma das mãos. */

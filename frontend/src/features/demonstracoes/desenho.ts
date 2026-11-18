@@ -1,6 +1,6 @@
 // Do esqueleto para o desenho. Há dois corpos: a silhueta (cápsulas, para o rastro e o parceiro) e o
 // atleta completo (pele, camiseta, short, meias, tênis, cabelo e rosto), que é o que se move na cena.
-import { CHAO, RAIO_BOLA, TORNOZELO, type Animacao, type Esqueleto, type Instante, type Musculo, type Ponto } from './motor'
+import { CHAO, RAIO_BOLA, TORNOZELO, type Animacao, type Esqueleto, type Instante, type Musculo, type Ponto, type PontoBola } from './motor'
 
 const f = (v: number) => v.toFixed(1)
 const P = (p: Ponto) => `${f(p.x)} ${f(p.y)}`
@@ -84,6 +84,7 @@ export interface Peca {
 
 const membro = (s: 'P' | 'L', lado: Lado, m: Musculo): Peca[] => [
   { id: `braco${s}`, material: 'pele', lado, musculo: m },
+  { id: `manga${s}`, material: 'camisa', lado },
   { id: `antebraco${s}`, material: 'pele', lado, musculo: m },
   { id: `mao${s}`, material: 'pele', lado },
 ]
@@ -134,7 +135,7 @@ function tenis(joelho: Ponto, t: Ponto, dir: number, chao: number) {
 }
 
 /** Caminho SVG de cada peça do atleta. `chao` é a altura do tornozelo quando o pé está no chão. */
-export function caminhosAtleta(e: Esqueleto, dir: number, frente: boolean, chao = TORNOZELO): Record<string, string> {
+export function caminhosAtleta(e: Esqueleto, dir: number, frente: boolean, chao = TORNOZELO, bola?: PontoBola | null): Record<string, string> {
   const c: Record<string, string> = {}
   const u = unit(e.quadril, e.pescoco)
   const uc = unit(e.pescoco, e.cabeca)
@@ -142,17 +143,51 @@ export function caminhosAtleta(e: Esqueleto, dir: number, frente: boolean, chao 
   for (const s of ['P', 'L'] as const) {
     const ombro = s === 'P' ? e.ombroP : e.ombroL
     const cotovelo = s === 'P' ? e.cotoveloP : e.cotoveloL
-    const mao = s === 'P' ? e.maoP : e.maoL
+    let mao = s === 'P' ? e.maoP : e.maoL
     c[`braco${s}`] = capsula(ombro, cotovelo, 4.9, 4)
+    c[`manga${s}`] = capsula(ombro, meio(ombro, cotovelo, 0.34), 6, 5.3)
     c[`antebraco${s}`] = capsula(cotovelo, mao, 4, 3.1)
-    c[`mao${s}`] = elipse(soma(mao, [unit(cotovelo, mao), 1.2]), 3.7, 3.7)
+    const ante = unit(cotovelo, mao)
+    let dedos = ante
+    let pegar = 0
+    let normal = { x: -ante.y * dir, y: ante.x * dir }
+    if (bola) {
+      const distancia = Math.hypot(bola.x - mao.x, bola.y - mao.y)
+      pegar = Math.max(0, Math.min(1, (22 - distancia) / 12))
+      const ateBola = unit(mao, bola)
+      normal = ateBola
+      let tangente = { x: -ateBola.y, y: ateBola.x }
+      if (tangente.x * ante.x + tangente.y * ante.y < 0) tangente = { x: -tangente.x, y: -tangente.y }
+      dedos = unit({ x: 0, y: 0 }, { x: ante.x * (1 - pegar * 0.7) + tangente.x * pegar * 0.7, y: ante.y * (1 - pegar * 0.7) + tangente.y * pegar * 0.7 })
+      if (bola.pegada?.peso && bola.pegada.tipo !== 'gancho') {
+        const principal = bola.pegada.lado === s
+        if (principal || bola.pegada.apoio) {
+          const peso = bola.pegada.peso
+          const alvo = principal ? { x: bola.x - dir * 5.7, y: bola.y + 7.8 } : { x: bola.x + dir * 9.7, y: bola.y }
+          mao = meio(mao, alvo, peso)
+          normal = unit(mao, bola)
+          dedos = principal ? unit({ x: 0, y: 0 }, { x: dir * 0.8, y: -0.6 }) : { x: 0, y: -1 }
+          // A palma tem espessura; não desenhar o centro sobre a circunferência da bola.
+          c[`antebraco${s}`] = capsula(cotovelo, mao, 4, 3.1)
+        }
+      }
+    }
+    const lat = { x: -dedos.y, y: dedos.x }
+    const punho = soma(mao, [ante, -2.1])
+    c[`mao${s}`] = capsula(punho, soma(mao, [dedos, 1]), 2.3, 2.4)
+    for (let i = 0; i < 4; i++) {
+      const raiz = soma(mao, [dedos, 1.2], [lat, (i - 1.5) * 1.05])
+      const ponta = soma(raiz, [dedos, 3.2 - Math.abs(i - 1.5) * 0.6], [normal, pegar * 1.1])
+      c[`mao${s}`] += capsula(raiz, ponta, 0.65, 0.5)
+    }
+    c[`mao${s}`] += capsula(soma(mao, [lat, 2 * dir]), soma(mao, [lat, 3 * dir], [dedos, 1.6]), 0.85, 0.65)
   }
 
   for (const s of ['F', 'T'] as const) {
     const quadril = s === 'F' ? e.quadrilF : e.quadrilT
     const joelho = s === 'F' ? e.joelhoF : e.joelhoT
     const t = s === 'F' ? e.tornozeloF : e.tornozeloT
-    c[`coxa${s}`] = capsula(quadril, joelho, 7.6, 5.6)
+    c[`coxa${s}`] = capsula(meio(quadril, joelho, 0.45), joelho, 6.8, 5.6)
     c[`canela${s}`] = capsula(joelho, t, 5.5, 3.5)
     c[`meia${s}`] = capsula(meio(joelho, t, 0.62), t, 4.3, 3.9)
     // Short largo, com a barra reta um pouco acima do joelho.
@@ -194,13 +229,15 @@ export function caminhosAtleta(e: Esqueleto, dir: number, frente: boolean, chao 
       `Q${P(g(12, 12))} ${P(g(11, 1))}L${P(g(-11, 1))}Q${P(g(-12, 12))} ${P(g(-11, 28))}Q${P(g(-9, 36))} ${P(g(-14, 44))}Z`
     c.gola = `M${P(g(-7, 47))}Q${P(g(0, 39))} ${P(g(7, 47))}L${P(g(5.5, 47.5))}Q${P(g(0, 41.5))} ${P(g(-5.5, 47.5))}Z`
     c.cava = ''
-    c.cintura = ''
+    c.cintura = `M${P(g(-11, 3))}L${P(g(11, 3))}L${P(g(11, -5))}L${P(g(-11, -5))}Z`
     const ladoC = { x: uc.y * -1, y: uc.x } // perpendicular à cabeça
-    c.cabeca = elipse(e.cabeca, 8.3, 10)
-    c.orelha = `${elipse(soma(e.cabeca, [ladoC, 8.4]), 1.8, 2.8)}${elipse(soma(e.cabeca, [ladoC, -8.4]), 1.8, 2.8)}`
     const h = (k: number, j: number) => soma(e.cabeca, [ladoC, k], [uc, j])
-    c.cabelo = `M${P(h(-8.6, 1))}Q${P(h(-9.5, 11.5))} ${P(h(0, 11))}Q${P(h(9.5, 11.5))} ${P(h(8.6, 1))}Q${P(h(5, 6.5))} ${P(h(0, 6.5))}Q${P(h(-5, 6.5))} ${P(h(-8.6, 1))}Z`
-    c.rosto = `${elipse(h(-3.2, 1), 1, 1.2)}${elipse(h(3.2, 1), 1, 1.2)}`
+    c.cabeca = `M${P(h(0, 10.5))}C${P(h(-8, 10.5))} ${P(h(-8, 5))} ${P(h(-7.2, -2))}L${P(h(-5.5, -7))}Q${P(h(0, -12))} ${P(h(5.5, -7))}L${P(h(7.2, -2))}C${P(h(8, 5))} ${P(h(8, 10.5))} ${P(h(0, 10.5))}Z`
+    c.orelha = `${elipse(h(-7.5, -0.5), 1, 2)}${elipse(h(7.5, -0.5), 1, 2)}`
+    c.cabelo = `M${P(h(-7.5, 2))}L${P(h(-8.3, 9))}Q${P(h(-7, 14))} ${P(h(-3, 12))}Q${P(h(3, 15))} ${P(h(7, 11))}L${P(h(8, 3))}L${P(h(6, 6))}Q${P(h(0, 8))} ${P(h(-6, 5.5))}Z`
+    c.rosto = `${capsula(h(-4.4, 2.2), h(-2, 2), 0.5, 0.5)}${capsula(h(2, 2), h(4.4, 2.2), 0.5, 0.5)}` +
+      `${capsula(h(-4.5, 4), h(-2, 4.3), 0.35, 0.35)}${capsula(h(2, 4.3), h(4.5, 4), 0.35, 0.35)}` +
+      `${capsula(h(0, 1), h(0.6, -2), 0.25, 0.3)}${capsula(h(-1.8, -5.5), h(1.8, -5.5), 0.3, 0.3)}`
   } else {
     const fr = frenteDe(u, dir)
     const g = (k: number, j: number) => soma(e.quadril, [fr, k], [u, j])
@@ -217,7 +254,7 @@ export function caminhosAtleta(e: Esqueleto, dir: number, frente: boolean, chao 
       `Q${P(h(8, -9))} ${P(h(2, -10))}Q${P(h(-7, -10))} ${P(h(-8.5, 0))}Z`
     c.orelha = elipse(h(-1.5, -0.5), 2, 2.8)
     c.cabelo = `M${P(h(6.5, 6.5))}Q${P(h(1, 11.5))} ${P(h(-5, 9.5))}Q${P(h(-9.5, 6))} ${P(h(-8.6, -2))}Q${P(h(-6, 0))} ${P(h(-4, 4))}Q${P(h(1, 6.5))} ${P(h(6.5, 6.5))}Z`
-    c.rosto = elipse(h(5, 2), 1, 1.2)
+    c.rosto = `${capsula(h(4.8, 2), h(6.3, 2.2), 0.45, 0.45)}${capsula(h(4.6, 4.2), h(6.4, 4.4), 0.3, 0.3)}${capsula(h(6, -5.4), h(8, -5.2), 0.3, 0.3)}`
   }
   return c
 }
@@ -230,7 +267,7 @@ export function pintar(
   sombra?: SVGEllipseElement | null,
 ) {
   const chao = TORNOZELO - agora.solo
-  const c = caminhosAtleta(agora.e, agora.dir, anim.frente, chao)
+  const c = caminhosAtleta(agora.e, agora.dir, anim.frente, chao, agora.bola)
   for (const p of PECAS) {
     const el = els[p.id]
     if (!el) continue

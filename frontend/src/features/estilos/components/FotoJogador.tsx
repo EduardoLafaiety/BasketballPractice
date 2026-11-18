@@ -17,7 +17,6 @@ export default function FotoJogador({ id, nome, categoria, grande = false }: { i
             loading="lazy"
             decoding="async"
           />
-          <img className="foto-cor" src={grande ? foto.src : foto.srcPequena} alt="" aria-hidden loading="lazy" decoding="async" />
         </>
       ) : (
         <span className="foto-jogador-iniciais" aria-hidden>{iniciais}</span>

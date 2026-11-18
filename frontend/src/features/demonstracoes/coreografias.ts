@@ -2,6 +2,7 @@
 // Cada quadro é uma pose-chave; os ângulos estão explicados em motor.ts. Na vista de lado o boneco olha
 // para a cesta (direita); na vista de frente, "F" é a perna da direita da tela e "P" o braço da direita.
 import type { Coreografia, Quadro } from './motor'
+import referencias from './referencias/catalogo.json'
 import { AQUECIMENTOS } from './figuras-aquecimento'
 import { FIGURAS_AVANCADO } from './figuras-avancado'
 import { FIGURAS_INICIANTE } from './figuras-iniciante'
@@ -128,12 +129,12 @@ export const COREOGRAFIAS: Record<string, Coreografia> = {
       { titulo: 'Bandeja', texto: 'Suba o joelho de fora e solte a bola com a mão fraca, mirando o quadrado da tabela.' },
     ],
     quadros: [
-      { d: 0, fase: 0, x: 140, ...BASE, ...DRIBLE, bola: mao(0) },
-      ...correr([185, 230, 275, 320, 365, 410], 0),
-      { d: 220, fase: 1, x: 460, t: 12, cF: 30, kF: 5, cT: -30, kT: -70, ...PEITO, bola: { m: 'peito' }, hl: ['pF'] },
-      { d: 220, fase: 2, x: 510, t: 8, cT: 30, kT: 5, cF: -30, kF: -70, ...PEITO, bola: { m: 'peito' }, hl: ['pT'] },
-      { d: 260, fase: 3, x: 560, ar: 38, t: 0, cT: -10, kT: -15, cF: 95, kF: 5, bP: 165, aP: 160, bL: 60, aL: 100, bola: { m: 'cima' }, hl: ['pT', 'bP'] },
-      { d: 180, fase: 3, x: 582, ar: 42, bola: voo(0.5, 30), hl: ['bP'] },
+      { d: 0, fase: 0, x: 140, ...BASE, bL: 25, aL: 10, bola: { m: 'mao', lado: 'L', d: 0 } },
+      ...correr([185, 230, 275, 320, 365, 410], 0, 'drible-L'),
+      { d: 220, fase: 1, x: 460, t: 12, cT: 30, kT: 5, cF: -30, kF: -70, ...PEITO, bola: { m: 'peito' }, hl: ['pT'] },
+      { d: 220, fase: 2, x: 510, t: 8, cF: 30, kF: 5, cT: -30, kT: -70, ...PEITO, bola: { m: 'peito' }, hl: ['pF'] },
+      { d: 260, fase: 3, x: 560, ar: 38, t: 0, cF: -10, kF: -15, cT: 95, kT: 5, bL: 165, aL: 160, bP: 60, aP: 100, bola: { m: 'cima', lado: 'L' }, hl: ['pF', 'bL'] },
+      { d: 180, fase: 3, x: 582, ar: 42, bola: voo(0.5, 30), hl: ['bL'] },
       { d: 220, fase: 3, x: 596, ar: 26, bola: voo(1, 30) },
       { d: 320, fase: 3, x: 604, ar: 0, ...ATERRISSA, ...SOLTOS, bola: voo(1.4, 30) },
       { d: 700, fase: 3, x: 604, bola: voo(1.94, 30) },
@@ -488,6 +489,30 @@ export const COREOGRAFIAS: Record<string, Coreografia> = {
       { d: 400, fase: 3, x: 58, dir: -1, ...BASE, ...SOLTOS, bola: NO_CHAO },
     ],
   },
+}
+
+// A técnica determina a pegada nos dois renderizadores; não infere o papel das mãos só pela proximidade.
+for (const { nome, categoria } of referencias.exercicios) {
+  const c = COREOGRAFIAS[nome]
+  if (!c || !c.quadros.some(q => q.bola?.m === 'cima')) continue
+  if (/gancho/i.test(nome)) c.tecnica = 'gancho'
+  else if (categoria === 'arremesso' && !/deitado/i.test(nome)) {
+    c.tecnica = 'arremesso'
+    if (c.vista !== 'frente') c.quadros.forEach((q, i) => {
+      if (q.bola?.m !== 'cima') return
+      const proximaBola = c.quadros.slice(i + 1).find(p => p.bola)?.bola
+      const referencia = proximaBola?.m === 'voo' && proximaBola.para === 'aro' ? SOLTAR : ARMAR
+      const principal = q.bola.lado ?? 'P'
+      q[principal === 'P' ? 'bP' : 'bL'] = referencia.bP
+      q[principal === 'P' ? 'aP' : 'aL'] = referencia.aP
+      // Exercício de uma mão conserva o braço livre ao lado do corpo.
+      if (!/uma mão/.test(nome)) {
+        q[principal === 'P' ? 'bL' : 'bP'] = referencia.bL
+        q[principal === 'P' ? 'aL' : 'aP'] = referencia.aL
+      }
+    })
+  }
+  else if (categoria === 'finalizacao') c.tecnica = 'bandeja'
 }
 
 /** Coreografia do exercício, se for um exercício do catálogo padrão. */

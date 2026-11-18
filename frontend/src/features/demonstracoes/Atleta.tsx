@@ -1,4 +1,4 @@
-import type { MutableRefObject } from 'react'
+import { useId, type CSSProperties, type MutableRefObject } from 'react'
 import { PECAS, type ElementosBola } from './desenho'
 import { RAIO_BOLA } from './motor'
 
@@ -12,8 +12,25 @@ export const novaBola = (): ElementosBola => ({ bola: null, sombra: null })
 
 /** O atleta da demonstração: sombra no chão e as peças do corpo, que `pintar` move a cada quadro. */
 export function Atleta({ els, frente }: { els: MutableRefObject<ElementosAtleta>; frente: boolean }) {
+  const id = useId().replace(/:/g, '')
+  const tons = {
+    pele: ['#ecd0b4', '#d0a887', '#a4795e'],
+    camisa: ['#c6c2ba', '#a7a39d', '#7d7b78'],
+    short: ['#43464b', '#292d33', '#171b20'],
+    tenis: ['#ffffff', '#e1e6eb', '#8e9ba7'],
+    cabelo: ['#684c39', '#3e2b21', '#241a16'],
+  }
   return (
     <>
+      <defs>
+        {Object.entries(tons).map(([material, cores]) => (
+          <linearGradient key={material} id={`${id}-${material}`} x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0" stopColor={cores[0]} />
+            <stop offset="0.55" stopColor={cores[1]} />
+            <stop offset="1" stopColor={cores[2]} />
+          </linearGradient>
+        ))}
+      </defs>
       <ellipse ref={(el) => { els.current.sombra = el }} className="demo-sombra" rx="0" ry="3.5" />
       <g className="demo-corpo demo-atleta">
         {PECAS.map((p) => (
@@ -21,6 +38,7 @@ export function Atleta({ els, frente }: { els: MutableRefObject<ElementosAtleta>
             key={p.id}
             ref={(el) => { els.current.partes[p.id] = el }}
             className={`demo-${p.material} demo-${frente ? 'perto' : p.lado}`}
+            style={p.material in tons ? { '--demo-material': `url(#${id}-${p.material})` } as CSSProperties : undefined}
           />
         ))}
       </g>

@@ -94,6 +94,7 @@ export interface Cena {
 }
 
 export interface Coreografia {
+  tecnica?: 'arremesso' | 'bandeja' | 'gancho'
   vista?: 'lado' | 'frente'
   cena: Cena
   fases: Fase[]
@@ -485,6 +486,9 @@ export function quedaComQuiques(tau: number, altura: number) {
 }
 
 export interface PontoBola extends Ponto {
+  pegada?: { tipo: 'arremesso' | 'bandeja' | 'gancho'; lado: Lado; apoio: boolean; peso: number }
+  /** Fase física do quique: 0 = contato no alto, 1 = bola no piso. */
+  quique?: { lado: Lado; d: number }
   /** Bola em voo (arremesso, passe, caindo da rede): nenhuma mão a segura, mesmo passando perto. */
   voando?: boolean
   /** Giro (graus): a bola rola conforme anda, com efeito para trás no arremesso. */
@@ -545,8 +549,6 @@ export function instante(anim: Animacao, t: number): Instante {
   // Corpo: curva contínua por todas as poses (inclusive as de passagem).
   const pose = {} as Pose
   for (const c of CAMPOS) pose[c] = hermite(a, b, c, u)
-  // Respiração: o tronco nunca fica congelado, nem nas pausas.
-  pose.t += 0.7 * Math.sin((t / 1500) * Math.PI)
   const solo = Math.max(0, hermite(a, b, 'solo', u))
   const ar = Math.max(0, hermite(a, b, 'ar', u))
   // Virada: o corpo afina na horizontal enquanto gira, em vez de espelhar de repente.
@@ -597,8 +599,18 @@ export function instante(anim: Animacao, t: number): Instante {
     if (!q) continue
     const cot = q.lado === 'L' ? 'cotoveloL' : 'cotoveloP'
     const mao = q.lado === 'L' ? 'maoL' : 'maoP'
-    const desce = Math.min(5 * Math.min(1, q.d / 0.2), Math.max(0, CHAO - solo - 2 * RAIO_BOLA - e[mao].y))
-    e = { ...e, [cot]: { x: e[cot].x, y: e[cot].y + desce / 2 }, [mao]: { x: e[mao].x, y: e[mao].y + desce } }
+    const ombro = e[q.lado === 'L' ? 'ombroL' : 'ombroP']
+    const desce = Math.min(11 * Math.min(1, q.d / 0.35), Math.max(0, CHAO - solo - 2 * RAIO_BOLA - e[mao].y))
+    const alvo = { x: e[mao].x, y: e[mao].y + desce }
+    const dx = alvo.x - ombro.x, dy = alvo.y - ombro.y
+    const distancia = Math.min(BRACO + ANTEBRACO - 0.01, Math.max(0.01, Math.hypot(dx, dy)))
+    const tamanho = Math.hypot(dx, dy) || 1
+    const ux = dx / tamanho, uy = dy / tamanho
+    const a = (BRACO * BRACO - ANTEBRACO * ANTEBRACO + distancia * distancia) / (2 * distancia)
+    const h = Math.sqrt(Math.max(0, BRACO * BRACO - a * a))
+    const opcoes = [-1, 1].map(s => ({ x: ombro.x + ux * a - uy * h * s, y: ombro.y + uy * a + ux * h * s }))
+    const dobrado = opcoes.sort((a, b) => Math.hypot(a.x - e[cot].x, a.y - e[cot].y) - Math.hypot(b.x - e[cot].x, b.y - e[cot].y))[0]
+    e = { ...e, [cot]: dobrado, [mao]: { x: ombro.x + ux * distancia, y: ombro.y + uy * distancia } }
   }
 
   const bolaEm = (qual: 'bola' | 'bola2'): PontoBola | null => {
@@ -610,7 +622,8 @@ export function instante(anim: Animacao, t: number): Instante {
     const q = quiques[qual]
     if (q) {
       const p = posicaoBola(anim, { m: 'mao', lado: q.lado, d: q.d }, e, ctx, qual)
-      return pronta(p, q.d > 0.97 ? 0.82 : 1)
+      const ponto = pronta(p, q.d > 0.97 ? 0.82 : 1)
+      return ponto ? { ...ponto, quique: q } : null
     }
     if (y?.m === 'voo') {
       const voando = (p: PontoBola | null) => (p ? { ...p, voando: true } : null)
@@ -678,6 +691,21 @@ export function instante(anim: Animacao, t: number): Instante {
   const segura = sa && sb ? { P: lerp(sa.P, sb.P, kb), L: lerp(sa.L, sb.L, kb) } : (sa ?? sb)
   const seguraPeso = sa && sb ? 1 : sb ? kb : sa ? 1 - kb : 0
 
+  const comPegada = (qual: 'bola' | 'bola2') => {
+    const ponto = bolaEm(qual)
+    if (!ponto || !anim.coreografia.tecnica) return ponto
+    const x = ba[qual], y = bb[qual]
+    let cima = y?.m === 'cima' ? y : x?.m === 'cima' ? x : undefined
+    if (!cima && y?.m === 'voo' && y.para === 'aro') {
+      for (let j = ia; j >= 0; j--) if (ks[j][qual]?.m === 'cima') { cima = ks[j][qual] as Extract<Bola, { m: 'cima' }>; break }
+    }
+    if (!cima) return ponto
+    const lado = cima.lado ?? 'P'
+    const outra = lado === 'P' ? e.maoL : e.maoP
+    const apoio = anim.coreografia.tecnica === 'arremesso' && Math.hypot(outra.x - ponto.x, outra.y - ponto.y) < 30
+    const peso = ponto.voando ? 0 : x?.m === 'cima' && y?.m === 'cima' ? 1 : y?.m === 'cima' ? kb : x?.m === 'cima' ? 1 - kb : 0
+    return { ...ponto, pegada: { tipo: anim.coreografia.tecnica, lado, apoio, peso } }
+  }
   return {
     e,
     dir,
@@ -689,8 +717,8 @@ export function instante(anim: Animacao, t: number): Instante {
     seguraPeso,
     fase: faseEm(anim, t),
     hl: ub > 0 ? bb.hl : ba.hl,
-    bola: bolaEm('bola'),
-    bola2: bolaEm('bola2'),
+    bola: comPegada('bola'),
+    bola2: comPegada('bola2'),
     px: a.px !== undefined && b.px !== undefined ? lerp(a.px, b.px) : undefined,
     solo,
     giro,

@@ -157,7 +157,6 @@ export default function Rotina() {
                     soltar(dia)
                   }}
                 >
-                  <span className="dia-sigla" aria-hidden>{SIGLA[dia]}</span>
                   <div className="dia-topo">
                     <h3>
                       {DIAS[dia]}
@@ -208,7 +207,7 @@ export default function Rotina() {
                       })()}
                     </ol>
                   ) : (
-                    <p className="dia-vazio">{previa ? 'Dia de descanso. A quadra espera.' : 'Arraste um treino para cá ou toque em adicionar.'}</p>
+                    <p className="dia-vazio">{previa ? 'Recuperação e descanso.' : 'Sem exercícios planejados.'}</p>
                   )}
                   {!previa && (
                     <select

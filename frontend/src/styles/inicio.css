@@ -1,0 +1,29 @@
+/* A abertura conserva as proporções e a rolagem originais de base.css/responsivo.css. */
+.pagina-inicio .abertura-bola { width: min(52vh, 48vw); }
+.pagina-inicio .treino-hoje {
+  position: relative;
+  width: 100%;
+  margin-inline: auto;
+  padding: 2rem clamp(1.25rem, 4vw, 3rem) 3rem;
+  border-top: 2px solid var(--borda);
+}
+.pagina-inicio .hoje-frente { gap: 1rem; margin-bottom: 1.25rem; }
+.pagina-inicio .hoje-frente h2 { max-width: 30ch; font-size: clamp(2rem, 4vw, 3.2rem); line-height: 1.5; text-wrap: balance; }
+.pagina-inicio .treino-corpo .muted { font-size: 1.1rem; line-height: 1.6; text-transform: none; }
+.pagina-inicio .hoje-rodape { margin-top: 1.25rem; }
+.pagina-inicio .manifesto { position: relative; isolation: isolate; min-height: 0; padding-block: clamp(4rem, 10vw, 8rem); }
+.pagina-inicio .manifesto-frase { position: relative; top: auto; color: #fff; opacity: 1; text-shadow: none; text-transform: none; }
+.pagina-inicio > section:not(.abertura),
+.pagina-inicio .escada-fixa {
+  background-color: var(--bg);
+  background-image: var(--fundo-quadra);
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+@media (max-width: 860px) {
+  .pagina-inicio .abertura-fixa { --bola: min(60vw, 32svh); }
+  .pagina-inicio .hoje-descanso-acoes { width: 100%; }
+  .pagina-inicio .hoje-descanso-acoes .btn { width: 100%; justify-content: center; }
+}

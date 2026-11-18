@@ -19,3 +19,77 @@
   .acoes-principais > .btn { min-height: 44px; }
 }
 @media (hover: none) { .rota .remover { opacity: 1; } }
+/* Controles neutros: o estado ativo é indicado por uma linha, sem preenchimento laranja. */
+.niveis .nivel-opcao {
+  border: 1px solid var(--borda);
+  border-bottom: 3px solid transparent;
+  background: var(--superficie);
+  color: var(--texto);
+  box-shadow: none;
+}
+.niveis .nivel-opcao.ativo {
+  background: var(--superficie-2);
+  color: var(--texto);
+  border-color: var(--borda);
+  border-bottom-color: var(--laranja);
+}
+.niveis .nivel-opcao.ativo strong { font-weight: 800; }
+.niveis .nivel-opcao strong { font-size: 1rem; line-height: 1.4; letter-spacing: 0; text-transform: none; }
+.niveis .nivel-opcao span { font-size: 0.9rem; line-height: 1.5; letter-spacing: 0; text-transform: none; }
+.niveis .nivel-opcao.ativo span { color: var(--muted); opacity: 1; }
+.niveis .nivel-opcao:hover { background: var(--superficie-2); box-shadow: none; }
+/* Filtros, seletores e escolhas do gerador seguem o mesmo padrão das abas. */
+.chip, .gs .gs-chip, .gs .gs-nivel, .gs .gs-foco, .gs .gs-leds .led,
+.conquistas-filtro, button.artigo-categoria {
+  border: 1px solid var(--borda);
+  border-bottom: 3px solid transparent;
+  background: var(--superficie);
+  color: var(--texto);
+  box-shadow: none;
+  text-shadow: none;
+  min-height: 44px;
+}
+.chip.ativo, .gs .gs-chip[aria-pressed='true'], .gs .gs-nivel[aria-pressed='true'],
+.gs .gs-foco[aria-pressed='true'], .gs .gs-leds .led[aria-pressed='true'],
+.conquistas-filtro.ativo, button.artigo-categoria.ativo {
+  background: var(--superficie-2);
+  color: var(--texto);
+  border-color: var(--borda);
+  border-bottom-color: var(--c, var(--laranja));
+  font-weight: 700;
+  text-shadow: none;
+}
+button.artigo-categoria.ativo :is(.meta, .artigo-contagem) { color: var(--muted); }
+.conteudo .chip, .gs .gs-chip, .gs .gs-foco, .gs .gs-leds .led,
+.gs .gs-nivel strong, .conquistas-filtro { font-size: 0.95rem; letter-spacing: 0; line-height: 1.4; text-transform: none; }
+.gs .gs-nivel span { color: var(--muted); font-size: 0.9rem; letter-spacing: 0; line-height: 1.5; text-transform: none; }
+/* Botões de ação: contraste no fundo neutro e uma borda de destaque. */
+body .btn.btn-primario,
+body .btn.btn-primario:is(:hover, :focus-visible, :active),
+.gs .gs-botao.gs-primario,
+.gs .gs-botao.gs-primario:hover:not(:disabled) {
+  background: var(--superficie-2);
+  color: var(--texto);
+  border: 1px solid var(--borda);
+  border-bottom: 3px solid var(--laranja);
+  filter: none;
+  box-shadow: none;
+}
+body .btn.btn-primario::before { display: none; }
+body .btn.btn-primario .icone-svg { color: var(--laranja-texto); }
+.gs .gs-botao:not(.gs-primario) { background: var(--superficie); border-color: var(--borda); color: var(--texto); }
+.gs .gs-botao:hover:not(:disabled) { background: var(--superficie-2); }
+/* Campos de texto e menus de seleção: fundo neutro, foco visível. */
+.input, select.input { background-color: var(--superficie); color: var(--texto); border-color: var(--borda); }
+.input[type='search']::placeholder { font-size: 0.9rem; font-weight: 400; letter-spacing: 0; text-transform: none; }
+.input:focus-visible, .input:focus { border-color: var(--laranja); outline-color: var(--laranja); }
+/* Pequenos indicadores de seleção substituem o preenchimento colorido. */
+input[type='checkbox']:checked, input[type='radio']:checked { background: var(--superficie-2); border-color: var(--laranja-texto); }
+input[type='checkbox']:checked::before {
+  width: 10px; height: 6px; background: none;
+  border-left: 2px solid var(--laranja-texto); border-bottom: 2px solid var(--laranja-texto);
+  transform: translateY(-1px) rotate(-45deg);
+}
+input[type='radio']:checked::before { background: var(--laranja-texto); }
+input[type='range']::-webkit-slider-thumb { background: var(--superficie-2); border-color: var(--laranja-texto); }
+input[type='range']::-moz-range-thumb { background: var(--superficie-2); border-color: var(--laranja-texto); }

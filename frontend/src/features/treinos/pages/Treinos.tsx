@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import DrillCard from '../components/DrillCard'
+import { CATEGORIAS } from '../components/FormExercicio'
 import { AvisoDesatualizado, Carregando, ErroCarga } from '../../../shared/ui/Estado'
 import { NIVEIS } from '../../../shared/lib/niveis'
 import { useDrills } from '../model/usarExercicios'
@@ -8,14 +9,25 @@ import type { Drill, Nivel } from '../../../shared/types'
 
 // A posição do catálogo é a progressão do nível; exercícios do atleta ficam no fim.
 const naOrdem = (a: Drill, b: Drill) => (a.ordem ?? Infinity) - (b.ordem ?? Infinity) || 0
+const normalizar = (texto: string) => texto.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLocaleLowerCase('pt-BR').trim()
 
 export default function Treinos() {
   const { drills, carregado, erro, recarregar } = useDrills()
   const [parametros, setParametros] = useSearchParams()
   const nivel = NIVEIS.find((n) => n.id === parametros.get('nivel')) ?? NIVEIS[0]
-  const escolherNivel = (id: Nivel) => setParametros({ nivel: id }, { replace: true })
+  const atualizarFiltro = (chave: string, valor: string) => setParametros((atuais) => {
+    const novos = new URLSearchParams(atuais)
+    if (valor) novos.set(chave, valor)
+    else novos.delete(chave)
+    return novos
+  }, { replace: true })
+  const escolherNivel = (id: Nivel) => atualizarFiltro('nivel', id)
+  const busca = parametros.get('busca') ?? ''
+  const fundamento = parametros.get('fundamento') ?? ''
 
-  const lista = useMemo(() => drills.filter((d) => !d.nivel || d.nivel === nivel.id).sort(naOrdem), [drills, nivel.id])
+  const lista = useMemo(() => drills.filter((d) => (!d.nivel || d.nivel === nivel.id)
+    && (!fundamento || normalizar(d.categoria) === normalizar(fundamento))
+    && normalizar(d.nome).includes(normalizar(busca))).sort(naOrdem), [drills, nivel.id, fundamento, busca])
   const aquecimento = lista.filter((d) => d.aquecimento)
   const exercicios = lista.filter((d) => !d.aquecimento)
   const contagem = (id: Nivel) => drills.filter((d) => d.nivel === id && !d.aquecimento).length
@@ -35,6 +47,19 @@ export default function Treinos() {
         ))}
       </div>
       <p className="muted">{nivel.foco}</p>
+      <div className="treinos-filtros" role="search" aria-label="Buscar exercícios">
+        <label>Buscar pelo nome
+          <input className="input" type="search" placeholder="Ex.: bandeja, crossover…" value={busca} onChange={(e) => atualizarFiltro('busca', e.target.value)} />
+        </label>
+        <label>Fundamento
+          <select className="input" value={fundamento} onChange={(e) => atualizarFiltro('fundamento', e.target.value)}>
+            <option value="">Todos os fundamentos</option>
+            {CATEGORIAS.map((c) => <option key={c} value={c}>{c}</option>)}
+          </select>
+        </label>
+        {(busca || fundamento) && <button className="btn" onClick={() => setParametros({ nivel: nivel.id }, { replace: true })}>Limpar filtros</button>}
+      </div>
+      {carregado && <p className="treinos-contagem" role="status">{lista.length} {lista.length === 1 ? 'exercício encontrado' : 'exercícios encontrados'}</p>}
 
       <div className="treinos-lista">
         {carregado && <AvisoDesatualizado erro={erro} tentarDeNovo={recarregar} />}
@@ -65,7 +90,7 @@ export default function Treinos() {
             )}
           </>
         ) : (
-          <div className="vazio">Nenhum treino encontrado neste nível.</div>
+          <div className="vazio">Nenhum treino encontrado. Experimente outro nome ou fundamento.</div>
         )}
       </div>
     </div>

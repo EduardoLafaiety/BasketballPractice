@@ -173,7 +173,7 @@ describe('Rotina semanal', () => {
     const quarta = cartaoDoDia('Quarta')
     expect(quarta).toHaveClass('dia-folga')
     expect(within(quarta).getByText('Descanso')).toBeInTheDocument()
-    expect(within(quarta).getByText(/Arraste um treino para cá/)).toBeInTheDocument()
+    expect(within(quarta).getByText('Sem exercícios planejados.')).toBeInTheDocument()
   })
 
   it('ao arrastar, a semana mostra onde soltar e o treino passa para o outro dia', async () => {
@@ -214,7 +214,7 @@ describe('Gerador da rotina semanal', () => {
     await user.click(screen.getByRole('button', { name: /^Avançado/ }))
     await user.click(screen.getByRole('button', { name: '60 min' }))
     await user.click(screen.getByRole('checkbox', { name: /aquecimento/ }))
-    await user.click(screen.getByRole('button', { name: 'Gerar semana' }))
+    await user.click(screen.getByRole('button', { name: 'Gerar treino' }))
 
     // Segunda, quarta e sexta são os dias de treino de quem ainda não tem rotina.
     await waitFor(() => expect(geradas(api)).toHaveLength(3))
@@ -230,7 +230,7 @@ describe('Gerador da rotina semanal', () => {
     const user = userEvent.setup()
     const { treinos, rotas } = servidorDeRotina()
     const api = abrirRotina({ ...rotas, 'POST /plans/generate': respostaGerador })
-    await user.click(await screen.findByRole('button', { name: 'Gerar semana' }))
+    await user.click(await screen.findByRole('button', { name: 'Gerar treino' }))
 
     const aviso = await screen.findByText('Prévia, ainda não salva')
     expect(aviso.closest('section')).toHaveTextContent('6 blocos')
@@ -275,7 +275,7 @@ describe('Gerador da rotina semanal', () => {
     expect(quartaAcesa).toHaveAttribute('aria-pressed', 'true')
     expect(screen.getByRole('button', { name: /^Segunda/ })).toHaveAttribute('aria-pressed', 'false')
 
-    await user.click(screen.getByRole('button', { name: 'Gerar semana' }))
+    await user.click(screen.getByRole('button', { name: 'Gerar treino' }))
     await waitFor(() => expect(geradas(api)).toHaveLength(1))
     await user.click(screen.getByRole('button', { name: /^Terça/ }))
     await waitFor(() => expect(geradas(api)).toHaveLength(3), { timeout: 3000 })
@@ -294,7 +294,7 @@ describe('Gerador da rotina semanal', () => {
       3: { id: 3, name: 'Rotina de quarta', description: 'bp-rotina:3', exercises: [{ exerciseId: 2 }] },
     })
     const api = abrirRotina({ ...rotas, 'POST /plans/generate': respostaGerador })
-    await user.click(await screen.findByRole('button', { name: 'Gerar semana' }))
+    await user.click(await screen.findByRole('button', { name: 'Gerar treino' }))
     await screen.findByText('Prévia, ainda não salva')
 
     await user.click(screen.getByRole('button', { name: 'Aplicar à rotina' }))
@@ -311,11 +311,11 @@ describe('Gerador da rotina semanal', () => {
     const user = userEvent.setup()
     const { rotas } = servidorDeRotina()
     abrirRotina({ ...rotas, 'POST /plans/generate': new Resposta(500, { error: 'Banco fora do ar' }) })
-    await user.click(await screen.findByRole('button', { name: 'Gerar semana' }))
+    await user.click(await screen.findByRole('button', { name: 'Gerar treino' }))
 
     expect(await screen.findByRole('alert')).toHaveTextContent('Banco fora do ar')
     expect(screen.queryByText('Prévia, ainda não salva')).toBeNull()
-    expect(screen.getByRole('button', { name: 'Gerar semana' })).toBeEnabled()
+    expect(screen.getByRole('button', { name: 'Gerar treino' })).toBeEnabled()
   })
 
   it('sem nenhum dia escolhido não dá para gerar, e o endereço antigo do gerador leva para a rotina', async () => {
@@ -328,6 +328,6 @@ describe('Gerador da rotina semanal', () => {
     await screen.findByRole('form', { name: 'Gerar rotina semanal' })
     for (const dia of ['Segunda', 'Quarta', 'Sexta']) await user.click(screen.getByRole('button', { name: new RegExp(`^${dia}`) }))
     expect(screen.getByText('Escolha ao menos um dia')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Gerar semana' })).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'Gerar treino' })).toBeDisabled()
   })
 })

@@ -29,7 +29,7 @@ export default function Demonstracao2D({ coreografia, nome, aoVer3D }: { coreogr
   const marcas = useMemo(() => pegadas(anim), [anim])
   const [tocando, setTocando] = useState(() => !menosMovimento())
   const [fase, setFase] = useState(0)
-  const [rastro, setRastro] = useState(true)
+  const [rastro, setRastro] = useState(false)
   const [camera, setCamera] = useState(true)
   const [velocidade, setVelocidade] = useState(0.5)
 
@@ -139,13 +139,18 @@ export default function Demonstracao2D({ coreografia, nome, aoVer3D }: { coreogr
     <section ref={regiao} className="demo" aria-label={`Demonstração: ${nome}`}>
       <svg className="demo-cena" viewBox="0 0 680 400" role="img" aria-label={`Manequim demonstrando ${nome}, passo a passo`}>
         <defs>
+          <pattern id={`${recorte}-piso`} width="96" height="12" patternUnits="userSpaceOnUse">
+            <rect width="96" height="12" fill="#bb9263" />
+            <path d="M0 0H96M48 0V6M0 6H96M20 6V12" fill="none" stroke="#916b45" strokeWidth="0.6" />
+            <path d="M0 3H96M0 9H96" stroke="#d3ae7f" strokeWidth="0.5" />
+          </pattern>
           <clipPath id={recorte}>
             <rect width={QUADRO.w} height={QUADRO.h} />
           </clipPath>
         </defs>
         <g clipPath={`url(#${recorte})`}>
           <g ref={lente}>
-            <rect x="20" y={CHAO} width="640" height="18" className="demo-piso" />
+            <rect x="20" y={CHAO} width="640" height="18" fill={`url(#${recorte}-piso)`} />
             <line x1="20" y1={CHAO} x2="660" y2={CHAO} className="demo-linha" />
             <Cenario anim={anim} />
             {fantasmas.map((c, i) => (
@@ -248,7 +253,7 @@ function Cenario({ anim }: { anim: Animacao }) {
       {cena.caixa && <rect x={cena.caixa.x} y={CHAO - cena.caixa.h} width={cena.caixa.w} height={cena.caixa.h} rx="3" className="demo-caixa" />}
       {cena.cadeira !== undefined && (
         <path
-          d={`M${cena.cadeira - 14} ${CHAO} L${cena.cadeira - 14} ${CHAO - 44} M${cena.cadeira + 14} ${CHAO} L${cena.cadeira + 14} ${CHAO - 44} M${cena.cadeira - 18} ${CHAO - 44} L${cena.cadeira + 18} ${CHAO - 44} M${cena.cadeira + 14} ${CHAO - 44} L${cena.cadeira + 14} ${CHAO - 90}`}
+          d={`M${cena.cadeira - 14} ${CHAO} L${cena.cadeira - 14} ${CHAO - 44} M${cena.cadeira + 14} ${CHAO} L${cena.cadeira + 14} ${CHAO - 44} M${cena.cadeira - 18} ${CHAO - 44} L${cena.cadeira + 18} ${CHAO - 44} M${cena.cadeira - 14} ${CHAO - 44} L${cena.cadeira - 14} ${CHAO - 90}`}
           className="demo-cadeira"
         />
       )}

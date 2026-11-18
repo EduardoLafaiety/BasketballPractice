@@ -1,0 +1,164 @@
+/* Refinamento visual: pixel nos títulos, leitura limpa no conteúdo. */
+:root {
+  --fonte-display: 'Jersey 10', 'Pixelify Sans Variable', monospace;
+  --fonte-texto: 'Trebuchet MS', 'Segoe UI', sans-serif;
+  --peso-display: 400;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+body::after { opacity: 0.12; background: repeating-linear-gradient(0deg, #000 0 1px, transparent 1px 4px); }
+:root[data-theme='light'] body::after { opacity: 0.05; }
+@media (prefers-color-scheme: light) { :root:not([data-theme='dark']) body::after { opacity: 0.05; } }
+.conteudo p:not(.manifesto-frase), .conteudo .muted, .conteudo .meta, .conteudo .nivel,
+.conteudo label, .conteudo legend, .conteudo .cartao-jogador-rodape {
+  font-family: var(--fonte-texto);
+  font-size: 1rem;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 1.65;
+  text-transform: none;
+}
+.conteudo .meta, .conteudo .cartao-jogador-rodape { font-size: 0.9rem; }
+.conteudo .manifesto-frase { font-size: clamp(1.4rem, 3vw, 2.5rem); line-height: 1.55; max-width: 30em; }
+.btn, .gs-botao { font-size: 0.9rem; letter-spacing: 0.02em; min-height: 44px; }
+.card p, .cartao-jogador-info p { margin-block: 0.75rem; }
+.topo { background: transparent; border: 0; }
+.topo .marca, .topo .topo-secao, .auth-marca .marca, .auth-marca .topo-secao { background: transparent; box-shadow: none; }
+.topo .topo-secao, .auth-marca .topo-secao { color: var(--texto); text-decoration: none; }
+.topo-atalhos { display: flex; gap: 0.5rem; margin-left: auto; background: var(--bg); border: 1px solid var(--borda); }
+.topo-atalhos a { min-height: 44px; display: flex; align-items: center; padding: 0.5rem 1rem; color: var(--texto); text-decoration: none; font-size: 1rem; border-bottom: 2px solid transparent; }
+.topo-atalhos a.active { color: var(--laranja-texto); border-bottom-color: currentColor; }
+.topo-atalhos a:hover { background: var(--superficie-2); }
+.topo-menu { margin-left: 0; }
+.treinos-filtros { display: flex; flex-wrap: wrap; gap: 1rem; align-items: end; margin-block: 2rem 1rem; }
+.treinos-filtros label { display: grid; gap: 0.5rem; flex: 1 1 15rem; }
+.treinos-filtros .input { width: 100%; min-height: 48px; font-size: 1rem; }
+.treinos-contagem { color: var(--muted); margin-bottom: 1.5rem; }
+.foto-jogador > img:not(.foto-cor) { filter: none; }
+.foto-cor { display: none; }
+.cartao-jogador,
+.cartao-jogador:hover,
+.cartao-jogador:active,
+.cartao-jogador[data-surge] { transform: none; opacity: 1; transition: none; box-shadow: var(--sombra); }
+.foto-jogador,
+.cartao-jogador[data-surge] .foto-jogador { clip-path: none; transition: none; }
+.foto-jogador img,
+.cartao-jogador:hover img,
+.cartao-jogador:active img { transform: none; filter: none; transition: none; }
+.nomes-automaticos { height: auto; padding-top: 4rem; }
+.nomes-automaticos .nomes-fixo { position: static; height: auto; overflow: visible; gap: 1.5rem; padding: 0; }
+.nomes-automaticos .nomes-fixo h2 { margin: 0; padding-inline: clamp(1.25rem, 5vw, 5rem); }
+.nomes-automaticos .nomes-fixo > p { margin: 0; max-width: 48em; }
+.nomes-janela { overflow: hidden; width: 100%; padding-block: 1.5rem; }
+.nomes-automaticos .nomes-linha { display: flex; padding: 0; margin-block: 1rem; animation: nomes-passar 50s linear infinite; font-size: clamp(2rem, 5vw, 4.5rem); }
+.nomes-grupo { display: flex; flex-shrink: 0; white-space: nowrap; }
+.nomes-grupo > span { color: var(--c, var(--texto)); }
+.nomes-automaticos .nomes-contorno { animation-direction: reverse; }
+@keyframes nomes-passar { to { transform: translateX(-50%); } }
+.jogue-corpo { padding-top: 2rem; padding-bottom: 4rem; }
+.grade-jogadores { gap: 1.5rem; }
+.rodape { padding: 2.5rem clamp(1.25rem, 5vw, 5rem) calc(2rem + var(--doca, 0px)); border-top: 2px solid var(--borda); background: var(--superficie); }
+.rodape-principal { display: flex; flex-wrap: wrap; gap: 1.5rem; align-items: center; justify-content: space-between; }
+.rodape-marca { display: flex; align-items: center; gap: 0.75rem; color: var(--texto); font-family: var(--fonte-texto); font-size: 1.35rem; font-weight: 600; line-height: 1.4; text-transform: none; text-decoration: none; }
+.rodape-marca .icone-svg { color: var(--laranja); flex-shrink: 0; }
+.rodape-principal nav { display: flex; flex-wrap: wrap; gap: 1.25rem; }
+.rodape-principal nav a { color: var(--laranja-texto); padding-block: 0.75rem; text-decoration: none; }
+.rodape-creditos { max-width: 75ch; font-size: 0.9rem; line-height: 1.7; color: var(--muted); margin-block: 1.75rem; text-transform: none; }
+.rodape .links-legais { justify-content: start; }
+.rodape .links-legais a, .rodape .links-legais button { font-size: 0.85rem; text-transform: none; letter-spacing: 0; }
+@media (max-width: 860px) { .topo-atalhos { display: none; } .topo-menu { margin-left: auto; } .doca-item { font-size: 0.7rem; text-transform: none; letter-spacing: 0; } }
+@media (max-width: 560px) { .treinos-filtros { flex-direction: column; align-items: stretch; } .treinos-filtros label { flex-basis: auto; } .grade-jogadores { grid-template-columns: minmax(0, 1fr); } }
+:root[data-movimento='reduzido'] .nomes-automaticos .nomes-linha { animation: none; }
+
+/* Menu: grupos alinhados e links em tamanho de leitura, sem numeração decorativa. */
+.menu-tela { justify-content: flex-start; gap: 2.5rem; padding: 6.5rem clamp(1.25rem, 5vw, 5rem) calc(1.5rem + var(--doca, 0px)); }
+.menu-tela .nav {
+  width: min(100%, 72rem);
+  margin-inline: auto;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: start;
+  gap: 1.5rem;
+}
+.menu-tela .nav-grupo { margin: 0; padding: 1.5rem; border: 1px solid #343434; border-top: 3px solid #ff8a33; background: #181818; }
+.menu-tela .nav-grupo h2 {
+  margin: 0 0 1rem;
+  font-family: 'Pixelify Sans Variable', monospace;
+  font-size: 1.65rem;
+  line-height: 1.3;
+  font-weight: 600;
+  color: #ff8a33;
+  text-transform: none;
+  text-shadow: none;
+}
+.menu-tela .nav-link {
+  width: 100%;
+  min-height: 50px;
+  padding: 0.7rem 0.75rem;
+  margin-block: 0.25rem;
+  font-family: var(--fonte-texto);
+  font-size: 1.2rem;
+  font-weight: 500;
+  line-height: 1.4;
+  letter-spacing: 0;
+  text-transform: none;
+  align-items: center;
+  border-left: 3px solid transparent;
+  transition: color 0.15s, background-color 0.15s;
+}
+.menu-tela .nav-link:hover, .menu-tela .nav-link:focus-visible { transform: none; background: #262626; color: #ff8a33; }
+.menu-tela .nav-link.active { color: #ff8a33; background: #2b211a; border-left-color: #ff8a33; }
+.menu-tela .conta { width: min(100%, 72rem); margin: auto auto 0; min-height: 64px; font-size: 1rem; }
+@media (max-width: 1000px) { .menu-tela .nav { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 600px) {
+  .menu-tela { gap: 1.5rem; padding-top: 5rem; }
+  .menu-tela .nav { grid-template-columns: minmax(0, 1fr); gap: 1rem; }
+  .menu-tela .nav-grupo { padding: 1rem; }
+  .menu-tela .nav-grupo h2 { margin-bottom: 0.5rem; font-size: 1.5rem; }
+  .menu-tela .nav-link { font-size: 1.15rem; }
+}
+
+/* Rotina como agenda: a quadra pertence ao fundo da página, não a cada dia. */
+.conteudo .semana { grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 1.25rem; align-items: start; }
+.semana .dia::before { content: none; display: none; }
+.semana .dia {
+  min-width: 0;
+  min-height: 0;
+  padding: 1.25rem;
+  gap: 1rem;
+  border: 1px solid var(--borda);
+  border-top: 3px solid var(--borda);
+  background: var(--superficie);
+  box-shadow: none;
+  animation: none;
+  transform: none;
+}
+.semana .dia.hoje { border-color: var(--laranja); border-top-width: 3px; box-shadow: none; transform: none; }
+.semana .dia-topo { display: grid; gap: 0.4rem; }
+.conteudo .semana .dia-topo h3 {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem;
+  font-family: var(--fonte-texto); font-size: 1.1rem; font-weight: 700; line-height: 1.4; letter-spacing: 0; text-transform: none;
+}
+.semana .dia-hoje { margin: 0; padding: 0.15rem 0.5rem; font-size: 0.75rem; line-height: 1.4; letter-spacing: 0; text-transform: none; }
+.semana .dia-mix:empty { display: none; }
+.conteudo .semana .dia-vazio { min-height: 3rem; margin: 0; padding-block: 0.75rem; font-size: 0.95rem; font-weight: 400; line-height: 1.6; letter-spacing: 0; text-transform: none; }
+.semana .dia select.input { min-height: 46px; font-size: 0.95rem; text-transform: none; letter-spacing: 0; background: var(--superficie-2); color: var(--texto); border: 1px dashed var(--borda); }
+.semana .rota li { grid-template-columns: 24px minmax(0, 1fr); gap: 0.6rem; padding-bottom: 0.75rem; }
+.semana .rota-nome { font-size: 1rem; font-weight: 600; line-height: 1.45; letter-spacing: 0; text-transform: none; }
+.semana .rota-sub { font-size: 0.85rem; font-weight: 400; line-height: 1.5; letter-spacing: 0; text-transform: none; }
+.semana .rotina-item-acoes, .semana .rota-min { grid-column: 2; }
+.semana .rotina-item-acoes { justify-content: space-between; }
+.semana .rotina-item-acoes label { display: flex; flex-direction: row; align-items: center; gap: 0.5rem; }
+.semana .rotina-item-acoes input { width: 4rem; min-height: 36px; font-size: 1rem; }
+.semana .rota .remover { opacity: 1; min-width: 44px; min-height: 44px; }
+.semana .rota-min { font-size: 0.9rem; }
+.semana.em-previa .dia { border-style: dashed; }
+
+/* O registro do exercício permanece no lugar enquanto o cronômetro atualiza. */
+.detalhe > .painel {
+  position: static;
+  top: auto;
+  opacity: 1;
+  transform: none;
+  animation: none;
+  transition: none;
+}

@@ -133,9 +133,6 @@ export default function Entrar({ modo, demonstracao = __DEMO__ }: { modo: 'entra
             <button type="button" className="btn btn-grande auth-sem-conta" disabled={enviando} onClick={() => acessar(() => entrar('visitante@demo.local', '-'))}>
               Entrar sem conta
             </button>
-            <p className="muted auth-troca">
-              Demonstração: use qualquer e-mail e senha. Nada é enviado, e seus treinos ficam só neste navegador.
-            </p>
           </>
         ) : (
           <p className="muted auth-troca">

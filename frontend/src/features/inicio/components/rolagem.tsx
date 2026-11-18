@@ -109,58 +109,41 @@ export function Figura({ nome, viewBox = '0 0 680 330', className, apiRef }: { n
   )
 }
 
-/** Abertura: a bola gira e cresce com a rolagem, e "Bora pra quadra." abre para os lados. */
+/** Abertura original: bola cresce e gira; as duas linhas abrem para os lados. */
 export function AberturaBola({ titulo, children }: { titulo: ReactNode; children?: ReactNode }) {
   const secao = useRef<HTMLElement>(null)
   const bola = useRef<HTMLImageElement>(null)
   const ultimo = useRef(-1)
-
   useRolagem(() => {
     if (!secao.current || menosMovimento()) return
     const p = progressoDoPino(secao.current)
-    // Fora do trecho da abertura o progresso não muda: nada a redesenhar enquanto o resto da página rola.
     if (p === ultimo.current) return
     ultimo.current = p
-    if (bola.current) bola.current.style.transform = `rotate(${p * 260}deg) scale(${1 + p * 1.7})`
-    // Direto nas duas metades do título: uma variável de CSS na seção faria o navegador recalcular o
-    // estilo de tudo o que está dentro dela a cada quadro.
+    if (bola.current) bola.current.style.transform = 'rotate(' + (p * 260) + 'deg) scale(' + (1 + p * 1.7) + ')'
     const a = secao.current.querySelector<HTMLElement>('.abertura-a')
     const b = secao.current.querySelector<HTMLElement>('.abertura-b')
-    if (a) a.style.transform = `translateX(${p * -80}vw)`
-    if (b) b.style.transform = `translateX(${p * 80}vw)`
+    if (a) a.style.transform = 'translateX(' + (p * -80) + 'vw)'
+    if (b) b.style.transform = 'translateX(' + (p * 80) + 'vw)'
   })
-
   return (
-    <section className="abertura" ref={secao}>
-      <div className="abertura-fixa">
-        <LinhasQuadra />
-        <div className="abertura-palco" aria-hidden>
-          <BolaCouro ref={bola} />
+    <>
+      <section className="abertura" ref={secao}>
+        <div className="abertura-fixa">
+          <LinhasQuadra />
+          <div className="abertura-palco" aria-hidden><BolaCouro ref={bola} /></div>
+          <div className="abertura-conteudo">{titulo}</div>
         </div>
-        <div className="abertura-conteudo">
-          {titulo}
-          {children}
-        </div>
-      </div>
-    </section>
+      </section>
+      {children}
+    </>
   )
 }
 
-/** Frase que acende palavra por palavra conforme a rolagem. */
+/** Frase inteira legível desde a entrada, sem escurecer palavras na rolagem. */
 export function FraseRolagem({ texto }: { texto: string }) {
-  const caixa = useRef<HTMLElement>(null)
-  const [acesas, setAcesas] = useState(() => (menosMovimento() ? Number.MAX_SAFE_INTEGER : 0))
-  const palavras = texto.split(' ')
-  useRolagem(() => {
-    if (!caixa.current || menosMovimento()) return
-    const r = caixa.current.getBoundingClientRect()
-    setAcesas(Math.round(limite((window.innerHeight * 0.85 - r.top) / (r.height * 0.72)) * palavras.length))
-  })
   return (
-    <section className="manifesto faixa-escura" ref={caixa}>
-      <p className="manifesto-frase frase-destaque" aria-label={texto}>
-        {palavras.map((p, i) => <span key={i} aria-hidden className={i < acesas ? 'aceso' : ''}>{p} </span>)}
-      </p>
+    <section className="manifesto faixa-escura">
+      <p className="manifesto-frase frase-destaque">{texto}</p>
     </section>
   )
 }
@@ -206,30 +189,23 @@ export interface NomeRolagem {
   cor?: string
 }
 
-/** Título parado e nomes correndo em sentidos opostos até passar por todos. Os links ficam na grade logo abaixo. */
+/** Nomes em movimento horizontal automático, sem prender a rolagem da página. */
 export function NomesRolagem({ nomes, titulo, texto }: { nomes: NomeRolagem[]; titulo: ReactNode; texto?: ReactNode }) {
-  const pino = useRef<HTMLDivElement>(null)
-  const a = useRef<HTMLDivElement>(null)
-  const b = useRef<HTMLDivElement>(null)
   const metade = Math.ceil(nomes.length / 2)
-  useRolagem(() => {
-    if (!pino.current || !a.current || !b.current || menosMovimento()) return
-    const caixa = pino.current.getBoundingClientRect()
-    if (caixa.bottom < 0 || caixa.top > window.innerHeight) return
-    const p = progressoDoPino(pino.current)
-    const largura = window.innerWidth
-    a.current.style.transform = `translateX(${-p * Math.max(0, a.current.offsetWidth - largura)}px)`
-    b.current.style.transform = `translateX(${-(1 - p) * Math.max(0, b.current.offsetWidth - largura)}px)`
-  })
-  const linha = (lista: NomeRolagem[]) =>
-    lista.map((n) => <span key={n.nome} style={n.cor ? ({ '--c': n.cor } as React.CSSProperties) : undefined}>{n.nome}<i>/</i></span>)
+  const linha = (lista: NomeRolagem[]) => [0, 1].map((copia) => (
+    <span className="nomes-grupo" key={copia}>
+      {lista.map((n) => <span key={n.nome} style={n.cor ? ({ '--c': n.cor } as React.CSSProperties) : undefined}>{n.nome}<i>/</i></span>)}
+    </span>
+  ))
   return (
-    <div className="nomes-pino" ref={pino}>
+    <div className="nomes-pino nomes-automaticos">
       <div className="nomes-fixo">
         {titulo}
-        <div className="nomes-linha" ref={a} aria-hidden>{linha(nomes.slice(0, metade))}</div>
-        <div className="nomes-linha nomes-contorno" ref={b} aria-hidden>{linha(nomes.slice(metade))}</div>
         {texto}
+        <div className="nomes-janela" aria-hidden>
+          <div className="nomes-linha" aria-hidden>{linha(nomes.slice(0, metade))}</div>
+          <div className="nomes-linha nomes-contorno" aria-hidden>{linha(nomes.slice(metade))}</div>
+        </div>
       </div>
     </div>
   )

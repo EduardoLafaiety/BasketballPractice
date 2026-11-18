@@ -53,6 +53,7 @@ export default defineConfig(({ mode }) => {
     test: {
       // Limita os bancos WASM e ambientes jsdom simultâneos para evitar disputa de memória no CI.
       maxWorkers: 2,
+      minWorkers: 1,
       environment: 'jsdom',
       setupFiles: ['src/test/setup.ts'],
       // Fixo para as contas de data e hora darem o mesmo resultado em qualquer máquina.

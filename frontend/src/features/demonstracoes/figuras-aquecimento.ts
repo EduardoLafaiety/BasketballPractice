@@ -11,8 +11,14 @@ export const AQUECIMENTOS: Record<string, Coreografia> = {
   // Iniciante
   'Polichinelo leve': ex('frente', {}, [
     ['Pés juntos', 'Comece em pé, com os braços soltos ao lado do corpo.', [{ x: 340, pe: 'M', ...F_PE, ...F_SOLTOS }, { d: 300 }]],
-    ['Abra', 'Salte abrindo as pernas e leve os braços para o alto, sem pressa.', [{ d: 320, ...F_ABERTO, ...F_ALTO, hl: ['bP', 'bL'] }]],
-    ['Feche', 'Volte à posição inicial, caindo macio na ponta dos pés.', ciclo([{ ...F_PE, ...F_SOLTOS }, { ...F_ABERTO, ...F_ALTO, hl: ['bP', 'bL'] }], 3).concat({ ...F_PE, ...F_SOLTOS })],
+    ['Abra', 'Salte abrindo as pernas e leve os braços para o alto, sem pressa.', [
+      { d: 180, ...F_ABERTO, ...F_ALTO, ar: 10, hl: ['bP', 'bL', 'pF', 'pT'] },
+      { d: 150, ...F_ABERTO, ...F_ALTO, ar: 0 },
+    ]],
+    ['Feche', 'Volte à posição inicial, caindo macio na ponta dos pés.', ciclo([
+      { d: 180, ...F_PE, ...F_SOLTOS, ar: 10 }, { d: 150, ...F_PE, ...F_SOLTOS, ar: 0 },
+      { d: 180, ...F_ABERTO, ...F_ALTO, ar: 10, hl: ['bP', 'bL', 'pF', 'pT'] }, { d: 150, ...F_ABERTO, ...F_ALTO, ar: 0 },
+    ], 3).concat({ ...F_PE, ...F_SOLTOS, ar: 0 })],
   ]),
   'Círculos com os braços': ex('lado', {}, [
     ['Postura', 'Em pé, abdômen firme e braços estendidos ao lado do corpo.', [{ x: 340, pe: 'M', ...EM_PE, bP: 0, aP: 0, bL: 0, aL: 0 }]],

@@ -25,7 +25,7 @@ describe('Entrar na demonstração', () => {
       </MemoryRouter>,
     )
 
-    expect(screen.getByText(/use qualquer e-mail e senha/i)).toBeInTheDocument()
+    expect(screen.queryByText(/use qualquer e-mail e senha/i)).not.toBeInTheDocument()
     expect(screen.queryByRole('link', { name: 'Criar conta' })).not.toBeInTheDocument()
 
     await user.click(screen.getByRole('button', { name: 'Entrar sem conta' }))

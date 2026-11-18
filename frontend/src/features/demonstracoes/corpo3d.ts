@@ -114,6 +114,8 @@ export interface Eixos {
 }
 
 export interface Bola3D {
+  pegada?: PontoBola['pegada']
+  quique?: { lado: 'P' | 'L'; d: number }
   /** Centro da bola: no mundo depois de colocarNoMundo; antes, relativo à pelve e girando com o corpo (presa à mão). */
   centro: V3
   /** Centro da bola solta, relativo à pelve e sem girar com o corpo (a bola não é do atleta). */
@@ -360,7 +362,7 @@ export function construirCorpo3D(entrada: Esqueleto, ctx: Contexto): Corpo3D {
   const joelhoPolo = (j: { x: number; y: number }, t: V3, h: V3, lado: number, eF: number): V3 => {
     const p = plano(j, 0, 0)
     const fora = abre(eF)
-    if (frente) return { x: Math.max(0.05, fora) + 0.04, y: p.y, z: p.z }
+    if (frente) return { x: Math.max(0.05, fora) + 0.04, y: p.y, z: ctx.z3?.bola !== undefined ? p.z : h.z + (t.z - h.z) * 0.6 }
     // De lado, o joelho fica entre o quadril e o pé; encurtada, a coxa aponta para fora do lado dela.
     return { x: p.x, y: p.y, z: (h.z + t.z) / 2 + lado * fora }
   }
@@ -394,8 +396,10 @@ export function construirCorpo3D(entrada: Esqueleto, ctx: Contexto): Corpo3D {
     const suaves = ctx.perto?.[i]
     const pertoP = b.voando ? 0 : suaves ? suaves.P : 1 - suave(9, folga, dP)
     const pertoL = b.voando ? 0 : suaves ? suaves.L : 1 - suave(9, folga, dL)
-    const wP = dita ? pertoP + (dita.P - pertoP) * k : pertoP
-    const wL = dita ? pertoL + (dita.L - pertoL) * k : pertoL
+    const contatoQuique = b.quique ? 1 - suave(0.04, 0.26, b.quique.d) : 0
+    const pesoTecnico = (lado: 'P' | 'L', original: number) => b.pegada && (b.pegada.lado === lado || b.pegada.apoio) ? Math.max(original, b.pegada.peso) : original
+    const wP = pesoTecnico('P', b.quique ? (b.quique.lado === 'P' ? contatoQuique : 0) : dita ? pertoP + (dita.P - pertoP) * k : pertoP)
+    const wL = pesoTecnico('L', b.quique ? (b.quique.lado === 'L' ? contatoQuique : 0) : dita ? pertoL + (dita.L - pertoL) * k : pertoL)
     const dupla = Math.min(wP, wL)
     const presa = Math.max(wP, wL)
     const visto = plano(b, 0, 0)
@@ -404,8 +408,9 @@ export function construirCorpo3D(entrada: Esqueleto, ctx: Contexto): Corpo3D {
     // Profundidade: a da coreografia, se houver; senão, solta fica no meio (de lado) ou à frente (de frente);
     // presa, vai para o lado da mão que a segura (de lado) ou para a frente do corpo (de frente).
     const zMao = mistura(v3(0, 0, ladoMao.L), v3(0, 0, ladoMao.P), wP / Math.max(1e-6, wP + wL)).z
-    const ocultoLivre = zOu(canal, frente ? 0.25 : 0)
-    const ocultoPreso = zOu(canal, frente ? 0.3 : zMao * (1 - dupla))
+    const faixaDrible = frente ? 0.3 : b.quique?.lado === 'L' ? -0.34 : 0.34
+    const ocultoLivre = zOu(canal, b.quique ? faixaDrible : frente ? 0.25 : 0)
+    const ocultoPreso = zOu(canal, b.quique ? faixaDrible : frente ? 0.3 : zMao * (1 - dupla))
     const livre = comOculto({ x: visto.x, y: yLivre, z: visto.z }, ocultoLivre)
     // Presa: a bola é desenhada a partir da mão (com o lado dado pelo sinal do giro). Refazê-la a partir da mão sem
     // espelho evita ampliar a distância bola–mão no meio da virada (o desespelho divide por até 0,3).
@@ -429,21 +434,28 @@ export function construirCorpo3D(entrada: Esqueleto, ctx: Contexto): Corpo3D {
       // puxada um pouco para onde a mão já estava: estável mesmo com a mão bem no centro da bola.
       const ombro = lado === 'P' ? ombroP : ombroL
       const lado3 = normalizar(soma(mul(normalizar(sub(alvo, centro), v3(0, 1, 0)), 0.6), normalizar(sub(ombro, centro), v3(0, 1, 0))), v3(0, 1, 0))
-      const umaMao = soma(centro, mul(lado3, R + 0.015))
+      const umaMao = b.quique ? soma(centro, v3(0, R + 0.006, 0)) : soma(centro, mul(lado3, R + 0.015))
       // Duas mãos: cada uma de um lado da bola.
-      const r = R - 0.012
+      const r = R + 0.025
       const duasMaos = { x: centro.x - 0.01, y: centro.y, z: centro.z + (lado === 'P' ? r : -r) * sinalP }
-      const contato = mistura(umaMao, duasMaos, limitar(dupla / peso, 0, 1))
+      let contato = mistura(umaMao, duasMaos, limitar(dupla / peso, 0, 1))
+      if (b.pegada && b.pegada.peso > 0 && b.pegada.tipo !== 'gancho') {
+        // A mão de arremesso fica atrás/embaixo; o apoio equilibra pela lateral.
+        const principal = lado === b.pegada.lado
+        const ladoPrincipal = (b.pegada.lado === 'P' ? 1 : -1) * sinalP
+        const direcao = principal ? normalizar(v3(-0.72, -0.69, 0), v3(0, -1, 0)) : v3(0, 0, -ladoPrincipal)
+        contato = mistura(contato, soma(centro, mul(direcao, R + 0.025)), b.pegada.peso)
+      }
       alvoMao[lado] = mistura(alvo, contato, w)
     }
-    bolas.push({ centro, livre, giro: b.giro, amasso: b.amasso, presa })
+    bolas.push({ centro, livre, giro: b.giro, amasso: b.amasso, presa, quique: b.quique, pegada: b.pegada })
   })
 
   // De frente, o desenho não mostra o tronco indo para a frente. Ele inclina sozinho (dobrando o quadril) quando o
   // atleta agacha e quando a bola que ele segura está baixa: sem isso, a mão não alcançaria a bola nos joelhos.
   if (frente) {
     let alcance = 0
-    for (const b of bolas) if (b.presa > 0.05) alcance = Math.max(alcance, b.presa * limitar((pelve.y + 0.2 - b.centro.y) / 0.45, 0, 1))
+    for (const b of bolas) if (!b.quique && b.presa > 0.05) alcance = Math.max(alcance, b.presa * limitar((pelve.y + 0.2 - b.centro.y) / 0.45, 0, 1))
     const ang = Math.min(68, Math.max(32 * agachado, 68 * alcance)) * DEG
     if (ang > 0.001) {
       const inclinar = (p: V3): V3 => {
@@ -614,7 +626,11 @@ export function posicaoDaCesta(cena: Cena | undefined): V3 | null {
  */
 function olharDoAtleta(corpo: Corpo3D, cesta: V3 | null): Eixos {
   const t = corpo.torax
-  const neutro = soma(corpo.cabeca, mul(t.frente, 6))
+  if (corpo.bolas.some(b => b.quique || (!cesta && b.centro.y < corpo.pescoco.y - 0.2))) {
+    return eixosDeFrente(normalizar(v3(t.frente.x, 0, t.frente.z), v3(1, 0, 0)), v3(0, 1, 0))
+  }
+  const frenteNeutra = t.cima.y > 0.7 ? normalizar(v3(t.frente.x, 0, t.frente.z), t.frente) : t.frente
+  const neutro = soma(corpo.cabeca, mul(frenteNeutra, 6))
   let alvo = neutro
   const bola = corpo.bolas[0]
   if (bola) {
@@ -622,7 +638,10 @@ function olharDoAtleta(corpo: Corpo3D, cesta: V3 | null): Eixos {
     const solta = 1 - bola.presa
     const perto = 1 - suave(5, 8, distancia(bola.centro, corpo.cabeca))
     if (cesta) alvo = mistura(alvo, cesta, alto)
-    alvo = mistura(alvo, bola.centro, solta * perto * (1 - (cesta ? alto : 0)) * 0.9)
+    // No drible, a cabeça permanece erguida em vez de perseguir cada quique.
+    // Receber uma bola alta ainda permite acompanhá-la com o olhar.
+    const acompanhar = suave(corpo.pelve.y + 0.2, corpo.pescoco.y, bola.centro.y)
+    alvo = mistura(alvo, bola.centro, solta * perto * acompanhar * (1 - (cesta ? alto : 0)) * 0.9)
   }
   const d = normalizar(sub(alvo, corpo.cabeca), t.frente)
   const fx = dot(d, t.frente)
