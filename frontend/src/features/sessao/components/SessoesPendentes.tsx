@@ -4,6 +4,7 @@ import { api, ApiError, contaLocal, tokenAtual } from '../../../shared/api/backe
 import { useAuth } from '../../autenticacao/model/auth'
 import { invalidar } from '../../../shared/data/recursos'
 import { enfileirar, lerLocal, pendentes, removerPendente, sincronizar } from '../model/treino-local'
+import type { FalhaEnvio } from '../model/treino-local'
 import type { NovaSessao } from '../../../shared/types'
 import Botao from '../../../shared/ui/Botao'
 
@@ -16,7 +17,8 @@ export default function SessoesPendentes() {
   const [rascunho, setRascunho] = useState(false)
   const [quantidade, setQuantidade] = useState(0)
   const [fila, setFila] = useState<NovaSessao[]>([])
-  const [statusErro, setStatusErro] = useState(0)
+  const [falhas, setFalhas] = useState<Record<string, FalhaEnvio>>({})
+  const falhasAtuais = useRef<Record<string, FalhaEnvio>>({})
   const [enviando, setEnviando] = useState(false)
   const bloqueado = useRef(false)
   const identidade = useRef('')
@@ -25,16 +27,27 @@ export default function SessoesPendentes() {
   useEffect(() => {
     if (!conta) { setQuantidade(0); setRascunho(false); return }
     const atual = `${conta}:${token}`
-    if (identidade.current !== atual) { bloqueado.current = false; identidade.current = atual; setErro(''); setStatusErro(0); setEnviando(false) }
+    if (identidade.current !== atual) { bloqueado.current = false; identidade.current = atual; setErro(''); falhasAtuais.current = {}; setFalhas({}); setEnviando(false) }
     let ativa = true
-    const atualizar = () => { if (ativa) { const itens = pendentes(conta); setFila(itens); setQuantidade(itens.length); setRascunho(lerLocal(conta, 'rascunho') !== null) } }
+    const atualizar = () => { if (ativa) {
+      const itens = pendentes(conta)
+      const atuais = Object.fromEntries(Object.entries(falhasAtuais.current).filter(([id, falha]) => itens.some((s) => s.clientId === id && JSON.stringify(s) === JSON.stringify(falha.sessao))))
+      falhasAtuais.current = atuais; setFalhas(atuais)
+      setFila(itens); setQuantidade(itens.length); setRascunho(lerLocal(conta, 'rascunho') !== null)
+    } }
     const enviar = () => {
       atualizar()
       if (!navigator.onLine || !autenticado || bloqueado.current) return
       setEnviando(true)
-      void sincronizar(conta, api.registrarSessao, () => ativa && tokenAtual() === token)
-        .then(() => { if (ativa) { setErro(''); setStatusErro(0); invalidar('sessoes', 'resumo', 'zonas', 'progresso') } })
-        .catch((e: Error) => { if (ativa) { const status = e instanceof ApiError ? e.status : 0; setStatusErro(status); bloqueado.current = status >= 400 && status < 500; setErro(e.message) } })
+      void sincronizar(conta, api.registrarSessao, () => ativa && tokenAtual() === token, (s) => Boolean(falhasAtuais.current[s.clientId!]))
+        .then((resultado) => { if (ativa) {
+          for (const falha of resultado.falhas) falhasAtuais.current[falha.sessao.clientId!] = falha
+          const e = resultado.interrupcao
+          bloqueado.current = e instanceof ApiError && [401, 403].includes(e.status)
+          setErro(e?.message ?? '')
+          if (resultado.enviadas) invalidar('sessoes', 'resumo', 'zonas', 'progresso')
+        } })
+        .catch((e: Error) => { if (ativa) setErro(e.message) })
         .finally(() => { if (ativa) setEnviando(false); atualizar() })
     }
     atualizar()
@@ -51,14 +64,18 @@ export default function SessoesPendentes() {
     {rascunho && pathname !== '/sessao' && <p><Link className="btn" to="/sessao">Retomar treino em andamento</Link></p>}
     {quantidade > 0 && <div role="status"><p>{quantidade} sessão(ões) salva(s) neste aparelho, aguardando sincronização. Entre nesta conta com conexão para enviar.</p>
     {erro && <p>{erro}</p>}
-    <Botao disabled={enviando} onClick={() => { bloqueado.current = false; setTentativa((t) => t + 1) }}>{enviando ? 'Enviando sessões' : 'Sincronizar agora'}</Botao>
+    <Botao disabled={enviando} onClick={() => { falhasAtuais.current = {}; setFalhas({}); bloqueado.current = false; setTentativa((t) => t + 1) }}>{enviando ? 'Enviando sessões' : 'Sincronizar agora'}</Botao>
     <details><summary>Revisar sessões pendentes</summary><ul className="pendentes-lista">
       {fila.map((s) => <li key={s.clientId}>
         <strong>{new Date(s.data).toLocaleString('pt-BR')} · {s.duracaoMin} min</strong>
         <p>{s.entradas.length} exercícios · {s.notas || 'Sem notas'}</p>
         {s.programa && <p>Programa: {s.programa.id}, dia {s.programa.dia}</p>}
-        {statusErro >= 400 && statusErro < 500 && <label>Corrigir notas<textarea defaultValue={s.notas} maxLength={2000} onBlur={(e) => { if (conta) enfileirar(conta, { ...s, notas: e.target.value }) }} /></label>}
-        {s.programa && statusErro === 409 && <Botao disabled={enviando} onClick={() => {
+        {falhas[s.clientId!] && <>
+          <p role="alert">{falhas[s.clientId!].erro.message}</p>
+          <label>Corrigir notas<textarea key={s.notas} disabled={enviando} defaultValue={s.notas} maxLength={2000} onBlur={(e) => { if (conta && e.target.value !== (s.notas ?? '')) { enfileirar(conta, { ...s, notas: e.target.value }); setTentativa((t) => t + 1) } }} /></label>
+          <Botao disabled={enviando} onClick={() => { delete falhasAtuais.current[s.clientId!]; setTentativa((t) => t + 1) }}>Tentar esta sessão novamente</Botao>
+        </>}
+        {s.programa && falhas[s.clientId!]?.erro.status === 409 && <Botao disabled={enviando} onClick={() => {
           if (!conta || !window.confirm('Salvar este treino sem marcar um dia do programa como concluído?')) return
           enfileirar(conta, { ...s, programa: undefined }); bloqueado.current = false; setTentativa((t) => t + 1)
         }}>Salvar treino fora do programa</Botao>}
