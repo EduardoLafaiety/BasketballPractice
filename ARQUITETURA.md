@@ -37,6 +37,9 @@ BasketballPractice/
 │   │   ├── routine/          # Rotas, schema, serviço e persistência da semana
 │   │   ├── workouts/         # Contrato, serviço e persistência compartilhada de treinos
 │   │   ├── data/             # Contrato v1, serviço, repositório e identidade do backup
+│   │   ├── auth/             # Contratos, casos de uso de conta e repositório
+│   │   ├── admin/            # Permissões, administração e ferramenta operacional
+│   │   ├── settings/         # Schema, serviço e repositório de preferências
 │   │   └── ...
 │   ├── db/                   # Conexão, migrações, catálogo e dados iniciais
 │   ├── middleware/           # Autorização, limites e tratamento de erros
@@ -59,9 +62,14 @@ BasketballPractice/
 6. Serviços, repositórios e geradores não dependem dos arquivos de rota HTTP.
 7. Contratos compartilhados são declarações de tipos, sem dependências de React, Express ou PostgreSQL.
 
-`npm run check:architecture` verifica imports locais e as fronteiras acima. Em sessões, rotina, treinos, backup, exercícios, programas e planos, impede SQL/transações e acesso direto a repositórios nas rotas e SQL direto nos serviços. Schemas, serviços e repositórios não importam Express ou módulos HTTP do Node; repositórios não importam serviços; schemas não importam serviços ou repositórios; geradores não importam infraestrutura HTTP ou PostgreSQL. A mesma verificação está no CI. O script não substitui revisão de domínio ou detecta toda possível dependência dinâmica.
+`npm run check:architecture` verifica imports locais e as fronteiras acima. Em sessões, rotina, treinos, backup, exercícios, programas, planos, autenticação, administração e preferências, impede SQL/transações e acesso direto a repositórios nas rotas e SQL direto nos serviços. Schemas, serviços e repositórios não importam Express ou módulos HTTP do Node; repositórios não importam serviços; schemas não importam serviços ou repositórios; geradores não importam infraestrutura HTTP ou PostgreSQL. A mesma verificação está no CI. O script não substitui revisão de domínio ou detecta toda possível dependência dinâmica.
 
 ## Decisões da refatoração
+
+- Autenticação possui schema, serviço e repositório. O router mantém códigos HTTP, middleware, limites e o disparo do trabalho após a resposta 202. Hash, tokens, validação de credenciais e transações ficam no serviço, com persistência no repositório. Provedor de e-mail, controle de envios e acompanhamento das tarefas são dependências injetadas.
+- O login autentica o hash lido e o revalida sob bloqueio antes de assinar a sessão. Troca e exclusão verificam a senha atual dentro da transação. Respostas públicas usam campos explícitos, sem serializar registros de credenciais.
+- `db/account-access.ts` concentra consultas de versão/papel e a trava de composição administrativa compartilhadas por middleware, administração, exclusão pessoal e ferramenta operacional. A política fica nos serviços; SQL e mecanismos de trava ficam na infraestrutura. Administração revalida o autor após a trava, impedindo alterações com papel já revogado. A ferramenta de admin deixa de escrever SQL diretamente e protege o último administrador.
+- Preferências possuem repositório próprio. O serviço mantém validação/fallback na leitura e aceita uma conexão transacional, preservando o backup. Nenhuma biblioteca nova foi adicionada.
 
 - Exercícios possuem serviço para visibilidade, proteção do catálogo e tradução de referência em uso para conflito. Edição e exclusão bloqueiam o exercício e validam propriedade dentro da transação; SQL fica no repositório. As validações de referências reutilizadas pelos demais módulos continuam em `exercise.repository.ts`.
 - Programas possuem schema HTTP, modelo de status sem acesso ao banco, serviço e repositório. Início/reinício, conclusão e saída usam a trava de progresso por conta. O serviço de sessão continua chamando a conclusão dentro da própria transação, preservando a atomicidade.

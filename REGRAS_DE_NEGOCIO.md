@@ -36,6 +36,8 @@ O produto ajuda o atleta a planejar, executar e registrar treinos individuais de
 - **RN-AC-09 — Administração:** operações administrativas exigem permissão no servidor. Esconder o menu não substitui essa validação.
 - **RN-AC-10 — Administração da própria conta:** pelo painel administrativo, o administrador não altera o próprio papel nem exclui a própria conta. A exclusão pela área pessoal é recusada se a conta for a única administradora.
 - **RN-AC-11 — Exclusão pessoal:** exige senha atual e remove os dados da conta conforme as relações e o procedimento de exclusão do banco.
+- **RN-AC-12 — Concorrência de credenciais:** login revalida o hash autenticado antes de assinar a sessão; não usa credencial anterior para assinar a versão nova após uma troca concorrente. Troca e exclusão verificam a senha atual sob bloqueio da conta dentro da transação.
+- **RN-AC-13 — Composição administrativa:** alterações de papel, exclusões administrativas, exclusão pessoal e ferramenta operacional oficial compartilham uma trava. Escritas administrativas revalidam o papel do autor após adquirir a trava. A ferramenta pode criar o primeiro administrador, mas não remover o último.
 
 Fontes: `backend/src/modules/auth/auth.routes.ts`, `admin.ts`, `backend/src/middleware/auth.ts`, `frontend/src/app/auth.tsx` e `frontend/src/app/App.tsx`.
 

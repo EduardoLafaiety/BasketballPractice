@@ -45,6 +45,8 @@ Os testes da API usam PGlite; os testes ponta a ponta usam Postgres real, um ban
 
 ### Organização
 
+Autenticação, administração e preferências seguem contrato, serviço e repositório. A ferramenta `npm --prefix backend run admin -- email [--remover]` usa a mesma trava das alterações administrativas e recusa remover o último administrador. O CI também verifica contas em PostgreSQL real (links concorrentes, ordem de travas, revogação, senha e composição administrativa). Para repetir esse grupo com `TEST_POSTGRES_URL` configurada, rode em `backend`: `npx tsx --test --test-name-pattern 'contas serializam|recuperação em conexões|ativação em conexões|troca de senha trava|últimos administradores|sair em conexões' test/postgres.test.ts`.
+
 Além dos três cenários de backup, o CI verifica coordenação de programas em PostgreSQL real. Para repetir os dois cenários novos, com `TEST_POSTGRES_URL` configurada, rode em `backend`: `npx tsx --test --test-name-pattern 'programas serializam' test/postgres.test.ts`.
 
 Os [contratos de treinos e backup](CONTRATOS_BACKEND.md) descrevem compatibilidade, limites e restauração. O CI também executa três cenários de concorrência de backup contra PostgreSQL real. Para repeti-los localmente, configure `TEST_POSTGRES_URL` para o banco administrativo de testes e rode, em `backend`, `npx tsx --test --test-name-pattern 'mesmo backup enviado|backup mantém|trava da importação' test/postgres.test.ts`. A suíte cria e remove seu próprio banco temporário.

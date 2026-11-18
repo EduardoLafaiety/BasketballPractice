@@ -3,8 +3,8 @@ import { type Database } from '../../db/index.js'
 import { parse } from '../../lib/validate.js'
 import { currentUser } from '../../middleware/auth.js'
 
-import { settingsSchema, readSettings, writeSettings } from './settings.service.js'
-export { settingsSchema, readSettings, writeSettings } from './settings.service.js'
+import { settingsSchema } from './settings.schema.js'
+import { readSettings, writeSettings } from './settings.service.js'
 export function settingsRouter(db: Database) {
   const router = Router()
 

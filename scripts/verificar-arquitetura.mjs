@@ -13,7 +13,7 @@ if (ignorados.status === 0) for (const p of ignorados.stdout.trim().split('\n').
 for (const arquivo of ['frontend/src', 'backend/src'].flatMap((p) => arquivos(resolve(raiz, p))).filter((p) => /\.(ts|tsx)$/.test(p) && !/\.test\./.test(p))) {
   const origem = normalizar(arquivo)
   const texto = readFileSync(arquivo, 'utf8')
-  const dominioMigrado = /^backend\/src\/modules\/(sessions|routine|workouts|data|exercises|programs|plans)\//.test(origem)
+  const dominioMigrado = /^backend\/src\/modules\/(sessions|routine|workouts|data|exercises|programs|plans|auth|admin|settings)\//.test(origem)
   // Migração incremental: os módulos já separados não voltam a gravar SQL nas rotas.
   if (dominioMigrado && origem.endsWith('.routes.ts') && /\.(?:query|transaction)\s*\(/.test(texto)) erros.push(`${origem}: persistência/transação deve ficar fora da rota HTTP`)
   if (dominioMigrado && origem.endsWith('.service.ts') && /\.query\s*\(/.test(texto)) erros.push(`${origem}: SQL deve ficar no repositório`)
