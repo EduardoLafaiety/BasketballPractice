@@ -130,7 +130,7 @@ function Marcas() {
         <CartaoProduto
           key={b.id}
           cor={b.cor}
-          bola={{ frente: b.cor, faixa: b.cor, canal: b.costura, marca: b.marca, modelo: b.modelo, canalLargo: b.canalLargo, faixaClara: b.faixa, grao: b.grao, calota: b.calota, colagem: colagemDe(b.colagem), marcaCor: b.marcaCor, marcaContorno: b.marcaContorno, emblema: b.emblema }}
+          bola={{ frente: b.cor, faixa: b.cor, canal: b.costura, marca: b.marca, modelo: b.modelo, canalLargo: b.canalLargo, faixaClara: b.faixa, grao: b.grao, calota: b.calota, colagem: colagemDe(b.colagem), marcaCor: b.marcaCor, marcaContorno: b.marcaContorno, marcaTamanho: b.marcaTamanho, emblema: b.emblema }}
           tag={b.marca}
           nome={b.nome}
           meta={b.material}

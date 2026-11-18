@@ -10,6 +10,7 @@ export const linkAmazon = (busca: string) =>
   `https://www.amazon.com.br/s?k=${encodeURIComponent(busca)}&tag=${TAG_AFILIADO}`
 
 import type { IconeTime } from './icones-times'
+import type { LogoRetro } from './logos-retro'
 
 export type Conferencia = 'leste' | 'oeste'
 
@@ -27,6 +28,57 @@ export interface Time {
   icone: IconeTime
 }
 
+/** Logo retrô colado na bola, no desenho (bola de centro 60, 60 e raio 52): centro, lado e giro em graus. */
+export interface Adesivo {
+  logo: LogoRetro
+  x: number
+  y: number
+  lado: number
+  giro: number
+}
+
+/**
+ * Adesivo na posição em que aparece na foto de frente da bola (1500 × 1500, vista em 800 × 600: bola de centro
+ * 400, 300 e raio 300). O tamanho é o do adesivo na foto, nas mesmas medidas.
+ */
+const daFoto = (logo: LogoRetro, x: number, y: number, tamanho: number, giro = 0): Adesivo => {
+  const k = 52 / 300
+  return { logo, x: +(60 + (x - 400) * k).toFixed(1), y: +(60 + (y - 300) * k).toFixed(1), lado: +(tamanho * k).toFixed(1), giro }
+}
+
+// A Wilson NBA All Team Retro de frente: cada logo retrô no lugar (e com as repetições) da foto do produto.
+// Os de trás vêm antes; os da frente (Jazz, Hawks, Celtics, Suns) por último, por cima.
+const ADESIVOS_RETRO: Adesivo[] = [
+  daFoto('magic', 120, 175, 100, -8),
+  daFoto('kings', 690, 230, 100, 10),
+  daFoto('hawks', 405, 40, 115),
+  daFoto('celtics', 515, 45, 115),
+  daFoto('magic', 170, 95, 140, -14),
+  daFoto('grizzlies', 320, 105, 135, -6),
+  daFoto('magic', 525, 150, 110, 6),
+  daFoto('suns', 615, 105, 130, 12),
+  daFoto('hawks', 630, 210, 135, 8),
+  daFoto('nuggets', 150, 270, 125, -4),
+  daFoto('kings', 260, 255, 125, -3),
+  daFoto('blazers', 520, 255, 120, 2),
+  daFoto('rockets', 400, 250, 135),
+  daFoto('knicks', 125, 465, 100, -10),
+  daFoto('rockets', 690, 430, 100, 10),
+  daFoto('magic', 175, 360, 135, -8),
+  daFoto('blazers', 235, 455, 100, -6),
+  daFoto('nuggets', 300, 545, 140, -4),
+  daFoto('kings', 490, 550, 130, 2),
+  daFoto('rockets', 625, 465, 105, 10),
+  daFoto('raptors', 420, 515, 115),
+  daFoto('knicks', 450, 340, 115, 6),
+  daFoto('warriors', 640, 345, 135, 8),
+  daFoto('pistons', 545, 475, 130, 4),
+  daFoto('jazz', 305, 345, 150, -6),
+  daFoto('suns', 545, 380, 140),
+  daFoto('hawks', 290, 420, 145, -4),
+  daFoto('celtics', 420, 425, 145),
+]
+
 export interface BolaMarca {
   id: string
   marca: string
@@ -42,10 +94,11 @@ export interface BolaMarca {
   grao?: boolean
   /** Calotas de outra cor que as faixas e logos dos times espalhados pela bola (as Wilson NBA All Team). */
   calota?: string
-  colagem?: { onde: 'tudo' | 'calotas'; passo: number }
+  colagem?: { onde: 'tudo' | 'calotas'; passo: number; adesivos?: Adesivo[] }
   /** Marca em dourado com contorno (a Retro) e mini logo da liga ao lado do modelo. */
   marcaCor?: string
   marcaContorno?: string
+  marcaTamanho?: number
   emblema?: boolean
   /** O que vem impresso na faixa de baixo, onde as bolas de time levam o logo. */
   modelo: string
@@ -155,9 +208,10 @@ export const MARCAS: BolaMarca[] = [
     cor: '#141414',
     costura: '#0B0B0B',
     modelo: '', // a colagem cobre a faixa de baixo, como na bola de verdade
-    marcaCor: '#F0DDA8',
-    marcaContorno: '#1E1407',
-    colagem: { onde: 'tudo', passo: 13 },
+    marcaCor: '#E6CF97',
+    marcaContorno: '#3B2610',
+    marcaTamanho: 27,
+    colagem: { onde: 'tudo', passo: 12, adesivos: ADESIVOS_RETRO },
     busca: 'bola basquete Wilson NBA All Team Retro 7',
   },
   {

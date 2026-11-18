@@ -97,22 +97,21 @@ describe('bolas de time: réplica da Wilson NBA Team Tribute', () => {
 })
 
 describe('bolas Wilson NBA All Team', () => {
-  it('a Retro e a All Team levam os logos dos times espalhados pela bola', async () => {
+  it('a Retro leva os logos retrô redesenhados, e a All Team os logos dos times nas calotas', async () => {
     abrir('/equipamentos')
     await userEvent.click(await screen.findByRole('tab', { name: /Marcas/ }))
     const retro = screen.getByRole('link', { name: /NBA All Team Retro/ })
+    const logosRetro = [...retro.querySelectorAll('.bola-adesivo')].map((l) => l.getAttribute('data-logo'))
+    expect(logosRetro.length).toBeGreaterThan(20)
+    expect(new Set(logosRetro)).toEqual(new Set(['rockets', 'hawks', 'kings', 'jazz', 'suns', 'pistons', 'celtics', 'warriors', 'raptors', 'blazers', 'magic', 'nuggets', 'grizzlies', 'knicks']))
+    // Desenhos próprios: nenhuma imagem de fora na Retro.
+    expect(retro.querySelectorAll('image.bola-colagem-logo')).toHaveLength(0)
+    expect(retro.querySelector('.bola-nome')).toHaveTextContent('Wilson')
+
     const todas = screen.getByRole('link', { name: /NBA All Team(?! Retro)/ })
-    for (const bola of [retro, todas]) {
-      const logos = [...bola.querySelectorAll('.bola-colagem-logo')].map((l) => l.getAttribute('href'))
-      expect(logos.length).toBeGreaterThan(8)
-      expect(new Set(logos).size).toBeGreaterThan(8)
-      expect(logos.every((h) => h!.includes('teamlogos/nba'))).toBe(true)
-    }
-    // Sobre a Retro (preta) entram os logos para fundo escuro; sobre as calotas brancas, os de fundo claro.
-    expect(retro.querySelector('.bola-colagem-logo')!.getAttribute('href')).toContain('500-dark')
-    expect(todas.querySelector('.bola-colagem-logo')!.getAttribute('href')).not.toContain('500-dark')
-    expect(todas.querySelector('.bola-nome')).toHaveTextContent('Wilson')
-    // Bolas comuns não levam colagem.
+    const logos = [...todas.querySelectorAll('.bola-colagem-logo')].map((l) => l.getAttribute('href'))
+    expect(new Set(logos).size).toBeGreaterThan(8)
+    expect(logos.every((h) => h!.includes('teamlogos/nba/500/'))).toBe(true)
     expect(screen.getByRole('link', { name: /TF-1000 Legacy/ }).querySelector('.bola-colagem-logo')).toBeNull()
   })
 })
