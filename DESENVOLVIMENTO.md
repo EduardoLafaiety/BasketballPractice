@@ -33,6 +33,8 @@ A fila e o rascunho são locais ao aparelho, sem backup automático. Sair explic
 ### Validação
 
 ```powershell
+npm run check:architecture
+npm run test:architecture
 npm --prefix backend run typecheck
 npm --prefix backend test
 npm --prefix frontend test
@@ -66,3 +68,18 @@ A raiz oferece atalhos como `npm run check:architecture`, `npm run test:site` e 
 `npm --prefix e2e run audit` captura Início, Treinos, Rotina, Sessão e Evolução em dois tamanhos e nos temas claro/escuro. Capturas e contagens de recursos vão para o diretório temporário do sistema. A auditoria utiliza o banco E2E e deve rodar separada da suíte ponta a ponta.
 
 A rotina preserva o tempo planejado de cada exercício. Aplicar a semana gerada usa uma transação no servidor atual; a compatibilidade com servidores anteriores mantém o envio por dia. A comparação em Evolução busca agregados na API; Overall e conquistas ainda consultam o histórico completo.
+
+### Fechamento do backend: notificações e estilos
+
+Todos os 12 módulos seguem as fronteiras descritas em [ARQUITETURA.md](ARQUITETURA.md). O analisador utiliza TypeScript do backend; execute primeiro npm --prefix backend ci. Seus sete testes de regressão rodam com npm run test:architecture. Não é necessário instalar dependências na raiz.
+
+O CI inclui dois cenários de push em PostgreSQL real, totalizando 14 cenários selecionados de backup, programas, contas e notificações. Para executar toda a suíte opcional de infraestrutura e concorrência, configure TEST_POSTGRES_URL para o banco administrativo local de testes e rode, em backend:
+
+```powershell
+$env:TEST_POSTGRES_URL='postgres://basketball:basketball@localhost:5433/postgres'
+npx tsx --test test/postgres.test.ts
+```
+
+A suíte cria e remove seu próprio banco temporário e provoca quedas de conexão deliberadas. Avisos de conexão encerrada fazem parte desses cenários. O build de demonstração e os testes ponta a ponta devem rodar em sequência, pois ambos escrevem frontend/dist.
+
+O agendador interno inicia com a API quando VAPID está configurado. O cron externo usa o mesmo serviço e a mesma coordenação por aparelho. Testes injetam um remetente falso; não enviam notificações reais. Contratos e limites de entrega estão em [CONTRATOS_BACKEND.md](CONTRATOS_BACKEND.md).

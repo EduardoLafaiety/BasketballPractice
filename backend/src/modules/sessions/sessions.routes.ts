@@ -2,8 +2,8 @@ import { Router } from 'express'
 import type { Database } from '../../db/index.js'
 import { idParam, parse } from '../../lib/validate.js'
 import { currentUser } from '../../middleware/auth.js'
-import { compareSessions, comparisonQuery } from './session.comparison.js'
-import { createSessionSchema, listQuery, sessionSchema } from './session.schema.js'
+import { compareSessions } from './session.comparison.js'
+import { comparisonQuery, createSessionSchema, listQuery, sessionSchema } from './session.schema.js'
 import { createSession, deleteSession, getSession, listSessions, updateSession } from './session.service.js'
 
 export function sessionsRouter(db: Database) {

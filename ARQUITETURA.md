@@ -40,7 +40,8 @@ BasketballPractice/
 │   │   ├── auth/             # Contratos, casos de uso de conta e repositório
 │   │   ├── admin/            # Permissões, administração e ferramenta operacional
 │   │   ├── settings/         # Schema, serviço e repositório de preferências
-│   │   └── ...
+│   │   ├── push/             # Inscrições, elegibilidade, envio e agendador
+│   │   └── styles/           # Catálogo estático, resolução e persistência
 │   ├── db/                   # Conexão, migrações, catálogo e dados iniciais
 │   ├── middleware/           # Autorização, limites e tratamento de erros
 │   ├── lib/                  # Infraestrutura compartilhada
@@ -62,9 +63,16 @@ BasketballPractice/
 6. Serviços, repositórios e geradores não dependem dos arquivos de rota HTTP.
 7. Contratos compartilhados são declarações de tipos, sem dependências de React, Express ou PostgreSQL.
 
-`npm run check:architecture` verifica imports locais e as fronteiras acima. Em sessões, rotina, treinos, backup, exercícios, programas, planos, autenticação, administração e preferências, impede SQL/transações e acesso direto a repositórios nas rotas e SQL direto nos serviços. Schemas, serviços e repositórios não importam Express ou módulos HTTP do Node; repositórios não importam serviços; schemas não importam serviços ou repositórios; geradores não importam infraestrutura HTTP ou PostgreSQL. A mesma verificação está no CI. O script não substitui revisão de domínio ou detecta toda possível dependência dinâmica.
+`npm run check:architecture` analisa a sintaxe com o compilador TypeScript já instalado no backend. Abrange todos os módulos, inclusive futuros, sem lista de domínios permitidos. Impede consultas/transações e acesso direto a repositórios nas rotas, consultas fora dos repositórios e dependências HTTP nas camadas inferiores. Verifica imports locais, reexports, imports dinâmicos literais, contratos somente de tipos, direção das dependências e ciclos de execução no backend. Dependências somente de tipos não formam ciclos de execução. Infraestrutura de banco e a consulta de saúde na composição ficam fora das regras de persistência de domínio.
+
+`npm run test:architecture` exercita sete cenários de violações e compatibilidade do analisador, com fixtures temporárias. Ambos rodam no CI e exigem instalar as dependências do backend. A análise estática não prova regras de negócio, segurança ou desempenho e não resolve caminhos dinâmicos calculados.
 
 ## Decisões da refatoração
+
+- Os 12 domínios foram revisados; o fechamento e seus limites estão em [REVISAO_ARQUITETURA_BACKEND.md](REVISAO_ARQUITETURA_BACKEND.md).
+- Notificações possuem schema, modelo puro de elegibilidade, serviço, repositório e agendador. `lib/push.ts` contém apenas o adaptador Web Push e tipos reexportados por compatibilidade. Limite de inscrições é transacional por conta; agendador e cron coordenam cada aparelho por trava, com revalidação antes do envio. Encerramento aguarda o envio em andamento antes de fechar o banco.
+- Estilos possuem catálogo estático, modelo puro de resolução/percentuais, schema, serviço e repositório do catálogo padrão. Textos, movimentos, minutos, ordem e cache permanecem compatíveis. O router ainda reexporta `STYLES` para um teste existente do frontend; essa ponte pode ser retirada ao atualizar esse consumidor.
+- Comparação de sessões mantém cálculo no módulo próprio; schema e filtros ficam separados, e todas as consultas pertencem ao repositório. IDs de exercício acima do limite do PostgreSQL retornam 400.
 
 - Autenticação possui schema, serviço e repositório. O router mantém códigos HTTP, middleware, limites e o disparo do trabalho após a resposta 202. Hash, tokens, validação de credenciais e transações ficam no serviço, com persistência no repositório. Provedor de e-mail, controle de envios e acompanhamento das tarefas são dependências injetadas.
 - O login autentica o hash lido e o revalida sob bloqueio antes de assinar a sessão. Troca e exclusão verificam a senha atual dentro da transação. Respostas públicas usam campos explícitos, sem serializar registros de credenciais.
@@ -99,6 +107,7 @@ Os scripts da raiz encaminham os comandos para os pacotes, sem introduzir outro 
 npm run dev:site
 npm run dev:api
 npm run check:architecture
+npm run test:architecture
 npm run test:site
 npm run test:api
 npm run test:e2e

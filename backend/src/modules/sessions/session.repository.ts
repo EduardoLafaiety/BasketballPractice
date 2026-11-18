@@ -1,5 +1,7 @@
 import { many, one, type Queryable } from '../../db/index.js'
-import { dateRangeFilter, type SessionInput, type SessionListQuery } from './session.schema.js'
+import type { SessionInput, SessionListQuery, SessionComparisonQuery } from './session.schema.js'
+import { dateRangeFilter } from './session.filters.js'
+import type { ResumoPeriodo } from '../../../../contracts/evolucao.js'
 export const SESSION_COLUMNS = `s.id, s.workout_id AS "workoutId", w.name AS "workoutName", s.performed_at AS "performedAt",
   s.duration_minutes AS "durationMinutes", s.rating, s.fatigue`
 
@@ -166,4 +168,28 @@ export async function insertSession(tx: Queryable, userId: number, input: Sessio
   ))!
   await replaceEntries(tx, id, input)
   return id
+}
+
+export async function comparisonRows(db: Queryable, userId: number, query: SessionComparisonQuery, range: { previous: string; start: string; end: string }) {
+  return many<ResumoPeriodo & { periodo: 'atual' | 'anterior' }>(db, `
+    SELECT CASE WHEN s.performed_at >= $3::timestamptz THEN 'atual' ELSE 'anterior' END AS periodo,
+      count(*)::int AS frequencia,
+      count(DISTINCT ((s.performed_at AT TIME ZONE 'UTC') - $6 * interval '1 minute')::date)::int AS "diasAtivos",
+      CASE WHEN $5::int IS NULL THEN COALESCE(sum(s.duration_minutes), 0)::float8 ELSE 0 END AS minutos,
+      COALESCE(sum(e.acertos), 0)::float8 AS acertos, COALESCE(sum(e.tentativas), 0)::float8 AS tentativas,
+      COALESCE(sum(e.repeticoes), 0)::float8 AS repeticoes, COALESCE(sum(e.segundos), 0)::float8 AS segundos
+    FROM practice_sessions s
+    LEFT JOIN LATERAL (
+      SELECT count(*) AS entradas, sum(makes) AS acertos, sum(attempts) AS tentativas, sum(reps) AS repeticoes, sum(seconds) AS segundos
+      FROM session_entries WHERE session_id = s.id AND ($5::int IS NULL OR exercise_id = $5)
+    ) e ON true
+    WHERE s.user_id = $1 AND s.performed_at >= $2::timestamptz AND s.performed_at < $4::timestamptz
+      AND ($5::int IS NULL OR e.entradas > 0)
+    GROUP BY periodo`, [userId, range.previous, range.start, range.end, query.exerciseId ?? null, query.tzOffset])
+}
+
+export async function comparedExercises(db: Queryable, userId: number) {
+  return many<{ id: string; nome: string }>(db, `SELECT DISTINCT e.id::text AS id, e.name AS nome
+    FROM session_entries se JOIN practice_sessions s ON s.id = se.session_id JOIN exercises e ON e.id = se.exercise_id
+    WHERE s.user_id = $1 ORDER BY nome`, [userId])
 }

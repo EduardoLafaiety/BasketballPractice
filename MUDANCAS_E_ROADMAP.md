@@ -372,7 +372,7 @@ Depois desta entrega, permanecem no backend autenticação, administração e pr
 
 ## Etapa atual — autenticação, administração e preferências
 
-Estado: implementação validada localmente e publicada no [PR #170](https://github.com/EduardoLafaiety/BasketballPractice/pull/170), branch `codex/arquitetura-contas-permissoes`, baseada na PR #169 integrada. Commit de implementação: `c7a4f3e`.
+Estado: integrado pelo [PR #170](https://github.com/EduardoLafaiety/BasketballPractice/pull/170), commit `af2b85a`, com todos os checks aprovados. Commit de implementação: `c7a4f3e`.
 
 - Autenticação separada em schema, serviço e repositório. Rotas preservam respostas, proteção HTTP e tarefas de e-mail disparadas após o 202; serviço recebe provedor e controle de envios por injeção, sem depender do middleware.
 - Sessões públicas montadas por campos explícitos. Login revalida o hash antes de assinar a versão do token; troca e exclusão verificam a senha atual dentro da transação. Ordem de bloqueio de conta antes dos links de recuperação, consumo único e revogação preservados.
@@ -387,3 +387,21 @@ Validações locais: 184 testes da API aprovados; sete cenários de conta em Pos
 Limites: sem tabela, endpoint, dependência, provedor ou mudança de interface. E-mail continua sem fila durável; limitadores seguem por instância. Revogação não cancela automaticamente toda operação já em andamento. Escritas SQL externas que ignoram a coordenação oficial não recebem a garantia de composição administrativa.
 
 Próximo bloco ainda no backend: notificações e estilos; depois revisão final dos contratos e fronteiras, testes e documentação dos módulos migrados. O frontend permanece posterior ao fechamento do backend.
+
+## Etapa atual — notificações, estilos e revisão final do backend
+
+Estado: implementação e revisão local concluídas, publicadas no [PR #173](https://github.com/EduardoLafaiety/BasketballPractice/pull/173), branch `codex/fechamento-arquitetura-backend`. Commit de implementação: `8d66e8d`. Integração condicionada aos checks do GitHub.
+
+- Notificações separadas em schema, modelo puro de elegibilidade, serviço, repositório e agendador. O adaptador Web Push fica em lib/push.ts, com dependências injetadas para testes sem envios reais.
+- Limite de dez endpoints coordenado na transação por conta; atualização de endpoint existente preserva a vaga. Cron e agendador usam trava por aparelho e revalidam a elegibilidade antes do envio.
+- Resposta atrasada de inscrição expirada não apaga uma inscrição transferida/renovada. Preferências inválidas não interrompem outras contas. Espera de envio limitada; encerramento aguarda o item em andamento antes de fechar o banco.
+- Estilos com catálogo estático, tipos, resolução/percentuais, schema, serviço e repositório separados. Catálogo, textos, ordem, aquecimento, minutos, percentuais e cache preservados; reexport temporário mantém o teste de fotos existente compatível.
+- Revisão final dos 12 módulos registrada em [REVISAO_ARQUITETURA_BACKEND.md](REVISAO_ARQUITETURA_BACKEND.md). Consultas de comparação de sessões extraídas para repositório, filtros separados do schema e filtro de exercício limitado ao int4, retornando 400 para excedentes.
+- Guardas de arquitetura agora analisam sintaxe TypeScript e todos os módulos futuros, sem lista manual. Cobrem imports/reexports, contratos somente de tipos e ciclos de execução; sete testes permanentes verificam as guardas. CI inclui esses testes e mais dois cenários de push, totalizando 14 cenários selecionados de concorrência PostgreSQL.
+- Contratos, regras de negócio, arquitetura, desenvolvimento e plano atualizados. Nenhum arquivo de frontend, tabela, endpoint ou dependência alterado.
+
+Validações locais: 189 testes da API, 27 testes da suíte completa de PostgreSQL real, sete testes do analisador, 16 testes de compatibilidade HTTP/demo/fotos e 24 jornadas Chrome/PostgreSQL aprovados. Build do backend, build de demonstração e build de produção aprovados; arquitetura sem violações ou ciclos de execução detectados. Jornadas sem repetição ou instabilidade. Catálogos estáticos comparados com a versão anterior. Reexecuções direcionadas não entram novamente na contagem.
+
+Limites: entrega de push e commit não são atômicos; falha/timeout com entrega incerta pode causar repetição posterior. O serviço limita a espera por envio a 15 segundos, mas não cancela necessariamente o transporte; durante um lembrete ocupa uma conexão/transação. Mudanças de preferências e sessões durante o envio continuam possíveis. E-mail sem fila durável, limites por instância, backup v1 sem restauração de extras e ausência de controle otimista geral permanecem documentados. Guardas estáticas não provam segurança/desempenho nem resolvem todo caminho dinâmico. Avisos existentes de fonte, dependências e chunks no build demo permanecem para a fase de medição.
+
+O ciclo estrutural do backend encerra-se com a integração desta entrega. Próxima sequência: recuperação e validação dos formatos locais de rascunho/fila, preparação do catálogo mínimo offline e medição de desempenho/acessibilidade, preservando a identidade retrô. O frontend permanece sem alterações nesta etapa.

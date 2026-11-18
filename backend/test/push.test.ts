@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict'
 import { describe, it } from 'node:test'
-import { dueReminders, runReminders, type PushMessage, type PushSubscriptionRow } from '../src/lib/push.js'
+import { dueReminders, runReminders } from '../src/modules/push/push.service.js'
+import type { PushMessage, PushSubscriptionRow } from '../src/modules/push/push.types.js'
 import { startApi } from './http.js'
 
 /** Envio falso: guarda cada mensagem; endpoints em `cancelados` respondem como inscrição cancelada (410). */

@@ -1,18 +1,20 @@
 # Plano de refatoração, desempenho e experiência
 
-Atualizado em **18/11/2026**. Estado: **PRs #165 a #169 integradas; autenticação, administração e preferências validadas localmente**.
+Atualizado em **18/11/2026**. Estado: **PRs #165 a #170 integradas; fechamento estrutural dos 12 módulos do backend implementado e validado localmente**.
 
 Prioridade atual: concluir a arquitetura do backend antes de alterar o frontend, conforme orientação do usuário. Sessões, rotina, treinos e backup separam transporte, casos de uso e persistência, com validação dos limites transacionais e contratos existentes. Recuperação local e preparação offline ficam depois do fechamento dessa etapa de backend.
 
-Fila para concluir o backend, em PRs por fluxo:
+Sequência do backend implementada:
 
-1. Concluir os contratos de treinos e backup, documentar compatibilidade e validar concorrência e rollback.
-2. Exercícios, programas e planos: separação implementada e validada localmente; catálogo, gerador, progressão e coordenação das escritas verificados.
-3. Autenticação, administração e preferências: separação implementada e validada localmente; contratos documentados, credenciais revalidadas e alterações administrativas coordenadas, preservando revogação e uso único de links.
-4. Revisar notificações e estilos de jogo, limites de concorrência e tratamento das falhas externas.
-5. Fechar verificações de arquitetura e compatibilidade dos endpoints, testes e documentação dos domínios migrados. Só então iniciar mudanças no frontend.
+1. Sessões, rotina, treinos e backup: transporte, casos de uso, persistência e contratos.
+2. Exercícios, programas e planos: catálogo, gerador e coordenação de progresso.
+3. Autenticação, administração e preferências: credenciais, revogação e permissões.
+4. Notificações e estilos: camadas separadas, concorrência e falhas externas.
+5. Revisão dos 12 módulos, guardas de arquitetura para módulos futuros e relatório de limites em [REVISAO_ARQUITETURA_BACKEND.md](REVISAO_ARQUITETURA_BACKEND.md).
 
-Não criar camadas vazias para preencher pastas; cada separação corresponde a uma operação real. Diretórios por domínio não significam que todas as rotas já foram migradas.
+Próxima etapa após a integração desse fechamento: validar e recuperar formatos locais de rascunho/fila; preparar o catálogo mínimo offline; medir desempenho, acessibilidade e aparência retrô antes de otimizar a interface. Esta entrega mantém o frontend existente.
+
+Não criar camadas vazias para preencher pastas; cada separação corresponde a uma operação real. Fechamento estrutural não significa concluir todas as evoluções de produto, sincronização ou operação descritas abaixo.
 
 A estrutura entregue está em [ARQUITETURA.md](ARQUITETURA.md). Já foram aplicados cache compartilhado, antecipação seletiva de rotas, suspensão de animações invisíveis, fila local por item, revisão de pendências, duração por exercício, escrita atômica da semana e comparação agregada no servidor. As fases abaixo continuam sendo a visão de evolução; nem todos os seus itens estão concluídos. A nova auditoria automatiza capturas e contagens locais, sem substituir medições em aparelhos reais ou dados de campo.
 

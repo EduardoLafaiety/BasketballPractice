@@ -5,6 +5,7 @@
     "dev:site": "npm --prefix frontend run dev",
     "dev:api": "npm --prefix backend run dev",
     "check:architecture": "node scripts/verificar-arquitetura.mjs",
+    "test:architecture": "node --test scripts/arquitetura.test.mjs",
     "test:site": "npm --prefix frontend test",
     "test:api": "npm --prefix backend test",
     "test:e2e": "npm --prefix e2e test",

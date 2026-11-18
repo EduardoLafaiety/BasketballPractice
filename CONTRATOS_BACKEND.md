@@ -198,3 +198,39 @@ GET `/` retorna preferências da conta; PUT `/` valida e substitui o objeto, res
 | `metronomeBpm` | Inteiro de 30 a 240, padrão 90 |
 
 Leitura de um objeto persistido inválido retorna o conjunto de padrões. Schema, serviço e repositório são independentes do transporte; a escrita aceita a conexão da transação, preservando a atomicidade da importação de backup e a leitura do snapshot de exportação.
+
+## Notificações — `/api/push`
+
+As quatro operações abaixo exigem autenticação, inclusive a configuração.
+
+| Operação | Entrada e resultado |
+| --- | --- |
+| GET `/config` | 200 com `{ enabled, publicKey }`; chave nula quando desabilitado |
+| POST `/subscriptions` | `{ endpoint, keys: { p256dh, auth }, tzOffset? }`; 201 com `{ subscribed: true }` |
+| DELETE `/subscriptions` | `{ endpoint }`; remove somente inscrição da conta; 204 ou 404 |
+| POST `/test` | 200 com `{ sent }`; 404 se nenhum envio foi confirmado; 503 se desabilitado |
+
+Endpoint de inscrição: URL HTTPS de até 1.000 caracteres. Chaves: base64url de até 200 caracteres. `tzOffset`: inteiro entre -840 e 840, padrão zero, no formato `Date.getTimezoneOffset()`. Inscrição desabilitada retorna 503 antes de validar o corpo. A exclusão exige texto de endpoint de até 1.000 caracteres.
+
+Limite de dez endpoints por conta, com contagem e upsert na mesma transação sob trava por conta. Atualizar endpoint existente não consome vaga. Endpoint é único globalmente: reinscrição pode transferi-lo de conta. Falha de um provedor/aparelho não impede o processamento dos seguintes. Uma resposta 404/410 do provedor remove somente a versão da inscrição usada no envio.
+
+POST `/api/push/run` é separado da autenticação de usuário e exige `x-cron-secret` igual a `PUSH_CRON_SECRET`. Segredo ausente/incorreto ou envio desabilitado retorna 404; sucesso retorna `{ due, sent }`. `due` conta candidatos iniciais, não entregas garantidas. Cron e agendador interno usam o mesmo serviço, com trava transacional não bloqueante por aparelho e nova verificação de elegibilidade. Contas diferentes continuam independentes.
+
+Elegibilidade: lembretes habilitados, dia selecionado e janela de 30 minutos após o horário local, sem sessão naquela data e sem confirmação anterior do aparelho na data. Configuração persistida inválida é ignorada. Sucesso confirma a data; falha preserva nova tentativa. Preferências e sessões podem mudar depois da verificação, durante o envio externo; não há bloqueio global dessas operações.
+
+Espera do serviço limitada a 15 segundos por envio; adaptador Web Push com dez segundos de inatividade de socket e TTL de seis horas. O timeout do serviço não cancela necessariamente o transporte injetado. O banco mantém uma conexão/transação durante o envio do lembrete. Uma queda entre envio externo e commit, ou timeout com entrega incerta, pode produzir repetição posterior; não há garantia de entrega única. Encerramento aguarda o item atual e preserva os restantes.
+
+## Estilos de jogo — `/api/styles`
+
+Ambas as consultas exigem autenticação e usam `Cache-Control: private, max-age=300` em respostas de sucesso.
+
+| Operação | Resultado |
+| --- | --- |
+| GET `/` | Lista de `id`, `name`, `group`, `archetype`, `moveCount`, `minutes` e `mix` |
+| GET `/:id` | Estilo completo com altura, ritmo, resumo, mentalidade, movimentos resolvidos, sessão, minutos e percentuais |
+
+ID: uma a 60 letras minúsculas/hífens; formato inválido retorna 400, estilo inexistente retorna 404. Grupos: `guard`, `forward`, `center`. Catálogo estático preservado integralmente; exercícios resolvidos apenas entre registros padrão, ordenados por ID. Movimento sem referência tem `exercise: null`; não entra nos blocos de sessão. Minutos e percentuais consideram somente os blocos resolvidos, incluindo aquecimento e desaquecimento quando disponíveis. O cálculo de percentuais e a ordem histórica permanecem iguais. Consultar não cria treino ou sessão.
+
+## Ajuste final de comparação de sessões
+
+O filtro `exerciseId` de GET `/api/sessions/comparison` aceita inteiro positivo até 2.147.483.647, compatível com a chave PostgreSQL. Valores superiores retornam 400 antes de executar SQL. As janelas de sete/30 dias e o formato da resposta permanecem iguais.
