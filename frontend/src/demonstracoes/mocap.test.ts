@@ -76,3 +76,34 @@ describe('exercícios com movimento real', () => {
     expect(fim.bolas[0].centro.y).toBeLessThan(0.5)
   })
 })
+
+describe('todos os clipes, do jeito que a cena os usa', () => {
+  for (const id of ['06_02', '06_08', '06_13', '06_14', '06_15', '124_06', '124_05', '124_11', '13_40', '118_01'] as const) {
+    it(`${id}: ossos fixos, pés no chão, bola válida`, async () => {
+      const cena = prepararCena(await carregarClipe(id), id)
+      for (let t = 0; t <= cena.total; t += 1000 / 30) {
+        const k = corpoMocap(cena.clipe, t, cena.colocacao, cena.bola, cena.arremesso)
+        for (const [m, a, b] of [[k.perna.F, MEDIDAS.coxa, MEDIDAS.canela], [k.perna.T, MEDIDAS.coxa, MEDIDAS.canela], [k.braco.P, MEDIDAS.braco, MEDIDAS.antebraco], [k.braco.L, MEDIDAS.braco, MEDIDAS.antebraco]] as const) {
+          expect(Math.abs(distancia(m.raiz, m.meio) - a)).toBeLessThan(0.005)
+          expect(Math.abs(distancia(m.meio, m.ponta) - b)).toBeLessThan(0.005)
+        }
+        expect(Number.isFinite(k.pelve.x + k.cabeca.y)).toBe(true)
+        // pés nunca afundam no chão (o pé salta, mas não atravessa)
+        expect(Math.min(k.pe.F.tornozelo.y, k.pe.T.tornozelo.y)).toBeGreaterThan(0.04)
+        for (const b of k.bolas) expect(b.centro.y).toBeGreaterThanOrEqual(MEDIDAS.raioBola - 0.005)
+      }
+    })
+  }
+
+  it('saltos não têm bola, e a bandeja termina com a bola caindo pela rede', async () => {
+    const salto = prepararCena(await carregarClipe('13_40'), '13_40')
+    expect(salto.bola).toBeNull()
+    expect(corpoMocap(salto.clipe, 500, salto.colocacao, salto.bola, salto.arremesso).bolas).toHaveLength(0)
+    const bandeja = prepararCena(await carregarClipe('124_06'), '124_06')
+    expect(bandeja.arremesso).not.toBeNull()
+    const fim = corpoMocap(bandeja.clipe, bandeja.total, bandeja.colocacao, bandeja.bola, bandeja.arremesso)
+    expect(fim.bolas[0].centro.y).toBeLessThan(0.5)
+    const perto = Math.abs(bandeja.arremesso!.cesta.x - corpoMocap(bandeja.clipe, bandeja.arremesso!.t, bandeja.colocacao, bandeja.bola, bandeja.arremesso).pelve.x)
+    expect(perto).toBeLessThan(2)
+  })
+})

@@ -72,7 +72,7 @@ export default function Demonstracao3D({ coreografia, nome, aoFalhar, aoVer2D }:
     setMocap(null)
     if (!id) return
     let vivo = true
-    carregarClipe(id).then((c) => vivo && setMocap(prepararCena(c))).catch(() => {})
+    carregarClipe(id).then((c) => vivo && setMocap(prepararCena(c, id))).catch(() => {})
     return () => { vivo = false }
   }, [nome])
   const anim = useMemo(

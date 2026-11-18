@@ -14,14 +14,21 @@ mkdirSync(pastaSaida, { recursive: true })
 // Articulações que o corpo 3D usa (nomes do esqueleto da CMU).
 const JUNTAS = ['Hips', 'LowerBack', 'Spine1', 'Neck', 'Head', 'LeftArm', 'LeftForeArm', 'LeftHand', 'RightArm', 'RightForeArm', 'RightHand', 'LeftUpLeg', 'LeftLeg', 'LeftFoot', 'LeftToeBase', 'RightUpLeg', 'RightLeg', 'RightFoot', 'RightToeBase', 'LeftHandIndex1', 'RightHandIndex1']
 
-// Clipes: arquivo, intervalo (s) aproveitado, nome para o app.
-const CLIPES = {
+const CLIPES_PADRAO = {
   '06_02': { de: 0.3, ate: 5.2 },
   '06_08': { de: 0.2, ate: 2.7 },
   '06_13': { de: 8, ate: 20 },
   '06_14': { de: 0.2, ate: 3.7 },
   '06_15': { de: 0.2, ate: 4.1 },
+  // bandeja, arremesso em suspensão e saltos (sem a pose em T do começo de cada gravação)
+  '124_06': { de: 0.45, ate: 4.6 },
+  '124_05': { de: 0.45, ate: 4.6 },
+  '124_11': { de: 1.0, ate: 5.2 },
+  '13_40': { de: 0.1, ate: 2.7 },
+  '118_01': { de: 2.7, ate: 5.0 },
 }
+// Clipes: arquivo, intervalo (s) aproveitado. CLIPES (JSON no ambiente) troca a lista, para experimentar.
+const CLIPES = process.env.CLIPES ? JSON.parse(process.env.CLIPES) : CLIPES_PADRAO
 
 function lerBvh(texto) {
   const linhas = texto.split(/\r?\n/).map((l) => l.trim())
