@@ -15,7 +15,6 @@ import Icone from '../../shared/ui/Icone'
 import { Carregando } from '../../shared/ui/Estado'
 import { LinksLegais } from '../../features/autenticacao/components/TelaAuth'
 import SessoesPendentes from '../../features/sessao/components/SessoesPendentes'
-import Botao from '../../shared/ui/Botao'
 
 const LINKS: { to: string; rotulo: string; fim?: boolean }[] = [
   { to: '/', rotulo: 'Início', fim: true },
@@ -192,7 +191,6 @@ export default function Layout() {
       </header>
 
       <div ref={menu} id="menu-tela" role={menuAberto ? 'dialog' : undefined} aria-label="Menu principal" aria-hidden={!menuAberto} {...(!menuAberto ? { inert: '' } : {})} className={`menu-tela ${menuAberto ? 'aberto' : ''}`}>
-        <Botao className="btn menu-fechar" onClick={() => { setMenuAberto(false); botaoMenu.current?.focus() }}>Fechar navegação</Botao>
         <nav className="nav" aria-label="Principal" style={{ '--linhas': Math.ceil((LINKS.length + (usuario?.isAdmin ? 1 : 0)) / 2) } as CSSProperties}>
           {[
             { titulo: 'Treinar', caminhos: ['/', '/treinos', '/rotina', '/programas', '/jogue-como'] },
@@ -243,7 +241,6 @@ export default function Layout() {
             <Link to="/treinos">Treinos</Link><Link to="/rotina">Rotina</Link><Link to="/evolucao">Evolução</Link>
           </nav>
         </div>
-        <p className="rodape-creditos">Projeto independente, sem vínculo com os jogadores, a NBA ou os times. Fotos da Wikimedia Commons; autoria e licença na página de cada jogador.</p>
         <LinksLegais />
       </footer>
 

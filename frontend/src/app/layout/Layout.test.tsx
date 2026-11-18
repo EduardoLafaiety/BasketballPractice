@@ -15,20 +15,21 @@ const tela = () => document.getElementById('menu-tela') as HTMLElement
 beforeEach(() => { vi.spyOn(window, 'scrollTo').mockImplementation(() => {}) })
 
 describe('Menu em tela cheia', () => {
-  it('leva o foco ao menu, mantém Tab dentro dele e oferece fechar por teclado', async () => {
+  it('leva o foco ao menu, mantém Tab dentro dele e fecha ao clicar de novo no botão do menu', async () => {
     const user = userEvent.setup()
     abrir()
     const abrirMenu = await botaoMenu()
     await user.click(abrirMenu)
     const dialogo = screen.getByRole('dialog', { name: 'Menu principal' })
     expect(dialogo).toContainElement(document.activeElement as HTMLElement)
-    const fechar = within(dialogo).getByRole('button', { name: 'Fechar navegação' })
-    fechar.focus()
+    const links = within(dialogo).getAllByRole('link')
+    const sair = within(dialogo).getByRole('button', { name: 'Sair' })
+    links[0].focus()
     await user.tab({ shift: true })
-    expect(within(dialogo).getByRole('button', { name: 'Sair' })).toHaveFocus()
+    expect(sair).toHaveFocus()
     await user.tab()
-    expect(fechar).toHaveFocus()
-    await user.click(fechar)
+    expect(links[0]).toHaveFocus()
+    await user.click(abrirMenu)
     expect(abrirMenu).toHaveFocus()
     expect(screen.queryByRole('dialog')).toBeNull()
   })

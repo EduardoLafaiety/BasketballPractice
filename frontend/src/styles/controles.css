@@ -5,7 +5,6 @@
 }
 .pular-conteudo { position: fixed; top: 0.5rem; left: 0.5rem; z-index: 100; transform: translateY(-180%); background: var(--superficie); color: var(--texto); border: 2px solid var(--laranja); padding: 0.8rem; }
 .pular-conteudo:focus { transform: none; }
-.menu-fechar { align-self: flex-end; flex-shrink: 0; min-height: 44px; color: #f4f2ea; border-color: #f4f2ea; }
 .rotina-item-acoes { display: flex; flex-wrap: wrap; gap: 0.5rem; max-width: 100%; }
 .rotina-item-acoes select { max-width: 9rem; min-height: 44px; font: inherit; color: var(--texto); background: var(--superficie); border: 1px solid var(--borda); }
 .remover { min-width: 44px; min-height: 44px; }
