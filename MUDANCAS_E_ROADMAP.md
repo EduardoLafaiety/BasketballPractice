@@ -294,7 +294,7 @@ A limpeza do README publicada no PR #164 foi preservada. As instruções de inst
 
 ## Complemento — rejeições individuais na sincronização
 
-Estado: implementação validada localmente, na branch `codex/pendencias-por-sessao`, preparada para revisão no GitHub.
+Estado: implementação validada localmente e publicada para revisão no [PR #166](https://github.com/EduardoLafaiety/BasketballPractice/pull/166), na branch `codex/pendencias-por-sessao`. Commit de implementação: `9d8697b`. A integração ainda não foi realizada.
 
 - Correção do bloqueio da fila: rejeições HTTP 400, 404, 409 e 422 são associadas à sessão correspondente; os demais registros continuam sendo enviados.
 - Erro, correção de notas, nova tentativa e opção de desvincular programa aparecem no item correto. A desvinculação continua exigindo confirmação e não conclui o dia do programa.
