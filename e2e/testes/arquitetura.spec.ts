@@ -29,3 +29,32 @@ test('abrir Evolução não baixa o histórico completo nem antecipa outras pág
   expect(pedidos.some((p) => /\/(Artigos|Demonstracao3D|Inicio)-.*\.js/.test(p))).toBeFalsy()
   expect(pedidos.some((p) => /\/api\/sessions\/comparison/.test(p))).toBeTruthy()
 })
+
+test('edições simultâneas retornam seus próprios dados e preservam uma sessão completa', async ({ request }) => {
+  const { token } = await novaConta(request)
+  const exerciseId = await idDoExercicio(request, token, 'Lance livre')
+  const original = { performedAt: new Date().toISOString(), durationMinutes: 10, entries: [] }
+  const created = await request.post('/api/sessions', { headers: autorizacao(token), data: original })
+  expect(created.status()).toBe(201)
+  const { id } = await created.json()
+  const edits = [1, 2].map((n) => ({
+    ...original, notes: `Edição ${n}`, durationMinutes: n * 10,
+    entries: [{ exerciseId, makes: n, attempts: n + 1 }],
+    shots: [{ zone: 'garrafao', makes: n, attempts: n + 1 }],
+  }))
+  const responses = await Promise.all(edits.map((data) => request.put(`/api/sessions/${id}`, { headers: autorizacao(token), data })))
+  for (const [i, response] of responses.entries()) {
+    expect(response.status()).toBe(200)
+    const saved = await response.json()
+    expect(saved.notes).toBe(edits[i].notes)
+    expect(saved.durationMinutes).toBe(edits[i].durationMinutes)
+    expect(saved.entries[0].makes).toBe(i + 1)
+    expect(saved.shots[0].makes).toBe(i + 1)
+  }
+  const final = await (await request.get(`/api/sessions/${id}`, { headers: autorizacao(token) })).json()
+  const latest = edits.find((edit) => edit.notes === final.notes)!
+  expect(latest).toBeDefined()
+  expect(final.durationMinutes).toBe(latest.durationMinutes)
+  expect(final.entries[0].makes).toBe(latest.entries[0].makes)
+  expect(final.shots[0].makes).toBe(latest.shots[0].makes)
+})

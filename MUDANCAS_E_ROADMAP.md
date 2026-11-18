@@ -294,7 +294,7 @@ A limpeza do README publicada no PR #164 foi preservada. As instruções de inst
 
 ## Complemento — rejeições individuais na sincronização
 
-Estado: implementação validada localmente e publicada para revisão no [PR #166](https://github.com/EduardoLafaiety/BasketballPractice/pull/166), na branch `codex/pendencias-por-sessao`. Commit de implementação: `9d8697b`. A integração ainda não foi realizada.
+Estado: integrado pelo [PR #166](https://github.com/EduardoLafaiety/BasketballPractice/pull/166), commit `49f3a38`, após aprovação dos checks. Commit de implementação: `9d8697b`.
 
 - Correção do bloqueio da fila: rejeições HTTP 400, 404, 409 e 422 são associadas à sessão correspondente; os demais registros continuam sendo enviados.
 - Erro, correção de notas, nova tentativa e opção de desvincular programa aparecem no item correto. A desvinculação continua exigindo confirmação e não conclui o dia do programa.
@@ -315,3 +315,22 @@ Próxima ordem sugerida após este complemento:
 2. Preparar explicitamente um treino para uso offline, com indicação dos recursos disponíveis.
 3. Integrar verificações de acessibilidade e limites de recursos ao CI a partir da auditoria existente.
 4. Paginar históricos e orientar o próximo treino com base nos registros disponíveis.
+
+## Etapa atual — arquitetura do backend antes do frontend
+
+Estado: implementação validada localmente e publicada no [PR #167](https://github.com/EduardoLafaiety/BasketballPractice/pull/167), branch `codex/arquitetura-backend-treinos`, partindo da PR #166 integrada. Commit de implementação: `6fc2376`.
+
+Direção autorizada: organizar e validar a base do backend antes de evoluir a recuperação local e a experiência offline no frontend.
+
+- Sessões: schema de criação centralizado; casos de uso de consulta, criação, edição e exclusão extraídos para serviço; SQL concentrado no repositório.
+- Criação: mantém deduplicação por conta, trava de criação e conclusão atômica do programa. Reenvio confirmado retorna o registro existente, sem sobrescrever seu conteúdo.
+- Edição: propriedade e referências verificadas dentro da transação, com bloqueio do registro. Cabeçalho, entradas e zonas são substituídos juntos; a resposta é montada dentro da transação.
+- Rotina: separação de schema, serviço e repositório, preservando o salvamento atômico da semana, IDs dos treinos e durações planejadas.
+- Arquitetura: verificações impedem a reintrodução de SQL/transações e repositórios nas rotas migradas, dependências HTTP nas camadas inferiores e importação de serviços por repositórios.
+- Cobertura: falhas injetadas no meio da gravação para verificar rollback de sessão e semana; isolamento entre contas; uso dos serviços sem objetos HTTP; edição concorrente em PostgreSQL real.
+
+Limites: etapa concentrada em sessões e rotina, sem reorganização automática dos demais domínios. Não adiciona tabelas, endpoints, dependências, detecção de conflitos entre dispositivos ou mudanças de interface. A última edição confirmada continua prevalecendo; bloqueio não substitui controle de versão.
+
+Validações desta etapa: 175 testes da API aprovados; 24 testes ponta a ponta com Chrome e PostgreSQL real aprovados, incluindo duas edições simultâneas; 15 testes dos adaptadores HTTP/demonstração aprovados; build do backend, build de produção do site e build da demonstração aprovados. Verificação de arquitetura aprovada; sondas temporárias confirmaram a rejeição de consulta na rota, importação direta de repositório e Express no serviço, e foram removidas após a verificação. A suíte opcional de infraestrutura PostgreSQL não foi executada; os 24 testes ponta a ponta utilizaram o banco real.
+
+Sequência seguinte: concluir a revisão de contratos e persistência dos domínios que suportam recuperação/offline; depois validar e recuperar formatos locais no frontend; preparar treino offline; revisar disponibilidade da API; medir desempenho e acessibilidade. Mudanças de plano de hospedagem dependem da confirmação da infraestrutura real e do custo.

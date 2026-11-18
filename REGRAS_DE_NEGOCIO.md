@@ -1,6 +1,6 @@
 # Regras de negócio — Basketball Practice
 
-Atualizado em **18/11/2026**, incluindo o ciclo integrado pelo PR #165 e o complemento de revisão individual da fila em validação.
+Atualizado em **18/11/2026**, incluindo os ciclos integrados pelos PRs #165 e #166 e a etapa de arquitetura do backend validada localmente.
 
 Este documento descreve as regras observadas na implementação e os contratos que precisam ser preservados durante a refatoração. Regras identificadas como propostas ainda não representam comportamento implementado. Em caso de divergência, investigar código, testes e intenção do produto antes de alterar qualquer comportamento.
 
@@ -84,6 +84,7 @@ Fontes: `backend/src/modules/plans/plans.routes.ts`, `frontend/src/shared/api/ba
 - **RN-SE-08 — Zonas:** o registro aceita 12 zonas: garrafão, lance livre, cinco de média distância e cinco de três pontos. Uma zona não pode aparecer repetida no mesmo pedido, e seus acertos não podem superar tentativas.
 - **RN-SE-09 — Limites da API:** até 100 entradas por sessão; duração opcional de 1 a 1.440 minutos; contagens opcionais de 0 a 100.000.
 - **RN-SE-10 — Propriedade das referências:** treino vinculado deve pertencer à conta; exercícios referenciados devem ser visíveis para ela.
+- **RN-SE-11 — Edição atômica:** a edição bloqueia a sessão pertencente à conta e verifica suas referências dentro da mesma transação. Cabeçalho, entradas e zonas são confirmados juntos ou integralmente desfeitos. Edições concorrentes não mesclam os campos das duas versões; a última gravação confirmada prevalece, sem detecção de conflito por versão.
 
 Fontes: `frontend/src/features/sessao/pages/SessaoGuiada.tsx`, `components/Contador.tsx` e `backend/src/modules/sessions/sessions.routes.ts`.
 

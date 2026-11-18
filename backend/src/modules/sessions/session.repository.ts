@@ -1,7 +1,64 @@
 import { many, one, type Queryable } from '../../db/index.js'
-import type { SessionInput } from './session.schema.js'
+import { dateRangeFilter, type SessionInput, type SessionListQuery } from './session.schema.js'
 export const SESSION_COLUMNS = `s.id, s.workout_id AS "workoutId", w.name AS "workoutName", s.performed_at AS "performedAt",
   s.duration_minutes AS "durationMinutes", s.rating, s.fatigue`
+
+export interface SessionRow {
+  id: number
+  workoutId: number | null
+  workoutName: string | null
+  performedAt: Date | string
+  durationMinutes: number | null
+  rating: number | null
+  fatigue: number | null
+  notes: string | null
+  createdAt?: Date | string
+}
+
+export async function findSession(db: Queryable, id: number, userId: number, lock = false) {
+  return one<SessionRow>(db,
+    `SELECT ${SESSION_COLUMNS}, s.notes, s.created_at AS "createdAt"
+     FROM practice_sessions s LEFT JOIN workouts w ON w.id = s.workout_id
+     WHERE s.id = $1 AND s.user_id = $2${lock ? ' FOR UPDATE OF s' : ''}`, [id, userId])
+}
+
+export async function listSessionRows(db: Queryable, userId: number, query: SessionListQuery) {
+  const range = dateRangeFilter(query, 2)
+  return many<SessionRow & { entryCount: number; makes: number | null; attempts: number | null }>(db,
+    `SELECT ${SESSION_COLUMNS}, s.notes,
+            COUNT(se.id)::int AS "entryCount", SUM(se.makes)::int AS makes, SUM(se.attempts)::int AS attempts
+     FROM practice_sessions s
+     LEFT JOIN workouts w ON w.id = s.workout_id
+     LEFT JOIN session_entries se ON se.session_id = s.id
+     WHERE s.user_id = $1 AND ${range.sql}
+     GROUP BY s.id, w.name ORDER BY s.performed_at DESC, s.id DESC LIMIT $4 OFFSET $5`,
+    [userId, ...range.params, query.limit, query.offset])
+}
+
+export async function lockSessionCreation(tx: Queryable, userId: number) {
+  await tx.query('SELECT pg_advisory_xact_lock(4245, $1)', [userId])
+}
+
+export async function findSessionByClientId(tx: Queryable, userId: number, clientId: string) {
+  return one<{ id: number }>(tx, 'SELECT id FROM practice_sessions WHERE user_id = $1 AND client_id = $2 FOR UPDATE', [userId, clientId])
+}
+
+export async function assignSessionClientId(tx: Queryable, id: number, userId: number, clientId: string) {
+  await tx.query('UPDATE practice_sessions SET client_id = $1 WHERE id = $2 AND user_id = $3', [clientId, id, userId])
+}
+
+export async function updateSessionRow(tx: Queryable, id: number, userId: number, input: SessionInput) {
+  await tx.query(
+    `UPDATE practice_sessions
+     SET workout_id = $1, performed_at = $2, duration_minutes = $3, rating = $4, fatigue = $5, notes = $6
+     WHERE id = $7 AND user_id = $8`,
+    [input.workoutId ?? null, input.performedAt, input.durationMinutes ?? null,
+      input.rating ?? null, input.fatigue ?? null, input.notes ?? null, id, userId])
+}
+
+export async function deleteSessionRow(db: Queryable, id: number, userId: number) {
+  return (await db.query('DELETE FROM practice_sessions WHERE id = $1 AND user_id = $2', [id, userId])).rowCount
+}
 
 const ENTRY_SELECT = `SELECT se.session_id AS "sessionId", se.id, se.exercise_id AS "exerciseId", e.name AS "exerciseName",
          e.category, e.metric, se.attempts, se.makes, se.reps, se.seconds, se.best_streak AS "bestStreak", se.notes
