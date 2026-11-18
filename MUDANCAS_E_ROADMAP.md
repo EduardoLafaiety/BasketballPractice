@@ -435,3 +435,18 @@ Validações locais: 1.102 testes do frontend, 189 da API, 29 jornadas Chrome/Po
 Sem dependência, endpoint, tabela, fórmula ou migração nova. Tipos não substituem validação em runtime. Cancelamento de consulta não desfaz uma operação recebida pelo servidor. A semana é atômica no servidor atual; o fallback legado permanece sequencial. Componentes e acessibilidade foram aplicados aos fluxos deste ciclo, sem declaração de auditoria integral WCAG. Alterações paralelas em Início foram preservadas no checkout original.
 
 Próxima ordem: carregamento e demonstrações por medição (9), histórico/evolução (10), operação (11) e proteção contra regressões (12).
+
+## Carregamento, histórico, operação e regressões — passos 9 a 12
+
+Implementação na branch codex/otimizacao-operacao, a partir do PR #176 integrado. Detalhes, medições, validação e backlog em [TERCEIRO_CICLO_FRONTEND.md](TERCEIRO_CICLO_FRONTEND.md); procedimentos em [OPERACAO_E_RECUPERACAO.md](OPERACAO_E_RECUPERACAO.md).
+
+9. 2D inicial com 3D por escolha/preferência, fallback local de falha e salvamento sem leitura prévia do histórico.
+10. Histórico paginado, projeção compacta de progresso, memoização e aviso de dados antigos, sem alterar fórmulas.
+11. Liveness/readiness separados, identificador por pedido, logs sanitizados e ensaio automatizado de restauração entre contas.
+12. Orçamentos de pacotes, auditoria visual/carregamento no CI, ferramentas corrigidas e remoção do hook sem consumidores.
+
+Próximos trabalhos: métricas reais e política de retenção, ensaio integral do banco com RPO/RTO observados, histórico grande medido, baseline visual aprovado e eventual fila durável. Não iniciados neste ciclo.
+
+Validação local deste ciclo: 1.110 testes do frontend, 193 da API, 27 de PostgreSQL real, 29 jornadas, sete testes de arquitetura, um de orçamento e três cenários de auditoria com 20 capturas aprovados. Builds de API, produção e demonstração aprovados. Integração condicionada ao commit final aprovado no GitHub.
+
+Entrega publicada no [PR #177](https://github.com/EduardoLafaiety/BasketballPractice/pull/177), branch codex/otimizacao-operacao. A integração permanece condicionada aos checks aprovados do commit final.

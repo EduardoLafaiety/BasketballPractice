@@ -43,6 +43,7 @@ test('registra aparência retrô e recursos das cinco telas principais', async (
         if (nome === 'sessao') await expect(page.getByRole('button', { name: 'Começar', exact: true })).toBeVisible()
         if (nome === 'evolucao') await expect(page.getByRole('table')).toBeVisible()
         await page.evaluate(() => document.fonts.ready)
+        expect(await page.evaluate(() => Array.from(document.fonts).some((f) => /Arcade/.test(f.family) && f.status === 'loaded'))).toBeTruthy()
         expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBeTruthy()
         await page.screenshot({ path: info.outputPath(`${nome}-${largura}-${theme}.png`), fullPage: false, animations: 'disabled' })
         const recursos = await page.evaluate(() => {

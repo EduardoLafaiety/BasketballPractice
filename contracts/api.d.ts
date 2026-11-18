@@ -60,6 +60,17 @@ export interface SessionApi {
   shots?: ShotApi[]
 }
 
+/** Somente os dados consumidos pelas fórmulas de Overall e conquistas. */
+export interface ProgressSessionApi {
+  id: number
+  performedAt: string
+  durationMinutes: number | null
+  makes: number
+  bestStreak: number
+  entries: { exerciseId: number }[]
+  shots: ShotApi[]
+}
+
 export interface WorkoutResumoApi {
   id: number
   name: string

@@ -1,6 +1,6 @@
-/// <reference types="vitest" />
 import { fileURLToPath } from 'node:url'
-import { defineConfig, loadEnv, type Plugin } from 'vite'
+import { loadEnv, type Plugin } from 'vite'
+import { defineConfig } from 'vitest/config'
 import react from '@vitejs/plugin-react'
 import { conteudoAdsTxt, idEditor } from './src/shared/lib/adsense'
 
@@ -39,8 +39,8 @@ export default defineConfig(({ mode }) => {
         { find: /^(?:\.\.\/)+lib\/token\.js$/, replacement: local('./src/demo/stubs.ts') },
       ],
     },
-    // O 3D das demonstrações (three.js) é um arquivo à parte, baixado só quando uma demonstração aparece.
-    build: { chunkSizeWarningLimit: 700 },
+    // O 3D das demonstrações (three.js) é um arquivo à parte, baixado por escolha explícita ou preferência salva.
+    build: { manifest: true, target: ['es2020', 'edge88', 'firefox78', 'chrome87', 'safari14'], chunkSizeWarningLimit: 700 },
     // O PGlite carrega o próprio WebAssembly; o pré-empacotamento do Vite em dev quebraria isso.
     optimizeDeps: { exclude: ['@electric-sql/pglite'] },
     server: {
@@ -53,7 +53,6 @@ export default defineConfig(({ mode }) => {
     test: {
       // Limita os bancos WASM e ambientes jsdom simultâneos para evitar disputa de memória no CI.
       maxWorkers: 2,
-      minWorkers: 1,
       environment: 'jsdom',
       setupFiles: ['src/test/setup.ts'],
       // Fixo para as contas de data e hora darem o mesmo resultado em qualquer máquina.

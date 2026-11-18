@@ -48,7 +48,8 @@ describe('Sessão guiada', () => {
     guardarTreinoOffline('1', { titulo: 'Treino preparado', blocos: [bloco({})] }, [{ id: '1', nome: 'Lance livre', categoria: 'Arremesso', metrica: 'acertos', descricao: 'Instruções guardadas.', personalizado: false }])
     const user = userEvent.setup()
     abrirSessao({ 'GET /exercises': new Resposta(503, { error: 'Indisponível' }), 'GET /workouts': new Resposta(503, { error: 'Indisponível' }) }, '/sessao?hoje')
-    await user.click(await screen.findByRole('button', { name: 'Abrir treino preparado neste aparelho' }))
+    // A primeira navegação carrega a rota sob demanda antes de concluir as consultas.
+    await user.click(await screen.findByRole('button', { name: 'Abrir treino preparado neste aparelho' }, { timeout: 5000 }))
     expect(screen.getByRole('heading', { name: 'Treino preparado' })).toBeInTheDocument()
     await clicar(user, 'Começar')
     expect(screen.getByRole('region', { name: 'Instruções: Lance livre' })).toHaveTextContent('Instruções guardadas.')

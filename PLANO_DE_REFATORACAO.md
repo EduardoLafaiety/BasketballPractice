@@ -173,3 +173,7 @@ Cada PR deve indicar regras preservadas, mudança observável, validação e lim
 8. Caminho Treinos → Rotina → Iniciar treino de hoje; aplicação da semana confirmada pelo servidor e erros com ação de recarga.
 
 Implementação e limites em [SEGUNDO_CICLO_FRONTEND.md](SEGUNDO_CICLO_FRONTEND.md). Próxima etapa autorizável do plano: carregamento/demonstrações guiados por medição, depois histórico/evolução, operação e proteção contra regressões. Não iniciar esses ciclos como parte desta entrega.
+
+## Terceiro ciclo — passos 9 a 12
+
+O bloco antes pendente foi implementado nesta ordem: carregamento/demonstrações; histórico/evolução; operação/recuperação; proteção contra regressões. A comparação continua agregada na API; a listagem visível é paginada e Overall/conquistas usam projeção compacta. Fórmulas e identidade retrô preservadas. Relatório e limites em [TERCEIRO_CICLO_FRONTEND.md](TERCEIRO_CICLO_FRONTEND.md). Backlog futuro separado das entregas e condicionado a medições e requisitos operacionais.

@@ -37,6 +37,26 @@ export async function listSessionRows(db: Queryable, userId: number, query: Sess
     [userId, ...range.params, query.limit, query.offset])
 }
 
+export async function listProgressRows(db: Queryable, userId: number, query: SessionListQuery) {
+  const range = dateRangeFilter(query, 2)
+  return many<Omit<import('../../../../contracts/api.js').ProgressSessionApi, 'performedAt'> & { performedAt: Date | string }>(db, `
+    SELECT s.id, s.performed_at AS "performedAt", s.duration_minutes AS "durationMinutes",
+      COALESCE(e.makes, 0)::float8 AS makes, COALESCE(e.streak, 0)::int AS "bestStreak",
+      COALESCE(e.entries, '[]'::json) AS entries, COALESCE(z.shots, '[]'::json) AS shots
+    FROM (SELECT * FROM practice_sessions s WHERE s.user_id = $1 AND ${range.sql}
+      ORDER BY s.performed_at DESC, s.id DESC LIMIT $4 OFFSET $5) s
+    LEFT JOIN LATERAL (
+      SELECT sum(makes) AS makes, max(best_streak) AS streak,
+        json_agg(json_build_object('exerciseId', exercise_id) ORDER BY id) AS entries
+      FROM session_entries WHERE session_id = s.id
+    ) e ON true
+    LEFT JOIN LATERAL (
+      SELECT json_agg(json_build_object('zone', zone, 'makes', makes, 'attempts', attempts) ORDER BY id) AS shots
+      FROM session_shots WHERE session_id = s.id
+    ) z ON true
+    ORDER BY s.performed_at DESC, s.id DESC`, [userId, ...range.params, query.limit, query.offset])
+}
+
 export async function lockSessionCreation(tx: Queryable, userId: number) {
   await tx.query('SELECT pg_advisory_xact_lock(4245, $1)', [userId])
 }

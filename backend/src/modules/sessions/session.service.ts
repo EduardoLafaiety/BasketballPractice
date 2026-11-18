@@ -6,7 +6,7 @@ import { workoutOwnedBy } from '../workouts/workout.repository.js'
 import type { CreateSessionInput, SessionInput, SessionListQuery } from './session.schema.js'
 import {
   assignSessionClientId, deleteSessionRow, findSession, findSessionByClientId, insertSession,
-  listSessionRows, lockSessionCreation, replaceEntries, sessionDetails, updateSessionRow,
+  listSessionRows, listProgressRows, lockSessionCreation, replaceEntries, sessionDetails, updateSessionRow,
 } from './session.repository.js'
 
 export async function getSession(db: Queryable, userId: number, id: number) {
@@ -19,6 +19,10 @@ export async function listSessions(db: Queryable, userId: number, query: Session
   const sessions = await listSessionRows(db, userId, query)
   const details = await sessionDetails(db, sessions.map((s) => s.id))
   return sessions.map((session) => ({ ...session, ...details(session.id) }))
+}
+
+export async function listProgress(db: Queryable, userId: number, query: SessionListQuery) {
+  return (await listProgressRows(db, userId, query)).map((row) => ({ ...row, performedAt: new Date(row.performedAt).toISOString() }))
 }
 
 async function validateReferences(tx: Queryable, userId: number, input: SessionInput) {

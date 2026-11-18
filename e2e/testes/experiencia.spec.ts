@@ -6,6 +6,7 @@ test('menu móvel mantém foco, fecha por Escape e permite pular ao conteúdo', 
   await page.setViewportSize({ width: 390, height: 844 })
   await entrarCom(page, token)
   await page.goto('/treinos')
+  await expect(page.getByRole('heading', { name: 'Treinos', exact: true })).toBeVisible()
   await page.keyboard.press('Tab')
   await expect(page.getByRole('link', { name: 'Pular para o conteúdo' })).toBeFocused()
   await page.keyboard.press('Enter')

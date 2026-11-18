@@ -56,6 +56,14 @@ jobs:
         working-directory: frontend
       - run: npm run build
         working-directory: frontend
+      - run: npm run test:bundles
+      - run: npm run check:bundles
+      - uses: actions/upload-artifact@v7
+        with:
+          name: medidas-pacotes
+          path: frontend/dist/pacotes.json
+      - run: npm audit --audit-level=moderate
+        working-directory: frontend
       - run: npm run build:demo
         working-directory: frontend
         env:
@@ -97,6 +105,17 @@ jobs:
       # Usa o Google Chrome que já vem no runner; nada de baixar navegador.
       - run: npx playwright test
         working-directory: e2e
+      - name: Auditoria visual e carregamento
+        run: npm run audit
+        working-directory: e2e
+        env:
+          AUDIT_OUTPUT_DIR: ${{ runner.temp }}/basketball-audit
+      - if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: auditoria-visual
+          path: ${{ runner.temp }}/basketball-audit
+          retention-days: 7
       - name: Contratos e concorrência em PostgreSQL real
         run: npx tsx --test --test-name-pattern 'mesmo backup enviado|backup mantém|trava da importação|programas serializam|contas serializam|recuperação em conexões|ativação em conexões|troca de senha trava|últimos administradores|sair em conexões|push coordena' test/postgres.test.ts
         working-directory: backend

@@ -11,6 +11,8 @@
     "test:e2e": "npm --prefix e2e test",
     "build:site": "npm --prefix frontend run build",
     "build:api": "npm --prefix backend run build",
-    "build:demo": "npm --prefix frontend run build:demo"
+    "build:demo": "npm --prefix frontend run build:demo",
+    "check:bundles": "node scripts/verificar-pacotes.mjs",
+    "test:bundles": "node --test scripts/pacotes.test.mjs"
   }
 }

@@ -1,6 +1,7 @@
 import type { NextFunction, Request, Response } from 'express'
 import { isDatabaseUnavailable } from '../db/index.js'
 import { HttpError } from '../lib/http-error.js'
+import { registrarFalha } from '../lib/operacao.js'
 
 const isClientError = (error: unknown): error is { status: number } => {
   const status = (error as { status?: unknown } | null)?.status
@@ -26,7 +27,7 @@ export function errorHandler(error: unknown, _req: Request, res: Response, _next
     return
   }
 
-  console.error(error)
+  registrarFalha(`http:${res.getHeader('X-Request-Id') ?? 'unknown'}`, error)
   // O problema é passageiro e não está nos dados: o cliente pode tentar de novo.
   if (isDatabaseUnavailable(error)) {
     res.setHeader('Retry-After', '5')
