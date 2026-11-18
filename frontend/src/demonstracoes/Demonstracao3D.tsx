@@ -6,6 +6,8 @@ import { corpoDoParceiro, corpoNoTempo, ESCALA, type Corpo3D } from './corpo3d'
 import { instante, preparar, type Coreografia } from './motor'
 import { Boneco, CORES_ATLETA, CORES_PARCEIRO } from './tres-d/boneco'
 import { Cenario } from './tres-d/cenario'
+import { corpoMocap } from './mocap'
+import { carregarClipe, CREDITO_MOCAP, MOCAP_DE_EXERCICIO, prepararCena, type CenaMocap } from './mocapExercicios'
 
 /** Fundo de estúdio: escuro em cima, mais claro no horizonte. */
 function fundoDegrade() {
@@ -62,7 +64,21 @@ interface Props {
 
 /** Demonstração em 3D: gire, aproxime, mova e veja por dentro (músculos e esqueleto). */
 export default function Demonstracao3D({ coreografia, nome, aoFalhar, aoVer2D }: Props) {
-  const anim = useMemo(() => preparar(coreografia), [coreografia])
+  const animBase = useMemo(() => preparar(coreografia), [coreografia])
+  // Movimento real (captura de movimento), quando o exercício tem: carrega o clipe à parte e troca ao chegar.
+  const [mocap, setMocap] = useState<CenaMocap | null>(null)
+  useEffect(() => {
+    const id = MOCAP_DE_EXERCICIO[nome]
+    setMocap(null)
+    if (!id) return
+    let vivo = true
+    carregarClipe(id).then((c) => vivo && setMocap(prepararCena(c))).catch(() => {})
+    return () => { vivo = false }
+  }, [nome])
+  const anim = useMemo(
+    () => (mocap ? { ...animBase, frente: false, total: mocap.total, inicioFase: coreografia.fases.map((_, i) => (i * mocap.total) / coreografia.fases.length) } : animBase),
+    [animBase, mocap, coreografia.fases],
+  )
   const [tocando, setTocando] = useState(() => !menosMovimento())
   const [fase, setFase] = useState(0)
   const [velocidade, setVelocidade] = useState(0.5)
@@ -138,12 +154,20 @@ export default function Demonstracao3D({ coreografia, nome, aoFalhar, aoVer2D }:
     contra.position.set(-5, 4, -6)
     cena.add(contra)
 
-    const cenario = new Cenario(anim)
+    const corpoEm = (t: number): Corpo3D =>
+      mocap ? corpoMocap(mocap.clipe, t, mocap.colocacao, mocap.bola, mocap.arremesso) : corpoNoTempo(anim, t, coreografia.cena)
+    const faseEm = (t: number) => {
+      if (!mocap) return instante(anim, t).fase
+      let f = 0
+      anim.inicioFase.forEach((ini, i) => { if (t >= ini) f = i })
+      return f
+    }
+    const cenario = new Cenario(anim, mocap ? corpoEm : undefined)
     cena.add(cenario.raiz)
     const atleta = new Boneco(CORES_ATLETA)
     cena.add(atleta.raiz)
     let parceiro: Boneco | null = null
-    if (coreografia.cena.parceiro) {
+    if (coreografia.cena.parceiro && !mocap) {
       parceiro = new Boneco(CORES_PARCEIRO)
       parceiro.atualizar(corpoDoParceiro(coreografia.cena.parceiro.pose, coreografia.cena.parceiro.dir, 0))
       cena.add(parceiro.raiz)
@@ -170,7 +194,7 @@ export default function Demonstracao3D({ coreografia, nome, aoFalhar, aoVer2D }:
     camera.position.copy(controles.target).add(posicaoPadrao())
 
     let sujo = true
-    let corpo: Corpo3D = corpoNoTempo(anim, 0, coreografia.cena)
+    let corpo: Corpo3D = corpoEm(0)
     const alvoVisto = new THREE.Vector3().copy(controles.target)
     let distanciaAlvo: number | null = null
     let tweenCamera: { de: THREE.Vector3; para: THREE.Vector3; t: number } | null = null
@@ -190,16 +214,17 @@ export default function Demonstracao3D({ coreografia, nome, aoFalhar, aoVer2D }:
     }
 
     const desenhar = (t: number, dt = 0) => {
-      const inst = instante(anim, t)
-      corpo = corpoNoTempo(anim, t, coreografia.cena)
+      const inst = mocap ? null : instante(anim, t)
+      corpo = corpoEm(t)
       atleta.atualizar(corpo, t)
       cenario.pousarBola(0, corpo.bolas[0])
       cenario.pousarBola(1, corpo.bolas[1])
       cenario.mostrarPegadas(t, estado.current.pegadas)
-      if (parceiro && inst.px !== undefined) parceiro.raiz.position.x = inst.px * ESCALA
-      if (faseAtual.current !== inst.fase) {
-        faseAtual.current = inst.fase
-        setFase(inst.fase)
+      if (parceiro && inst?.px !== undefined) parceiro.raiz.position.x = inst.px * ESCALA
+      const fase = faseEm(t)
+      if (faseAtual.current !== fase) {
+        faseAtual.current = fase
+        setFase(fase)
       }
       if (linha.current && document.activeElement !== linha.current) linha.current.value = String(Math.round(t))
       if (angulos.current) {
@@ -321,7 +346,7 @@ export default function Demonstracao3D({ coreografia, nome, aoFalhar, aoVer2D }:
       renderer.domElement.remove()
       api.current = null
     }
-  }, [anim, coreografia.cena.parceiro, nome, aoFalhar])
+  }, [anim, mocap, coreografia.cena, coreografia.fases, nome, aoFalhar])
 
   // Camadas e opções: redesenha o quadro atual.
   useEffect(() => {
@@ -433,6 +458,7 @@ export default function Demonstracao3D({ coreografia, nome, aoFalhar, aoVer2D }:
           </li>
         ))}
       </ol>
+      {mocap && <p className="muted demo3d-credito">{CREDITO_MOCAP}</p>}
       <p className="demo3d-rodape">
         <button type="button" className="link botao-link" onClick={aoVer2D}>Ver em 2D</button>
       </p>

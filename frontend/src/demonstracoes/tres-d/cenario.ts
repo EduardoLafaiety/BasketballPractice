@@ -122,7 +122,11 @@ export class Cenario {
   private materiaisLinha: LineMaterial[] = []
   private texturaDaBola = texturaBola()
 
-  constructor(readonly anim: Animacao) {
+  /**
+   * `corpoEm`: o corpo no tempo t, quando o movimento não vem da coreografia (captura de movimento). Nesse caso a
+   * cena não tem pegadas (elas vêm das poses da coreografia).
+   */
+  constructor(readonly anim: Animacao, private readonly corpoEm?: (t: number) => import('../corpo3d').Corpo3D) {
     const { cena } = anim.coreografia
     const frente = anim.frente
     this.piso(frente)
@@ -146,7 +150,7 @@ export class Cenario {
       this.bolas.push(b)
       this.raiz.add(b)
     }
-    this.pegadasNoChao()
+    if (!corpoEm) this.pegadasNoChao()
     this.raiz.add(this.trajetorias)
   }
 
@@ -330,7 +334,7 @@ export class Cenario {
       { cor: 0xa8f0b8, pontos: [] },
     ]
     for (let t = 0; t <= this.anim.total; t += 30) {
-      const c = corpoNoTempo(this.anim, t, this.anim.coreografia.cena)
+      const c = this.corpoEm ? this.corpoEm(t) : corpoNoTempo(this.anim, t, this.anim.coreografia.cena)
       const add = (i: number, p: V3 | undefined) => p && series[i].pontos.push(p.x, p.y, p.z)
       add(0, c.braco.P.ponta)
       add(1, c.braco.L.ponta)
