@@ -612,65 +612,81 @@ section + section, .card + section { margin-top: 1.5rem; }
 .barra-progresso > div { height: 100%; background: var(--laranja); border-radius: 0; transition: width 0.3s; }
 .barra-progresso.completa > div { background: var(--verde); }
 .metas { list-style: none; padding: 0; margin: 0; display: grid; gap: 0.6rem; }
-/* Conquistas, no estilo da lista de conquistas da Steam: um ícone grande, o nome, a descrição e o estado. */
-.conquistas-resumo { display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; background: var(--superficie); }
-.conquistas-resumo > div { flex: 1; display: grid; gap: 0.35rem; }
-.conquistas-resumo h2, .conquistas-resumo p { margin: 0; }
-.conquistas-trofeu { flex-shrink: 0; display: grid; place-items: center; width: 64px; height: 64px; background: var(--laranja); color: #0b0b0b; }
-.conquistas { list-style: none; padding: 0; margin: 1rem 0 0; display: grid; gap: 2px; }
-.conquista { display: grid; grid-template-columns: 64px minmax(0, 1fr) auto; align-items: center; gap: 1rem; padding: 0.7rem 1rem 0.7rem 0.7rem; border: 2px solid var(--borda); background: var(--superficie); transition: background 0.2s, border-color 0.2s, opacity 0.2s; }
-.conquista-texto { display: grid; gap: 0.25rem; min-width: 0; }
-.conquista-texto strong { font-size: 1.05rem; }
-.conquista-descricao { color: var(--muted); font-size: 0.88rem; }
-.conquista-icone { width: 64px; height: 64px; display: grid; place-items: center; background: var(--superficie-2); color: var(--muted); }
-.conquista-estado { display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.78rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; color: var(--muted); }
-.conquista.desbloqueada { border-color: var(--laranja); background: color-mix(in srgb, var(--laranja) 9%, var(--superficie)); }
-.conquista.desbloqueada .conquista-icone { background: var(--fundo, var(--laranja)); box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.28), 3px 3px 0 rgba(0, 0, 0, 0.35); color: #0b0b0b; }
-.conquista-sprite { width: 48px; height: 48px; display: block; image-rendering: pixelated; }
-.conquista.desbloqueada .conquista-estado { color: var(--laranja-texto); }
-/* Bloqueada: apagada, como na Steam, até chegar perto de sair. */
-.conquista:not(.desbloqueada) .conquista-icone { background: var(--superficie-2); box-shadow: inset 0 0 0 2px var(--borda); }
-.conquista:not(.desbloqueada) .conquista-sprite { filter: grayscale(1) brightness(0.85); opacity: 0.55; }
-.conquista:not(.desbloqueada) .conquista-texto > strong { color: var(--muted); }
-.conquista-pontos { padding: 0.1rem 0.4rem; border: 2px solid currentColor; font-size: 0.72rem; }
+/* Conquistas, no Painel limpo: lateral com anel e filtros, e os grupos em duas colunas. Os ícones ficam coloridos; bloqueada ganha o cadeado. */
+.conquistas-painel { display: grid; grid-template-columns: 17rem minmax(0, 1fr); gap: 1.25rem; align-items: start; margin-top: 1rem; }
+.conquistas-lateral { position: sticky; top: 1rem; display: grid; gap: 0.6rem; background: var(--superficie); }
+.conquistas-lateral h2, .conquistas-lateral p { margin: 0; text-align: center; }
+.conquistas-lateral h2 { font-size: 1.6rem; }
+.conquistas-anel { width: 9.5rem; height: 9.5rem; margin: 0.25rem auto 0; display: grid; place-items: center; background: conic-gradient(var(--laranja) var(--pct, 0%), var(--superficie-2) 0); clip-path: polygon(30% 0, 70% 0, 70% 6%, 80% 6%, 80% 12%, 88% 12%, 88% 20%, 94% 20%, 94% 30%, 100% 30%, 100% 70%, 94% 70%, 94% 80%, 88% 80%, 88% 88%, 80% 88%, 80% 94%, 70% 94%, 70% 100%, 30% 100%, 30% 94%, 20% 94%, 20% 88%, 12% 88%, 12% 80%, 6% 80%, 6% 70%, 0 70%, 0 30%, 6% 30%, 6% 20%, 12% 20%, 12% 12%, 20% 12%, 20% 6%, 30% 6%); }
+.conquistas-anel > span { width: 6.9rem; height: 6.9rem; display: grid; place-content: center; justify-items: center; gap: 0.1rem; background: var(--superficie); clip-path: inherit; }
+.conquistas-anel strong { font-family: var(--fonte-display); font-weight: var(--peso-display); font-size: 2rem; line-height: 1; font-variant-numeric: tabular-nums; }
 .conquistas-pontos-total { font-size: 0.85rem; }
-.conquista:not(.desbloqueada) .barra-progresso { height: 8px; max-width: 22rem; }
-@media (max-width: 560px) {
-  .conquista { grid-template-columns: 52px minmax(0, 1fr); gap: 0.75rem; }
-  .conquista-icone { width: 52px; height: 52px; }
-  .conquista-sprite { width: 40px; height: 40px; }
-  .conquista-estado { grid-column: 2; }
+.conquistas-filtros { display: grid; gap: 0.35rem; margin-top: 0.4rem; }
+.conquistas-filtro { font: inherit; font-size: 0.85rem; text-align: left; padding: 0.5rem 0.7rem; color: var(--texto); background: transparent; border: 2px solid transparent; cursor: pointer; }
+.conquistas-filtro:hover { background: var(--superficie-2); }
+.conquistas-filtro.ativo { border-color: var(--texto); background: var(--superficie-2); font-weight: 700; }
+.conquistas-filtro:focus-visible { outline: 3px solid var(--laranja); outline-offset: 2px; }
+.conquistas-proxima { margin-top: 0.4rem; padding: 0.7rem; font-size: 0.82rem; line-height: 1.4; border: 2px solid var(--laranja); background: color-mix(in srgb, var(--laranja) 12%, var(--superficie)); }
+.conquistas-grupo + .conquistas-grupo { margin-top: 1.25rem; }
+.conquistas-grupo h3 { display: flex; justify-content: space-between; gap: 1rem; margin: 0 0 0.5rem; font-size: 0.85rem; letter-spacing: 0.1em; text-transform: uppercase; }
+.conquistas { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.6rem; }
+.conquista { display: grid; grid-template-columns: 56px minmax(0, 1fr); align-items: center; gap: 0.2rem 0.8rem; padding: 0.65rem; border: 2px solid var(--borda); background: var(--superficie); transition: background 0.2s, border-color 0.2s; }
+.conquista-texto { display: grid; gap: 0.2rem; min-width: 0; }
+.conquista-texto strong { font-size: 1rem; }
+.conquista-descricao { color: var(--muted); font-size: 0.8rem; line-height: 1.3; }
+.conquista-icone { position: relative; width: 56px; height: 56px; display: grid; place-items: center; background: var(--fundo, var(--laranja)); box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.28), 3px 3px 0 rgba(0, 0, 0, 0.35); color: #0b0b0b; }
+.conquista-sprite { width: 42px; height: 42px; display: block; image-rendering: pixelated; }
+.conquista-estado { grid-column: 2; display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.74rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; color: var(--muted); }
+.conquista.desbloqueada { border-color: var(--laranja); background: color-mix(in srgb, var(--laranja) 9%, var(--superficie)); }
+.conquista.desbloqueada .conquista-estado { color: var(--laranja-texto); }
+/* Bloqueada: continua colorida; o cadeado e a contagem dizem que falta chegar lá. */
+.conquista:not(.desbloqueada) .barra-progresso { height: 8px; }
+.conquista-pontos { margin-left: auto; padding: 0.1rem 0.4rem; border: 2px solid currentColor; font-size: 0.7rem; }
+@media (max-width: 900px) {
+  .conquistas-painel { grid-template-columns: minmax(0, 1fr); }
+  .conquistas-lateral { position: static; }
+}
+@media (max-width: 640px) {
+  .conquistas { grid-template-columns: minmax(0, 1fr); }
 }
 
-/* Overall, no estilo da ficha do NBA 2K: painel escuro na cor da faixa da nota, jogador, nota grande e radar. */
-.ficha-2k { --faixa: #9a988c; display: grid; grid-template-columns: 180px minmax(0, 1fr) 240px; gap: 1.5rem; align-items: center; margin: 1rem 0; padding: 1.25rem; color: #f4f2ea; border: 3px solid var(--faixa); background: repeating-linear-gradient(135deg, transparent 0 14px, color-mix(in srgb, var(--faixa) 9%, transparent) 14px 28px), #0f0f0f; box-shadow: inset 0 0 0 2px #0b0b0b, 6px 6px 0 rgba(0, 0, 0, 0.45); }
-.ficha-jogador { aspect-ratio: 4 / 5; display: grid; place-items: end center; padding: 0.8rem 0.8rem 0; border: 3px solid var(--faixa); background: color-mix(in srgb, var(--faixa) 24%, #0f0f0f); }
+/* Overall, no Painel limpo: ficha clara com jogador, nota e radar; abaixo, os atributos e o foco sugerido. */
+.ficha-2k { --faixa: #9a988c; display: grid; grid-template-columns: 170px minmax(0, 1fr) 240px; gap: 1.5rem; align-items: center; margin: 1rem 0; padding: 1.25rem; color: var(--texto); border: 3px solid var(--texto); background: var(--superficie); box-shadow: 6px 6px 0 var(--faixa); }
+.ficha-jogador { aspect-ratio: 4 / 5; display: grid; place-items: end center; padding: 0.8rem 0.8rem 0; border: 3px solid var(--faixa); background: color-mix(in srgb, var(--faixa) 24%, var(--superficie-2)); }
 .jogador-pixel { width: 100%; height: auto; display: block; image-rendering: pixelated; }
 .ficha-centro { display: grid; gap: 0.15rem; justify-items: start; min-width: 0; }
-.ficha-centro h2 { margin: 0.4rem 0 0; font-size: 2.3rem; color: #fff; overflow-wrap: anywhere; }
+.ficha-centro h2 { margin: 0.4rem 0 0; font-size: 2.2rem; overflow-wrap: anywhere; }
 .ficha-centro p { margin: 0; }
 .ficha-faixa { padding: 0.15rem 0.6rem; background: var(--faixa); color: #0b0b0b; font-family: var(--fonte-display); font-weight: var(--peso-display); font-size: 1rem; letter-spacing: 0.1em; text-transform: uppercase; }
-.ficha-build { color: var(--faixa); font-weight: 800; font-size: 0.85rem; letter-spacing: 0.12em; text-transform: uppercase; }
-.ficha-nivel { color: #b5b3a6; font-size: 0.85rem; }
+.ficha-build { color: var(--laranja-texto); font-weight: 800; font-size: 0.85rem; letter-spacing: 0.12em; text-transform: uppercase; }
+.ficha-nivel { color: var(--muted); font-size: 0.85rem; }
 .ficha-nota { display: flex; align-items: baseline; gap: 0.6rem; margin-top: 0.5rem; }
-.ficha-nota strong { font-family: var(--fonte-display); font-weight: var(--peso-display); font-size: 6.5rem; line-height: 0.85; color: var(--faixa); text-shadow: 4px 4px 0 rgba(0, 0, 0, 0.7); font-variant-numeric: tabular-nums; }
-.ficha-nota span { font-family: var(--fonte-display); font-weight: var(--peso-display); font-size: 1.6rem; letter-spacing: 0.12em; color: #f4f2ea; }
+.ficha-nota strong { font-family: var(--fonte-display); font-weight: var(--peso-display); font-size: 6rem; line-height: 0.85; color: var(--faixa); text-shadow: 4px 4px 0 rgba(0, 0, 0, 0.7); font-variant-numeric: tabular-nums; }
+.ficha-nota span { font-family: var(--fonte-display); font-weight: var(--peso-display); font-size: 1.6rem; letter-spacing: 0.12em; }
 .ficha-destaques { list-style: none; padding: 0; margin: 0.75rem 0 0; display: flex; flex-wrap: wrap; gap: 0.5rem 1.5rem; }
 .ficha-destaques li { display: grid; gap: 0.1rem; }
-.ficha-destaques span { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: #b5b3a6; }
+.ficha-destaques span { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
 .ficha-destaques strong { font-size: 0.95rem; }
 .radar { width: 100%; max-width: 240px; justify-self: center; overflow: visible; }
-.radar-grade { fill: none; stroke: #45463a; stroke-width: 1; }
-.radar-rotulo { fill: #f4f2ea; font-family: var(--fonte-display); font-weight: var(--peso-display); font-size: 15px; letter-spacing: 0.06em; }
-.overall-nota-info { font-size: 0.85rem; margin-top: 0.75rem; }
-.overall-atributos { list-style: none; padding: 0; margin: 0; display: grid; gap: 0.6rem; }
-.overall-atributo { display: grid; grid-template-columns: 4rem 11rem minmax(0, 1fr); align-items: center; gap: 0.2rem 1rem; padding: 0.6rem 1rem 0.6rem 0.6rem; border: 2px solid var(--borda); border-left: 6px solid var(--cor); background: var(--superficie); }
-.overall-valor { display: grid; place-items: center; height: 2.6rem; background: var(--faixa-nota); color: #0b0b0b; font-family: var(--fonte-display); font-weight: var(--peso-display); font-size: 1.9rem; font-variant-numeric: tabular-nums; box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.3), 3px 3px 0 rgba(0, 0, 0, 0.35); }
-.overall-rotulo { font-family: var(--fonte-display); font-weight: var(--peso-display); text-transform: uppercase; letter-spacing: 0.04em; font-size: 1.35rem; line-height: 1; }
+.radar-grade { fill: none; stroke: var(--borda); stroke-width: 1; }
+.radar-rotulo { fill: var(--texto); font-family: var(--fonte-display); font-weight: var(--peso-display); font-size: 15px; letter-spacing: 0.06em; }
+.overall-painel { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 1rem; align-items: start; }
+.overall-caixa { padding: 1rem 1.1rem; border: 2px solid var(--texto); background: var(--superficie); }
+.overall-caixa h3 { margin: 0 0 0.8rem; font-size: 0.85rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+.overall-foco p { margin: 0 0 0.8rem; font-size: 0.95rem; line-height: 1.5; }
+.overall-foco p:first-of-type { padding: 0.8rem; border: 2px solid var(--laranja); background: color-mix(in srgb, var(--laranja) 12%, var(--superficie)); }
+.overall-nota-info { font-size: 0.8rem; }
+.overall-atributos { list-style: none; padding: 0; margin: 0; display: grid; gap: 0.8rem; }
+.overall-atributo { display: grid; grid-template-columns: 3.2rem 9rem minmax(0, 1fr); align-items: center; gap: 0.2rem 0.8rem; }
+.overall-valor { display: grid; place-items: center; height: 2.3rem; background: var(--faixa-nota); color: #0b0b0b; font-family: var(--fonte-display); font-weight: var(--peso-display); font-size: 1.7rem; font-variant-numeric: tabular-nums; box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.3), 3px 3px 0 rgba(0, 0, 0, 0.35); }
+.overall-rotulo { font-family: var(--fonte-display); font-weight: var(--peso-display); text-transform: uppercase; letter-spacing: 0.04em; font-size: 1.25rem; line-height: 1; }
 .overall-barra { display: grid; grid-template-columns: repeat(20, 1fr); gap: 2px; padding: 3px; background: var(--bg); border: 2px solid var(--borda); }
-.overall-barra i { height: 14px; background: var(--superficie-2); transition: background 0.3s; }
+.overall-barra i { height: 12px; background: var(--superficie-2); transition: background 0.3s; }
 .overall-barra i.cheio { background: var(--cor); }
-.overall-dica { grid-column: 2 / -1; font-size: 0.8rem; }
+.overall-dica { grid-column: 2 / -1; font-size: 0.78rem; }
+@media (max-width: 900px) {
+  .overall-painel { grid-template-columns: minmax(0, 1fr); }
+}
 @media (max-width: 800px) {
   .ficha-2k { grid-template-columns: 120px minmax(0, 1fr); gap: 1rem; }
   .ficha-centro h2 { font-size: 1.8rem; }
@@ -681,7 +697,7 @@ section + section, .card + section { margin-top: 1.5rem; }
   .ficha-2k { grid-template-columns: 96px minmax(0, 1fr); padding: 1rem; }
   .ficha-nota strong { font-size: 4rem; }
   .ficha-nota span { font-size: 1.2rem; }
-  .overall-atributo { grid-template-columns: 3.4rem minmax(0, 1fr); }
+  .overall-atributo { grid-template-columns: 3.2rem minmax(0, 1fr); }
   .overall-barra { grid-column: 1 / -1; order: 3; }
   .overall-dica { grid-column: 1 / -1; order: 4; }
 }
