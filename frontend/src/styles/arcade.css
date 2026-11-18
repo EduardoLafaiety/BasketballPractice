@@ -125,3 +125,8 @@ optgroup {
 .pagina-inicio .escada-fixa {
   background-image: none;
 }
+
+/* Sem a tela de tubo (linhas horizontais finas e o escurecer das bordas) por cima da página. */
+body::after {
+  display: none;
+}
