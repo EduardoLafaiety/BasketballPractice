@@ -25,11 +25,12 @@ body::after { opacity: 0.12; background: repeating-linear-gradient(0deg, #000 0 
 .topo { background: transparent; border: 0; }
 .topo .marca, .topo .topo-secao, .auth-marca .marca, .auth-marca .topo-secao { background: transparent; box-shadow: none; }
 .topo .topo-secao, .auth-marca .topo-secao { color: var(--texto); text-decoration: none; }
-.topo-atalhos { display: flex; gap: 0.5rem; margin-left: auto; background: var(--bg); border: 1px solid var(--borda); }
-.topo-atalhos a { min-height: 44px; display: flex; align-items: center; padding: 0.5rem 1rem; color: var(--texto); text-decoration: none; font-size: 1rem; border-bottom: 2px solid transparent; }
-.topo-atalhos a.active { color: var(--laranja-texto); border-bottom-color: currentColor; }
-.topo-atalhos a:hover { background: var(--superficie-2); }
-.topo-menu { margin-left: 0; }
+/* Barra de cima só com os nomes: sem fundo, sem contorno e sem sublinhado. O item ativo e o mouse em cima só trocam a cor. */
+.topo-atalhos { display: flex; gap: 0.5rem; margin-left: auto; background: transparent; border: 0; }
+.topo-atalhos a { min-height: 44px; display: flex; align-items: center; padding: 0.5rem 1rem; color: var(--texto); text-decoration: none; font-size: 1rem; border: 0; background: transparent; }
+.topo-atalhos a.active, .topo-atalhos a:hover { color: var(--laranja-texto); background: transparent; }
+.topo-menu { margin-left: 0; background: transparent; border: 0; color: var(--texto); }
+.topo-menu:hover { background: transparent; color: var(--laranja-texto); }
 .treinos-filtros { display: flex; flex-wrap: wrap; gap: 1rem; align-items: end; margin-block: 2rem 1rem; }
 .treinos-filtros label { display: grid; gap: 0.5rem; flex: 1 1 15rem; }
 .treinos-filtros .input { width: 100%; min-height: 48px; font-size: 1rem; }
