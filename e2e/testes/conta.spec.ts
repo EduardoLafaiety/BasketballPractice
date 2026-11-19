@@ -77,6 +77,6 @@ test('Equipamentos e Artigos abrem sem conta, com os links da Amazon e o convite
 
   await page.getByRole('navigation', { name: 'Páginas abertas' }).getByRole('link', { name: 'Artigos' }).click()
   await expect(page.getByRole('heading', { name: 'Artigos', level: 1 })).toBeVisible()
-  await page.getByRole('banner').getByRole('link', { name: 'Entrar' }).click()
+  await page.getByRole('banner').getByRole('link', { name: 'Entrar', exact: true }).click()
   await expect(page).toHaveURL(/\/entrar$/)
 })
