@@ -48,3 +48,21 @@ export function carregarAdsense(id: string, personalizados: boolean) {
   script.dataset.adsense = ''
   document.head.appendChild(script)
 }
+
+/**
+ * Tags do <head> no build de produção: o script do AdSense já no HTML, como o Google pede para verificar o site,
+ * e antes dele a escolha do aviso de cookies (mesma chave e versão de cookies.ts), para os primeiros anúncios
+ * só serem personalizados com o Aceitar. O componente Anuncios encontra o script pelo data-adsense e não repete.
+ */
+export function tagsDoHead(id: string) {
+  const consentimento =
+    "(function(){var p=0;try{var s=JSON.parse(localStorage.getItem('bp.cookies')||'null');p=s&&s.versao===1&&s.escolha==='aceito'?0:1}catch(e){p=1}(window.adsbygoogle=window.adsbygoogle||[]).requestNonPersonalizedAds=p})()"
+  return [
+    { tag: 'script', children: consentimento, injectTo: 'head' as const },
+    {
+      tag: 'script',
+      attrs: { async: true, src: `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${clienteAdsense(id)}`, crossorigin: 'anonymous', 'data-adsense': '' },
+      injectTo: 'head' as const,
+    },
+  ]
+}

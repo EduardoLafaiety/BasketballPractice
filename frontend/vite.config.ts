@@ -2,11 +2,11 @@ import { fileURLToPath } from 'node:url'
 import { loadEnv, type Plugin } from 'vite'
 import { defineConfig } from 'vitest/config'
 import react from '@vitejs/plugin-react'
-import { conteudoAdsTxt, idEditor } from './src/shared/lib/adsense'
+import { conteudoAdsTxt, idEditor, tagsDoHead } from './src/shared/lib/adsense'
 
 const local = (caminho: string) => fileURLToPath(new URL(caminho, import.meta.url))
 
-/** Põe o ads.txt na raiz do build quando há VITE_ADSENSE_ID; sem ele, o arquivo não existe. */
+/** Com VITE_ADSENSE_ID, o build ganha o ads.txt na raiz e o script do AdSense no <head>; sem ele, nada disso. */
 function adsTxt(valor: string | undefined): Plugin {
   const id = idEditor(valor)
   return {
@@ -14,6 +14,9 @@ function adsTxt(valor: string | undefined): Plugin {
     apply: 'build',
     generateBundle() {
       if (id) this.emitFile({ type: 'asset', fileName: 'ads.txt', source: conteudoAdsTxt(id) })
+    },
+    transformIndexHtml() {
+      return id ? tagsDoHead(id) : []
     },
   }
 }
@@ -25,7 +28,7 @@ export default defineConfig(({ mode }) => {
   return {
     // VITE_BASE publica o site numa subpasta (ex.: /BasketballPractice/ no GitHub Pages).
     base: env.VITE_BASE || '/',
-    plugins: [react(), adsTxt(env.VITE_ADSENSE_ID)],
+    plugins: [react(), adsTxt(demo ? undefined : env.VITE_ADSENSE_ID)],
     // Constante de compilação: no site normal vira false e o bundler descarta todo o código da demonstração.
     define: { __DEMO__: JSON.stringify(demo) },
     resolve: {

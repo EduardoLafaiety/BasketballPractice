@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from 'vitest'
-import { carregarAdsense, conteudoAdsTxt, definirPersonalizacao, idEditor } from './adsense'
+import { carregarAdsense, conteudoAdsTxt, definirPersonalizacao, idEditor, tagsDoHead } from './adsense'
 
 describe('ads.txt do AdSense', () => {
   it('aceita o ID como aparece na conta (ca-pub-) ou sem o prefixo', () => {
@@ -46,5 +46,40 @@ describe('script do AdSense', () => {
     expect(window.adsbygoogle?.requestNonPersonalizedAds).toBe(0)
     definirPersonalizacao(false)
     expect(window.adsbygoogle?.requestNonPersonalizedAds).toBe(1)
+  })
+})
+
+describe('script do AdSense no <head> do build de produção', () => {
+  afterEach(() => {
+    delete window.adsbygoogle
+    localStorage.clear()
+  })
+
+  const rodarConsentimento = () => new Function(tagsDoHead('pub-1234567890123456')[0].children as string)()
+  // Função, e não acesso direto: o TypeScript não estreita window.adsbygoogle depois do delete.
+  const naoPersonalizados = () => window.adsbygoogle?.requestNonPersonalizedAds
+
+  it('vem com o ID do editor e a marca que impede o componente de carregar de novo', () => {
+    const [, script] = tagsDoHead('pub-1234567890123456')
+    expect(script.attrs).toMatchObject({
+      async: true,
+      src: 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1234567890123456',
+      'data-adsense': '',
+    })
+  })
+
+  it('antes do script, pede anúncios não personalizados até o Aceitar guardado pelo aviso de cookies', () => {
+    rodarConsentimento()
+    expect(naoPersonalizados()).toBe(1)
+
+    delete window.adsbygoogle
+    localStorage.setItem('bp.cookies', JSON.stringify({ versao: 1, escolha: 'aceito' }))
+    rodarConsentimento()
+    expect(naoPersonalizados()).toBe(0)
+
+    delete window.adsbygoogle
+    localStorage.setItem('bp.cookies', '{quebrado')
+    rodarConsentimento()
+    expect(naoPersonalizados()).toBe(1)
   })
 })

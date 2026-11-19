@@ -75,3 +75,16 @@ it('atualização remove somente versões antigas do cache deste aplicativo', as
   await tarefa
   expect(caches.delete.mock.calls).toEqual([['bp-v6']])
 })
+
+it('prepara o treino mesmo com o script do AdSense no HTML: scripts de fora não são guardados nem exigidos', async () => {
+  const { listeners, cache, fetch } = worker()
+  fetch.mockResolvedValue(new Response(
+    '<script src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1"></script><script type="module" src="/assets/sessao-abc.js"></script>',
+  ))
+  let tarefa!: Promise<unknown>
+  const postMessage = vi.fn()
+  listeners.message({ data: { tipo: 'PREPARAR_TREINO', urls: ['https://app.exemplo.com/assets/sessao-abc.js'] }, ports: [{ postMessage }], waitUntil: (p: Promise<unknown>) => { tarefa = p } })
+  await tarefa
+  expect(postMessage).toHaveBeenCalledWith({ ok: true })
+  expect(cache.addAll.mock.calls[0][0].some((u: string) => u.includes('googlesyndication'))).toBe(false)
+})
