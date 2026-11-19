@@ -1,0 +1,164 @@
+/* Telas de aviso do beta. Sempre no escuro, como uma tela de fliperama: as cores não mudam com o tema do site.
+   A tipografia vem de arcade.css (Quadra 8, maiúsculas); aqui só o que é próprio de cada versão. */
+.beta {
+  --b-fundo: #14150f;
+  --b-painel: #1f211a;
+  --b-linha: #3a3c31;
+  --b-texto: #f4f2ea;
+  --b-apagado: #b9b6a6;
+  --b-laranja: #ff6a1f;
+  --b-ouro: #ffc72b;
+  --b-azul: #2f43e8;
+  --b-verde: #3ddc84;
+  min-height: 100svh;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 1.1rem;
+  padding: clamp(1.5rem, 5vw, 3rem) clamp(1.1rem, 4vw, 2.5rem) 5.5rem;
+  background: var(--b-fundo);
+  color: var(--b-texto);
+  text-align: center;
+  line-height: 1.6;
+}
+.beta p, .beta ul, .beta ol, .beta h1 { margin: 0; }
+.beta a { color: var(--b-ouro); }
+.beta a:hover { color: var(--b-laranja); }
+.beta-titulo { font-size: clamp(2.4rem, 9vw, 5.2rem); line-height: 1.15; text-wrap: balance; }
+.beta-marca { font-size: 0.85rem; letter-spacing: 0.14em; color: var(--b-laranja); }
+
+/* Botão principal: degrau azul atrás, aperta ao clicar. */
+.beta-btn {
+  padding: 0.95rem 1.4rem;
+  background: var(--b-laranja);
+  color: #0b0b0b;
+  border: 3px solid #000;
+  border-radius: 0;
+  box-shadow: 5px 5px 0 var(--b-azul);
+  font-size: 1rem;
+  cursor: pointer;
+  transition: transform 0.12s, box-shadow 0.12s, background 0.12s;
+}
+.beta-btn:hover { background: var(--b-ouro); }
+.beta-btn:active { transform: translate(4px, 4px); box-shadow: 1px 1px 0 var(--b-azul); }
+.beta-btn:focus-visible, .beta a:focus-visible, .beta button:focus-visible { outline: 3px solid var(--b-ouro); outline-offset: 3px; }
+.beta-ja { font-size: 0.85rem; color: var(--b-apagado); }
+
+.beta-contato { display: grid; gap: 0.25rem; font-size: 0.9rem; color: var(--b-apagado); }
+.beta-contato > span { color: var(--b-texto); letter-spacing: 0.1em; }
+.beta-contato a { overflow-wrap: anywhere; }
+
+.pixel { width: 1.1em; height: 1.1em; flex: none; image-rendering: pixelated; }
+
+/* Barra de prévia (só em /beta). */
+.beta-previa {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 50;
+  display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 0.4rem;
+  padding: 0.6rem; background: #000; border-top: 3px solid var(--laranja, #ff6a1f);
+  color: #f4f2ea; font-size: 0.8rem;
+}
+.beta-previa span { color: #ffc72b; margin-right: 0.3rem; }
+.beta-previa button, .beta-previa a {
+  padding: 0.4rem 0.7rem; background: #23241f; color: #f4f2ea; border: 2px solid #3a3c31; border-radius: 0; font-size: 0.8rem; cursor: pointer; text-decoration: none;
+}
+.beta-previa button[aria-pressed='true'] { border-color: #ffc72b; color: #ffc72b; }
+
+/* ---------- 1. Fliperama ---------- */
+.beta-fliperama { gap: 1rem; }
+.beta-placar-topo { display: flex; justify-content: space-between; width: min(100%, 44rem); font-size: 0.75rem; color: var(--b-apagado); }
+.beta-placar-topo b { color: var(--b-ouro); font-weight: 400; }
+.bf-tela {
+  width: min(100%, 40rem); display: grid; gap: 0.8rem; padding: 1.3rem 1.4rem; background: var(--b-painel);
+  border: 3px solid var(--b-linha); box-shadow: 0 0 0 3px #000, 6px 6px 0 3px var(--b-azul); font-size: 0.95rem; text-align: left;
+}
+.bf-start { margin-top: 0.4rem; animation: beta-piscar 1.4s ease-in-out infinite; }
+.bf-credito { font-size: 0.75rem; color: var(--b-apagado); letter-spacing: 0.2em; }
+@keyframes beta-piscar { 50% { opacity: 0.55; } }
+
+/* ---------- 2. Cartucho ---------- */
+.bc-conjunto { display: grid; grid-template-columns: auto minmax(0, 28rem); gap: clamp(1.5rem, 5vw, 3.5rem); align-items: center; text-align: left; }
+.bc-cartucho {
+  position: relative; width: clamp(11rem, 26vw, 15rem); padding: 1.1rem 1rem 1.6rem; background: #6d6f64;
+  border: 4px solid #000; box-shadow: 8px 8px 0 var(--b-azul); transform: rotate(-3deg);
+}
+.bc-entalhe { position: absolute; top: -4px; left: 50%; width: 38%; height: 0.7rem; translate: -50% 0; background: var(--b-fundo); border: 4px solid #000; border-top: 0; }
+.bc-etiqueta { display: grid; justify-items: center; gap: 0.5rem; padding: 0.8rem 0.6rem; background: var(--b-ouro); border: 3px solid #000; color: #0b0b0b; }
+.bc-etiqueta .abertura-bola { width: 5.5rem; height: auto; }
+.bc-selo { padding: 0.1rem 0.5rem; background: #0b0b0b; color: var(--b-ouro); font-size: 0.85rem; letter-spacing: 0.2em; }
+.bc-nome { font-size: 0.8rem; line-height: 1.4; text-align: center; }
+.bc-pinos { position: absolute; left: 12%; right: 12%; bottom: 0.4rem; display: flex; gap: 3px; }
+.bc-pinos i { flex: 1; height: 0.6rem; background: #c9a227; }
+.bc-texto { display: grid; gap: 1rem; justify-items: start; }
+.bc-texto .beta-titulo { font-size: clamp(2.2rem, 6vw, 3.8rem); }
+.bc-lista { list-style: none; padding: 0; display: grid; gap: 0.7rem; font-size: 0.95rem; }
+.bc-lista li { display: grid; grid-template-columns: 1.4rem 1fr; gap: 0.7rem; align-items: start; }
+.bc-lista .pixel { color: var(--b-ouro); margin-top: 0.15rem; }
+
+/* ---------- 3. Diálogo ---------- */
+.bd-cena { width: min(100%, 44rem); display: grid; gap: 1.6rem; justify-items: center; }
+.bd-bola { position: relative; width: clamp(7rem, 22vw, 10rem); animation: beta-quicar 1.1s cubic-bezier(0.4, 0, 0.6, 1) infinite alternate; }
+.bd-bola .abertura-bola { width: 100%; height: auto; display: block; }
+.bd-sombra { position: absolute; left: 12%; right: 12%; bottom: -1rem; height: 0.7rem; background: rgba(0, 0, 0, 0.55); animation: beta-sombra 1.1s cubic-bezier(0.4, 0, 0.6, 1) infinite alternate; }
+@keyframes beta-quicar { from { transform: translateY(-1.2rem); } to { transform: translateY(0); } }
+@keyframes beta-sombra { from { transform: scaleX(0.7); opacity: 0.5; } to { transform: scaleX(1); opacity: 1; } }
+.bd-caixa {
+  position: relative; width: 100%; display: grid; gap: 0.9rem; padding: 1.8rem 1.6rem 1.4rem; background: #0b0b0b; text-align: left;
+  border: 4px solid var(--b-texto); box-shadow: 0 0 0 4px #000, 8px 8px 0 4px var(--b-azul);
+}
+.bd-nome { position: absolute; top: -1.15rem; left: 1.2rem; padding: 0.15rem 0.8rem; background: var(--b-ouro); color: #0b0b0b; border: 3px solid #000; font-size: 0.85rem; letter-spacing: 0.12em; }
+.bd-caixa .beta-titulo { font-size: clamp(1.8rem, 5vw, 2.8rem); }
+.bd-caixa p { font-size: 0.95rem; }
+.bd-menu { list-style: none; padding: 0; display: grid; gap: 0.25rem; margin-top: 0.3rem; }
+.bd-menu a, .bd-menu button {
+  display: flex; gap: 0.7rem; width: 100%; padding: 0.55rem 0.4rem; background: none; border: 0; color: var(--b-texto); font-size: 1rem; text-align: left; text-decoration: none; cursor: pointer;
+}
+.bd-menu b { color: var(--b-laranja); font-weight: 400; opacity: 0; }
+.bd-menu a:hover, .bd-menu button:hover, .bd-menu a:focus-visible, .bd-menu button:focus-visible { color: var(--b-ouro); }
+.bd-menu a:hover b, .bd-menu button:hover b, .bd-menu a:focus-visible b, .bd-menu button:focus-visible b, .bd-menu li:first-child b { opacity: 1; }
+.bd-seta { position: absolute; right: 1.1rem; bottom: 0.9rem; width: 0; height: 0; border: 0.55rem solid transparent; border-top: 0.7rem solid var(--b-ouro); border-bottom: 0; animation: beta-piscar 1s ease-in-out infinite; }
+
+/* ---------- 4. Placar ---------- */
+.bp-painel {
+  width: min(100%, 46rem); display: grid; gap: 1.1rem; justify-items: center; padding: clamp(1.3rem, 4vw, 2.2rem); background: #000;
+  border: 6px solid #4a4c40; box-shadow: 0 0 0 4px #000, 10px 10px 0 4px var(--b-azul);
+}
+.bp-topo { font-size: 0.9rem; letter-spacing: 0.25em; color: var(--b-ouro); }
+.bp-celulas { width: 100%; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.6rem; }
+.bp-celulas div { display: grid; gap: 0.3rem; padding: 0.8rem 0.4rem; background: var(--b-painel); border: 3px solid var(--b-linha); }
+.bp-celulas span { font-size: 0.75rem; color: var(--b-apagado); letter-spacing: 0.12em; }
+.bp-celulas strong { font-size: clamp(1.2rem, 4vw, 1.9rem); font-weight: 400; color: var(--b-laranja); }
+.bp-celulas div:last-child strong { color: var(--b-ouro); animation: beta-piscar 1.4s ease-in-out infinite; }
+.bp-texto { max-width: 34rem; font-size: 0.95rem; }
+
+/* ---------- 5. Fases ---------- */
+.bm-conjunto { width: min(100%, 38rem); display: grid; gap: 1rem; justify-items: center; }
+.bm-texto { font-size: 0.95rem; max-width: 32rem; }
+.bm-fases { list-style: none; padding: 0; width: 100%; display: grid; gap: 0.5rem; }
+.bm-fases li {
+  display: grid; grid-template-columns: 2.2rem minmax(0, 1fr) auto; gap: 0.9rem; align-items: center; padding: 0.65rem 0.9rem; text-align: left;
+  background: var(--b-painel); border: 3px solid var(--b-linha);
+}
+.bm-fases li.aberta { border-color: var(--b-verde); box-shadow: 4px 4px 0 #000; }
+.bm-fases li.fechada { color: var(--b-apagado); border-style: dashed; }
+.bm-num { display: grid; place-items: center; height: 2.2rem; background: var(--b-ouro); color: #0b0b0b; font-size: 1.1rem; }
+.fechada .bm-num { background: var(--b-linha); color: var(--b-apagado); }
+.bm-nome { font-size: 1.05rem; }
+.bm-estado { display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; }
+.bm-estado b { font-weight: 400; }
+.aberta .bm-estado { color: var(--b-verde); }
+.bm-barra { width: 100%; height: 1.2rem; padding: 3px; background: #000; border: 3px solid var(--b-linha); }
+.bm-barra i { display: block; height: 100%; background: repeating-linear-gradient(90deg, var(--b-ouro) 0 10px, var(--b-laranja) 10px 12px); }
+.bm-legenda { font-size: 0.8rem; color: var(--b-apagado); }
+
+@media (max-width: 760px) {
+  .bc-conjunto { grid-template-columns: 1fr; justify-items: center; }
+  .bc-texto { justify-items: center; text-align: center; }
+  .bc-lista { text-align: left; }
+}
+@media (max-width: 420px) {
+  .bp-celulas { grid-template-columns: 1fr; }
+  .beta-placar-topo span:nth-child(3) { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bf-start, .bd-bola, .bd-sombra, .bd-seta, .bp-celulas div:last-child strong { animation: none; }
+}

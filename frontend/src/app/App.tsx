@@ -10,6 +10,7 @@ import RecuperarSenha from '../features/autenticacao/pages/RecuperarSenha'
 import { ConfirmarConta, RedefinirSenha } from '../features/autenticacao/pages/LinkDeConta'
 import { PoliticaPrivacidade, TermosDeUso } from '../features/legal/pages/Legal'
 import AvisoCookies from '../shared/ui/AvisoCookies'
+import { PortaBeta, PreviaBeta } from '../features/beta/PortaBeta'
 
 // Páginas baixadas quando abertas; antecipação apenas por intenção de navegação.
 function pagina<M, K extends keyof M>(carregar: () => Promise<M>, nome: K, rota: string) {
@@ -51,7 +52,9 @@ function Rotas() {
     <Routes>
       <Route path="entrar" element={<Entrar modo="entrar" />} />
       {/* Na demonstração não há contas para criar: o login já aceita qualquer e-mail e senha. */}
-      <Route path="cadastro" element={__DEMO__ ? <Navigate to="/entrar" replace /> : <Entrar modo="cadastro" />} />
+      <Route path="cadastro" element={__DEMO__ ? <Navigate to="/entrar" replace /> : <PortaBeta><Entrar modo="cadastro" /></PortaBeta>} />
+      {/* Prévia das versões do aviso de beta (também na demonstração, para escolher a preferida). */}
+      <Route path="beta" element={<PreviaBeta />} />
       <Route path="recuperar-senha" element={__DEMO__ ? <Navigate to="/entrar" replace /> : <RecuperarSenha />} />
       <Route path="redefinir-senha" element={__DEMO__ ? <Navigate to="/entrar" replace /> : <RedefinirSenha />} />
       <Route path="confirmar-conta" element={__DEMO__ ? <Navigate to="/entrar" replace /> : <ConfirmarConta />} />

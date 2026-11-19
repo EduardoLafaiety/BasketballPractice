@@ -25,7 +25,11 @@ export default defineConfig({
       origins: [
         {
           origin: `http://localhost:${PORTA_SITE}`,
-          localStorage: [{ name: 'bp.cookies', value: JSON.stringify({ versao: 1, escolha: 'recusado' }) }],
+          localStorage: [
+            { name: 'bp.cookies', value: JSON.stringify({ versao: 1, escolha: 'recusado' }) },
+            // O aviso do beta antes do cadastro já foi visto (ele tem teste próprio).
+            { name: 'bp.beta', value: 'visto' },
+          ],
         },
       ],
     },
