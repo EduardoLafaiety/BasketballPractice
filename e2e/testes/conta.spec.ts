@@ -5,7 +5,7 @@ test('cadastro pelo formulário, ativação pelo e-mail, sair e entrar de novo v
   const email = emailUnico('cadastro')
 
   // Sem login, uma página protegida manda para o login.
-  await page.goto('/artigos')
+  await page.goto('/alimentacao')
   await expect(page).toHaveURL(/\/entrar$/)
 
   await page.getByRole('link', { name: 'Criar conta' }).click()
@@ -38,7 +38,7 @@ test('cadastro pelo formulário, ativação pelo e-mail, sair e entrar de novo v
   await page.getByRole('button', { name: 'Sair' }).click()
   await expect(page).toHaveURL(/\/entrar$/)
 
-  await page.goto('/artigos')
+  await page.goto('/alimentacao')
   await expect(page).toHaveURL(/\/entrar$/)
   await page.getByLabel('E-mail').fill(email)
   await page.getByLabel('Senha').fill('senha-errada-123')
@@ -48,8 +48,8 @@ test('cadastro pelo formulário, ativação pelo e-mail, sair e entrar de novo v
   await page.getByLabel('Senha').fill(SENHA)
   await page.getByRole('button', { name: 'Entrar' }).click()
   // Depois do login, volta para a página que foi pedida.
-  await expect(page).toHaveURL(/artigos$/)
-  await expect(page.getByRole('heading', { name: 'Artigos', level: 1 })).toBeVisible()
+  await expect(page).toHaveURL(/alimentacao$/)
+  await expect(page.getByRole('heading', { name: 'Alimentação', level: 1 })).toBeVisible()
 })
 
 test('cadastrar um e-mail que já tem conta não revela isso na tela: o aviso vai para o dono', async ({ page, request }) => {
@@ -67,4 +67,16 @@ test('cadastrar um e-mail que já tem conta não revela isso na tela: o aviso va
   // A senha da conta continua a mesma.
   const login = await request.post('/api/auth/login', { data: { email, password: SENHA } })
   expect(login.status()).toBe(200)
+})
+
+test('Equipamentos e Artigos abrem sem conta, com os links da Amazon e o convite para entrar', async ({ page }) => {
+  await page.goto('/equipamentos')
+  await expect(page).toHaveURL(/\/equipamentos$/)
+  await expect(page.getByRole('heading', { name: 'Equipamentos', level: 1 })).toBeVisible()
+  await expect(page.getByRole('link', { name: /Ver na Amazon/ }).first()).toHaveAttribute('href', /amazon\.com\.br/)
+
+  await page.getByRole('navigation', { name: 'Páginas abertas' }).getByRole('link', { name: 'Artigos' }).click()
+  await expect(page.getByRole('heading', { name: 'Artigos', level: 1 })).toBeVisible()
+  await page.getByRole('banner').getByRole('link', { name: 'Entrar' }).click()
+  await expect(page).toHaveURL(/\/entrar$/)
 })
