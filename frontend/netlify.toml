@@ -1,8 +1,0 @@
-# Site na Netlify (base: frontend). O tsc do site também confere ../backend (modo demonstração),
-# então as dependências do backend precisam estar instaladas antes do build.
-[build]
-  command = "(cd ../backend && npm ci --include=dev) && npm run build"
-  publish = "dist"
-
-[build.environment]
-  NODE_VERSION = "22"
