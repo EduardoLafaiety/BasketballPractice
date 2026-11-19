@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom/vitest'
 import { cleanup } from '@testing-library/react'
-import { afterEach, vi } from 'vitest'
+import { afterEach, beforeEach, vi } from 'vitest'
 import { definirToken } from '../shared/api/backend'
 import { limparCache } from '../shared/data/recursos'
 
@@ -22,6 +22,11 @@ if (!Blob.prototype.text) {
     })
   }
 }
+
+// O aviso do beta aparece antes do cadastro uma vez por navegador: os testes já chegam com ele visto.
+beforeEach(() => {
+  globalThis.localStorage?.setItem('bp.beta', 'visto')
+})
 
 afterEach(() => {
   cleanup()
