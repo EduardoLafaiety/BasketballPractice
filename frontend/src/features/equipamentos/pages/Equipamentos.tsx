@@ -1,14 +1,21 @@
-import { useState, type ComponentProps, type CSSProperties } from 'react'
+import { useState, type CSSProperties, type ReactNode } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { buscaTime, linkAmazon, MARCAS, TIMES, type Conferencia } from '../dados'
-import Bola, { LADO_DO_LOGO, type Colagem } from '../Bola'
+import Bola, { ehEscura, LADO_DO_LOGO, type Colagem } from '../Bola'
+import Sprite from '../Sprite'
+import { buscaRegata, CATEGORIAS, PRODUTOS, type Categoria } from '../produtos'
 import { logoPequeno } from '../../nba/escudos'
 import Icone from '../../../shared/ui/Icone'
 
 const ABAS = [
-  { id: 'times', rotulo: 'Times da NBA', resumo: `${TIMES.length} bolas nas cores de cada time` },
-  { id: 'marcas', rotulo: 'Marcas', resumo: 'Wilson, Spalding e Molten' },
+  { id: 'times', rotulo: 'Bolas da NBA', resumo: `${TIMES.length} bolas nas cores de cada time` },
+  { id: 'marcas', rotulo: 'Bolas de marca', resumo: 'Wilson, Spalding e Molten' },
+  { id: 'regatas', rotulo: 'Regatas da NBA', resumo: `${TIMES.length} times, com o logo no peito` },
+  ...CATEGORIAS,
 ] as const
+
+// Branco some no cartão claro: nesse caso a faixa de cima do cartão usa a cor de destaque.
+const BRANCO = '#F4F2EA'
 
 // A faixa da marca é preta em quase todas as bolas de time.
 const FAIXA_PRETA = '#141414'
@@ -31,9 +38,9 @@ function colagemDe(c: (typeof MARCAS)[number]['colagem']): Colagem | undefined {
 }
 
 function CartaoProduto(p: {
-  /** A cor do cartão e as da bola. */
+  /** A cor do cartão e o desenho do produto (a bola ou o sprite). */
   cor: string
-  bola: ComponentProps<typeof Bola>
+  vitrine: ReactNode
   tag: string
   nome: string
   meta: string
@@ -50,7 +57,7 @@ function CartaoProduto(p: {
       rel="sponsored noopener noreferrer"
     >
       <span className="produto-vitrine">
-        <Bola {...p.bola} />
+        {p.vitrine}
       </span>
       <span className="tag">{p.tag}</span>
       <h3>{p.nome}</h3>
@@ -67,7 +74,9 @@ function CartaoProduto(p: {
   )
 }
 
-function Times() {
+
+/** Os 30 times, com busca e filtro de conferência: uma bola de cada (tipo "bolas") ou uma regata de cada. */
+function Times({ tipo }: { tipo: 'bolas' | 'regatas' }) {
   const [params, setParams] = useSearchParams()
   const [busca, setBusca] = useState('')
   const conf = CONFERENCIAS.find((c) => c.id === params.get('conf'))?.id ?? 'todas'
@@ -101,20 +110,26 @@ function Times() {
             <CartaoProduto
               key={t.sigla}
               cor={t.cor}
-              bola={{
-                frente: t.bola?.frente ?? t.cor,
-                faixa: t.bola?.faixa ?? FAIXA_PRETA,
-                canal: t.bola?.canal ?? t.costura,
-                marca: 'Wilson',
-                logo: logoPequeno(t.sigla, LADO_DO_LOGO),
-                icone: t.icone,
-                logoContorno: t.bola?.logoContorno,
-              }}
+              vitrine={
+                tipo === 'bolas' ? (
+                  <Bola
+                    frente={t.bola?.frente ?? t.cor}
+                    faixa={t.bola?.faixa ?? FAIXA_PRETA}
+                    canal={t.bola?.canal ?? t.costura}
+                    marca="Wilson"
+                    logo={logoPequeno(t.sigla, LADO_DO_LOGO)}
+                    icone={t.icone}
+                    logoContorno={t.bola?.logoContorno}
+                  />
+                ) : (
+                  <Sprite nome="regata" cor={t.cor} destaque={t.costura} logo={logoPequeno(t.sigla, LADO_DO_LOGO)[ehEscura(t.cor) ? 'escuro' : 'claro']} />
+                )
+              }
               tag={`${t.sigla} · ${t.conferencia === 'leste' ? 'Leste' : 'Oeste'}`}
               nome={`${t.cidade} ${t.nome}`}
-              meta="Wilson NBA Team Tribute"
-              detalhes={['Tamanho 7', 'Coleção NBA']}
-              busca={buscaTime(t)}
+              meta={tipo === 'bolas' ? 'Wilson NBA Team Tribute' : 'Regata do time'}
+              detalhes={tipo === 'bolas' ? ['Tamanho 7', 'Coleção NBA'] : ['Regata', 'Coleção NBA']}
+              busca={tipo === 'bolas' ? buscaTime(t) : buscaRegata(t)}
             />
           ))}
         </div>
@@ -130,13 +145,34 @@ function Marcas() {
         <CartaoProduto
           key={b.id}
           cor={b.cor}
-          bola={{ frente: b.cor, faixa: b.cor, canal: b.costura, marca: b.marca, modelo: b.modelo, canalLargo: b.canalLargo, faixaClara: b.faixa, grao: b.grao, calota: b.calota, colagem: colagemDe(b.colagem), marcaCor: b.marcaCor, marcaContorno: b.marcaContorno, marcaTamanho: b.marcaTamanho, emblema: b.emblema }}
+          vitrine={<Bola frente={b.cor} faixa={b.cor} canal={b.costura} marca={b.marca} modelo={b.modelo} canalLargo={b.canalLargo} faixaClara={b.faixa} grao={b.grao} calota={b.calota} colagem={colagemDe(b.colagem)} marcaCor={b.marcaCor} marcaContorno={b.marcaContorno} marcaTamanho={b.marcaTamanho} emblema={b.emblema} />}
           tag={b.marca}
           nome={b.nome}
           meta={b.material}
           texto={b.texto}
           detalhes={[b.uso, 'Tamanho 7']}
           busca={b.busca}
+        />
+      ))}
+    </div>
+  )
+}
+
+/** Roupas, tênis e proteção, ou material de treino. */
+function Produtos({ categoria }: { categoria: Categoria }) {
+  return (
+    <div className="grade produtos">
+      {PRODUTOS.filter((p) => p.categoria === categoria).map((p) => (
+        <CartaoProduto
+          key={p.id}
+          cor={p.cor === BRANCO ? p.destaque : p.cor}
+          vitrine={<Sprite nome={p.sprite} cor={p.cor} destaque={p.destaque} />}
+          tag={p.tipo}
+          nome={p.nome}
+          meta={p.detalhes[0]}
+          texto={p.texto}
+          detalhes={p.detalhes.slice(1)}
+          busca={p.busca}
         />
       ))}
     </div>
@@ -150,7 +186,9 @@ export default function Equipamentos() {
   return (
     <>
       <h1>Equipamentos</h1>
-      <p className="muted">Bolas para treinar e para colecionar: as oficiais das grandes marcas e uma de cada time da NBA.</p>
+      <p className="muted">
+        Tudo para a quadra: bolas das grandes marcas e de cada time da NBA, regatas, roupas, tênis, proteção e material de treino.
+      </p>
       <p className="dieta-aviso">
         <strong>Os botões abrem a Amazon.</strong> Preço, fotos e compra ficam por lá. Como Associado da Amazon, o Basketball Practice
         ganha com compras qualificadas, sem custo a mais para você.
@@ -166,8 +204,10 @@ export default function Equipamentos() {
       </div>
 
       <section role="tabpanel" aria-label={ABAS.find((a) => a.id === aba)!.rotulo}>
-        {aba === 'times' && <Times />}
+        {aba === 'times' && <Times tipo="bolas" />}
         {aba === 'marcas' && <Marcas />}
+        {aba === 'regatas' && <Times tipo="regatas" />}
+        {(aba === 'roupas' || aba === 'calcados' || aba === 'treino') && <Produtos categoria={aba} />}
       </section>
     </>
   )
