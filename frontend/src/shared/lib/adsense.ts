@@ -17,3 +17,34 @@ export function idEditor(valor: string | undefined): string | null {
 export function conteudoAdsTxt(id: string) {
   return `google.com, ${id}, DIRECT, ${CERTIFICACAO_GOOGLE}\n`
 }
+
+/** O ID no formato do script de anúncios: "ca-pub-…". */
+export const clienteAdsense = (id: string) => `ca-${id}`
+
+type FilaAdsense = unknown[] & { requestNonPersonalizedAds?: 0 | 1 }
+declare global {
+  interface Window {
+    adsbygoogle?: FilaAdsense
+  }
+}
+
+/**
+ * Diz ao AdSense se pode personalizar os anúncios (só com o Aceitar do aviso de cookies). Vale para os
+ * próximos pedidos de anúncio; por isso é chamado antes de o script carregar e de novo a cada mudança.
+ */
+export function definirPersonalizacao(personalizados: boolean) {
+  const fila: FilaAdsense = (window.adsbygoogle ??= [])
+  fila.requestNonPersonalizedAds = personalizados ? 0 : 1
+}
+
+/** Põe o script do AdSense na página uma vez (anúncios automáticos: o Google escolhe onde mostrar). */
+export function carregarAdsense(id: string, personalizados: boolean) {
+  definirPersonalizacao(personalizados)
+  if (document.querySelector('script[data-adsense]')) return
+  const script = document.createElement('script')
+  script.async = true
+  script.crossOrigin = 'anonymous'
+  script.src = `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${clienteAdsense(id)}`
+  script.dataset.adsense = ''
+  document.head.appendChild(script)
+}

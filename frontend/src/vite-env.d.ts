@@ -7,6 +7,8 @@ interface ImportMetaEnv {
   readonly VITE_DEMO?: string
   /** Subpasta onde o site é publicado, ex.: /BasketballPractice/ (GitHub Pages). Padrão: /. */
   readonly VITE_BASE?: string
+  /** ID de editor do Google AdSense (ca-pub-…): gera o ads.txt e liga os anúncios automáticos. */
+  readonly VITE_ADSENSE_ID?: string
 }
 
 /** true no build da demonstração; definido no vite.config.ts a partir de VITE_DEMO. */
