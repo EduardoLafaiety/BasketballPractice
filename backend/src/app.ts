@@ -63,7 +63,7 @@ export function createApp(
   app.use(helmet({ contentSecurityPolicy: { directives: { defaultSrc: ["'none'"], frameAncestors: ["'none'"] } } }))
   // Respostas comprimidas (gzip/brotli): desempenho, backup e listas chegam bem menores.
   app.use(compression())
-  app.use(cors({ origin: config.corsOrigin }))
+  app.use(cors({ origin: config.corsOrigins }))
   // O backup importado pode ter anos de sessões; o resto da API fica no limite pequeno.
   app.use('/api/data/import', express.json({ limit: '10mb' }))
   app.use(express.json({ limit: '100kb' }))

@@ -33,16 +33,20 @@ const email: EmailConfig = {
 }
 if (isProduction) assertProductionEmail(email)
 
-const corsOrigin = process.env.CORS_ORIGIN ?? 'http://localhost:5173'
+// CORS_ORIGIN aceita um ou vários endereços do site, separados por vírgula (ex.: o domínio, o www e o endereço antigo).
+const corsOrigins = (process.env.CORS_ORIGIN ?? 'http://localhost:5173')
+  .split(',')
+  .map((o) => o.trim().replace(/\/$/, ''))
+  .filter(Boolean)
 
 export const config = {
   port: Number(process.env.PORT ?? 3333),
   jwtSecret,
   jwtExpiresIn: process.env.JWT_EXPIRES_IN ?? '7d',
   databaseUrl: process.env.DATABASE_URL ?? 'postgres://basketball:basketball@localhost:5433/basketball',
-  corsOrigin,
+  corsOrigins,
   /** Endereço do site, para os links dos e-mails. Vem da configuração, nunca do pedido: um Host forjado desviaria o link. */
-  appUrl: (process.env.APP_URL || corsOrigin).replace(/\/$/, ''),
+  appUrl: (process.env.APP_URL || corsOrigins[0]).replace(/\/$/, ''),
   email,
   // Atrás de um proxy (Nginx, Render, Railway…), defina TRUST_PROXY=1 para o req.ip ser o do atleta, não o do proxy.
   trustProxy: Number(process.env.TRUST_PROXY ?? 0),
