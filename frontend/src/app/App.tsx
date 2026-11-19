@@ -10,6 +10,7 @@ import RecuperarSenha from '../features/autenticacao/pages/RecuperarSenha'
 import { ConfirmarConta, RedefinirSenha } from '../features/autenticacao/pages/LinkDeConta'
 import { PoliticaPrivacidade, TermosDeUso } from '../features/legal/pages/Legal'
 import AvisoCookies from '../shared/ui/AvisoCookies'
+import Anuncios from '../shared/ui/Anuncios'
 import { PortaBeta, PreviaBeta } from '../features/beta/PortaBeta'
 
 // Páginas baixadas quando abertas; antecipação apenas por intenção de navegação.
@@ -43,6 +44,7 @@ export default function App() {
     <>
       <Rotas />
       <AvisoCookies />
+      <Anuncios />
     </>
   )
 }

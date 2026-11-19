@@ -143,7 +143,8 @@ describe('modelo humano realista', () => {
     expect(movidos).toBeGreaterThan(10)
     mesh.morphTargetInfluences = influencias
   })
-  it('mantém matrizes válidas nas fases de todos os exercícios, inclusive braços apontados para a frente', () => {
+  // Percorre todas as poses de todos os exercícios: no servidor do CI leva de 5 a 8 s, acima do limite padrão.
+  it('mantém matrizes válidas nas fases de todos os exercícios, inclusive braços apontados para a frente', { timeout: 30_000 }, () => {
     for (const [nome, c] of Object.entries(COREOGRAFIAS)) {
       const anim = preparar(c)
       const tempos = anim.chaves.flatMap((k, i) => [k.tempo, (k.tempo + (anim.chaves[i + 1]?.tempo ?? k.tempo)) / 2])
