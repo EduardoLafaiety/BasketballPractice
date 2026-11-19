@@ -35,7 +35,11 @@ self.addEventListener('message', (evento) => {
       const html = await fetch(INDEX, { cache: 'reload' })
       if (!html.ok) throw new Error('Página indisponível')
       const documento = await html.clone().text()
-      const entradas = [...documento.matchAll(/<script\b[^>]*\bsrc=["']([^"']+)["']/g)].map((m) => new URL(m[1], self.registration.scope).href)
+      // Só os módulos do próprio site: scripts de fora (o do AdSense) não entram no cache offline.
+      const entradas = [...documento.matchAll(/<script\b[^>]*\bsrc=["']([^"']+)["']/g)]
+        .map((m) => new URL(m[1], self.registration.scope))
+        .filter((url) => url.origin === self.location.origin)
+        .map((url) => url.href)
       if (!entradas.length || entradas.some((url) => !urls.includes(url))) throw new Error('Página atualizada; recarregue antes de preparar')
       const cache = await caches.open(VERSAO)
       await cache.addAll([BASE + 'manifest.webmanifest', BASE + 'icon.svg', ...urls])
