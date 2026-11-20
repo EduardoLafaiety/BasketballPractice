@@ -16,11 +16,27 @@ export function billingRouter(service: BillingService) {
   router.use((_req, res, next) => { res.setHeader('Cache-Control', 'no-store'); next() })
   router.get('/status', async (req, res) => { res.json(await service.status(currentUser(req))) })
   router.post('/checkout', async (req, res) => {
-    const { plan } = parse(z.object({ plan: z.enum(['mensal', 'anual']) }).strict(), req.body)
-    res.json(await service.checkout(currentUser(req), plan))
+    const { plan, mode } = parse(z.object({ plan: z.enum(['mensal', 'anual']), mode: z.enum(['recorrente','avulso']).default('recorrente') }).strict(), req.body)
+    res.json(await service.checkout(currentUser(req), plan, mode))
   })
   router.post('/refresh', async (req, res) => { res.json(await service.refresh(currentUser(req))) })
   router.post('/cancel', async (req, res) => { res.json(await service.cancel(currentUser(req))) })
+  return router
+}
+
+/** Compra antes do cadastro. A chave aleatória permite consultar só esta compra, nunca acessar a plataforma. */
+export function publicBillingRouter(service: BillingService) {
+  const router = Router()
+  const key = z.string().regex(/^[a-f0-9]{64}$/, 'Identificador de compra inválido.')
+  router.get('/availability', (_req, res) => { res.json({ ready: service.options.enabled && service.ready }) })
+  router.post('/purchase', async (req, res) => {
+    const input = parse(z.object({ email: z.string().trim().toLowerCase().email().max(254), plan: z.enum(['mensal','anual']), checkoutKey: key, mode: z.enum(['recorrente','avulso']).default('recorrente') }).strict(), req.body)
+    res.json(await service.purchase(input.email, input.plan, input.checkoutKey, input.mode))
+  })
+  router.post('/purchase/status', async (req, res) => {
+    const { checkoutKey } = parse(z.object({ checkoutKey: key }).strict(), req.body)
+    res.json(await service.purchaseStatus(checkoutKey))
+  })
   return router
 }
 

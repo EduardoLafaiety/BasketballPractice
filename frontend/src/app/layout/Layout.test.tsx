@@ -33,15 +33,18 @@ describe('Menu em tela cheia', () => {
     expect(abrirMenu).toHaveFocus()
     expect(screen.queryByRole('dialog')).toBeNull()
   })
-  it('a bola e o rótulo Início voltam ao topo mesmo na página inicial', async () => {
+  it('a marca volta ao início da landing e o rótulo Início mantém a navegação dos treinos', async () => {
     const user = userEvent.setup()
     abrir('/')
     await botaoMenu()
     const topo = within(document.querySelector('.topo') as HTMLElement)
-    await user.click(topo.getByRole('link', { name: 'Basketball Practice, início' }))
     await user.click(topo.getByRole('link', { name: 'Início' }))
-    expect(window.scrollTo).toHaveBeenCalledTimes(2)
     expect(window.scrollTo).toHaveBeenLastCalledWith(0, 0)
+    await user.click(topo.getByRole('link', { name: 'Basketball Practice, início' }))
+    expect(await screen.findByRole('heading',{level:1})).toHaveTextContent('Seu jogo.')
+    expect(screen.getByTestId('caminho')).toHaveTextContent('/conheca')
+    expect(window.scrollTo).toHaveBeenCalledTimes(2)
+    expect(window.scrollTo).toHaveBeenLastCalledWith({top:0,left:0,behavior:'instant'})
   })
   it('abre e fecha pelo botão, que informa o estado', async () => {
     const user = userEvent.setup()
@@ -77,8 +80,8 @@ describe('Menu em tela cheia', () => {
     abrir()
     await user.click(await botaoMenu())
     await user.click(within(document.querySelector('.topo') as HTMLElement).getByRole('link', { name: /início/i }))
-    await waitFor(() => expect(screen.getByTestId('caminho')).toHaveTextContent(/^\/$/))
-    await waitFor(() => expect(tela()).not.toHaveClass('aberto'))
+    await waitFor(() => expect(screen.getByTestId('caminho')).toHaveTextContent('/conheca'))
+    expect(screen.queryByRole('dialog',{name:'Menu principal'})).toBeNull()
   })
 
   it('o topo não tem mais o botão Gerar rotina: sobram a marca e o menu', async () => {

@@ -13,6 +13,7 @@ import { PortaBeta, PreviaBeta } from '../features/beta/PortaBeta'
 import { useIdioma } from '../shared/i18n/idioma'
 import Apresentacao from '../features/apresentacao/Apresentacao'
 import Assinatura, { RequerAssinatura } from '../features/assinatura/Assinatura'
+import Compra from '../features/assinatura/Compra'
 import Contato from '../features/apresentacao/Contato'
 
 // Páginas baixadas quando abertas; antecipação apenas por intenção de navegação.
@@ -58,6 +59,7 @@ function Rotas() {
       <Route path="/" element={<EntradaSite />}><Route element={<RequerAssinatura />}><Route index element={<Inicio />} /></Route></Route>
       <Route path="conheca" element={<Apresentacao />} />
       <Route path="assinatura" element={<Assinatura />} />
+      <Route path="compra" element={<Compra />} />
       <Route path="contato" element={<Contato />} />
       <Route path="entrar" element={<Entrar modo="entrar" />} />
       {/* Na demonstração não há contas para criar: o login já aceita qualquer e-mail e senha. */}

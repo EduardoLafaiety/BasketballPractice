@@ -1,3 +1,4 @@
+import LinkInicio from '../../../shared/ui/LinkInicio'
 import { Link } from '../../../shared/i18n/links'
 import { useState, type ReactNode } from 'react'
 
@@ -10,10 +11,10 @@ export default function TelaAuth({ children }: { children: ReactNode }) {
   return (
     <div className="auth auth-atualizada">
       <header className="topo auth-cabecalho">
-      <Link to="/entrar" className="auth-marca" aria-label="Basketball Practice">
+      <LinkInicio className="auth-marca" aria-label="Basketball Practice">
         <span className="marca"><LogoBola tamanho={28} /></span>
         <span className="auth-nome">Basketball Practice</span>
-      </Link>
+      </LinkInicio>
       <PreferenciasCabecalho />
       </header>
       <section className="auth-palco" aria-hidden="true">
