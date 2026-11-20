@@ -1,21 +1,14 @@
 import { useState, type CSSProperties, type ReactNode } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { buscaTime, linkAmazon, MARCAS, TIMES, type Conferencia } from '../dados'
-import Bola, { ehEscura, LADO_DO_LOGO, type Colagem } from '../Bola'
-import Sprite from '../Sprite'
-import { buscaRegata, CATEGORIAS, PRODUTOS, type Categoria } from '../produtos'
+import Bola, { LADO_DO_LOGO, type Colagem } from '../Bola'
 import { logoPequeno } from '../../nba/escudos'
 import Icone from '../../../shared/ui/Icone'
 
 const ABAS = [
   { id: 'times', rotulo: 'Bolas da NBA', resumo: `${TIMES.length} bolas nas cores de cada time` },
   { id: 'marcas', rotulo: 'Bolas de marca', resumo: 'Wilson, Spalding e Molten' },
-  { id: 'regatas', rotulo: 'Regatas da NBA', resumo: `${TIMES.length} times, com o logo no peito` },
-  ...CATEGORIAS,
 ] as const
-
-// Branco some no cartão claro: nesse caso a faixa de cima do cartão usa a cor de destaque.
-const BRANCO = '#F4F2EA'
 
 // A faixa da marca é preta em quase todas as bolas de time.
 const FAIXA_PRETA = '#141414'
@@ -38,7 +31,7 @@ function colagemDe(c: (typeof MARCAS)[number]['colagem']): Colagem | undefined {
 }
 
 function CartaoProduto(p: {
-  /** A cor do cartão e o desenho do produto (a bola ou o sprite). */
+  /** A cor do cartão e o desenho da bola. */
   cor: string
   vitrine: ReactNode
   tag: string
@@ -75,8 +68,8 @@ function CartaoProduto(p: {
 }
 
 
-/** Os 30 times, com busca e filtro de conferência: uma bola de cada (tipo "bolas") ou uma regata de cada. */
-function Times({ tipo }: { tipo: 'bolas' | 'regatas' }) {
+/** Os 30 times, com busca e filtro de conferência: uma bola de cada. */
+function Times() {
   const [params, setParams] = useSearchParams()
   const [busca, setBusca] = useState('')
   const conf = CONFERENCIAS.find((c) => c.id === params.get('conf'))?.id ?? 'todas'
@@ -111,8 +104,7 @@ function Times({ tipo }: { tipo: 'bolas' | 'regatas' }) {
               key={t.sigla}
               cor={t.cor}
               vitrine={
-                tipo === 'bolas' ? (
-                  <Bola
+                <Bola
                     frente={t.bola?.frente ?? t.cor}
                     faixa={t.bola?.faixa ?? FAIXA_PRETA}
                     canal={t.bola?.canal ?? t.costura}
@@ -121,15 +113,12 @@ function Times({ tipo }: { tipo: 'bolas' | 'regatas' }) {
                     icone={t.icone}
                     logoContorno={t.bola?.logoContorno}
                   />
-                ) : (
-                  <Sprite nome="regata" cor={t.cor} destaque={t.costura} logo={logoPequeno(t.sigla, LADO_DO_LOGO)[ehEscura(t.cor) ? 'escuro' : 'claro']} />
-                )
               }
               tag={`${t.sigla} · ${t.conferencia === 'leste' ? 'Leste' : 'Oeste'}`}
               nome={`${t.cidade} ${t.nome}`}
-              meta={tipo === 'bolas' ? 'Wilson NBA Team Tribute' : 'Regata do time'}
-              detalhes={tipo === 'bolas' ? ['Tamanho 7', 'Coleção NBA'] : ['Regata', 'Coleção NBA']}
-              busca={tipo === 'bolas' ? buscaTime(t) : buscaRegata(t)}
+              meta="Wilson NBA Team Tribute"
+              detalhes={['Tamanho 7', 'Coleção NBA']}
+              busca={buscaTime(t)}
             />
           ))}
         </div>
@@ -158,27 +147,6 @@ function Marcas() {
   )
 }
 
-/** Roupas, tênis e proteção, ou material de treino. */
-function Produtos({ categoria }: { categoria: Categoria }) {
-  return (
-    <div className="grade produtos">
-      {PRODUTOS.filter((p) => p.categoria === categoria).map((p) => (
-        <CartaoProduto
-          key={p.id}
-          cor={p.cor === BRANCO ? p.destaque : p.cor}
-          vitrine={<Sprite nome={p.sprite} cor={p.cor} destaque={p.destaque} />}
-          tag={p.tipo}
-          nome={p.nome}
-          meta={p.detalhes[0]}
-          texto={p.texto}
-          detalhes={p.detalhes.slice(1)}
-          busca={p.busca}
-        />
-      ))}
-    </div>
-  )
-}
-
 export default function Equipamentos() {
   const [params, setParams] = useSearchParams()
   const aba = (ABAS.find((a) => a.id === params.get('aba'))?.id ?? 'times') as Aba
@@ -187,7 +155,7 @@ export default function Equipamentos() {
     <>
       <h1>Equipamentos</h1>
       <p className="muted">
-        Tudo para a quadra: bolas das grandes marcas e de cada time da NBA, regatas, roupas, tênis, proteção e material de treino.
+        Bolas das grandes marcas e de cada time da NBA.
       </p>
       <p className="dieta-aviso">
         <strong>Os botões abrem a Amazon.</strong> Preço, fotos e compra ficam por lá. Como Associado da Amazon, o Basketball Practice
@@ -204,10 +172,8 @@ export default function Equipamentos() {
       </div>
 
       <section role="tabpanel" aria-label={ABAS.find((a) => a.id === aba)!.rotulo}>
-        {aba === 'times' && <Times tipo="bolas" />}
+        {aba === 'times' && <Times />}
         {aba === 'marcas' && <Marcas />}
-        {aba === 'regatas' && <Times tipo="regatas" />}
-        {(aba === 'roupas' || aba === 'calcados' || aba === 'treino') && <Produtos categoria={aba} />}
       </section>
     </>
   )
