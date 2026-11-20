@@ -1,0 +1,17 @@
+# Cabeçalhos do Cloudflare Pages (o GitHub Pages e o servidor de desenvolvimento ignoram este arquivo).
+
+# Arquivos com hash no nome nunca mudam: o navegador pode guardar por um ano.
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# O service worker e a casca do app precisam ser revalidados, senão uma versão nova demora a chegar.
+/sw.js
+  Cache-Control: no-cache
+/index.html
+  Cache-Control: no-cache
+/manifest.webmanifest
+  Cache-Control: no-cache
+
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
