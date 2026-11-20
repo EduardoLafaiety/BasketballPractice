@@ -127,10 +127,10 @@ export default function Bola({ frente, faixa, canal, marca, logo, icone, modelo,
 
   return (
     <svg className="bola-desenho" viewBox="0 0 120 126" width="176" height="185" aria-hidden>
-      {/* Sombra no chão, em degraus. */}
-      <path d="M30 114h60v3h-60zM24 117h72v3h-72zM30 120h60v3h-60z" fill="#000" opacity=".2" />
+      {/* Sombra no chão. */}
+      <ellipse cx="60" cy="118" rx="36" ry="5" fill="#000" opacity=".2" />
 
-      <image href={sprite} x={DESLOCA} y={DESLOCA} width={LADO_DO_SPRITE} height={LADO_DO_SPRITE} style={{ imageRendering: 'pixelated' }} />
+      <image href={sprite} x={DESLOCA} y={DESLOCA} width={LADO_DO_SPRITE} height={LADO_DO_SPRITE} />
 
       {colagem && (
         <g clipPath={`url(#${id}-bola)`}>

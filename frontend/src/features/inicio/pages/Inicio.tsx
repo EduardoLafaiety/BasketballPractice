@@ -46,7 +46,7 @@ export default function Inicio() {
       >
         <section className="treino-hoje" aria-labelledby="treino-hoje-titulo">
           <div className="hoje-frente">
-            <h2 id="treino-hoje-titulo" className="arcade-letreiro">Treine no seu ritmo. Evolua a cada jogada.</h2>
+            <h2 id="treino-hoje-titulo">Treine no seu ritmo. Evolua a cada jogada.</h2>
             {prontoHoje && treinosHoje.length > 0 && (
               <Link to="/sessao?hoje" className="btn btn-primario">
                 Começar treino de hoje <Icone nome="seta" />

@@ -3,7 +3,7 @@ import BarraProgresso from '../../../shared/ui/BarraProgresso'
 import { Carregando, ErroCarga, AvisoDesatualizado } from '../../../shared/ui/Estado'
 import Icone from '../../../shared/ui/Icone'
 import { conquistas as calcular, ordenarConquistas } from '../model/calculos'
-import IconeConquista, { fundoDaConquista, temSprite } from '../model/IconeConquista'
+import { fundoDaConquista } from '../model/IconeConquista'
 import { useHistorico } from '../model/usarSessoes'
 
 type Filtro = 'todas' | 'desbloqueadas' | 'bloqueadas'
@@ -85,7 +85,7 @@ export default function Conquistas() {
                     <li key={c.id} className={`conquista ${c.desbloqueada ? 'desbloqueada' : ''}`}>
                       {/* O ícone aparece sempre, colorido; bloqueada, ganha o cadeado no canto. */}
                       <span className="conquista-icone" style={{ '--fundo': fundoDaConquista(c.id) } as CSSProperties}>
-                        {temSprite(c.id) ? <IconeConquista id={c.id} /> : <Icone nome="medalha" tamanho={34} />}
+                        <Icone nome="medalha" tamanho={34} />
                       </span>
                       <div className="conquista-texto">
                         <strong>{c.titulo}</strong>

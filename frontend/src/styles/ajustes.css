@@ -1,0 +1,76 @@
+/* Ajustes de layout pedidos depois da repaginada: fundo liso, treinos de hoje em duas fileiras e botões na fonte do site. */
+/* Botões e campos não herdam a fonte do navegador por padrão (ficavam em Arial, como os botões de tempo e foco da
+   Rotina). Seletor simples de propósito: quem já define a própria fonte numa classe continua vencendo. */
+button,
+input,
+select,
+textarea,
+optgroup {
+  font-family: var(--fonte-texto);
+}
+
+/* Sem as linhas de quadra no fundo (círculos, garrafão e meia-quadra): o fundo fica liso. */
+.app::before,
+.linhas-quadra {
+  display: none;
+}
+.pagina-inicio > section:not(.abertura),
+.pagina-inicio .escada-fixa {
+  background-image: none;
+}
+
+/* Abertura: "Bora pra" e "quadra." ficam à mesma distância da bola (a letra tem a mesma folga acima e abaixo dentro da linha). */
+@media (min-width: 861px) {
+  .pagina-inicio .abertura-fixa { --bola: min(52vh, 48vw); }
+  .abertura-fixa .abertura-bola { width: var(--bola); }
+}
+.abertura-a {
+  top: auto;
+  bottom: calc(50% + var(--bola) / 2 - 0.04em);
+}
+.abertura-b {
+  bottom: auto;
+  top: calc(50% + var(--bola) / 2 - 0.04em);
+}
+
+/* Treinos de hoje: duas fileiras de 5 cartões, para a página não rolar tanto. */
+.pagina-inicio .treino-hoje .lista-treino {
+  max-width: 78rem;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+.pagina-inicio .treino-hoje .treino-linha {
+  height: 100%;
+  margin: 0;
+  padding: 0.9rem 0.8rem 1rem;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.5rem;
+  position: relative;
+}
+.pagina-inicio .treino-hoje .treino-numero { font-size: 2.2rem; line-height: 1; }
+.pagina-inicio .treino-hoje .treino-corpo { gap: 0.4rem; align-content: start; }
+.pagina-inicio .treino-hoje .treino-corpo h3 { font-size: 1.05rem; line-height: 1.25; overflow-wrap: anywhere; }
+.pagina-inicio .treino-hoje .treino-corpo .muted {
+  font-size: 0.78rem;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.pagina-inicio .treino-hoje .treino-linha > .icone-svg { position: absolute; top: 0.8rem; right: 0.7rem; }
+@media (max-width: 900px) { .pagina-inicio .treino-hoje .lista-treino { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 560px) { .pagina-inicio .treino-hoje .lista-treino { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 380px) { .pagina-inicio .treino-hoje .lista-treino { grid-template-columns: 1fr; } }
+
+/* Número do exercício: letra cheia em vez de contorno fino, mais nítida em tamanho pequeno. */
+.treino-numero {
+  color: var(--texto);
+  -webkit-text-stroke: 0;
+}
+.treino-linha:hover .treino-numero {
+  color: var(--laranja);
+  -webkit-text-stroke: 0;
+}

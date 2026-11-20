@@ -2,7 +2,7 @@ import { useMemo, type CSSProperties } from 'react'
 import { Carregando, ErroCarga, AvisoDesatualizado } from '../../../shared/ui/Estado'
 import { useAuth } from '../../autenticacao/model/auth'
 import { atributos as calcular, estiloDeJogador, faixaDaNota, faixaDoOverall, overall as media, TETO } from '../model/calculos'
-import JogadorPixel from '../model/JogadorPixel'
+import Icone from '../../../shared/ui/Icone'
 import Radar from '../model/Radar'
 import { useHistorico } from '../model/usarSessoes'
 import { useDrills } from '../../treinos/model/usarExercicios'
@@ -36,7 +36,7 @@ export default function Overall() {
           <AvisoDesatualizado erro={erro} tentarDeNovo={recarregar} />
           <section className="ficha-2k" aria-label="Ficha do jogador" style={{ '--faixa': faixa.cor } as CSSProperties}>
             <div className="ficha-jogador">
-              <JogadorPixel cor={faixa.cor} />
+              <Icone nome="bola" tamanho={120} />
             </div>
             <div className="ficha-centro">
               <span className="ficha-faixa">{faixa.nome}</span>

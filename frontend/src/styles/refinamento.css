@@ -1,14 +1,8 @@
-/* Refinamento visual: pixel nos títulos, leitura limpa no conteúdo. */
+/* Refinamento visual: leitura limpa no conteúdo. */
 :root {
-  --fonte-display: 'Arcade', 'Jersey 10', 'Pixelify Sans Variable', 'Courier New', monospace;
-  --fonte-texto: 'Arcade Texto', 'Pixelify Sans Variable', 'Courier New', monospace;
-  --peso-display: 400;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
-body::after { opacity: 0.12; background: repeating-linear-gradient(0deg, #000 0 1px, transparent 1px 4px); }
-:root[data-theme='light'] body::after { opacity: 0.05; }
-@media (prefers-color-scheme: light) { :root:not([data-theme='dark']) body::after { opacity: 0.05; } }
 .conteudo p:not(.manifesto-frase), .conteudo .muted, .conteudo .meta, .conteudo .nivel,
 .conteudo label, .conteudo legend, .conteudo .cartao-jogador-rodape {
   font-family: var(--fonte-texto);

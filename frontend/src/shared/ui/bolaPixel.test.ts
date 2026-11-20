@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { LADO, bolaModeloPng, bolaPng, codificarPng, parteDoBloco, pixelsDaBola, pixelsDoModelo, tomDoBloco, tonsDoCouro } from './bolaPixel'
+import { LADO, bolaModeloPng, bolaPng, codificarPng, parteDoBloco, pixelsDaBola, pixelsDoModelo, tomDoBloco } from './bolaPixel'
 
 describe('bola em pixel art', () => {
   it('é redonda: os cantos da grade ficam vazios e o miolo, preenchido', () => {
@@ -102,13 +102,9 @@ describe('bolas de vitrine, por modelo', () => {
     expect(parteDoBloco(4, 30)).toBe('costura')
   })
 
-  it('pinta a bola de time só com os tons das duas cores e a cor do canal', () => {
+  it('pinta a bola de time com sombreado contínuo entre as duas cores e a cor do canal', () => {
     const vistas = cores(pixelsDoModelo({ gomos: ['#552583', '#fdb927'], costura: '#141414' }))
-    const roxos = tonsDoCouro('#552583')
-    const amarelos = tonsDoCouro('#fdb927')
-    expect([...vistas].every((c) => c === '#141414' || roxos.includes(c) || amarelos.includes(c))).toBe(true)
-    expect(roxos.filter((t) => vistas.has(t)).length).toBeGreaterThanOrEqual(4)
-    expect(amarelos.filter((t) => vistas.has(t)).length).toBeGreaterThanOrEqual(4)
+    expect(vistas.size).toBeGreaterThan(40)
     expect(vistas.has('#141414')).toBe(true)
   })
 
@@ -123,7 +119,7 @@ describe('bolas de vitrine, por modelo', () => {
 
   it('a faixa clara acompanha os canais de cima e de baixo por dentro, com um segundo canal a fechando', () => {
     const vistas = cores(pixelsDoModelo({ gomos: ['#d9661f', '#d9661f'], costura: '#1b1b1b', faixa: '#f1e6d2' }))
-    expect(tonsDoCouro('#f1e6d2').some((t) => vistas.has(t))).toBe(true)
+    expect(vistas.size).toBeGreaterThan(20)
     expect(parteDoBloco(20, 8, { faixa: '#f1e6d2' })).toMatchObject({ faixa: true })
     expect(parteDoBloco(20, 31, { faixa: '#f1e6d2' })).toMatchObject({ faixa: true })
     expect(parteDoBloco(20, 8)).toMatchObject({ gomo: 1 })
@@ -132,11 +128,10 @@ describe('bolas de vitrine, por modelo', () => {
     expect(parteDoBloco(20, 14, { faixa: '#f1e6d2' })).toEqual(parteDoBloco(20, 14))
   })
 
-  it('o grão mistura os tons em pontilhado, sem sair da paleta', () => {
+  it('o grão mistura os tons em pontilhado', () => {
     const liso = pixelsDoModelo({ gomos: ['#a8521e', '#a8521e'], costura: '#1b1b1b' })
     const grao = pixelsDoModelo({ gomos: ['#a8521e', '#a8521e'], costura: '#1b1b1b', grao: true })
     expect(grao).not.toEqual(liso)
-    expect(cores(grao)).toEqual(cores(liso))
   })
 
   it('gera uma imagem por modelo e a guarda', () => {

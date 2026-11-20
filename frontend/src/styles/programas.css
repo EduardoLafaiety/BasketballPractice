@@ -7,7 +7,7 @@
 
 /* Programas de 30 dias */
 .programas-grade { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 1.1rem; margin-top: 2rem; }
-.programa-cartao { position: relative; display: flex; flex-direction: column; gap: 0.8rem; min-height: 25rem; padding: 1.5rem; border-radius: 0; background: var(--c); color: #111; overflow: hidden; text-decoration: none; transition: transform 0.25s, box-shadow 0.25s; }
+.programa-cartao { position: relative; display: flex; flex-direction: column; gap: 0.8rem; min-height: 25rem; padding: 1.5rem; border-radius: 26px; background: var(--c); color: #111; overflow: hidden; text-decoration: none; transition: transform 0.25s, box-shadow 0.25s; }
 .programa-cartao:hover { transform: translateY(-6px); box-shadow: 0 22px 40px -22px rgba(0, 0, 0, 0.55); }
 .programa-dias-gigante { position: absolute; right: 0.6rem; top: -1.6rem; font-family: var(--fonte-display); font-weight: var(--peso-display); font-size: 12rem; line-height: 1; color: rgba(255, 255, 255, 0.32); pointer-events: none; }
 .programa-foco { position: relative; font-size: 0.7rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; opacity: 0.8; }
@@ -21,7 +21,7 @@
 .programa-progresso { display: grid; gap: 0.35rem; }
 .programa-topo { display: grid; gap: 0.85rem; margin-bottom: 1.5rem; }
 .programa-dias { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.5rem; }
-.programa-dia { display: grid; grid-template-columns: 3.2rem minmax(0, 1fr) auto; gap: 0.4rem 1rem; align-items: center; padding: 0.9rem 1.1rem; border-radius: 0; background: var(--superficie); }
+.programa-dia { display: grid; grid-template-columns: 3.2rem minmax(0, 1fr) auto; gap: 0.4rem 1rem; align-items: center; padding: 0.9rem 1.1rem; border-radius: 18px; background: var(--superficie); }
 .programa-dia h3, .programa-dia p { margin: 0; }
 .programa-dia-numero { font-family: var(--fonte-display); font-weight: var(--peso-display); font-size: 2.2rem; line-height: 1; color: var(--muted); font-variant-numeric: tabular-nums; }
 .programa-dia-estado { display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.68rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
@@ -38,7 +38,7 @@
 
 /* Quadras perto de você (Leaflet + OpenStreetMap) */
 .quadras { display: grid; gap: 0.75rem; }
-.mapa { height: min(60vh, 520px); border-radius: 0; overflow: hidden; background: var(--superficie-2); z-index: 0; }
+.mapa { height: min(60vh, 520px); border-radius: 18px; overflow: hidden; background: var(--superficie-2); z-index: 0; }
 
 /* Diário de jogos */
 
@@ -62,6 +62,6 @@
 
 /* Modo técnico */
 .tarefas { gap: 0.6rem; margin-top: 1rem; }
-.tarefa { display: grid; gap: 0.4rem; padding: 1rem 1.2rem; border-radius: 0; background: var(--superficie); }
+.tarefa { display: grid; gap: 0.4rem; padding: 1rem 1.2rem; border-radius: 18px; background: var(--superficie); }
 .tarefa h3, .tarefa p { margin: 0; }
 

@@ -7,14 +7,13 @@ import { iniciarPwa } from './shared/lib/pwa'
 import { aplicarMovimento } from './shared/lib/movimento'
 import { aplicarTema, temaSalvo } from './shared/lib/tema'
 // Fontes servidas pelo próprio site: sem depender do Google Fonts e funcionando offline no PWA.
-import '@fontsource/jersey-10'
-import '@fontsource-variable/pixelify-sans'
+import '@fontsource-variable/big-shoulders-display'
+import '@fontsource-variable/manrope'
+import '@fontsource/instrument-serif/400-italic.css'
 import './styles.css'
-import './pixel.css'
-// Por último: a tipografia arcade vence os ajustes de título dos arquivos anteriores.
-import './styles/arcade.css'
 import './styles/controles.css'
 import './styles/refinamento.css'
+import './styles/ajustes.css'
 
 // Subpasta do site (VITE_BASE), ex.: /BasketballPractice no GitHub Pages; "/" no site normal.
 const BASE = import.meta.env.BASE_URL.replace(/\/$/, '') || '/'

@@ -122,7 +122,8 @@ export function parteDoBloco(coluna: number, linha: number, modelo: Pick<ModeloB
 
   const sombra = Math.hypot(x - LUZ.x, y - LUZ.y) / (0.8 * LADO)
   const pontilhado = modelo.grao ? (BAYER[((linha & 3) << 2) | (coluna & 3)] / 16 - 0.5) * 0.9 : 0
-  const tom = Math.max(0, Math.min(TONS - 1, Math.floor(sombra * TONS + pontilhado)))
+  // Sombreado contínuo (sem faixas): o tom é fracionário e pixelsDoModelo mistura os dois vizinhos.
+  const tom = Math.max(0, Math.min(TONS - 1, sombra * TONS + pontilhado))
 
   if (modelo.faixa) {
     // Por dentro dos canais de cima e de baixo: a faixa clara e um segundo canal fechando.
@@ -136,7 +137,14 @@ export function parteDoBloco(coluna: number, linha: number, modelo: Pick<ModeloB
 }
 
 /** Quantos pixels cada bloco da bola de vitrine tem de lado: a bola é desenhada na mesma forma, só com mais detalhe. */
-export const RESOLUCAO_VITRINE = 3
+export const RESOLUCAO_VITRINE = 6
+
+/** Cor entre dois tons vizinhos da tabela (tom fracionário: 0 = brilho, 5 = sombra). */
+function mistura(tabela: (readonly number[])[], tom: number): readonly number[] {
+  const i = Math.min(tabela.length - 2, Math.floor(tom))
+  const f = tom - i
+  return tabela[i].map((c, k) => Math.round(c + (tabela[i + 1][k] - c) * f))
+}
 
 /** Os pixels RGBA da bola de vitrine do modelo, com (LADO × resolução) pixels de lado. */
 export function pixelsDoModelo(modelo: ModeloBola, resolucao = RESOLUCAO_VITRINE): Uint8Array {
@@ -150,7 +158,7 @@ export function pixelsDoModelo(modelo: ModeloBola, resolucao = RESOLUCAO_VITRINE
     for (let x = 0; x < lado; x++) {
       const parte = parteDoBloco(x, y, modelo, resolucao)
       if (parte === null) continue
-      const [r, g, b] = (parte === 'costura' ? costura : 'faixa' in parte ? faixa![parte.tom] : 'calota' in parte ? calota![parte.tom] : gomos[parte.gomo][parte.tom])
+      const [r, g, b] = parte === 'costura' ? costura : 'faixa' in parte ? mistura(faixa!, parte.tom) : 'calota' in parte ? mistura(calota!, parte.tom) : mistura(gomos[parte.gomo], parte.tom)
       dados.set([r, g, b, 255], (y * lado + x) * 4)
     }
   }
@@ -197,8 +205,15 @@ export function codificarPng(rgba: Uint8Array, largura: number, altura: number):
     a = (a + v) % 65521
     b = (b + a) % 65521
   }
-  const n = linhas.length // cabe num único bloco "stored" (até 65535 bytes)
-  const zlib = juntar([0x78, 0x01, 0x01, n & 255, n >> 8, ~n & 255, (~n >> 8) & 255], linhas, u32(((b << 16) | a) >>> 0))
+  // Blocos "stored" do zlib: cada um leva até 65535 bytes, e o último é marcado como final.
+  const partes: Uint8Array[] = [Uint8Array.of(0x78, 0x01)]
+  for (let em = 0; em < linhas.length || em === 0; em += 65535) {
+    const pedaco = linhas.subarray(em, em + 65535)
+    const n = pedaco.length
+    partes.push(Uint8Array.of(em + 65535 >= linhas.length ? 1 : 0, n & 255, n >> 8, ~n & 255, (~n >> 8) & 255), pedaco)
+  }
+  partes.push(Uint8Array.from(u32(((b << 16) | a) >>> 0)))
+  const zlib = juntar(...partes)
   return juntar(
     [137, 80, 78, 71, 13, 10, 26, 10],
     bloco('IHDR', [...u32(largura), ...u32(altura), 8, 6, 0, 0, 0]),
