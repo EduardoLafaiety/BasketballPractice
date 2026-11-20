@@ -2,6 +2,7 @@ import type { Database, Queryable } from '../../db/index.js'
 import { adminIds, isAdmin, lockAdminMembership } from '../../db/account-access.js'
 import { deleteUser } from '../../db/users.js'
 import { HttpError, notFound } from '../../lib/http-error.js'
+import { hashPassword } from '../../lib/password.js'
 import * as repository from './admin.repository.js'
 
 async function requireAdmin(db: Queryable, actorId: number) {
@@ -47,5 +48,28 @@ export function setAdminByEmail(db: Database, email: string, role: boolean) {
     }
     await repository.changeRole(tx, user.id, role)
     return user
+  })
+}
+
+/**
+ * Cria uma conta de administrador já ativa, sem passar por e-mail de confirmação nem pagamento (o admin tem acesso
+ * interno). Se o e-mail já tem conta, ela só recebe o papel de admin; a senha só muda com redefinirSenha.
+ */
+export async function createAdminAccount(db: Database, input: { name: string; email: string; password: string; redefinirSenha?: boolean }) {
+  const email = input.email.trim().toLowerCase()
+  const name = input.name.trim()
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new HttpError(400, 'E-mail inválido.')
+  if (name.length < 2) throw new HttpError(400, 'O nome precisa ter pelo menos 2 letras.')
+  if (input.password.length < 10) throw new HttpError(400, 'A senha do administrador precisa ter pelo menos 10 caracteres.')
+  return db.transaction(async (tx) => {
+    await lockAdminMembership(tx)
+    const passwordHash = await hashPassword(input.password)
+    const existing = await repository.findUserByEmail(tx, email)
+    if (existing) {
+      await repository.changeRole(tx, existing.id, true)
+      if (input.redefinirSenha) await repository.replacePassword(tx, existing.id, passwordHash)
+      return { id: existing.id, email, criada: false }
+    }
+    return { id: await repository.insertAdmin(tx, name, email, passwordHash), email, criada: true }
   })
 }

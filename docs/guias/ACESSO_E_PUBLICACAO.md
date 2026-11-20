@@ -26,3 +26,13 @@ Ao reabrir o site sem conexão, a sessão precisa ser reconfirmada antes de aces
 - As prévias históricas foram retiradas da pasta pública. Os arquivos recuperáveis e logs estão em `artifacts/arquivo-2026-11-20/`, fora do Git e do build. Não copiar essa pasta para hospedagem.
 
 Nada nesta revisão altera o site que já está no ar. A aplicação destas regras depende de publicar o novo frontend e a nova API com as configurações privadas corretas. Confira o [guia de pagamentos](../pagamentos/MERCADO_PAGO.md) e a [homologação local](../pagamentos/MERCADO_PAGO_HOMOLOGACAO.md).
+
+## Conta de administrador
+
+O administrador tem acesso interno (sem pagamento). Para criar a conta já ativa, sem e-mail de confirmação, rode no pacote `backend`, com `DATABASE_URL` apontando para o banco desejado (no Render, pelo Shell do serviço da API):
+
+```powershell
+npm run admin:criar -- email@exemplo.com "Seu Nome"
+```
+
+A senha (mínimo 10 caracteres) é pedida no terminal, sem aparecer na tela, ou lida de `ADMIN_PASSWORD`. Ela não é gravada em arquivo nem no Git. Se o e-mail já tiver conta, ela só recebe o papel de admin e a senha continua a mesma; use `--redefinir-senha` para trocá-la (as sessões abertas dessa conta são encerradas). Para tirar o papel, `npm run admin -- email@exemplo.com --remover`.
