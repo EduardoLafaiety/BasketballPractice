@@ -11,7 +11,7 @@
 | Configurações, segurança, saída da conta e dados pessoais | Titular autenticado, inclusive sem assinatura, para gerenciamento e exercício de seus direitos. |
 | Administração | Somente administradores confirmados pela API. A isenção é interna, não um plano gratuito oferecido ao cliente. |
 
-A API verifica cada pedido de exercícios, treinos, rotina, sessões, planos, programas, estilos e notificações. Sem sessão responde 401; conta sem acesso pago recebe 402. Informar a URL diretamente, escolher um plano ou retornar do checkout não concede acesso.
+A API verifica cada pedido de exercícios, treinos, rotina, sessões, planos, programas, estilos e notificações. A importação de backup, que também grava treinos e sessões, exige o mesmo acesso pago antes de ler o arquivo. Sem sessão responde 401; conta sem acesso pago recebe 402. Informar a URL diretamente, escolher um plano ou retornar do checkout não concede acesso. Respostas da API usam `Cache-Control: no-store`, inclusive recusas de acesso e dados pessoais.
 
 O frontend exige confirmação de acesso da API. Dados de assinatura ausentes, validade ausente/inválida ou período vencido não liberam conteúdo. Um temporizador e a retomada da aba verificam o vencimento com a página aberta. A decisão do servidor continua sendo obrigatória em cada chamada protegida.
 

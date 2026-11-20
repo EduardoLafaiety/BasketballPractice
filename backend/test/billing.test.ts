@@ -74,6 +74,48 @@ describe('Assinaturas Mercado Pago', () => {
     assert.equal((await api('GET', '/settings', undefined, user.token)).status, 200)
     assert.equal((await api('GET', '/data/export', undefined, user.token)).status, 200)
   })
+  it('importar backup também exige período pago e não altera dados quando bloqueado', async () => {
+    const { token, sub } = await checkout()
+    const backup = { format: 'basketball-practice', version: 1, workouts: [{ name: 'Treino importado na auditoria', exercises: [] }] }
+    assert.equal((await api('POST', '/data/import', backup)).status, 401)
+    assert.equal((await api('POST', '/data/import', backup, token)).status, 402)
+    assert.deepEqual((await api('GET', '/data/export', undefined, token)).body.workouts, [])
+    const { invoice, payment } = paid(sub)
+    await notify('subscription_authorized_payment', String(invoice.id))
+    assert.equal((await api('POST', '/data/import', backup, token)).status, 200)
+    payment.status = 'refunded'
+    await notify('payment', String(payment.id))
+    assert.equal((await api('POST', '/data/import', backup, token)).status, 402)
+    assert.equal((await api('GET', '/data/export', undefined, token)).body.workouts.length, 1, 'o titular ainda pode exportar seus registros')
+  })
+  it('respostas privadas, de pagamento e recusas de acesso não podem ser guardadas em cache', async () => {
+    const { token, sub } = await checkout()
+    for (const path of ['/exercises', '/data/export', '/billing/status']) {
+      const response = await fetch(`${baseUrl}${path}`, { headers: { Authorization: `Bearer ${token}` } })
+      assert.equal(response.headers.get('cache-control'), 'no-store', path)
+    }
+    const anonymous = await fetch(`${baseUrl}/exercises`)
+    assert.equal(anonymous.status, 401)
+    assert.equal(anonymous.headers.get('cache-control'), 'no-store')
+    const { invoice } = paid(sub)
+    await notify('subscription_authorized_payment', String(invoice.id))
+    const approved = await fetch(`${baseUrl}/exercises`, { headers: { Authorization: `Bearer ${token}` } })
+    assert.equal(approved.status, 200)
+    assert.equal(approved.headers.get('cache-control'), 'no-store')
+  })
+  it('campos de administrador e pagamento enviados nas preferências não concedem acesso', async () => {
+    const user = await register()
+    const result = await api('PUT', '/settings', { theme: 'escuro', isAdmin: true, billing: { required: false, hasAccess: true, paidUntil: '2099-01-01' } }, user.token)
+    assert.equal(result.status, 200)
+    assert.equal(result.body.isAdmin, undefined)
+    assert.equal(result.body.billing, undefined)
+    const me = await api('GET', '/auth/me', undefined, user.token)
+    assert.equal(me.body.isAdmin, false)
+    assert.equal(me.body.billing.required, true)
+    assert.equal(me.body.billing.hasAccess, false)
+    assert.equal((await api('GET', '/exercises', undefined, user.token)).status, 402)
+    assert.equal((await api('GET', '/admin/users', undefined, user.token)).status, 403)
+  })
   it('define valores e frequência no servidor e rejeita preço enviado pelo cliente', async () => {
     const monthly = await checkout()
     const yearly = await checkout('anual')
