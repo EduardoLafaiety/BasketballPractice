@@ -1,5 +1,5 @@
 /* Telas de aviso do beta. Sempre no escuro, como uma tela de fliperama: as cores não mudam com o tema do site.
-   A tipografia vem de arcade.css (Quadra 8, maiúsculas); aqui só o que é próprio de cada versão. */
+   Aqui só o que é próprio de cada versão. */
 .beta {
   --b-fundo: #14150f;
   --b-painel: #1f211a;
@@ -21,10 +21,11 @@
   text-align: center;
   line-height: 1.6;
 }
+.beta, .beta button { text-transform: none; }
 .beta p, .beta ul, .beta ol, .beta h1 { margin: 0; }
 .beta a { color: var(--b-ouro); }
 .beta a:hover { color: var(--b-laranja); }
-.beta-titulo { font-size: clamp(2.4rem, 9vw, 5.2rem); line-height: 1.15; text-wrap: balance; }
+.beta-titulo { color: var(--b-ouro); font-size: clamp(2.4rem, 9vw, 5.2rem); line-height: 1.15; text-wrap: balance; }
 .beta-marca { font-size: 0.85rem; letter-spacing: 0.14em; color: var(--b-laranja); }
 
 /* Botão principal: degrau azul atrás, aperta ao clicar. */

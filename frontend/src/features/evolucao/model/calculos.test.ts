@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { Drill, Sessao } from '../../../shared/types'
 import { atributos, conquistas, estatisticas, estiloDeJogador, faixaDaNota, faixaDoOverall, ordenarConquistas, overall, pontosParaNota } from './calculos'
-import { JOGADOR } from './JogadorPixel'
 
 const sessao = (dia: string, extra: Partial<Sessao> = {}): Sessao => ({
   id: dia + Math.random(),
@@ -141,8 +140,4 @@ describe('visual do overall', () => {
     expect(conquistas([]).every((c) => c.pontos > 0)).toBe(true)
   })
 
-  it('o jogador em pixel tem todas as linhas do mesmo tamanho', () => {
-    expect(JOGADOR.every((l) => l.length === 16)).toBe(true)
-    expect(JOGADOR.length).toBe(20)
-  })
 })

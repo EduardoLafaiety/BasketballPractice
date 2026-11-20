@@ -63,7 +63,7 @@ function Fliperama({ aoContinuar }: PropsBeta) {
         <span>2UP <b>000000</b></span>
       </p>
       <p className="beta-marca">Basketball Practice</p>
-      <h1 className="arcade-letreiro beta-titulo">Versão beta</h1>
+      <h1 className="beta-titulo">Versão beta</h1>
       <div className="bf-tela">
         <p>Você chegou antes de todo mundo. O site ainda está em construção e este é o melhor momento para explorar, treinar e se divertir.</p>
         <p>Funcionalidades novas ainda vão chegar. Se algo travar, confundir ou faltar, avise.</p>
@@ -96,7 +96,7 @@ function Cartucho({ aoContinuar }: PropsBeta) {
         </div>
         <div className="bc-texto">
           <p className="beta-marca">Leia antes de jogar</p>
-          <h1 className="arcade-letreiro beta-titulo">Este é o beta</h1>
+          <h1 className="beta-titulo">Este é o beta</h1>
           <ul className="bc-lista">
             <li><Pixel grade={ESTRELA} /> Explore tudo, treine e se divirta. O site é seu para testar.</li>
             <li><Pixel grade={CADEADO} /> Tem funcionalidades que ainda vão chegar.</li>
@@ -119,7 +119,7 @@ function Dialogo({ aoContinuar }: PropsBeta) {
         <div className="bd-bola" aria-hidden><BolaCouro /><i className="bd-sombra" /></div>
         <section className="bd-caixa" aria-labelledby="bd-titulo">
           <span className="bd-nome">Técnico</span>
-          <h1 id="bd-titulo" className="arcade-letreiro beta-titulo">Calma, é um beta!</h1>
+          <h1 id="bd-titulo" className="beta-titulo">Calma, é um beta!</h1>
           <p>Aqui você encontra treinos, rotina e evolução, mas o jogo ainda está sendo montado. Aproveite, explore cada canto e treine à vontade.</p>
           <p>Vão aparecer funcionalidades novas por aqui. O que você achar, me conta que eu ajusto.</p>
           <Contato />
@@ -141,7 +141,7 @@ function Placar({ aoContinuar }: PropsBeta) {
     <Moldura nome="placar">
       <div className="bp-painel">
         <p className="bp-topo">Basketball Practice</p>
-        <h1 className="arcade-letreiro beta-titulo">Beta</h1>
+        <h1 className="beta-titulo">Beta</h1>
         <div className="bp-celulas">
           <div><span>Fase</span><strong>Testes</strong></div>
           <div><span>Tempo</span><strong>Livre</strong></div>
@@ -170,7 +170,7 @@ function Fases({ aoContinuar }: PropsBeta) {
     <Moldura nome="fases">
       <div className="bm-conjunto">
         <p className="beta-marca">Basketball Practice · Beta</p>
-        <h1 className="arcade-letreiro beta-titulo">Escolha a fase</h1>
+        <h1 className="beta-titulo">Escolha a fase</h1>
         <p className="bm-texto">Três fases já estão abertas para você treinar. As outras abrem aos poucos, durante o beta. Explore, divirta-se e conte o que achou.</p>
         <ol className="bm-fases">
           {FASES.map((f, i) => (

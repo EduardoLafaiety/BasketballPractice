@@ -112,7 +112,7 @@ export function Figura({ nome, viewBox = '0 0 680 330', className, apiRef }: { n
 /** Abertura original: bola cresce e gira; as duas linhas abrem para os lados. */
 export function AberturaBola({ titulo, children }: { titulo: ReactNode; children?: ReactNode }) {
   const secao = useRef<HTMLElement>(null)
-  const bola = useRef<HTMLImageElement>(null)
+  const bola = useRef<SVGSVGElement>(null)
   const ultimo = useRef(-1)
   useRolagem(() => {
     if (!secao.current || menosMovimento()) return

@@ -70,9 +70,9 @@ describe('ícones das conquistas', () => {
     abrir([])
     await resumo(/de 12 desbloqueadas/)
     const item = screen.getByText('Sniper').closest('li')!
-    expect(item.querySelector('svg.conquista-sprite')).not.toBeNull()
+    expect(item.querySelector('.conquista-icone svg')).not.toBeNull()
     expect(item.querySelector('.conquista-estado svg')).not.toBeNull()
-    expect(document.querySelectorAll('li.conquista svg.conquista-sprite').length).toBe(12)
+    expect(document.querySelectorAll('li.conquista .conquista-icone svg').length).toBe(12)
   })
 
   it('soma os pontos das desbloqueadas', async () => {
