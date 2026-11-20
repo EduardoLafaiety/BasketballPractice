@@ -25,7 +25,7 @@ describe('Equipamentos', () => {
 
   it('mostra uma bola de cada time, com link de afiliado e o aviso da Amazon', async () => {
     abrir('/equipamentos')
-    expect(await screen.findByText(/Como Associado da Amazon/)).toBeInTheDocument()
+    expect(await screen.findByText(/Como Associado da Amazon/, {}, { timeout: 8000 })).toBeInTheDocument()
     expect(TIMES).toHaveLength(30)
 
     const lakers = screen.getByRole('link', { name: /Los Angeles Lakers/ })

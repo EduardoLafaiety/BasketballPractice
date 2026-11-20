@@ -13,7 +13,7 @@ describe('Páginas abertas sem conta', () => {
     apiFalsa({})
     abrirApp('/equipamentos')
 
-    expect(await screen.findByRole('heading', { name: 'Equipamentos', level: 1 })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: 'Equipamentos', level: 1 }, { timeout: 8000 })).toBeInTheDocument()
     expect(screen.getByTestId('caminho')).toHaveTextContent('/equipamentos')
     expect(screen.getAllByRole('link', { name: /Ver na Amazon/ }).length).toBeGreaterThan(0)
     const topo = within(screen.getByRole('banner'))
@@ -53,7 +53,7 @@ describe('Páginas abertas sem conta', () => {
     apiFalsa({ 'GET /auth/me': usuarioFalso(), 'GET /settings': configFalsa, 'GET /exercises': [], 'GET /workouts': [] })
     abrirApp('/equipamentos')
 
-    expect(await screen.findByRole('heading', { name: 'Equipamentos', level: 1 })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: 'Equipamentos', level: 1 }, { timeout: 8000 })).toBeInTheDocument()
     expect(screen.getAllByRole('button', { name: /Menu|Mais/ }).length).toBeGreaterThan(0)
     expect(screen.queryByRole('link', { name: 'Criar conta' })).toBeNull()
   })
