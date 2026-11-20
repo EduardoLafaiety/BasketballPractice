@@ -67,10 +67,9 @@ export async function createAdminAccount(db: Database, input: { name: string; em
     const existing = await repository.findUserByEmail(tx, email)
     if (existing) {
       await repository.changeRole(tx, existing.id, true)
-      if (input.redefinirSenha) await tx.query('UPDATE users SET password_hash = $1, token_version = token_version + 1 WHERE id = $2', [passwordHash, existing.id])
+      if (input.redefinirSenha) await repository.replacePassword(tx, existing.id, passwordHash)
       return { id: existing.id, email, criada: false }
     }
-    const created = await tx.query<{ id: number }>('INSERT INTO users (name, email, password_hash, is_admin) VALUES ($1, $2, $3, true) RETURNING id', [name, email, passwordHash])
-    return { id: created.rows[0].id, email, criada: true }
+    return { id: await repository.insertAdmin(tx, name, email, passwordHash), email, criada: true }
   })
 }

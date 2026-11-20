@@ -34,3 +34,13 @@ export function findUserByEmail(tx: Queryable, email: string) {
   return one<{ id: number; name: string; isAdmin: boolean }>(tx,
     'SELECT id, name, is_admin AS "isAdmin" FROM users WHERE lower(email) = $1', [email])
 }
+
+export async function insertAdmin(tx: Queryable, name: string, email: string, passwordHash: string) {
+  const created = await one<{ id: number }>(tx, 'INSERT INTO users (name, email, password_hash, is_admin) VALUES ($1, $2, $3, true) RETURNING id', [name, email, passwordHash])
+  return created!.id
+}
+
+/** Troca a senha e encerra as sessões abertas dessa conta. */
+export async function replacePassword(tx: Queryable, id: number, passwordHash: string) {
+  await tx.query('UPDATE users SET password_hash = $1, token_version = token_version + 1 WHERE id = $2', [passwordHash, id])
+}
