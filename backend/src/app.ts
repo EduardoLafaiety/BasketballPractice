@@ -65,11 +65,16 @@ export function createApp(
   app.disable('x-powered-by')
   app.set('trust proxy', config.trustProxy)
   app.use(observabilidade(observarHttp))
+  // Não deixa respostas autenticadas (nem recusas) serem reutilizadas após sair ou vencer o acesso.
+  app.use('/api', (_req, res, next) => { res.setHeader('Cache-Control', 'no-store'); next() })
   // Cabeçalhos de segurança; a API só responde JSON, então a política de conteúdo pode ser a mais fechada.
   app.use(helmet({ contentSecurityPolicy: { directives: { defaultSrc: ["'none'"], frameAncestors: ["'none'"] } } }))
   // Respostas comprimidas (gzip/brotli): desempenho, backup e listas chegam bem menores.
   app.use(compression())
   app.use(cors({ origin: config.corsOrigins }))
+  // Restaurar um backup também grava treinos/sessões: exige pagamento antes de ler o arquivo grande.
+  // A exportação dos próprios dados continua disponível ao titular mesmo sem assinatura.
+  app.post('/api/data/import', auth, paid)
   // O backup importado pode ter anos de sessões; o resto da API fica no limite pequeno.
   app.use('/api/data/import', express.json({ limit: '10mb' }))
   app.use('/api/auth/avatar', express.json({ limit: '400kb' }))
