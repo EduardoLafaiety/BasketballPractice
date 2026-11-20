@@ -49,3 +49,17 @@ body, button, select, option, ::placeholder { text-transform: none; }
 
 /* Avisos e quadros avulsos no mesmo raio dos cartões. */
 .dieta-aviso { border-radius: 18px; }
+
+/* Topo: fundo translúcido na cor da página. Sem ele, o texto escuro some nas páginas com faixa escura (Jogue como). */
+.topo { background: color-mix(in srgb, var(--bg) 86%, transparent); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
+/* Páginas com faixa escura no alto: o topo usa as cores claras sobre fundo escuro, e o título desce para não ficar embaixo dele. */
+body:has(.pagina-larga.faixa-escura) .topo { --texto: #f4f2ea; --bg: #1f2019; }
+.pagina-larga.faixa-escura { padding-top: max(5rem, 9vh); }
+
+/* Rodapé sempre no pé da tela: em páginas curtas ele não fica boiando com um vazio embaixo. */
+.app { display: flex; flex-direction: column; min-height: 100svh; }
+.app > .conteudo { width: 100%; flex: 1 0 auto; }
+
+/* Marca das páginas legais igual à das outras telas: sem a pílula preta. */
+.legal-marca .marca, .legal-marca .topo-secao { background: transparent; box-shadow: none; }
+.legal-marca .topo-secao { color: var(--texto); padding-inline: 0; }
