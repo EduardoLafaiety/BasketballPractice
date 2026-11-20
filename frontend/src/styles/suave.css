@@ -1,0 +1,51 @@
+/* Acabamento suave: as telas feitas na fase pixel art (Conquistas, Overall, demonstração 3D, avisos do beta) voltam
+   para o mesmo desenho dos demais cartões do site: cantos arredondados, sombra macia e sem bordas duras nem degraus. */
+
+/* Texto fora do conteúdo (topo, entrada, avisos, carregando) em frase normal, não Cada Palavra Em Maiúscula. */
+body, button, select, option, ::placeholder { text-transform: none; }
+
+/* Conquistas */
+.conquistas-anel, .conquistas-anel > span { clip-path: none; border-radius: 50%; }
+.conquistas-filtro { border: 0; border-radius: 999px; padding: 0.55rem 0.95rem; }
+.conquistas-filtro.ativo { border: 0; background: var(--superficie-2); }
+.conquistas-proxima { border: 1px solid color-mix(in srgb, var(--laranja) 55%, transparent); border-radius: 18px; padding: 0.85rem 1rem; }
+.conquista { padding: 0.9rem; border: 0; border-radius: 22px; box-shadow: var(--sombra); }
+.conquista.desbloqueada { box-shadow: var(--sombra), inset 0 0 0 1.5px var(--laranja); }
+.conquista-icone { border-radius: 16px; box-shadow: none; }
+.conquista-pontos { padding: 0.1rem 0.6rem; border: 1px solid currentColor; border-radius: 999px; }
+
+/* Overall */
+.ficha-2k { border: 0; border-radius: 28px; box-shadow: var(--sombra); }
+.ficha-jogador { place-items: center; padding: 0.8rem; border: 0; border-radius: 22px; color: var(--faixa); }
+.ficha-faixa { padding: 0.2rem 0.85rem; border-radius: 999px; }
+.ficha-nota strong { text-shadow: none; }
+.overall-caixa { border: 0; border-radius: 28px; box-shadow: var(--sombra); }
+.overall-foco p:first-of-type { border: 0; border-radius: 16px; }
+.overall-valor { border-radius: 12px; box-shadow: none; }
+.overall-barra { gap: 3px; padding: 4px; border: 0; border-radius: 999px; background: var(--superficie-2); }
+.overall-barra i { height: 10px; border-radius: 999px; background: color-mix(in srgb, var(--texto) 10%, transparent); }
+
+/* Demonstração 3D */
+.demo3d-palco { border: 0; border-radius: 22px; }
+.demo3d-angulos { border: 0; border-radius: 16px; }
+
+/* Avisos do beta */
+.beta-btn { border: 0; border-radius: 999px; box-shadow: 0 10px 24px rgb(255 106 31 / 0.35); }
+.beta-btn:active { transform: translateY(2px); box-shadow: 0 4px 12px rgb(255 106 31 / 0.3); }
+.bf-tela, .bd-caixa, .bp-painel { border: 1px solid var(--b-linha); border-radius: 26px; box-shadow: 0 24px 60px rgb(0 0 0 / 0.45); }
+.bd-caixa { background: var(--b-painel); }
+.bd-nome { border: 0; border-radius: 999px; padding: 0.2rem 0.9rem; }
+.bp-celulas div, .bm-fases li { border: 1px solid var(--b-linha); border-radius: 16px; }
+.bm-fases li.aberta { border-color: var(--b-verde); box-shadow: none; }
+.bm-fases li.fechada { border-style: dashed; }
+.bm-num { border-radius: 10px; }
+.bm-barra { border: 0; border-radius: 999px; background: var(--b-linha); }
+.bm-barra i { border-radius: 999px; background: var(--b-laranja); }
+.bc-cartucho { border: 0; border-radius: 18px; box-shadow: 0 24px 50px rgb(0 0 0 / 0.5); }
+.bc-entalhe { border: 0; }
+.bc-etiqueta { border: 0; border-radius: 12px; }
+.beta-previa button, .beta-previa a { border: 1px solid #3a3c31; border-radius: 999px; }
+.beta-previa button[aria-pressed='true'] { border-color: #ffc72b; }
+
+/* Avisos e quadros avulsos no mesmo raio dos cartões. */
+.dieta-aviso { border-radius: 18px; }
