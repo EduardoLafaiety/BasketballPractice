@@ -97,7 +97,6 @@
 @media (max-width: 860px) { .produtos-abas .nivel-opcao:last-child { grid-column: auto; } }
 .produto-vitrine { padding: 1.1rem 1rem 0.6rem; }
 /* Roupas e acessórios: o sprite ocupa o mesmo espaço da bola (176 × 185), com uma sombra em degrau. */
-.produto-sprite { width: 176px; height: 185px; padding: 8px 4px 0; filter: drop-shadow(6px 6px 0 rgb(0 0 0 / 0.14)); }
 .bola-nome { font-family: var(--fonte-display); font-weight: 400; letter-spacing: 0.04em; text-transform: none; }
 
 /* Estatísticas da NBA: um cartão por categoria, com o líder na cor do time e o ranking em barras. */

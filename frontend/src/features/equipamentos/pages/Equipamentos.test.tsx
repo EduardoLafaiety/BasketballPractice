@@ -3,8 +3,6 @@ import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import { definirToken } from '../../../shared/api/backend'
 import { TAG_AFILIADO, TIMES } from '../dados'
-import { CATEGORIAS, PRODUTOS } from '../produtos'
-import { SPRITES } from '../sprites'
 import { ICONES_TIMES } from '../icones-times'
 import { apiFalsa, configFalsa, usuarioFalso } from '../../../test/api-falsa'
 import { abrirApp, abrirMenu } from '../../../test/renderizar'
@@ -119,53 +117,3 @@ describe('bolas Wilson NBA All Team', () => {
   })
 })
 
-describe('roupas, tênis, proteção e material de treino', () => {
-  it('cada categoria tem a sua aba, e cada produto abre a busca na Amazon com o código de afiliado', async () => {
-    abrir('/equipamentos')
-    for (const c of CATEGORIAS) {
-      await userEvent.click(await screen.findByRole('tab', { name: new RegExp(c.rotulo) }))
-      const painel = screen.getByRole('tabpanel', { name: c.rotulo })
-      const doTipo = PRODUTOS.filter((p) => p.categoria === c.id)
-      const links = within(painel).getAllByRole('link', { name: /Ver na Amazon/ })
-      expect(links, c.id).toHaveLength(doTipo.length)
-      for (const [i, link] of links.entries()) {
-        const href = new URL(link.getAttribute('href')!)
-        expect(href.hostname).toBe('www.amazon.com.br')
-        expect(href.searchParams.get('tag')).toBe(TAG_AFILIADO)
-        expect(href.searchParams.get('k')).toBe(doTipo[i].busca)
-        expect(link).toHaveAttribute('rel', expect.stringContaining('sponsored'))
-        expect(link.querySelector('svg.produto-sprite')).not.toBeNull()
-      }
-    }
-  })
-
-  it('a aba de roupas tem regata, camiseta, moletom, shorts e meia; a de treino, cones e tabela', async () => {
-    abrir('/equipamentos?aba=roupas')
-    for (const nome of [/Regata/, /Camiseta/, /Moletom/, /Shorts/, /Meia/]) {
-      expect((await screen.findAllByRole('link', { name: nome })).length).toBeGreaterThan(0)
-    }
-    await userEvent.click(screen.getByRole('tab', { name: /Treino e quadra/ }))
-    expect(screen.getByRole('link', { name: /Kit de cones/ })).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: /Tabela de basquete/ })).toBeInTheDocument()
-  })
-
-  it('regatas da NBA: uma por time, com o logo no peito e o filtro de conferência', async () => {
-    abrir('/equipamentos?aba=regatas')
-    const celtics = await screen.findByRole('link', { name: /Boston Celtics/ })
-    expect(new URL(celtics.getAttribute('href')!).searchParams.get('k')).toBe('regata NBA Boston Celtics')
-    expect(celtics.querySelector('svg.produto-sprite image')!.getAttribute('href')).toContain('/bos.png')
-    expect(screen.getAllByRole('link', { name: /Ver na Amazon/ })).toHaveLength(TIMES.length)
-    await userEvent.click(screen.getByRole('button', { name: 'Oeste' }))
-    expect(screen.queryByRole('link', { name: /Boston Celtics/ })).not.toBeInTheDocument()
-  })
-
-  it('os desenhos têm 16 × 16 blocos e só usam as cores conhecidas; cada busca é única', () => {
-    for (const [nome, linhas] of Object.entries(SPRITES)) {
-      expect(linhas, nome).toHaveLength(16)
-      for (const l of linhas) expect(l, nome).toMatch(/^[oabdw.]{16}$/)
-    }
-    for (const p of PRODUTOS) expect(SPRITES[p.sprite], p.id).toBeDefined()
-    expect(new Set(PRODUTOS.map((p) => p.busca)).size).toBe(PRODUTOS.length)
-    expect(new Set(PRODUTOS.map((p) => p.id)).size).toBe(PRODUTOS.length)
-  })
-})
