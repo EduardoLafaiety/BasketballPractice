@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test'
 import { autorizacao, entrarCom, idDoExercicio, novaConta } from './ajuda'
 
-test('prepara um treino e inicia após reabrir offline, sem depender de rascunho prévio', async ({ page, context, request }) => {
+test('preserva o treino preparado e exige confirmar a sessão ao reabrir offline', async ({ page, context, request }) => {
   const { token } = await novaConta(request)
   const exerciseId = await idDoExercicio(request, token, 'Lance livre')
   await request.put('/api/routine', { headers: autorizacao(token), data: { days: Array.from({ length: 7 }, (_, day) => ({ day, exercises: [{ exerciseId, minutes: 4 }] })) } })
@@ -13,8 +13,12 @@ test('prepara um treino e inicia após reabrir offline, sem depender de rascunho
   await expect(page.getByRole('region', { name: 'Disponibilidade offline' })).toContainText('preparado neste aparelho')
   await context.setOffline(true)
   await page.reload()
-  await expect(page.getByRole('status')).toContainText('Sem conexão. Usando o treino preparado')
+  await expect(page.getByRole('alert')).toContainText('Não foi possível falar com o servidor')
+  await expect(page.getByRole('button', { name: 'Começar', exact: true })).toHaveCount(0)
+  await context.setOffline(false)
+  await expect(page.getByRole('button', { name: 'Começar', exact: true })).toBeVisible()
   await expect(page.getByText('1 exercícios · 4 min', { exact: false })).toBeVisible()
+  await context.setOffline(true)
   await page.getByRole('button', { name: 'Começar', exact: true }).click()
   await expect(page.getByRole('region', { name: 'Instruções: Lance livre' })).toBeVisible()
   await page.getByRole('button', { name: /Acertou/ }).click()
@@ -69,8 +73,11 @@ test('recupera a sessão após recarregar e envia o treino ao voltar a conexão'
   await expect(page.locator('.contador-placar')).toContainText('1/2')
   await context.setOffline(true)
   await page.reload()
+  await expect(page.getByRole('alert')).toContainText('Não foi possível falar com o servidor')
+  await context.setOffline(false)
   await page.getByRole('button', { name: 'Retomar treino', exact: true }).click()
   await expect(page.locator('.contador-placar')).toContainText('1/2')
+  await context.setOffline(true)
   await page.getByRole('button', { name: 'Concluir treino' }).click()
   await page.getByLabel('Notas').fill('Sem conexão na quadra')
   await page.getByRole('button', { name: 'Salvar sessão' }).click()

@@ -8,6 +8,7 @@ import { useAuth } from '../autenticacao/model/auth'
 import PreferenciasCabecalho from '../../shared/ui/PreferenciasCabecalho'
 import LogoBola from '../../shared/ui/LogoBola'
 import Icone from '../../shared/ui/Icone'
+import { Carregando, ErroCarga } from '../../shared/ui/Estado'
 import './assinatura.css'
 
 const DEMO: EstadoAssinatura = { required: true, hasAccess: false, ready: false, paidUntil: null, subscription: null }
@@ -16,7 +17,7 @@ const planoValido = (v: string | null): PlanoAssinatura => v === 'anual' ? 'anua
 const planoSalvo = () => { try { return localStorage.getItem('bp.plano-escolhido') } catch { return null } }
 
 export function RequerAssinatura() {
-  const { usuario, reconferirSessao } = useAuth()
+  const { usuario, erroSessao, reconferirSessao } = useAuth()
   const [agora, setAgora] = useState(Date.now)
   const vence = new Date(usuario?.billing?.paidUntil ?? '').getTime()
   useEffect(() => {
@@ -30,6 +31,9 @@ export function RequerAssinatura() {
     document.addEventListener('visibilitychange', conferir)
     return () => { window.clearTimeout(timer); window.removeEventListener('focus', conferir); document.removeEventListener('visibilitychange', conferir) }
   }, [vence, agora, reconferirSessao])
+  // Sem confirmação da identidade, mantém a rota e o treino salvo, mas não abre conteúdo.
+  // Assim uma queda de rede não transforma a retomada em redirecionamento para o pagamento.
+  if (!__DEMO__ && !usuario) return erroSessao ? <ErroCarga erro={erroSessao} tentarDeNovo={reconferirSessao} /> : <Carregando texto="Conferindo sua sessão" />
   const acesso = __DEMO__ || usuario?.billing?.hasAccess === true && (!usuario.billing.required || usuario.isAdmin || vence > agora)
   return acesso ? <Outlet /> : <Navigate to="/assinatura" replace />
 }

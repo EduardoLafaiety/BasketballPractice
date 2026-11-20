@@ -36,7 +36,7 @@ test('cadastro pelo formulário, ativação pelo e-mail, sair e entrar de novo v
 
   await abrirMenu(page)
   await page.getByRole('button', { name: 'Sair' }).click()
-  await expect(page).toHaveURL(/\/entrar$/)
+  await expect(page.getByRole('heading', { name: 'Seu jogo. Próximo nível.', level: 1 })).toBeVisible()
 
   await page.goto('/alimentacao')
   await expect(page).toHaveURL(/\/entrar$/)
