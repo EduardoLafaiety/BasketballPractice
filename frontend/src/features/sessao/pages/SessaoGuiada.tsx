@@ -1,10 +1,12 @@
+import { Link } from '../../../shared/i18n/links'
+import { localeAtual } from '../../../shared/i18n/idioma'
 import Final from './ResumoSessao'
 import Botao from '../../../shared/ui/Botao'
 import { contaLocal } from '../../../shared/api/backend'
 import { useAuth } from '../../autenticacao/model/auth'
 import { lerLocal, registrosComProblema, removerLocal } from '../model/treino-local'
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import Contador from '../components/Contador'
 import { Carregando, ErroCarga, EstadoVazio } from '../../../shared/ui/Estado'
 import ComoFazer from '../../demonstracoes/ComoFazer'
@@ -134,9 +136,9 @@ function Execucao({ plano, conta, rascunho, offline, catalogo }: { plano: PlanoG
           Começar
         </Botao>
         <section className="card" aria-label="Disponibilidade offline">
-          {!offline.online ? <p role="status">Sem conexão. Usando o treino preparado em {offline.pacote ? new Date(offline.pacote.preparadoEm).toLocaleString('pt-BR') : 'outro momento'}. Os resultados serão guardados neste aparelho ao salvar.</p> : <>
+          {!offline.online ? <p role="status">Sem conexão. Usando o treino preparado em {offline.pacote ? new Date(offline.pacote.preparadoEm).toLocaleString(localeAtual()) : 'outro momento'}. Os resultados serão guardados neste aparelho ao salvar.</p> : <>
             <Botao disabled={offline.preparando || !catalogo.length} onClick={() => void offline.preparar(plano, catalogo)}>{offline.preparando ? 'Preparando treino' : 'Preparar este treino offline'}</Botao>
-            {offline.pacote && <p role="status">Treino “{offline.pacote.plano.titulo}” preparado neste aparelho em {new Date(offline.pacote.preparadoEm).toLocaleString('pt-BR')}. Preparar novamente substitui essa cópia.</p>}
+            {offline.pacote && <p role="status">Treino “{offline.pacote.plano.titulo}” preparado neste aparelho em {new Date(offline.pacote.preparadoEm).toLocaleString(localeAtual())}. Preparar novamente substitui essa cópia.</p>}
           </>}
           <p className="meta">Inclui exercícios, instruções e contadores deste plano. Demonstrações animadas precisam de conexão. Dias de programa são confirmados pelo servidor ao sincronizar.</p>
           {offline.erro && <p className="erro" role="alert">{offline.erro}</p>}

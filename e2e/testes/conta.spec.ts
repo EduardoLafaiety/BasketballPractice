@@ -69,14 +69,17 @@ test('cadastrar um e-mail que já tem conta não revela isso na tela: o aviso va
   expect(login.status()).toBe(200)
 })
 
-test('Equipamentos e Artigos abrem sem conta, com os links da Amazon e o convite para entrar', async ({ page }) => {
+test('Equipamentos e Artigos exigem conta e continuam disponíveis para usuários autorizados', async ({ page, request }) => {
+  for (const rota of ['/equipamentos', '/artigos']) {
+    await page.goto(rota)
+    await expect(page).toHaveURL(/\/entrar$/)
+  }
+  const { token } = await novaConta(request)
+  await page.addInitScript(t => localStorage.setItem('bp.token', t), token)
   await page.goto('/equipamentos')
-  await expect(page).toHaveURL(/\/equipamentos$/)
   await expect(page.getByRole('heading', { name: 'Equipamentos', level: 1 })).toBeVisible()
   await expect(page.getByRole('link', { name: /Ver na Amazon/ }).first()).toHaveAttribute('href', /amazon\.com\.br/)
 
-  await page.getByRole('navigation', { name: 'Páginas abertas' }).getByRole('link', { name: 'Artigos' }).click()
+  await irPara(page, 'Artigos')
   await expect(page.getByRole('heading', { name: 'Artigos', level: 1 })).toBeVisible()
-  await page.getByRole('banner').getByRole('link', { name: 'Entrar', exact: true }).click()
-  await expect(page).toHaveURL(/\/entrar$/)
 })

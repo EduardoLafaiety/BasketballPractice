@@ -70,6 +70,7 @@ export const usuarioFalso = (extra: Partial<{ id: number; name: string; email: s
   email: 'marina@example.com',
   isAdmin: false,
   createdAt: '2026-10-01T12:00:00.000Z',
+  billing: { required: false, hasAccess: true },
   ...extra,
 })
 

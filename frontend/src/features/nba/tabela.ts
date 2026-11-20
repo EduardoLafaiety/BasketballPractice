@@ -1,3 +1,4 @@
+import { localeAtual } from '../../shared/i18n/idioma'
 // Classificação das conferências Leste e Oeste, da API pública da ESPN (aceita chamada direto do
 // navegador). As cores dos times vêm da aba Equipamentos, que já tem os 30 times.
 import { TIMES } from '../equipamentos/dados'
@@ -89,4 +90,4 @@ export const buscarTabela = comValidade('bp.nba.tabela', 15 * 60_000, async () =
 /** "0,750" vira ".750", como nas tabelas americanas. */
 export const aproveitamento = (v: number) => v.toFixed(3).replace(/^0/, '')
 /** Jogos atrás: "—" para o líder, "2,5" para os outros. */
-export const jogosAtras = (v: number) => (v ? v.toLocaleString('pt-BR', { maximumFractionDigits: 1 }) : '—')
+export const jogosAtras = (v: number) => (v ? v.toLocaleString(localeAtual(), { maximumFractionDigits: 1 }) : '—')

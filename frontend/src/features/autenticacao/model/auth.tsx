@@ -1,3 +1,4 @@
+import { traduzir } from '../../../shared/i18n/idioma'
 import { useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { Navigate, useLocation } from 'react-router-dom'
 import { ApiError, aoTokenExpirar, api, definirToken, tokenAtual, type Usuario } from '../../../shared/api/backend'
@@ -27,7 +28,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // A tela sai na hora, sem esperar a rede. O pedido já partiu com o token: o fetch monta os cabeçalhos ao ser chamado.
   // Sem conexão, o token não é revogado no servidor e vale até expirar, mas some deste navegador.
   const sair = useCallback(() => {
-    if (temTreinosLocais() && !window.confirm('Há um treino em andamento ou sessões aguardando envio neste aparelho. Sair apaga esses dados locais. Deseja sair mesmo assim?')) return
+    if (temTreinosLocais() && !window.confirm(traduzir('Há um treino em andamento ou sessões aguardando envio neste aparelho. Sair apaga esses dados locais. Deseja sair mesmo assim?'))) return
     try { limparTreinosLocais() } catch { /* armazenamento indisponível */ }
     if (tokenAtual()) void api.sair().catch(() => {})
     encerrarLocal()
@@ -63,7 +64,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const aoConectar = () => { if (tokenAtual()) void conferirSessao() }
     window.addEventListener('online', aoConectar)
-    return () => window.removeEventListener('online', aoConectar)
+    window.addEventListener('bp:assinatura-inativa', aoConectar)
+    return () => {
+      window.removeEventListener('online', aoConectar)
+      window.removeEventListener('bp:assinatura-inativa', aoConectar)
+    }
   }, [conferirSessao])
 
   // Cada falha traz um erro novo e rearma a espera, até a API voltar ou a pessoa sair.

@@ -7,6 +7,8 @@ export interface Usuario {
   name: string
   email: string
   isAdmin: boolean
+  avatarUrl?: string | null
+  billing?: { required: boolean; hasAccess: boolean; paidUntil?: string | null }
 }
 
 /** Conta vista pelo painel admin, com o resumo de uso. */

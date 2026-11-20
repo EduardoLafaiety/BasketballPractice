@@ -101,6 +101,7 @@ describe('Início', () => {
 
     expect(within(document.querySelector('.pagina-inicio') as HTMLElement).queryByRole('heading', { name: 'Rotina' })).not.toBeInTheDocument()
     expect(screen.queryByRole('heading', { name: 'Coma como quem joga' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: /Aqueça.*de perto.*para longe/i })).not.toBeInTheDocument()
   })
 
   it('sem resposta dos jogadores, o resto da página continua', async () => {

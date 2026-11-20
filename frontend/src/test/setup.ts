@@ -1,8 +1,12 @@
 import '@testing-library/jest-dom/vitest'
-import { cleanup } from '@testing-library/react'
+import { cleanup, configure } from '@testing-library/react'
 import { afterEach, beforeEach, vi } from 'vitest'
 import { definirToken } from '../shared/api/backend'
 import { limparCache } from '../shared/data/recursos'
+
+// Rotas lazy podem levar mais de um segundo ao compilar em runners compartilhados.
+// A espera continua condicionada ao elemento esperado, sem pausas fixas nos testes.
+configure({ asyncUtilTimeout: 5000 })
 
 // Avisos do React Router sobre a futura v7: não indicam problema e só poluem a saída.
 const avisar = console.warn

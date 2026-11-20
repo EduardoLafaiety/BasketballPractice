@@ -1,11 +1,12 @@
 // Service worker do Basketball Practice: deixa o app abrir sem internet.
 // Guarda só a "casca" do site (HTML, JS, CSS, ícones). Respostas da API nunca são guardadas:
 // Rascunhos e envios pendentes ficam no armazenamento local por conta, limpo no logout explícito.
-const VERSAO = 'bp-v7'
+const VERSAO = 'bp-v9'
 // Caminhos relativos ao escopo: o site pode estar em / ou numa subpasta (ex.: /BasketballPractice/ no GitHub Pages).
 const BASE = new URL(self.registration.scope).pathname
 const INDEX = BASE + 'index.html'
-const CASCA = [BASE, INDEX, BASE + 'manifest.webmanifest', BASE + 'icon.svg']
+const ICONES = ['icon.svg', 'favicon-16.png', 'favicon-32.png', 'icon-192.png', 'icon-512.png', 'apple-touch-icon.png'].map(nome => BASE + nome)
+const CASCA = [BASE, INDEX, BASE + 'manifest.webmanifest', ...ICONES]
 
 self.addEventListener('install', (evento) => {
   evento.waitUntil(caches.open(VERSAO).then((cache) => cache.addAll(CASCA)).then(() => self.skipWaiting()))
@@ -35,14 +36,14 @@ self.addEventListener('message', (evento) => {
       const html = await fetch(INDEX, { cache: 'reload' })
       if (!html.ok) throw new Error('Página indisponível')
       const documento = await html.clone().text()
-      // Só os módulos do próprio site: scripts de fora (o do AdSense) não entram no cache offline.
+      // Só os módulos do próprio site: scripts de fora não entram no cache offline.
       const entradas = [...documento.matchAll(/<script\b[^>]*\bsrc=["']([^"']+)["']/g)]
         .map((m) => new URL(m[1], self.registration.scope))
         .filter((url) => url.origin === self.location.origin)
         .map((url) => url.href)
       if (!entradas.length || entradas.some((url) => !urls.includes(url))) throw new Error('Página atualizada; recarregue antes de preparar')
       const cache = await caches.open(VERSAO)
-      await cache.addAll([BASE + 'manifest.webmanifest', BASE + 'icon.svg', ...urls])
+      await cache.addAll([BASE + 'manifest.webmanifest', ...ICONES, ...urls])
       await cache.put(INDEX, html.clone())
       await cache.put(BASE, html)
       evento.ports[0].postMessage({ ok: true })

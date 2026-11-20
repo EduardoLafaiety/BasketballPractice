@@ -1,5 +1,6 @@
+import { Link } from '../../shared/i18n/links'
 import type { ReactNode } from 'react'
-import { Link } from 'react-router-dom'
+
 import { BolaCouro } from '../../shared/ui/fundoQuadra'
 import './beta.css'
 

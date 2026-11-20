@@ -1,3 +1,4 @@
+import { traduzir } from '../../../shared/i18n/idioma'
 import { useState } from 'react'
 import Icone from '../../../shared/ui/Icone'
 import Quadra, { NOME_ZONA } from './Quadra'
@@ -78,7 +79,7 @@ export default function Contador({ contador, comQuadra = true }: { contador: Est
           type="button"
           className="chip"
           disabled={!tentativas}
-          onClick={() => window.confirm('Zerar o contador?') && contador.zerar()}
+          onClick={() => window.confirm(traduzir('Zerar o contador?')) && contador.zerar()}
         >
           Zerar
         </button>

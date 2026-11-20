@@ -22,8 +22,11 @@ import { stylesRouter } from './modules/styles/styles.routes.js'
 import { workoutsRouter } from './modules/workouts/workouts.routes.js'
 import { routineRouter } from './modules/routine/routine.routes.js'
 import { observabilidade, type ObservarHttp } from './middleware/observabilidade.js'
+import { createBillingService, type BillingOptions } from './modules/billing/billing.service.js'
+import { billingRouter, billingWebhook, requireBillingAccess } from './modules/billing/billing.routes.js'
 
 export interface AppOptions {
+  billing?: BillingOptions
   observarHttp?: ObservarHttp
   limiteTentativas?: LimiteTentativas
   limiteConta?: LimiteTentativas
@@ -51,10 +54,13 @@ export function createApp(
     segundoPlano,
     observarHttp = process.env.NODE_ENV === 'production' ? (evento) => console.info(JSON.stringify(evento)) : undefined,
     push = { publicKey: config.push.publicKey, send: createPushSender(config.push), cronSecret: config.push.cronSecret },
+    billing: billingOptions = { ...config.billing, appUrl: config.appUrl },
   }: AppOptions = {},
 ) {
   const app = express()
   const auth = requireAuth(db)
+  const billing = createBillingService(db, billingOptions)
+  const paid = requireBillingAccess(billing)
 
   app.disable('x-powered-by')
   app.set('trust proxy', config.trustProxy)
@@ -66,7 +72,11 @@ export function createApp(
   app.use(cors({ origin: config.corsOrigins }))
   // O backup importado pode ter anos de sessões; o resto da API fica no limite pequeno.
   app.use('/api/data/import', express.json({ limit: '10mb' }))
+  app.use('/api/auth/avatar', express.json({ limit: '400kb' }))
   app.use(express.json({ limit: '100kb' }))
+  app.use('/api/billing/webhook', billingWebhook(billing))
+  const billingLimit = limitarTentativas({ maximo: 20, janelaMs: 60_000 })
+  app.use('/api/billing', auth, billingLimit, billingRouter(billing))
 
   app.get('/api/live', (_req, res) => {
     res.setHeader('Cache-Control', 'no-store')
@@ -110,17 +120,18 @@ export function createApp(
       limiteEnvios,
       segundoPlano,
       aoRedefinirSenha: porConta.liberar,
+      billingAccess: billing.access,
     }),
   )
-  app.use('/api/exercises', auth, exercisesRouter(db))
-  app.use('/api/workouts', auth, workoutsRouter(db))
-  app.use('/api/routine', auth, routineRouter(db))
-  app.use('/api/sessions', auth, sessionsRouter(db))
-  app.use('/api/plans', auth, plansRouter(db))
-  app.use('/api/programs', auth, programsRouter(db))
+  app.use('/api/exercises', auth, paid, exercisesRouter(db))
+  app.use('/api/workouts', auth, paid, workoutsRouter(db))
+  app.use('/api/routine', auth, paid, routineRouter(db))
+  app.use('/api/sessions', auth, paid, sessionsRouter(db))
+  app.use('/api/plans', auth, paid, plansRouter(db))
+  app.use('/api/programs', auth, paid, programsRouter(db))
   app.use('/api/push/run', pushCronRouter(db, { secret: push.cronSecret ?? '', send: push.send }))
-  app.use('/api/push', auth, pushRouter(db, push))
-  app.use('/api/styles', auth, stylesRouter(db))
+  app.use('/api/push', auth, paid, pushRouter(db, push))
+  app.use('/api/styles', auth, paid, stylesRouter(db))
   app.use('/api/settings', auth, settingsRouter(db))
   app.use('/api/data', auth, dataRouter(db, { maxImports }))
   app.use('/api/admin', auth, requireAdmin(db), adminRouter(db))

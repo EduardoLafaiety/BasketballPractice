@@ -1,33 +1,27 @@
 // Peças paradas do visual de quadra (a bola da abertura, as linhas de fundo e a listra): ficam separadas das
 // peças animadas de rolagem.tsx para a tela de entrada não carregar os bonecos e as coreografias.
 import { forwardRef } from 'react'
+import { bolaPng, LADO } from './bolaPixel'
 
-/** A bola da abertura: o couro com as costuras. */
-export const BolaCouro = forwardRef<SVGSVGElement>(function BolaCouro(_, ref) {
-  return (
-    <svg ref={ref} className="abertura-bola" viewBox="0 0 400 400" aria-hidden>
-      <defs>
-        <radialGradient id="couro-bola" cx=".36" cy=".3" r=".8">
-          <stop offset="0" stopColor="#ff9a52" />
-          <stop offset=".62" stopColor="#ee6210" />
-          <stop offset="1" stopColor="#a83d05" />
-        </radialGradient>
-      </defs>
-      <circle cx="200" cy="200" r="190" fill="url(#couro-bola)" />
-      <path className="bola-costura" d="M10 200h380M200 10v380M64 68c70 62 70 202 0 264M336 68c-70 62-70 202 0 264" />
-    </svg>
-  )
+/** Bola da PR 190: sprite original de 40 × 40 na paleta laranja escura. */
+export const BolaCouro = forwardRef<HTMLImageElement>(function BolaCouro(_, ref) {
+  return <img ref={ref} className="abertura-bola" src={bolaPng()} alt="" width={LADO} height={LADO} aria-hidden decoding="sync" />
 })
 
 /** Linhas de quadra no fundo, no lugar das curvas de nível do estilo original. */
 export function LinhasQuadra() {
   return (
-    <svg className="linhas-quadra" viewBox="0 0 1000 620" preserveAspectRatio="xMidYMid slice" aria-hidden>
-      <circle cx="500" cy="310" r="110" />
-      <circle cx="500" cy="310" r="245" />
-      <rect x="-40" y="190" width="240" height="240" />
-      <rect x="800" y="190" width="240" height="240" />
-      <path d="M500 -20V640M-40 40C120 40 240 170 240 310S120 580-40 580M1040 40C880 40 760 170 760 310S880 580 1040 580" />
+    <svg className="linhas-quadra" viewBox="0 0 1000 620" preserveAspectRatio="xMidYMid meet" aria-hidden>
+      <rect x="45" y="40" width="910" height="540" rx="3" />
+      <path d="M500 40V580" />
+      <circle cx="500" cy="310" r="80" />
+      <rect x="45" y="220" width="180" height="180" />
+      <rect x="775" y="220" width="180" height="180" />
+      <circle cx="225" cy="310" r="60" />
+      <circle cx="775" cy="310" r="60" />
+      <path d="M45 75H125A245 245 0 0 1 125 545H45M955 75H875A245 245 0 0 0 875 545H955M80 275V345M920 275V345" />
+      <circle cx="97" cy="310" r="8" />
+      <circle cx="903" cy="310" r="8" />
     </svg>
   )
 }

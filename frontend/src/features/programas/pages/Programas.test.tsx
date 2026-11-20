@@ -36,6 +36,14 @@ function abrir(caminho: string, rotas: Parameters<typeof apiFalsa>[0] = {}) {
 }
 
 describe('Programas', () => {
+  it('diferencia as cores de todos os programas mesmo quando têm o mesmo fundamento', async () => {
+    abrir('/programas', { 'GET /programs': Array.from({ length: 20 }, (_, i) => resumo({ id: `programa-${i}`, name: `Programa ${i}` })) })
+    await screen.findByRole('heading', { name: 'Programa 19' })
+    const colors = screen.getAllByRole('heading', { level: 2 }).map(heading => heading.closest('a')?.style.getPropertyValue('--c')).filter(Boolean)
+    expect(colors).toHaveLength(20)
+    expect(new Set(colors).size).toBe(20)
+  })
+
   it('lista os programas com o progresso de quem já começou', async () => {
     abrir('/programas', {
       'GET /programs': [resumo(), resumo({ id: 'arremesso-30', name: '30 dias de arremesso', totalDays: 30, status: status({ started: true, total: 30, done: 12, nextDay: 13, availableToday: false }) })],

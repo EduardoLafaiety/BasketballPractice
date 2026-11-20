@@ -1,5 +1,6 @@
+import { Link } from '../../../shared/i18n/links'
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+
 import { Carregando, ErroCarga, AvisoDesatualizado } from '../../../shared/ui/Estado'
 import { api } from '../../../shared/api/backend'
 import { useRecurso } from '../../../shared/data/recursos'

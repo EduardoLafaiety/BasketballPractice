@@ -1,3 +1,4 @@
+import { localeAtual } from '../../shared/i18n/idioma'
 import type { CSSProperties } from 'react'
 import { CartaoCategoria, CartaoNoticia } from '../nba/cartoes'
 import { Escudo, Estado } from '../nba/componentes'
@@ -133,7 +134,7 @@ export default function ClassificacaoNbb() {
       )}
 
       <p className="nba-fonte">
-        Dados da LNB (Liga Nacional de Basquete){atualizada && ` lidos em ${atualizada.toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}`}. A vitória vale 2 pontos e a derrota, 1. Os líderes são a média por jogo, e as notícias abrem no site da LNB.
+        Dados da LNB (Liga Nacional de Basquete){atualizada && ` lidos em ${atualizada.toLocaleString(localeAtual(), { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}`}. A vitória vale 2 pontos e a derrota, 1. Os líderes são a média por jogo, e as notícias abrem no site da LNB.
       </p>
     </>
   )

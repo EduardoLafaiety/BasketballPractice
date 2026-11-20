@@ -304,19 +304,18 @@ describe('Documentos', () => {
   it.each([
     ['/privacidade', 'Política de Privacidade'],
     ['/termos', 'Termos de Uso'],
-  ])('%s abre sem login, marcado como rascunho, com o responsável e a idade mínima de 18 anos', (rota, titulo) => {
+  ])('%s abre sem login, sem rascunho, com contato atualizado, responsável, versão e idade mínima', (rota, titulo) => {
     apiFalsa({})
     abrirApp(rota)
 
     expect(screen.getByRole('heading', { name: titulo, level: 1 })).toBeInTheDocument()
-    const aviso = screen.getByRole('note')
-    expect(aviso).toHaveTextContent('Rascunho')
-    expect(aviso).toHaveTextContent('revisado por um advogado')
+    expect(screen.queryByRole('note')).toBeNull()
     expect(screen.getByText(/mantido por Eduardo Lopes|oferecido por Eduardo Lopes/)).toBeInTheDocument()
-    for (const link of screen.getAllByRole('link', { name: 'deveducontato@gmail.com' })) {
-      expect(link).toHaveAttribute('href', 'mailto:deveducontato@gmail.com')
+    for (const link of screen.getAllByRole('link', { name: 'contatobasketballpractice@gmail.com' })) {
+      expect(link).toHaveAttribute('href', 'mailto:contatobasketballpractice@gmail.com')
     }
-    expect(document.body).not.toHaveTextContent('contato a definir')
+    expect(document.body).not.toHaveTextContent(/Rascunho|A definir|A confirmar|A revisar|deveducontato/)
+    expect(document.querySelector('time')).toHaveAttribute('dateTime', '2026-11-20')
     expect(screen.getByText(/18 anos ou mais|maiores de 18 anos/)).toBeInTheDocument()
   })
 
@@ -336,9 +335,10 @@ describe('Documentos', () => {
     expect(rodape.getByRole('link', { name: 'Termos de Uso' })).toHaveAttribute('href', '/termos')
   })
 
-  it('as telas de conta também mostram os links', () => {
+  it('as telas de conta mantêm os links nos detalhes de privacidade', async () => {
     apiFalsa({})
     abrirApp('/entrar')
+    await userEvent.click(screen.getByText('Privacidade e termos', { selector: 'summary' }))
     const links = within(screen.getByRole('navigation', { name: 'Documentos' }))
     expect(links.getByRole('link', { name: 'Termos de Uso' })).toBeInTheDocument()
     expect(links.getByRole('link', { name: 'Política de Privacidade' })).toBeInTheDocument()

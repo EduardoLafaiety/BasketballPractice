@@ -1,5 +1,7 @@
+import { traduzir } from '../../../shared/i18n/idioma'
+import { Link } from '../../../shared/i18n/links'
 import { useEffect, useState, type FormEvent } from 'react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import Contador, { useContador, zonasParaLista } from '../../sessao/components/Contador'
 import { Carregando, ErroCarga } from '../../../shared/ui/Estado'
 import { coreografiaDe } from '../../demonstracoes/coreografias'
@@ -100,12 +102,12 @@ export default function TreinoDetalhe() {
   }
 
   async function excluir() {
-    if (!drill || !window.confirm(`Excluir o exercício "${drill.nome}"?`)) return
+    if (!drill || !window.confirm(traduzir(`Excluir o exercício "${drill.nome}"?`))) return
     try {
       await drills.remover(drill.id)
       navigate('/treinos')
     } catch (e) {
-      window.alert((e as Error).message)
+      window.alert(traduzir((e as Error).message))
     }
   }
 
@@ -119,8 +121,8 @@ export default function TreinoDetalhe() {
             <span className="meta">{ROTULO_METRICA[drill.metrica]}</span>
             {drill.nivel && <span className="meta">{ROTULO_NIVEL[drill.nivel]}{drill.aquecimento ? ' · Aquecimento' : ''}</span>}
           </div>
-          <h1>{drill.nome}</h1>
-          <p className="muted">{drill.descricao}</p>
+          <h1 translate={drill.personalizado ? 'no' : undefined}>{drill.nome}</h1>
+          <p className="muted" translate={drill.personalizado ? 'no' : undefined}>{drill.descricao}</p>
 
           {drill.personalizado && !editando && (
             <div className="acoes">

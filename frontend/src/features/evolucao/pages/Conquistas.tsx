@@ -1,3 +1,4 @@
+import { localeAtual } from '../../../shared/i18n/idioma'
 import { useMemo, useState, type CSSProperties } from 'react'
 import BarraProgresso from '../../../shared/ui/BarraProgresso'
 import { Carregando, ErroCarga, AvisoDesatualizado } from '../../../shared/ui/Estado'
@@ -40,9 +41,11 @@ export default function Conquistas() {
     .filter((g) => g.itens.length > 0)
 
   return (
-    <>
-      <h1>Conquistas</h1>
-      <p className="muted">Cada treino registrado aproxima você da próxima. As bloqueadas mostram quanto falta.</p>
+    <div className="pagina-conquistas">
+      <header className="conquistas-cabecalho">
+        <h1>Conquistas</h1>
+        <p className="muted">Cada treino registrado aproxima você da próxima. As bloqueadas mostram quanto falta.</p>
+      </header>
 
       {!sessoes ? (
         erro ? <ErroCarga erro={erro} tentarDeNovo={recarregar} /> : <Carregando texto="Contando suas conquistas" />
@@ -56,13 +59,20 @@ export default function Conquistas() {
                 <strong>{pct}%</strong>
               </span>
             </div>
+            <div className="conquistas-resumo">
             <h2 id="titulo-conquistas">Suas conquistas</h2>
             <p className="muted">
               <strong>{feitas}</strong> de <strong>{total}</strong> desbloqueadas ({pct}%)
             </p>
             <p className="muted conquistas-pontos-total">
-              <strong>{pontosFeitos.toLocaleString('pt-BR')}</strong> de {pontosTotal.toLocaleString('pt-BR')} pontos
+              <strong>{pontosFeitos.toLocaleString(localeAtual())}</strong> de {pontosTotal.toLocaleString(localeAtual())} pontos
             </p>
+            </div>
+            {proxima && <div className="conquistas-meta-seguinte">
+              <p className="conquistas-proxima">{`Próxima: ${proxima.titulo}`}</p>
+              <BarraProgresso valor={proxima.progresso} alvo={proxima.alvo} rotulo={`Progresso: ${proxima.titulo}`} />
+            </div>}
+          </aside>
             <div className="conquistas-filtros" role="group" aria-label="Mostrar conquistas">
               {FILTROS.map((f) => (
                 <button key={f.id} className={`conquistas-filtro ${filtro === f.id ? 'ativo' : ''}`} aria-pressed={filtro === f.id} onClick={() => setFiltro(f.id)}>
@@ -70,10 +80,9 @@ export default function Conquistas() {
                 </button>
               ))}
             </div>
-            {proxima && <p className="conquistas-proxima">{`Próxima: ${proxima.titulo}`}</p>}
-          </aside>
 
           <div className="conquistas-grupos">
+            {visiveis.length === 0 && <p className="conquistas-vazio" role="status">Nenhuma conquista neste filtro.</p>}
             {grupos.map((g) => (
               <section key={g.id} className="conquistas-grupo" aria-label={g.titulo}>
                 <h3>
@@ -102,7 +111,7 @@ export default function Conquistas() {
                           <>
                             <Icone nome="cadeado" tamanho={16} />
                             <span className="conquista-contagem">
-                              {c.progresso.toLocaleString('pt-BR')}/{c.alvo.toLocaleString('pt-BR')}
+                              {c.progresso.toLocaleString(localeAtual())}/{c.alvo.toLocaleString(localeAtual())}
                             </span>
                           </>
                         )}
@@ -116,6 +125,6 @@ export default function Conquistas() {
           </div>
         </section></>
       )}
-    </>
+    </div>
   )
 }

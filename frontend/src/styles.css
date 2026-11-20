@@ -1,8 +1,14 @@
+/* Entrada global: preserve a ordem da cascata ao reorganizar as folhas. */
 @import './styles/tokens.css';
 @import './styles/base.css';
 @import './styles/conteudo.css';
 @import './styles/programas.css';
 @import './styles/responsivo.css';
 @import './styles/navegacao.css';
-@import './styles/controles.css';
 @import './styles/inicio.css';
+@import './styles/controles.css';
+/* Acabamento publicado, aplicado depois dos estilos estruturais e de cada área. */
+@import './styles/refinamento.css';
+@import './styles/ajustes.css';
+@import './styles/suave.css';
+@import './styles/experiencia.css';

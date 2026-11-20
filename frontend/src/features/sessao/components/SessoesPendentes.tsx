@@ -1,6 +1,9 @@
+import { traduzir } from '../../../shared/i18n/idioma'
+import { Link } from '../../../shared/i18n/links'
+import { localeAtual } from '../../../shared/i18n/idioma'
 import { sincronizar } from '../model/sincronizar-sessoes'
 import { useEffect, useRef, useState } from 'react'
-import { Link, useLocation } from 'react-router-dom'
+import { useLocation } from 'react-router-dom'
 import { api, ApiError, contaLocal, tokenAtual } from '../../../shared/api/backend'
 import { useAuth } from '../../autenticacao/model/auth'
 import { invalidar } from '../../../shared/data/recursos'
@@ -72,7 +75,7 @@ export default function SessoesPendentes() {
     {problemas > 0 && <div>
       <p role="alert">{problemas} registro(s) local(is) precisam de revisão. Os dados foram preservados e não serão enviados automaticamente.</p>
       <Botao onClick={() => { try { baixarArquivo(exportarTreinosLocais(conta!), 'treinos-recuperacao-local.json', 'application/json') } catch { setErro('Não foi possível exportar os dados deste aparelho.') } }}>Exportar dados para recuperação</Botao>
-      <Botao disabled={enviando} onClick={() => { if (conta && window.confirm('Descartar somente os registros locais inválidos? Exporte uma cópia antes; essa ação não pode ser desfeita.')) { try { descartarRegistrosInvalidos(conta) } catch { setErro('Não foi possível descartar os registros locais.') } } }}>Descartar registros inválidos</Botao>
+      <Botao disabled={enviando} onClick={() => { if (conta && window.confirm(traduzir('Descartar somente os registros locais inválidos? Exporte uma cópia antes; essa ação não pode ser desfeita.'))) { try { descartarRegistrosInvalidos(conta) } catch { setErro('Não foi possível descartar os registros locais.') } } }}>Descartar registros inválidos</Botao>
       {erro && !quantidade && <p role="alert">{erro}</p>}
     </div>}
     {rascunho && pathname !== '/sessao' && <p><Link className="btn" to="/sessao">Retomar treino em andamento</Link></p>}
@@ -81,7 +84,7 @@ export default function SessoesPendentes() {
     <Botao disabled={enviando} onClick={() => { falhasAtuais.current = {}; setFalhas({}); bloqueado.current = false; setTentativa((t) => t + 1) }}>{enviando ? 'Enviando sessões' : 'Sincronizar agora'}</Botao>
     <details><summary>Revisar sessões pendentes</summary><ul className="pendentes-lista">
       {fila.map((s) => <li key={s.clientId}>
-        <strong>{new Date(s.data).toLocaleString('pt-BR')} · {s.duracaoMin} min</strong>
+        <strong>{new Date(s.data).toLocaleString(localeAtual())} · {s.duracaoMin} min</strong>
         <p>{s.entradas.length} exercícios · {s.notas || 'Sem notas'}</p>
         {s.programa && <p>Programa: {s.programa.id}, dia {s.programa.dia}</p>}
         {falhas[s.clientId!] && <>
@@ -90,10 +93,10 @@ export default function SessoesPendentes() {
           <Botao disabled={enviando} onClick={() => { delete falhasAtuais.current[s.clientId!]; setTentativa((t) => t + 1) }}>Tentar esta sessão novamente</Botao>
         </>}
         {s.programa && falhas[s.clientId!]?.erro.status === 409 && <Botao disabled={enviando} onClick={() => {
-          if (!conta || !window.confirm('Salvar este treino sem marcar um dia do programa como concluído?')) return
+          if (!conta || !window.confirm(traduzir('Salvar este treino sem marcar um dia do programa como concluído?'))) return
           alterarLocal(() => { enfileirar(conta, { ...s, programa: undefined }); bloqueado.current = false })
         }}>Salvar treino fora do programa</Botao>}
-        <Botao disabled={enviando} onClick={() => { if (conta && window.confirm('Descartar somente esta sessão ainda não sincronizada?')) alterarLocal(() => { removerPendente(conta, s.clientId!); bloqueado.current = false }) }}>Descartar esta pendência</Botao>
+        <Botao disabled={enviando} onClick={() => { if (conta && window.confirm(traduzir('Descartar somente esta sessão ainda não sincronizada?'))) alterarLocal(() => { removerPendente(conta, s.clientId!); bloqueado.current = false }) }}>Descartar esta pendência</Botao>
       </li>)}
     </ul></details></div>}
   </aside>

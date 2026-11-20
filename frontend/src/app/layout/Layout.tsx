@@ -1,7 +1,10 @@
+import LogoBola from '../../shared/ui/LogoBola'
+import Avatar from '../../shared/ui/Avatar'
+import { Link, NavLink } from '../../shared/i18n/links'
 import LimiteDeErro from '../../shared/ui/LimiteDeErro'
 import { precarregarDestino } from '../../shared/lib/precarregamento'
 import { Suspense, useEffect, useRef, useState, type CSSProperties, type MouseEvent } from 'react'
-import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
+import { Outlet, useLocation } from 'react-router-dom'
 import { api, dataLocal } from '../../shared/api/backend'
 import { useAuth } from '../../features/autenticacao/model/auth'
 import { iniciarEfeitos } from '../../shared/lib/efeitos'
@@ -15,6 +18,7 @@ import Icone from '../../shared/ui/Icone'
 import { Carregando } from '../../shared/ui/Estado'
 import { LinksLegais } from '../../features/autenticacao/components/TelaAuth'
 import SessoesPendentes from '../../features/sessao/components/SessoesPendentes'
+import PreferenciasCabecalho from '../../shared/ui/PreferenciasCabecalho'
 
 const LINKS: { to: string; rotulo: string; fim?: boolean }[] = [
   { to: '/', rotulo: 'Início', fim: true },
@@ -92,7 +96,7 @@ function antecipar(alvo: EventTarget) {
 
 export default function Layout() {
   const { usuario, sair } = useAuth()
-  const { config, carregado } = useConfig()
+  const { config, carregado, salvar } = useConfig()
   const { pathname } = useLocation()
   const [menuAberto, setMenuAberto] = useState(false)
   const conteudo = useRef<HTMLElement>(null)
@@ -174,7 +178,7 @@ export default function Layout() {
       <div className="progresso-pagina" aria-hidden><i ref={barra} /></div>
       <header className="topo">
         <Link to="/" className="marca" aria-label="Basketball Practice, início" onClick={voltarAoTopo}>
-          <Icone nome="bola" tamanho={34} />
+          <LogoBola tamanho={34} />
         </Link>
         {secao && (pathname === '/'
           ? <Link to="/" className="topo-secao" onClick={voltarAoTopo}>Início</Link>
@@ -184,6 +188,7 @@ export default function Layout() {
             <NavLink key={l.to} to={l.to}>{l.rotulo}</NavLink>
           ))}
         </nav>
+        <PreferenciasCabecalho temaConta={carregado ? config.tema : undefined} salvarTema={carregado ? (tema) => salvar({ ...config, tema }) : undefined} />
         <button className="topo-menu" aria-expanded={menuAberto} aria-controls="menu-tela" onClick={alternarMenu}>
           <span className="topo-tracos" aria-hidden />
           {menuAberto ? 'Fechar' : 'Menu'}
@@ -193,9 +198,9 @@ export default function Layout() {
       <div ref={menu} id="menu-tela" role={menuAberto ? 'dialog' : undefined} aria-label="Menu principal" aria-hidden={!menuAberto} {...(!menuAberto ? { inert: '' } : {})} className={`menu-tela ${menuAberto ? 'aberto' : ''}`}>
         <nav className="nav" aria-label="Principal" style={{ '--linhas': Math.ceil((LINKS.length + (usuario?.isAdmin ? 1 : 0)) / 2) } as CSSProperties}>
           {[
-            { titulo: 'Treinar', caminhos: ['/', '/treinos', '/rotina', '/programas', '/jogue-como'] },
-            { titulo: 'Evolução', caminhos: ['/evolucao', '/overall', '/conquistas'] },
-            { titulo: 'Explorar', caminhos: ['/nba', '/nbb', '/alimentacao', '/equipamentos', '/artigos'] },
+            { titulo: 'Treinar', caminhos: ['/', '/rotina', '/treinos', '/programas', '/jogue-como'] },
+            { titulo: 'Evolução', caminhos: ['/overall', '/evolucao', '/conquistas'] },
+            { titulo: 'Explorar', caminhos: ['/nbb', '/artigos', '/alimentacao', '/equipamentos', '/nba'] },
           ].map((grupo) => <section className="nav-grupo" key={grupo.titulo} aria-label={grupo.titulo}>
             <h2>{grupo.titulo}</h2>
             {grupo.caminhos.map((caminho) => {
@@ -214,10 +219,10 @@ export default function Layout() {
         </nav>
         <div className="conta">
           {usuario && (
-            <span className="conta-nome">
-              <span className="avatar" aria-hidden>{usuario.name.trim().charAt(0).toUpperCase()}</span>
-              <span className="conta-primeiro">{usuario.name.split(' ')[0]}</span>
-            </span>
+            <NavLink to="/configuracoes" className="conta-nome" aria-label="Meu perfil e configurações" onClick={() => setMenuAberto(false)}>
+              <Avatar nome={usuario.name} foto={usuario.avatarUrl} letras={1} />
+              <span className="conta-primeiro" translate={__DEMO__ ? undefined : 'no'}>{usuario.name.split(' ')[0]}</span>
+            </NavLink>
           )}
           <NavLink to="/configuracoes" className="botao-icone" aria-label="Configurações" title="Configurações" onClick={() => setMenuAberto(false)}>
             <Icone nome="config" />
@@ -236,7 +241,7 @@ export default function Layout() {
       </main>
       <footer className="rodape">
         <div className="rodape-principal">
-          <Link to="/" className="rodape-marca" onClick={voltarAoTopo}><Icone nome="bola" tamanho={28} /> Basketball Practice</Link>
+          <Link to="/" className="rodape-marca" onClick={voltarAoTopo}><LogoBola tamanho={28} /> Basketball Practice</Link>
           <nav aria-label="Links do rodapé">
             <Link to="/treinos">Treinos</Link><Link to="/rotina">Rotina</Link><Link to="/evolucao">Evolução</Link>
           </nav>

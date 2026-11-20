@@ -9,6 +9,7 @@
     "module": "ESNext",
     "moduleResolution": "bundler",
     "jsx": "react-jsx",
+    "jsxImportSource": "@localizacao",
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
@@ -16,6 +17,8 @@
     "isolatedModules": true,
     "noEmit": true,
     "paths": {
+      "@localizacao/jsx-runtime": ["./src/shared/i18n/jsx-runtime.ts"],
+      "@localizacao/jsx-dev-runtime": ["./src/shared/i18n/jsx-dev-runtime.ts"],
       "@demo/servidor": [
         "./src/demo/servidor.ts"
       ]
