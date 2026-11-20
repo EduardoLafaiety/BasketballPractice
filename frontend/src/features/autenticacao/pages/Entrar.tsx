@@ -15,7 +15,7 @@ export default function Entrar({ modo, demonstracao = __DEMO__ }: { modo: 'entra
   const destino = (local.state as { de?: string } | null)?.de ?? (plano === 'mensal' || plano === 'anual' ? `/assinatura?plano=${plano}` : '/')
 
   const [nome, setNome] = useState('')
-  const [email, setEmail] = useState('')
+  const [email, setEmail] = useState(() => (local.state as { email?: string } | null)?.email ?? '')
   const [senha, setSenha] = useState('')
   const [enviando, setEnviando] = useState(false)
   const [erro, setErro] = useState<string | null>(null)
@@ -139,7 +139,7 @@ export default function Entrar({ modo, demonstracao = __DEMO__ }: { modo: 'entra
               <>Já tem conta? <Link to="/entrar" state={local.state} className="link">Entrar</Link></>
             ) : (
               <>
-                Ainda não tem conta? <Link to="/cadastro" state={local.state} className="link">Criar conta</Link>
+                Ainda não tem conta? <Link to={(local.state as { compraPaga?: boolean } | null)?.compraPaga ? '/cadastro' : '/assinatura'} state={local.state} className="link">{(local.state as { compraPaga?: boolean } | null)?.compraPaga ? 'Criar conta' : 'Escolher um plano'}</Link>
               </>
             )}
           </p>

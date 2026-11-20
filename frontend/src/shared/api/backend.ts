@@ -39,8 +39,11 @@ export const fuso = () => `tzOffset=${new Date().getTimezoneOffset()}`
 // ---------- Endpoints ----------
 
 export const api = {
+  pagamentoDisponivel: () => request<{ ready: boolean }>('GET', '/billing/availability'),
+  comprarAntesDoCadastro: (email: string, plan: PlanoAssinatura, checkoutKey: string, mode: import('../../../../contracts/billing').ModoPagamento = 'recorrente') => request<{ url: string }>('POST', '/billing/purchase', { email, plan, checkoutKey, ...(mode === 'avulso' ? { mode } : {}) }),
+  consultarCompra: (checkoutKey: string) => request<import('../../../../contracts/billing').EstadoCompra>('POST', '/billing/purchase/status', { checkoutKey }),
   assinatura: (signal?: AbortSignal) => request<EstadoAssinatura>('GET', '/billing/status', undefined, { signal }),
-  iniciarAssinatura: (plan: PlanoAssinatura) => request<{ url: string }>('POST', '/billing/checkout', { plan }),
+  iniciarAssinatura: (plan: PlanoAssinatura, mode: import('../../../../contracts/billing').ModoPagamento = 'recorrente') => request<{ url: string }>('POST', '/billing/checkout', { plan, ...(mode === 'avulso' ? { mode } : {}) }),
   atualizarAssinatura: () => request<EstadoAssinatura>('POST', '/billing/refresh'),
   cancelarAssinatura: () => request<EstadoAssinatura>('POST', '/billing/cancel'),
   comparacao: (dias: number, exercicio = '', signal?: AbortSignal) => request<ComparacaoEvolucao>('GET', `/sessions/comparison?${fuso()}&days=${dias}${exercicio ? `&exerciseId=${encodeURIComponent(exercicio)}` : ''}`, undefined, { signal }),

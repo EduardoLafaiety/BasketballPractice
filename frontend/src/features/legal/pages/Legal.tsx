@@ -1,3 +1,4 @@
+import LinkInicio from '../../../shared/ui/LinkInicio'
 import { Link } from '../../../shared/i18n/links'
 import { useEffect, type ReactNode } from 'react'
 import { useLocation } from 'react-router-dom'
@@ -22,7 +23,7 @@ function PaginaLegal({ titulo, resumo, indice, children }: { titulo: string; res
   }, [hash, pathname])
   return <div className="legal legal-atualizada">
     <header className="topo legal-cabecalho">
-      <Link to="/" className="legal-marca" aria-label="Basketball Practice, início"><span className="marca"><LogoBola tamanho={28} /></span><span className="auth-nome">Basketball Practice</span></Link>
+      <LinkInicio className="legal-marca" aria-label="Basketball Practice, início"><span className="marca"><LogoBola tamanho={28} /></span><span className="auth-nome">Basketball Practice</span></LinkInicio>
       <PreferenciasCabecalho />
     </header>
     <main className="legal-texto">
@@ -137,7 +138,7 @@ export function TermosDeUso() {
       <p>O canal de atendimento para dúvidas, solicitações e questões relacionadas a estes termos é {CONTATO}.</p>
       {INSTAGRAM}
       <p>Os planos apresentados são de R$ 15,00 por mês ou R$ 150,00 a cada 12 meses, em reais, com os mesmos recursos. O anual corresponde a um pagamento por ano, não a 12 parcelas. A contratação depende da disponibilidade do checkout e da autorização expressa do usuário no Mercado Pago. A demonstração local não realiza cobranças.</p>
-      <p>A assinatura é renovada automaticamente na periodicidade escolhida e autorizada no checkout. O acesso pago depende da confirmação do pagamento. Você pode cancelar as próximas cobranças em Assinatura; o período já pago permanece até o vencimento. Cancelar a renovação não executa reembolso automático. Para contestar cobrança ou solicitar estorno, procure o atendimento, sem prejuízo dos direitos previstos na legislação.</p>
+      <p>Na opção Assinatura automática, as cobranças são renovadas na periodicidade escolhida e autorizada no checkout. Na opção Pagar pelo período, o pagamento é único e não há renovação automática: para continuar após o vencimento, é necessário pagar um novo período. O acesso pago depende da confirmação do pagamento; emitir boleto ou gerar Pix não libera acesso. Você pode cancelar as próximas cobranças automáticas em Assinatura; o período já pago permanece até o vencimento. Cancelar a renovação não executa reembolso automático. Para contestar cobrança ou solicitar estorno, procure o atendimento, sem prejuízo dos direitos previstos na legislação.</p>
       <p>Ao criar a conta, você declara que leu estes termos e a <Link className="link" to="/privacidade">Política de Privacidade</Link> e se compromete com as condições de uso. O acesso deve respeitar a legislação e os direitos de terceiros.</p>
     </Secao>
     <Secao {...TERMOS[1]}>

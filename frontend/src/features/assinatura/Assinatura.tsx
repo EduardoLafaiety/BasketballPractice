@@ -1,6 +1,7 @@
+import LinkInicio from '../../shared/ui/LinkInicio'
 import { useEffect, useState } from 'react'
 import { Navigate, Outlet, useLocation, useSearchParams } from 'react-router-dom'
-import type { EstadoAssinatura, PlanoAssinatura } from '../../../../contracts/billing'
+import type { EstadoAssinatura, PlanoAssinatura, ModoPagamento } from '../../../../contracts/billing'
 import { Link } from '../../shared/i18n/links'
 import { useIdioma } from '../../shared/i18n/idioma'
 import { api } from '../../shared/api/backend'
@@ -10,6 +11,9 @@ import LogoBola from '../../shared/ui/LogoBola'
 import Icone from '../../shared/ui/Icone'
 import { Carregando, ErroCarga } from '../../shared/ui/Estado'
 import './assinatura.css'
+import { CompraInicial } from './Compra'
+import FormaPagamento from './FormaPagamento'
+import { destinoPagamento } from './checkout-url'
 
 const DEMO: EstadoAssinatura = { required: true, hasAccess: false, ready: false, paidUntil: null, subscription: null }
 const ROTULOS: Record<string, string> = { creating: 'Preparando pagamento', pending: 'Aguardando pagamento', authorized: 'Renovação automática ativada', paused: 'Renovação pausada', cancelled: 'Renovação cancelada', failed: 'Pagamento não iniciado' }
@@ -45,6 +49,7 @@ export default function Assinatura() {
   const [params] = useSearchParams()
   const idioma = useIdioma()
   const [plano, setPlano] = useState(() => planoValido(params.get('plano') ?? planoSalvo()))
+  const [modo, setModo] = useState<ModoPagamento>('avulso')
   const [estado, setEstado] = useState<EstadoAssinatura | null>(__DEMO__ ? DEMO : null)
   const [erro, setErro] = useState('')
   const [acao, setAcao] = useState('')
@@ -56,7 +61,10 @@ export default function Assinatura() {
     const controller = new AbortController()
     api.assinatura(controller.signal).then(result => {
       setEstado(result)
-      if (result.subscription) setPlano(result.subscription.plan)
+      if (result.subscription) {
+        if (!params.has('plano')) setPlano(result.subscription.plan)
+        setModo(result.subscription.mode ?? 'recorrente')
+      }
     }, e => { if (!controller.signal.aborted) setErro(e.message) })
     return () => controller.abort()
   }, [usuario?.id])
@@ -78,7 +86,7 @@ export default function Assinatura() {
     return () => { ativo = false; clearTimeout(timer) }
   }, [usuario?.id, local.search])
 
-  if (!__DEMO__ && !usuario && !verificando) return <Navigate to="/entrar" replace state={{ de: `/assinatura${local.search}` }} />
+  if (!__DEMO__ && !usuario && !verificando) return <CompraInicial />
 
   async function verificar() {
     setAcao('verificar'); setErro(''); setAviso('')
@@ -89,10 +97,8 @@ export default function Assinatura() {
   async function pagar() {
     setAcao('pagar'); setErro('')
     try {
-      const { url } = await api.iniciarAssinatura(plano)
-      const destino = new URL(url)
-      if (destino.protocol !== 'https:' || destino.hostname !== 'www.mercadopago.com.br' || !destino.pathname.startsWith('/subscriptions/checkout')) throw new Error('Endereço de pagamento inválido.')
-      window.location.assign(destino.href)
+      const { url } = await api.iniciarAssinatura(plano, modo)
+      window.location.assign(destinoPagamento(url, modo))
     } catch (e) { setErro((e as Error).message); setAcao(''); void api.assinatura().then(setEstado, () => {}) }
   }
   async function cancelar() {
@@ -102,10 +108,11 @@ export default function Assinatura() {
     finally { setAcao('') }
   }
   const acesso = estado?.hasAccess && estado.required
-  const vigente = estado?.subscription && !['cancelled', 'failed'].includes(estado.subscription.status)
+  const vigente = estado?.subscription && estado.subscription.mode !== 'avulso' && !['cancelled', 'failed','completed'].includes(estado.subscription.status)
+  const trocando = vigente && (estado?.subscription?.plan !== plano || (estado.subscription.mode ?? 'recorrente') !== modo)
   const data = estado?.paidUntil ? new Intl.DateTimeFormat(idioma === 'en' ? 'en-US' : 'pt-BR', { dateStyle: 'long' }).format(new Date(estado.paidUntil)) : null
   return <div className="assinatura-pagina">
-    <header className="topo assinatura-topo"><Link to="/conheca" className="assinatura-marca"><LogoBola /><span>Basketball Practice</span></Link><PreferenciasCabecalho /></header>
+    <header className="topo assinatura-topo"><LinkInicio className="assinatura-marca"><LogoBola /><span>Basketball Practice</span></LinkInicio><PreferenciasCabecalho /></header>
     <main className="assinatura-conteudo">
       <Link to="/conheca#planos" className="assinatura-voltar">← Conheça os planos</Link>
       <p className="assinatura-kicker">Seu próximo passo</p><h1>{acesso ? 'Sua assinatura' : 'Bora pra quadra.'}</h1>
@@ -115,14 +122,16 @@ export default function Assinatura() {
       {aviso && <p className="assinatura-aviso" role="status">{aviso}</p>}
       {!estado && <div className="assinatura-aviso" role="status">Conferindo sua assinatura…</div>}
       {estado && <>
-        {estado.subscription && <section className="assinatura-estado" aria-label="Estado da assinatura"><div><h2>{estado.subscription.plan === 'anual' ? 'Plano anual' : 'Plano mensal'}</h2><p>{ROTULOS[estado.subscription.status] ?? 'Em análise'}</p>{data && <p>Acesso pago até <strong>{data}</strong>.</p>}</div>{acesso && <Link className="btn btn-primario" to="/">Ir para os treinos <Icone nome="seta" /></Link>}</section>}
+        {estado.subscription && <section className="assinatura-estado" aria-label="Estado da assinatura"><div><h2>{estado.subscription.plan === 'anual' ? 'Plano anual' : 'Plano mensal'}</h2><p>{estado.subscription.mode === 'avulso' ? estado.subscription.status === 'completed' ? 'Período pago, sem renovação automática' : 'Pagamento único em andamento' : ROTULOS[estado.subscription.status] ?? 'Em análise'}</p>{data && <p>Acesso pago até <strong>{data}</strong>.</p>}</div>{acesso && <Link className="btn btn-primario" to="/">Ir para os treinos <Icone nome="seta" /></Link>}</section>}
         {!estado.ready && !__DEMO__ && <p className="assinatura-aviso">As assinaturas estão em configuração. Nenhuma cobrança será iniciada por este site enquanto o pagamento não estiver disponível.</p>}
         {!acesso && <>
-          <fieldset className="assinatura-planos" disabled={Boolean(acao) || Boolean(vigente)}><legend>Escolha a frequência de pagamento</legend>
-            <label className={plano === 'mensal' ? 'selecionado' : ''}><input type="radio" name="plano" value="mensal" checked={plano === 'mensal'} onChange={() => setPlano('mensal')} /><span>Mensal<strong>R$ 15,00<small>por mês</small></strong><small>Cobrança recorrente mensal.</small></span></label>
+          <fieldset className="assinatura-planos" disabled={Boolean(acao)}><legend>Escolha a frequência de pagamento</legend>
+            <label className={plano === 'mensal' ? 'selecionado' : ''}><input type="radio" name="plano" value="mensal" checked={plano === 'mensal'} onChange={() => setPlano('mensal')} /><span>Mensal<strong>R$ 15,00<small>por mês</small></strong><small>1 mês de acesso completo.</small></span></label>
             <label className={plano === 'anual' ? 'selecionado' : ''}><input type="radio" name="plano" value="anual" checked={plano === 'anual'} onChange={() => setPlano('anual')} /><span>Anual<strong>R$ 150,00<small>por ano</small></strong><small>Pagamento anual. Equivale a R$ 12,50/mês.</small></span></label>
           </fieldset>
-          <div className="assinatura-checkout"><p>Os dois planos incluem todos os recursos de treino. A renovação é automática; você pode cancelá-la por aqui.</p><button className="btn btn-primario" disabled={!estado.ready || Boolean(acao) || estado.subscription?.status === 'creating'} onClick={() => void pagar()}>{acao === 'pagar' ? 'Abrindo Mercado Pago…' : vigente ? 'Continuar pagamento' : 'Continuar no Mercado Pago'}<Icone nome="seta" /></button><p className="assinatura-nota">O acesso depende da confirmação do pagamento. Seus dados de cartão são informados apenas no Mercado Pago.</p><p className="assinatura-nota">Ao continuar, você concorda com os <Link to="/termos">Termos de Uso</Link> e a <Link to="/privacidade">Política de Privacidade</Link>.</p></div>
+          <FormaPagamento value={modo} onChange={setModo} disabled={Boolean(acao)} />
+          {trocando && <p className="assinatura-aviso">Ao continuar, cancelaremos a tentativa anterior antes de abrir o plano escolhido. Cobranças já em processamento precisam ser conferidas primeiro.</p>}
+          <div className="assinatura-checkout"><p>{modo === 'avulso' ? 'Pague uma vez pelo período escolhido. Sem renovação automática.' : 'A renovação é automática; você pode cancelá-la por aqui.'} Os dois planos incluem todos os recursos de treino.</p><button className="btn btn-primario" disabled={!estado.ready || Boolean(acao) || estado.subscription?.status === 'creating'} onClick={() => void pagar()}>{acao === 'pagar' ? 'Abrindo Mercado Pago…' : trocando ? 'Trocar plano e continuar' : vigente ? 'Continuar pagamento' : 'Continuar no Mercado Pago'}<Icone nome="seta" /></button><p className="assinatura-nota">O acesso depende da confirmação do pagamento. Seus dados de cartão são informados apenas no Mercado Pago.</p><p className="assinatura-nota">Ao continuar, você concorda com os <Link to="/termos">Termos de Uso</Link> e a <Link to="/privacidade">Política de Privacidade</Link>.</p></div>
         </>}
         {estado.subscription && <div className="assinatura-gerenciar">
           <button className="btn" disabled={Boolean(acao) || !(estado.canManage ?? estado.ready)} onClick={() => void verificar()}>{acao === 'verificar' ? 'Verificando…' : 'Verificar pagamento'}</button>

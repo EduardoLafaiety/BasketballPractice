@@ -12,8 +12,15 @@ export interface MpInvoice {
 export interface MpPayment {
   id: number; status: string; transaction_amount: number; transaction_amount_refunded?: number
   currency_id: string; collector_id: number; live_mode: boolean; date_approved: string | null; date_last_updated: string
+  external_reference?: string; order?: { id: number; type: string }
 }
+export interface MpPreference { id: string; init_point?: string; external_reference: string; collector_id: number; items: { quantity: number; unit_price: number; currency_id: string }[] }
+export interface MpOrder { id: number; preference_id: string; external_reference: string; collector: { id: number }; payments: { id: number }[] }
 export interface MercadoPago {
+  preference(body: Record<string, unknown>, key: string): Promise<MpPreference>
+  getPreference(id: string): Promise<MpPreference>
+  order(id: string): Promise<MpOrder>
+  payments(reference: string): Promise<MpPayment[]>
   create(body: Record<string, unknown>, key: string): Promise<MpSubscription>
   subscription(id: string): Promise<MpSubscription>
   cancel(id: string): Promise<MpSubscription>
@@ -39,6 +46,14 @@ export function mercadoPago(accessToken: string): MercadoPago {
     }
   }
   return {
+    preference: (body, key) => request('/checkout/preferences', 'POST', body, key),
+    getPreference: id => request(`/checkout/preferences/${encodeURIComponent(id)}`),
+    order: id => request(`/merchant_orders/${encodeURIComponent(id)}`),
+    payments: async reference => {
+      const result = await request<{ results: MpPayment[]; paging: { total: number } }>(`/v1/payments/search?${new URLSearchParams({ external_reference: reference, sort: 'date_created', criteria: 'desc', limit: '100' })}`)
+      if (result.paging.total > result.results.length) throw new HttpError(502, 'A compra precisa de conciliação. Consulte o atendimento antes de pagar novamente.')
+      return result.results
+    },
     create: (body, key) => request('/preapproval', 'POST', body, key),
     subscription: id => request(`/preapproval/${encodeURIComponent(id)}`),
     cancel: id => request(`/preapproval/${encodeURIComponent(id)}`, 'PUT', { status: 'cancelled' }),
@@ -61,9 +76,10 @@ export function validWebhook(secret: string, signature: string, requestId: strin
   return timingSafeEqual(expected, Buffer.from(parts.v1, 'hex'))
 }
 
-export function checkoutUrl(value: string | undefined) {
+export function checkoutUrl(value: string | undefined, mode: 'recorrente' | 'avulso' = 'recorrente') {
   if (!value) throw new HttpError(502, 'O Mercado Pago não retornou o endereço de pagamento.')
   const url = new URL(value)
-  if (url.protocol !== 'https:' || url.hostname !== 'www.mercadopago.com.br' || url.username || url.password || !url.pathname.startsWith('/subscriptions/checkout')) throw new HttpError(502, 'Endereço de pagamento inválido.')
+  const path = mode === 'avulso' ? '/checkout/v1/redirect' : '/subscriptions/checkout'
+  if (url.protocol !== 'https:' || url.hostname !== 'www.mercadopago.com.br' || url.username || url.password || url.pathname !== path) throw new HttpError(502, 'Endereço de pagamento inválido.')
   return url.href
 }

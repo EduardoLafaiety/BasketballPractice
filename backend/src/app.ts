@@ -23,7 +23,7 @@ import { workoutsRouter } from './modules/workouts/workouts.routes.js'
 import { routineRouter } from './modules/routine/routine.routes.js'
 import { observabilidade, type ObservarHttp } from './middleware/observabilidade.js'
 import { createBillingService, type BillingOptions } from './modules/billing/billing.service.js'
-import { billingRouter, billingWebhook, requireBillingAccess } from './modules/billing/billing.routes.js'
+import { billingRouter, billingWebhook, publicBillingRouter, requireBillingAccess } from './modules/billing/billing.routes.js'
 
 export interface AppOptions {
   billing?: BillingOptions
@@ -80,6 +80,9 @@ export function createApp(
   app.use('/api/auth/avatar', express.json({ limit: '400kb' }))
   app.use(express.json({ limit: '100kb' }))
   app.use('/api/billing/webhook', billingWebhook(billing))
+  const purchaseLimit = limitarTentativas({ maximo: 60, janelaMs: 60_000 })
+  app.use(['/api/billing/purchase', '/api/billing/availability'], purchaseLimit)
+  app.use('/api/billing', publicBillingRouter(billing))
   const billingLimit = limitarTentativas({ maximo: 20, janelaMs: 60_000 })
   app.use('/api/billing', auth, billingLimit, billingRouter(billing))
 
@@ -125,7 +128,7 @@ export function createApp(
       limiteEnvios,
       segundoPlano,
       aoRedefinirSenha: porConta.liberar,
-      billingAccess: billing.access,
+      billingAccess: async id => { await billing.claimPurchases(id); return billing.access(id) },
     }),
   )
   app.use('/api/exercises', auth, paid, exercisesRouter(db))

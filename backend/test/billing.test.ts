@@ -1,8 +1,10 @@
 import assert from 'node:assert/strict'
-import { createHmac } from 'node:crypto'
+import { createHmac, randomBytes, randomUUID } from 'node:crypto'
+import { criarConta } from './caixa.js'
 import { describe, it } from 'node:test'
 import { startApi } from './http.js'
 import { periodEnd } from '../src/modules/billing/billing.service.js'
+import { fakeCheckoutPro } from './fake-checkout-pro.js'
 import type { MercadoPago, MpInvoice, MpPayment, MpSubscription } from '../src/modules/billing/mercado-pago.js'
 
 const secret = 'segredo-de-webhook-apenas-para-testes'
@@ -13,7 +15,9 @@ let creates = 0
 let cancels = 0
 let loseResponse = false
 let nextPayment = 1000
+const single = fakeCheckoutPro(payments)
 const client: MercadoPago = {
+  ...single.client,
   async create(body) {
     creates++
     const id = `sub${creates}`
@@ -30,7 +34,7 @@ const client: MercadoPago = {
   async payment(id) { return payments.get(id)! },
 }
 const billing = { enabled: true, accessToken: 'apenas-teste', webhookSecret: secret, collectorId: '123', appUrl: 'https://basketball.example', liveMode: false, client }
-const { api, register, db, baseUrl } = await startApi({ billing })
+const { api, register, db, baseUrl, caixa } = await startApi({ billing })
 
 async function notify(type: string, id: string, options: { signature?: string; ts?: string; bodyId?: string } = {}) {
   const ts = options.ts ?? String(Date.now())
@@ -130,7 +134,11 @@ describe('Assinaturas Mercado Pago', () => {
     const results = await Promise.all([api('POST', '/billing/checkout', { plan: 'mensal' }, user.token), api('POST', '/billing/checkout', { plan: 'mensal' }, user.token)])
     assert.ok(results.some(r => r.status === 200))
     assert.equal(creates, before + 1)
-    assert.equal((await api('POST', '/billing/checkout', { plan: 'anual' }, user.token)).status, 409)
+    const annual = await api('POST', '/billing/checkout', { plan: 'anual' }, user.token)
+    assert.equal(annual.status, 200)
+    assert.equal(creates, before + 2)
+    assert.equal(subscriptions.get(`sub${before + 1}`)!.status, 'cancelled')
+    assert.equal(subscriptions.get(`sub${before + 2}`)!.auto_recurring.transaction_amount, 150)
   })
   it('assinatura autorizada e retorno do navegador não liberam acesso sem pagamento aprovado', async () => {
     const { token, sub } = await checkout()
@@ -294,5 +302,99 @@ describe('Assinaturas Mercado Pago', () => {
     assert.equal((await isolated.api('GET', '/exercises', undefined, user.token)).status, 402)
     const count = await db.query('SELECT COUNT(*) FROM billing_payments')
     assert.ok(Number(count.rows[0].count) > 0)
+  })
+})
+
+describe('Compra antes do cadastro', () => {
+  const buyer = () => ({ email: `compra-${randomUUID()}@example.com`, plan: 'mensal' as const, checkoutKey: randomBytes(32).toString('hex') })
+  async function guest() {
+    const input = buyer()
+    const response = await api('POST', '/billing/purchase', input)
+    assert.equal(response.status, 200, JSON.stringify(response.body))
+    const id = new URL(response.body.url).searchParams.get('preapproval_id')!
+    return { input, sub: subscriptions.get(id)!, url: response.body.url }
+  }
+  it('permite pagar sem conta e só vincula o acesso após confirmar o mesmo e-mail', async () => {
+    const before = (await db.query<{ n: number }>('SELECT count(*)::int AS n FROM users')).rows[0].n
+    const { input, sub } = await guest()
+    const row = (await db.query<{ user_id: number | null; checkout_key_hash: string }>('SELECT user_id,checkout_key_hash FROM billing_subscriptions WHERE mp_id = $1', [sub.id])).rows[0]
+    assert.equal(row.user_id, null)
+    assert.notEqual(row.checkout_key_hash, input.checkoutKey)
+    assert.equal((await db.query<{ n: number }>('SELECT count(*)::int AS n FROM users')).rows[0].n, before)
+    assert.equal((await api('POST', '/billing/purchase/status', { checkoutKey: input.checkoutKey })).body.paid, false)
+    const { invoice } = paid(sub)
+    assert.equal((await notify('subscription_authorized_payment', String(invoice.id))).status, 200)
+    const purchase = await api('POST', '/billing/purchase/status', { checkoutKey: input.checkoutKey })
+    assert.equal(purchase.body.paid, true)
+    assert.equal(purchase.body.email, input.email)
+    assert.equal((await api('GET', '/exercises')).status, 401)
+    const password = 'senha-segura-apos-pagar'
+    await api('POST', '/auth/register', { name: 'Cliente pago', email: input.email, password })
+    assert.equal((await api('POST', '/auth/login', { email: input.email, password })).status, 401)
+    const token = await caixa.ultimoToken(input.email)
+    const confirmation = await api('POST', '/auth/confirm', { token, password })
+    assert.equal(confirmation.status, 201)
+    assert.equal(confirmation.body.user.billing.hasAccess, true)
+    assert.equal((await api('GET', '/exercises', undefined, confirmation.body.token)).status, 200)
+    assert.equal((await db.query<{ user_id: number }>('SELECT user_id FROM billing_subscriptions WHERE mp_id = $1', [sub.id])).rows[0].user_id, confirmation.body.user.id)
+    const other = await register()
+    assert.equal((await api('GET', '/auth/me', undefined, other.token)).body.billing.hasAccess, false)
+  })
+  it('assinatura autorizada sem pagamento não libera a conta e a chave não substitui autenticação', async () => {
+    const { input, sub } = await guest()
+    sub.status = 'authorized'
+    assert.equal((await api('POST', '/billing/purchase/status', { checkoutKey: input.checkoutKey })).body.paid, false)
+    const { user, token } = await criarConta(api, caixa, { name: 'Sem pagamento', email: input.email, password: 'senha-segura' })
+    assert.equal((await api('GET', '/exercises', undefined, token)).status, 402)
+    assert.equal((await api('GET', '/exercises', undefined, input.checkoutKey)).status, 401)
+    assert.equal((await api('GET', '/admin/users', undefined, token)).status, 403)
+    assert.equal((await api('POST', '/billing/purchase/status', { checkoutKey: randomBytes(32).toString('hex') })).status, 404)
+    assert.equal((await api('POST', '/billing/purchase/status', { checkoutKey: input.checkoutKey, paid: true })).status, 400)
+    const { invoice } = paid(sub)
+    await notify('subscription_authorized_payment', String(invoice.id))
+    assert.equal((await api('GET', '/auth/me', undefined, token)).body.billing.hasAccess, true)
+    assert.equal((await api('GET', '/billing/status', undefined, token)).body.hasAccess, true)
+    assert.ok(user.id)
+  })
+  it('repetir a compra não gera outra assinatura e não permite trocar sua identidade', async () => {
+    const previous = creates
+    const { input, url } = await guest()
+    const repeated = await api('POST', '/billing/purchase', input)
+    assert.equal(repeated.status, 200)
+    assert.equal(repeated.body.url, url)
+    assert.equal(creates, previous + 1)
+    assert.equal((await api('POST', '/billing/purchase', { ...input, email: 'outro@example.com' })).status, 409)
+    assert.equal((await api('POST', '/billing/purchase', { ...input, checkoutKey: randomBytes(32).toString('hex') })).status, 409)
+    assert.equal((await api('POST', '/billing/purchase', { ...input, userId: 1, amount: 1 })).status, 400)
+    assert.equal(creates, previous + 1)
+    const annual = await api('POST', '/billing/purchase', { ...input, plan: 'anual' })
+    assert.equal(annual.status, 200)
+    assert.equal(creates, previous + 2)
+    assert.equal(subscriptions.get(`sub${previous + 1}`)!.status, 'cancelled')
+    assert.equal((await api('POST','/billing/purchase/status',{checkoutKey:input.checkoutKey})).body.plan,'anual')
+  })
+  it('estorno revoga o acesso de uma compra vinculada depois do cadastro', async () => {
+    const { input, sub } = await guest()
+    const { invoice, payment } = paid(sub)
+    await notify('subscription_authorized_payment', String(invoice.id))
+    const { token } = await criarConta(api, caixa, { name: 'Cliente', email: input.email, password: 'senha-segura' })
+    assert.equal((await api('GET', '/exercises', undefined, token)).status, 200)
+    payment.status = 'refunded'
+    await notify('payment', String(payment.id))
+    assert.equal((await api('GET', '/exercises', undefined, token)).status, 402)
+    assert.equal((await api('POST', '/billing/purchase/status', { checkoutKey: input.checkoutKey })).body.paid, false)
+  })
+  it('resposta de criação perdida é recuperada pelo webhook antes de existir uma conta', async () => {
+    const input = buyer(), previous = creates
+    loseResponse = true
+    assert.equal((await api('POST', '/billing/purchase', input)).status, 500)
+    assert.equal((await api('POST', '/billing/purchase', input)).status, 409)
+    assert.equal(creates, previous + 1)
+    const sub = subscriptions.get(`sub${creates}`)!
+    const { invoice } = paid(sub)
+    assert.equal((await notify('subscription_authorized_payment', String(invoice.id))).status, 200)
+    assert.equal((await api('POST', '/billing/purchase/status', { checkoutKey: input.checkoutKey })).body.paid, true)
+    const { token } = await criarConta(api, caixa, { name: 'Recuperado', email: input.email, password: 'senha-segura' })
+    assert.equal((await api('GET', '/exercises', undefined, token)).status, 200)
   })
 })

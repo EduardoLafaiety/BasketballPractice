@@ -8,7 +8,16 @@ test('cadastro pelo formulário, ativação pelo e-mail, sair e entrar de novo v
   await page.goto('/alimentacao')
   await expect(page).toHaveURL(/\/entrar$/)
 
-  await page.getByRole('link', { name: 'Criar conta' }).click()
+  // Novo cliente passa primeiro pelo plano/pagamento. O cadastro direto abaixo
+  // verifica apenas o ciclo de autenticação, com cobrança desligada no ambiente E2E.
+  await page.getByRole('link', { name: 'Escolher um plano' }).click()
+  await expect(page).toHaveURL(/\/assinatura$/)
+  await expect(page.getByLabel('Seu e-mail de acesso')).toBeVisible()
+  await expect(page.getByLabel('Senha', { exact: true })).toHaveCount(0)
+  await page.getByRole('radio', { name: /Anual R\$/ }).check()
+  await expect(page.getByRole('radio', { name: /Anual R\$/ })).toBeChecked()
+  await expect(page.getByText('Pix, boleto, débito ou crédito')).toBeVisible()
+  await page.goto('/cadastro')
   await page.getByLabel('Nome').fill('Marina E2E')
   await page.getByLabel('E-mail').fill(email)
   await page.getByLabel('Senha').fill('curta')

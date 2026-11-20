@@ -14,11 +14,13 @@ function abrir(extra: Record<string, object | ((body: unknown) => unknown)> = {}
   return fake
 }
 describe('Assinatura', () => {
-  it('preserva o plano e o destino ao pedir login', async () => {
-    apiFalsa({})
+  it('abre o pagamento antes de pedir login ou cadastro', async () => {
+    apiFalsa({ 'GET /billing/availability': { ready: true } })
     abrirApp('/assinatura?plano=anual')
-    await waitFor(() => expect(screen.getByTestId('caminho')).toHaveTextContent('/entrar'))
-    expect(screen.getByRole('heading', { name: /^Entrar$/ })).toBeInTheDocument()
+    expect(await screen.findByLabelText('Seu e-mail de acesso')).toBeInTheDocument()
+    expect(screen.getByTestId('caminho')).toHaveTextContent('/assinatura')
+    expect(screen.queryByLabelText('Senha')).not.toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: /^Entrar$/ })).not.toBeInTheDocument()
     expect(localStorage.getItem('bp.plano-escolhido')).toBe('anual')
   })
   it('envia apenas o identificador do plano e recusa redirecionamento externo inválido', async () => {
@@ -26,7 +28,18 @@ describe('Assinatura', () => {
     const fake = abrir({ 'POST /billing/checkout': { url: 'https://outro.example/pagar' } })
     await user.click(await screen.findByRole('button', { name: 'Continuar no Mercado Pago' }))
     expect(await screen.findByRole('alert')).toHaveTextContent('Endereço de pagamento inválido')
-    expect(fake.ultima('POST', '/billing/checkout')?.corpo).toEqual({ plan: 'anual' })
+    expect(fake.ultima('POST', '/billing/checkout')?.corpo).toEqual({ plan: 'anual', mode: 'avulso' })
+  })
+  it('permite selecionar anual mesmo com checkout mensal pendente e avisa sobre a troca', async () => {
+    const user = userEvent.setup()
+    abrir({ 'GET /billing/status': {...status,subscription:{plan:'mensal',mode:'recorrente',status:'pending'}} })
+    await user.click(await screen.findByRole('radio',{name:/Anual/}))
+    expect(screen.getByRole('radio',{name:/Anual/})).toBeChecked()
+    expect(screen.getByRole('radio',{name:/Anual/})).toBeEnabled()
+    expect(screen.getByRole('button',{name:'Trocar plano e continuar'})).toBeEnabled()
+    expect(screen.getByText(/cancelaremos a tentativa anterior/)).toBeInTheDocument()
+    await user.click(screen.getByRole('radio',{name:/Pagar pelo período/}))
+    expect(screen.getByText('Pix, boleto, débito ou crédito')).toBeInTheDocument()
   })
   it('sem configuração não permite iniciar cobrança', async () => {
     abrir({ 'GET /billing/status': { ...status, ready: false } })
