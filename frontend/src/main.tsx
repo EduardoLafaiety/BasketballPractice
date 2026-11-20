@@ -14,6 +14,7 @@ import './styles.css'
 import './styles/controles.css'
 import './styles/refinamento.css'
 import './styles/ajustes.css'
+import './styles/suave.css'
 
 // Subpasta do site (VITE_BASE), ex.: /BasketballPractice no GitHub Pages; "/" no site normal.
 const BASE = import.meta.env.BASE_URL.replace(/\/$/, '') || '/'
