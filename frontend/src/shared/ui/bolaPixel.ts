@@ -137,7 +137,7 @@ export function parteDoBloco(coluna: number, linha: number, modelo: Pick<ModeloB
 }
 
 /** Quantos pixels cada bloco da bola de vitrine tem de lado: a bola é desenhada na mesma forma, só com mais detalhe. */
-export const RESOLUCAO_VITRINE = 6
+export const RESOLUCAO_VITRINE = 4
 
 /** Cor entre dois tons vizinhos da tabela (tom fracionário: 0 = brilho, 5 = sombra). */
 function mistura(tabela: (readonly number[])[], tom: number): readonly number[] {
