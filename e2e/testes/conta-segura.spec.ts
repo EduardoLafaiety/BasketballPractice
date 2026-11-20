@@ -76,7 +76,7 @@ test('sair revoga o token de verdade', async ({ page, request }) => {
   const revogado = page.waitForResponse((r) => r.url().endsWith('/api/auth/logout'))
   await page.getByRole('button', { name: 'Sair' }).click()
   expect((await revogado).status()).toBe(204)
-  await expect(page).toHaveURL(/\/entrar$/)
+  await expect(page.getByRole('heading', { name: 'Seu jogo. Próximo nível.', level: 1 })).toBeVisible()
 
   expect((await request.get('/api/auth/me', { headers: autorizacao(token) })).status()).toBe(401)
 })

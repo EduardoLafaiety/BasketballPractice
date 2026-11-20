@@ -15,6 +15,8 @@ A API verifica cada pedido de exercícios, treinos, rotina, sessões, planos, pr
 
 O frontend exige confirmação de acesso da API. Dados de assinatura ausentes, validade ausente/inválida ou período vencido não liberam conteúdo. Um temporizador e a retomada da aba verificam o vencimento com a página aberta. A decisão do servidor continua sendo obrigatória em cada chamada protegida.
 
+Ao reabrir o site sem conexão, a sessão precisa ser reconfirmada antes de acessar o conteúdo. O treino preparado e o rascunho permanecem no aparelho; a tela mantém a rota e permite tentar novamente quando a rede voltar. Uma sessão já confirmada pode continuar sem conexão até o prazo de acesso conhecido, e registros pendentes aguardam sincronização.
+
 ## Produção sem acesso gratuito acidental
 
 - `NODE_ENV=production` exige assinatura independentemente de `BILLING_ENABLED`. Sem chaves válidas o checkout fica indisponível, e o conteúdo continua bloqueado.
