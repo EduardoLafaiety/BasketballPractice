@@ -74,9 +74,6 @@ html::-webkit-scrollbar, .menu-tela::-webkit-scrollbar { display: none; }
 
   .conteudo { padding-bottom: calc(6rem + var(--doca, 0px)); }
   .rodape { padding-bottom: calc(2rem + var(--doca, 0px)); }
-  .aviso-cookies { bottom: calc(0.5rem + var(--doca, 0px)); inset-inline: 0.5rem; width: auto; padding: 0.8rem 0.9rem; gap: 0.55rem; }
-  .aviso-cookies p { font-size: 0.74rem; line-height: 1.4; }
-  .aviso-cookies-botoes .btn { padding-block: 0.55rem; }
   .menu-tela { padding-bottom: calc(1.5rem + var(--doca, 0px)); overscroll-behavior: contain; }
   .nav-link:active { color: var(--laranja); }
 }
@@ -419,11 +416,11 @@ html::-webkit-scrollbar, .menu-tela::-webkit-scrollbar { display: none; }
  * Ficam de fora os destaques grandes (títulos das páginas, "Bora pra quadra", números de placar, nomes dos jogadores)
  * e os títulos de cartão, um degrau acima (0,85rem), também em maiúsculas.
  */
-.meta, .link-forte, .faixa .stat span, .dieta-foco span, .dieta-quando .meta, .artigo-destaque-resumo, .nba-sigla, .dia-hoje, .doca-item, .auth-troca, .aviso-cookies p, .campo .meta {
+.meta, .link-forte, .faixa .stat span, .dieta-foco span, .dieta-quando .meta, .artigo-destaque-resumo, .nba-sigla, .dia-hoje, .doca-item, .auth-troca, .campo .meta {
   font-size: 0.7rem;
   text-transform: uppercase;
 }
-.dieta-foco span, .dieta-quando .meta, .auth-troca, .aviso-cookies p { font-weight: 700; letter-spacing: 0.06em; }
+.dieta-foco span, .dieta-quando .meta, .auth-troca { font-weight: 700; letter-spacing: 0.06em; }
 /* Na tela inicial (que usa iniciais maiúsculas), os nomes de artigo e de posição viram títulos de cartão. */
 /* Rótulos dos campos de entrar e cadastrar: o mesmo texto pequeno; ao subir, só trocam de lugar e de cor. */
 .campo-rotulo { top: 1.75rem; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }

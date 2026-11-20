@@ -1,4 +1,4 @@
-/* Controles e foco preservam fontes, bordas retas e a paleta retrô existente. */
+/* Controles e foco usam as fontes e a paleta atuais; o acabamento segue a cascata global. */
 :where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
   outline: 3px solid var(--laranja-texto);
   outline-offset: 3px;

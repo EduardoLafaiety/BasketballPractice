@@ -1,10 +1,11 @@
+import { Link } from '../../../shared/i18n/links'
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+
 import { api } from '../../../shared/api/backend'
 import { AvisoDesatualizado, Carregando, ErroCarga } from '../../../shared/ui/Estado'
 import GradeJogadores from '../../estilos/components/GradeJogadores'
 import Icone from '../../../shared/ui/Icone'
-import { AberturaBola, EscadaRolagem, Figura, FraseRolagem, NomesRolagem } from '../components/rolagem'
+import { AberturaBola, Figura, FraseRolagem, NomesRolagem } from '../components/rolagem'
 import { corDoJogador } from '../../estilos/lib/cor-do-time'
 import { NIVEIS } from '../../../shared/lib/niveis'
 import { ROTULO_METRICA } from '../../../shared/lib/formatacao'
@@ -44,6 +45,7 @@ export default function Inicio() {
           </h1>
         }
       >
+        <hr className="inicio-divisor" />
         <section className="treino-hoje" aria-labelledby="treino-hoje-titulo">
           <div className="hoje-frente">
             <h2 id="treino-hoje-titulo">Treine no seu ritmo. Evolua a cada jogada.</h2>
@@ -92,8 +94,10 @@ export default function Inicio() {
           </section>
       </AberturaBola>
 
+      <hr className="inicio-divisor" />
       <FraseRolagem texto="Ninguém começa arremessando de três. Primeiro vem a bola na mão, depois o arremesso colado à cesta, e só então a distância." />
 
+      <hr className="inicio-divisor" />
       <section className="faixa-preta banda">
         <div className="secao-topo">
           <h2 className="titulo-gigante">Treinos</h2>
@@ -111,9 +115,9 @@ export default function Inicio() {
         </div>
       </section>
 
-      <EscadaRolagem nome="Escada de arremesso" rotulo="Role e veja o boneco se mexer" titulo={<>Aqueça<br />de perto<br />para longe</>} />
-
       {estilos.length > 0 && (
+        <>
+        <hr className="inicio-divisor" />
         <section className="faixa-escura">
           <NomesRolagem
             nomes={estilos.map((e) => ({ nome: e.nome, cor: corDoJogador(e.id) }))}
@@ -123,6 +127,7 @@ export default function Inicio() {
             <GradeJogadores estilos={estilos} />
           </div>
         </section>
+        </>
       )}
 
     </div>

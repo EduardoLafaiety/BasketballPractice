@@ -1,12 +1,16 @@
 import { one, type Queryable } from '../../db/index.js'
 
 export interface UserRow {
-  id: number; name: string; email: string; isAdmin: boolean; createdAt: Date; tokenVersion: number
+  id: number; name: string; email: string; isAdmin: boolean; createdAt: Date; tokenVersion: number; avatarUrl: string | null
 }
 export type CredentialRow = UserRow & { passwordHash: string }
 export interface PendingRegistration { name: string; email: string; passwordHash: string }
 
-const USER_COLUMNS = `id, name, email, is_admin AS "isAdmin", created_at AS "createdAt", token_version AS "tokenVersion"`
+const USER_COLUMNS = `id, name, email, is_admin AS "isAdmin", created_at AS "createdAt", token_version AS "tokenVersion", avatar_url AS "avatarUrl"`
+
+export async function updateAvatar(db: Queryable, userId: number, avatarUrl: string | null) {
+  return (await db.query('UPDATE users SET avatar_url = $2 WHERE id = $1 RETURNING id', [userId, avatarUrl])).rowCount > 0
+}
 
 export function findUser(db: Queryable, id: number) {
   return one<UserRow>(db, `SELECT ${USER_COLUMNS} FROM users WHERE id = $1`, [id])

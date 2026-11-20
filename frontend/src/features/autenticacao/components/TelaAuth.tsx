@@ -1,32 +1,38 @@
+import { Link } from '../../../shared/i18n/links'
 import { useState, type ReactNode } from 'react'
-import { Link } from 'react-router-dom'
-import Icone from '../../../shared/ui/Icone'
-import { abrirPreferenciasCookies } from '../../../shared/lib/cookies'
-import { BolaCouro, LinhasQuadra, ListraBola } from '../../../shared/ui/fundoQuadra'
+
+import LogoBola from '../../../shared/ui/LogoBola'
+import { BolaCouro, LinhasQuadra } from '../../../shared/ui/fundoQuadra'
+import PreferenciasCabecalho from '../../../shared/ui/PreferenciasCabecalho'
 
 /** A moldura das telas de conta: a quadra de um lado, o formulário do outro. */
 export default function TelaAuth({ children }: { children: ReactNode }) {
   return (
-    <div className="auth">
+    <div className="auth auth-atualizada">
+      <header className="topo auth-cabecalho">
       <Link to="/entrar" className="auth-marca" aria-label="Basketball Practice">
-        <span className="marca"><Icone nome="bola" tamanho={28} /></span>
-        <span className="topo-secao">Basketball Practice</span>
+        <span className="marca"><LogoBola tamanho={28} /></span>
+        <span className="auth-nome">Basketball Practice</span>
       </Link>
+      <PreferenciasCabecalho />
+      </header>
       <section className="auth-palco" aria-hidden="true">
         <LinhasQuadra />
-        <div className="abertura-palco">
+        <div className="auth-ilustracao">
+          <h2 className="auth-titulo">
+            <span className="auth-titulo-a">Bora pra</span>
+            <span className="auth-titulo-b">quadra<span className="ponto">.</span></span>
+          </h2>
           <BolaCouro />
         </div>
-        <h2 className="auth-titulo">
-          <span className="auth-titulo-a">Bora pra</span>
-          <span className="auth-titulo-b">quadra<span className="ponto">.</span></span>
-        </h2>
       </section>
 
-      <section className="auth-lado faixa-preta com-listra">
-        <ListraBola />
+      <section className="auth-lado">
         {children}
-        <LinksLegais />
+        <details className="auth-legal">
+          <summary>Privacidade e termos</summary>
+          <LinksLegais />
+        </details>
       </section>
     </div>
   )
@@ -37,7 +43,6 @@ export function LinksLegais() {
     <nav className="links-legais" aria-label="Documentos">
       <Link to="/privacidade">Política de Privacidade</Link>
       <Link to="/termos">Termos de Uso</Link>
-      <button type="button" onClick={abrirPreferenciasCookies}>Preferências de cookies</button>
     </nav>
   )
 }
@@ -95,7 +100,11 @@ export function CampoSenha({
         aria-label={ver ? 'Ocultar o que foi digitado' : 'Mostrar o que foi digitado'}
         onClick={() => setVer((v) => !v)}
       >
-        {ver ? 'Ocultar' : 'Mostrar'}
+        <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z" />
+          <circle cx="12" cy="12" r="3" />
+          {ver && <path d="m3 3 18 18" />}
+        </svg>
       </button>
     </div>
   )

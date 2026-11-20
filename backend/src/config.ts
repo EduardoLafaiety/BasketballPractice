@@ -21,6 +21,8 @@ export function assertProductionSecret(secret: string) {
 }
 
 const isProduction = process.env.NODE_ENV === 'production'
+/** Produção sempre exige assinatura, mesmo com flag ausente ou desligada. */
+export const billingRequired = (environment: string | undefined, flag: string | undefined) => environment === 'production' || flag === 'true'
 if (isProduction) assertProductionSecret(process.env.JWT_SECRET ?? '')
 const jwtSecret = process.env.JWT_SECRET || 'dev-secret-change-me'
 
@@ -40,6 +42,13 @@ const corsOrigins = (process.env.CORS_ORIGIN ?? 'http://localhost:5173')
   .filter(Boolean)
 
 export const config = {
+  billing: {
+    enabled: billingRequired(process.env.NODE_ENV, process.env.BILLING_ENABLED),
+    accessToken: process.env.MP_ACCESS_TOKEN ?? '',
+    webhookSecret: process.env.MP_WEBHOOK_SECRET ?? '',
+    collectorId: process.env.MP_COLLECTOR_ID ?? '',
+    liveMode: process.env.MP_LIVE_MODE !== 'false',
+  },
   port: Number(process.env.PORT ?? 3333),
   jwtSecret,
   jwtExpiresIn: process.env.JWT_EXPIRES_IN ?? '7d',

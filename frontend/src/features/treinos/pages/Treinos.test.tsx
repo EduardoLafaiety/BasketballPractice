@@ -85,6 +85,17 @@ describe('Níveis', () => {
     expect(screen.queryByRole('region', { name: 'Aquecimento' })).toBeNull()
   })
 
+  it('o seletor móvel troca de nível preservando os filtros e a seleção do desktop', async () => {
+    const user = userEvent.setup()
+    abrir({ 'GET /auth/me': usuarioFalso(), 'GET /settings': configFalsa, 'GET /exercises': niveis })
+    await screen.findByRole('heading', { name: 'Arremesso a um metro' })
+    await user.type(screen.getByRole('searchbox'), 'Arremesso')
+    await user.selectOptions(screen.getByLabelText('Nível do treino'), 'avancado')
+    expect(nomesNaTela()).toEqual(['Arremesso de três'])
+    expect(screen.getByRole('searchbox')).toHaveValue('Arremesso')
+    expect(screen.getByRole('button', { name: /Avançado/ })).toHaveAttribute('aria-pressed', 'true')
+  })
+
   it('abre direto no nível pedido no link', async () => {
     abrir({ 'GET /auth/me': usuarioFalso(), 'GET /settings': configFalsa, 'GET /exercises': niveis }, '/treinos?nivel=intermediario')
     await waitFor(() => expect(nomesNaTela()).toEqual(['Receber e arremessar', 'Meu exercício']))

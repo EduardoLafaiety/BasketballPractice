@@ -1,5 +1,6 @@
+import { Link } from '../../../shared/i18n/links'
 import { useState, type FormEvent } from 'react'
-import { Link } from 'react-router-dom'
+
 import { api, ApiError } from '../../../shared/api/backend'
 import Icone from '../../../shared/ui/Icone'
 import TelaAuth, { ErroCampo } from '../components/TelaAuth'

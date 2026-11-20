@@ -1,10 +1,12 @@
+import { Link } from '../../../shared/i18n/links'
 import { useState, type CSSProperties } from 'react'
-import { Link, useParams, useSearchParams } from 'react-router-dom'
+import { useParams, useSearchParams } from 'react-router-dom'
 import { ARTIGOS, CATEGORIAS, POR_FILEIRA, categoria, minutosDeLeitura, type Artigo, type Categoria } from '../dados'
 import { linkDaFonte } from '../links'
 import ImagemArtigo from '../ImagemArtigo'
 import Icone from '../../../shared/ui/Icone'
 import NaoEncontrada from '../../navegacao/pages/NaoEncontrada'
+import { traduzir, useIdioma } from '../../../shared/i18n/idioma'
 
 const AVISO = 'Conteúdo educativo. Não substitui a orientação de médico, fisioterapeuta, nutricionista ou preparador físico.'
 
@@ -48,13 +50,14 @@ function Destaque({ artigo }: { artigo: Artigo }) {
 }
 
 export default function Artigos() {
+  useIdioma()
   const [params, setParams] = useSearchParams()
   const [busca, setBusca] = useState('')
   const filtro = CATEGORIAS.find((c) => c.id === params.get('categoria'))?.id
   const q = busca.trim().toLowerCase()
 
   const lista = ARTIGOS.filter(
-    (a) => (!filtro || a.categoria === filtro) && (!q || `${a.titulo} ${a.resumo}`.toLowerCase().includes(q)),
+    (a) => (!filtro || a.categoria === filtro) && (!q || `${a.titulo} ${a.resumo} ${traduzir(a.titulo)} ${traduzir(a.resumo)}`.toLowerCase().includes(q)),
   )
   const escolher = (c?: Categoria) => setParams(c ? { categoria: c } : {}, { replace: true })
 

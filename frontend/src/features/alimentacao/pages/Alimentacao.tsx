@@ -1,4 +1,5 @@
 import { useState, type CSSProperties } from 'react'
+import { traduzir, useIdioma } from '../../../shared/i18n/idioma'
 import { useSearchParams } from 'react-router-dom'
 import {
   COR,
@@ -199,6 +200,7 @@ function DiaDeJogo() {
 }
 
 function Despensa() {
+  useIdioma()
   const [busca, setBusca] = useState('')
   const q = busca.trim().toLowerCase()
   return (
@@ -214,7 +216,7 @@ function Despensa() {
             <p className="meta">{g.texto}</p>
             <ul className="alimentos">
               {g.alimentos.map((a) => (
-                <li key={a} className={q && !a.toLowerCase().includes(q) ? 'apagado' : undefined}>{a}</li>
+                <li key={a} className={q && !`${a} ${traduzir(a)}`.toLowerCase().includes(q) ? 'apagado' : undefined}>{a}</li>
               ))}
             </ul>
           </article>

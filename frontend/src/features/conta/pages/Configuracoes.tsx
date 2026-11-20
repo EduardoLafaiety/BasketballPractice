@@ -1,285 +1,72 @@
-import { useEffect, useRef, useState, type FormEvent } from 'react'
-import { api, ApiError, dataLocal, definirToken, type ResultadoImportacao } from '../../../shared/api/backend'
+import { Link } from '../../../shared/i18n/links'
+import { useState, type FormEvent } from 'react'
+
+import { api, ApiError, definirToken } from '../../../shared/api/backend'
 import { useAuth } from '../../autenticacao/model/auth'
 import { limparTreinosLocais } from '../../sessao/model/treino-local'
-import { Carregando, ErroCarga } from '../../../shared/ui/Estado'
-import { baixarArquivo, sessoesParaCsv } from '../../../shared/lib/arquivo'
-import { definirAnimacoes, useAnimacoes, type Animacoes } from '../../../shared/lib/movimento'
-import { notificar, pedirPermissao, proximoLembrete, suportaNotificacoes } from '../../../shared/lib/lembretes'
-import { instalar, rodandoComoApp, usePodeInstalar } from '../../../shared/lib/pwa'
-import { ativarPush, desativarPush, inscricaoAtual, suportaPush, testarPush } from '../../../shared/lib/push'
-import { DIAS } from '../../../shared/lib/formatacao'
-import { recarregarTudo } from '../../../shared/data/recursos'
-import { useConfig } from '../model/usarConfig'
-import type { Config, DiaSemana, Tema } from '../../../shared/types'
-
-const ORDEM: DiaSemana[] = [1, 2, 3, 4, 5, 6, 0]
-const TEMAS: { id: Tema; rotulo: string }[] = [
-  { id: 'sistema', rotulo: 'Igual ao sistema' },
-  { id: 'claro', rotulo: 'Claro' },
-  { id: 'escuro', rotulo: 'Escuro' },
-]
-const ANIMACOES: { id: Animacoes; rotulo: string }[] = [
-  { id: 'ligadas', rotulo: 'Ligadas' },
-  { id: 'sistema', rotulo: 'Seguir o sistema' },
-  { id: 'desligadas', rotulo: 'Desligadas' },
-]
-
-const INDICE = [
-  { id: 'config-aparencia', rotulo: 'Aparência' },
-  { id: 'config-lembretes', rotulo: 'Lembretes' },
-  { id: 'config-dados', rotulo: 'Seus dados' },
-  { id: 'config-conta', rotulo: 'Sua conta' },
-  { id: 'config-aplicativo', rotulo: 'Aplicativo' },
-]
+import FotoPerfil from '../components/FotoPerfil'
 
 export default function Configuracoes() {
-  const { config, carregado, erro, recarregar, salvar } = useConfig()
-  const [erroSalvar, setErroSalvar] = useState<string | null>(null)
-  const animacoes = useAnimacoes().escolha
-
-  const atualizar = (nova: Config) => {
-    setErroSalvar(null)
-    salvar(nova).catch((e: Error) => setErroSalvar(`Não foi possível salvar: ${e.message}`))
-  }
+  const { usuario, sair } = useAuth()
+  const nome = usuario?.name || 'Visitante'
 
   return (
-    <>
-      <h1>Configurações</h1>
-      {erroSalvar && <p className="erro aviso" role="alert">{erroSalvar}</p>}
-      {/* No computador, um índice fixo à esquerda leva a cada grupo de preferências. */}
-      <div className="config-corpo">
-        <nav className="config-indice" aria-label="Seções das configurações">
-          {INDICE.filter((i) => !(__DEMO__ && i.id === 'config-conta')).map((i) => (
-            <a
-              key={i.id}
-              href={`#${i.id}`}
-              onClick={(e) => {
-                e.preventDefault()
-                document.getElementById(i.id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-              }}
-            >
-              {i.rotulo}
-            </a>
-          ))}
-        </nav>
-        <div className="config-secoes">
-          {!carregado ? (
-            erro ? <ErroCarga erro={erro} tentarDeNovo={recarregar} /> : <Carregando texto="Carregando preferências" />
+    <div className="conta-pagina">
+      <header className="conta-cabecalho">
+        <p className="conta-sobretitulo">Seu espaço</p>
+        <h1>Minha conta</h1>
+        <p className="muted">Seus dados e sua segurança, em um só lugar.</p>
+      </header>
+      <section className="card conta-perfil" aria-labelledby="conta-perfil-titulo">
+        <FotoPerfil />
+        <div className="conta-identidade">
+          <span className="conta-etiqueta">{__DEMO__ ? 'Acesso de visitante' : 'Perfil pessoal'}</span>
+          <h2 id="conta-perfil-titulo" translate={__DEMO__ ? undefined : 'no'}>{nome}</h2>
+          {!__DEMO__ && <p className="muted" translate="no">{usuario?.email}</p>}
+        </div>
+      </section>
+      <div className="conta-grade">
+        <section className="card conta-painel" aria-labelledby="conta-dados-titulo">
+          <h2 id="conta-dados-titulo">Dados da conta</h2>
+          <p className="muted">Informações usadas para identificar seu acesso.</p>
+          <dl className="conta-dados">
+            <div><dt>Nome</dt><dd translate={__DEMO__ ? undefined : 'no'}>{nome}</dd></div>
+            <div><dt>E-mail</dt><dd translate={__DEMO__ ? undefined : 'no'}>{__DEMO__ ? 'Acesso sem e-mail' : usuario?.email}</dd></div>
+            <div><dt>Tipo de acesso</dt><dd>{__DEMO__ ? 'Visitante' : usuario?.isAdmin ? 'Administrador' : 'Conta pessoal'}</dd></div>
+          </dl>
+        </section>
+        <section className="card conta-painel" aria-labelledby="conta-seguranca-titulo">
+          <h2 id="conta-seguranca-titulo">Segurança</h2>
+          {__DEMO__ ? (
+            <p className="muted">Você está usando o acesso de visitante. Não há uma senha vinculada a este perfil.</p>
           ) : (
             <>
-              <section className="card form form-solto" id="config-aparencia">
-                <h2 className="sem-margem">Aparência</h2>
-                <div className="chips" role="radiogroup" aria-label="Tema">
-                  {TEMAS.map((t) => (
-                    <button
-                      key={t.id}
-                      role="radio"
-                      aria-checked={config.tema === t.id}
-                      className={`chip ${config.tema === t.id ? 'ativo' : ''}`}
-                      onClick={() => atualizar({ ...config, tema: t.id })}
-                    >
-                      {t.rotulo}
-                    </button>
-                  ))}
-                </div>
-                <h3 className="sem-margem">Animações e efeitos</h3>
-                <p className="muted sem-margem">Rolagem, mouse e demonstrações em movimento. Desligue se o movimento na tela incomodar.</p>
-                <div className="chips" role="radiogroup" aria-label="Animações e efeitos">
-                  {ANIMACOES.map((a) => (
-                    <button
-                      key={a.id}
-                      role="radio"
-                      aria-checked={animacoes === a.id}
-                      className={`chip ${animacoes === a.id ? 'ativo' : ''}`}
-                      onClick={() => definirAnimacoes(a.id)}
-                    >
-                      {a.rotulo}
-                    </button>
-                  ))}
-                </div>
-              </section>
-
-              <Lembretes config={config} atualizar={atualizar} />
+              <p className="muted">Atualize sua senha para proteger seu acesso.</p>
+              <TrocarSenha />
             </>
           )}
-
-          <Dados />
-          {/* Na demonstração não há conta de verdade para mudar a senha ou excluir. */}
-          {!__DEMO__ && <Conta />}
-          <Aplicativo />
-        </div>
+        </section>
       </div>
-    </>
-  )
-}
-
-function Lembretes({ config, atualizar }: { config: Config; atualizar: (c: Config) => void }) {
-  const { lembretes } = config
-  const [permissao, setPermissao] = useState(suportaNotificacoes() ? Notification.permission : 'denied')
-  const proximo = proximoLembrete(lembretes)
-  const mudar = (parcial: Partial<Config['lembretes']>) => atualizar({ ...config, lembretes: { ...lembretes, ...parcial } })
-
-  async function ativar(ativo: boolean) {
-    if (ativo) {
-      const p = await pedirPermissao()
-      setPermissao(p)
-      if (p !== 'granted') return
-    }
-    mudar({ ativo })
-  }
-
-  return (
-    <section className="card form form-solto" id="config-lembretes">
-      <h2 className="sem-margem">Lembretes de treino</h2>
-      {!suportaNotificacoes() ? (
-        <p className="muted">Este navegador não suporta notificações.</p>
-      ) : (
-        <>
-          <label className="check">
-            <input type="checkbox" checked={lembretes.ativo} onChange={(e) => void ativar(e.target.checked)} />
-            Me lembrar de treinar
-          </label>
-          {permissao === 'denied' && (
-            <p className="erro">As notificações estão bloqueadas para este site. Libere nas configurações do navegador.</p>
-          )}
-          <div className="linha">
-            <label>
-              Horário
-              <input className="input" type="time" value={lembretes.horario} onChange={(e) => e.target.value && mudar({ horario: e.target.value })} />
-            </label>
+      {!__DEMO__ && <section className="card conta-painel"><h2>Assinatura</h2><p className="muted">Consulte seu acesso, confirme pagamentos ou cancele as próximas cobranças.</p><Link to="/assinatura" className="btn">Gerenciar assinatura</Link></section>}
+      <section className="card conta-sessao" aria-labelledby="conta-sessao-titulo">
+        <div>
+          <h2 id="conta-sessao-titulo">Sessão e privacidade</h2>
+          <p className="muted">Consulte como seus dados são tratados ou encerre seu acesso.</p>
+          <div className="conta-links">
+            <Link to="/privacidade">Política de privacidade</Link>
+            <Link to="/termos">Termos de uso</Link>
           </div>
-          <fieldset className="fieldset">
-            <legend>Dias</legend>
-            <div className="chips">
-              {ORDEM.map((d) => {
-                const marcado = lembretes.dias.includes(d)
-                return (
-                  <button
-                    key={d}
-                    type="button"
-                    aria-pressed={marcado}
-                    className={`chip ${marcado ? 'ativo' : ''}`}
-                    onClick={() => mudar({ dias: marcado ? lembretes.dias.filter((x) => x !== d) : [...lembretes.dias, d] })}
-                  >
-                    {DIAS[d].slice(0, 3)}
-                  </button>
-                )
-              })}
-            </div>
-          </fieldset>
-          <p className="meta">
-            {proximo
-              ? `Próximo lembrete: ${proximo.toLocaleString('pt-BR', { weekday: 'long', hour: '2-digit', minute: '2-digit' })}.`
-              : 'Nenhum lembrete agendado.'}{' '}
-            Sem a opção abaixo, o lembrete só chega com o site (ou o app instalado) aberto em alguma aba. Nunca avisa se você já treinou no dia.
-          </p>
-          <PushNoCelular ativo={lembretes.ativo} />
-          <button
-            className="chip"
-            type="button"
-            disabled={permissao !== 'granted'}
-            onClick={() => void notificar('Hora do treino!', 'Assim chega o lembrete.')}
-          >
-            Testar notificação
-          </button>
-        </>
+        </div>
+        <button className="btn" onClick={sair}>Sair da conta</button>
+      </section>
+      {!__DEMO__ && (
+        <section className="conta-encerrar" aria-label="Encerramento da conta">
+          <h2>Encerrar conta</h2>
+          <p className="muted">A exclusão é permanente e remove seus treinos e registros.</p>
+          <ExcluirConta />
+        </section>
       )}
-    </section>
-  )
-}
-
-function Dados() {
-  const { sair } = useAuth()
-  const arquivo = useRef<HTMLInputElement>(null)
-  const [ocupado, setOcupado] = useState<string | null>(null)
-  const [erro, setErro] = useState<string | null>(null)
-  const [resultado, setResultado] = useState<ResultadoImportacao | null>(null)
-
-  async function rodar(rotulo: string, tarefa: () => Promise<void>) {
-    setOcupado(rotulo)
-    setErro(null)
-    setResultado(null)
-    try {
-      await tarefa()
-    } catch (e) {
-      setErro((e as Error).message)
-    } finally {
-      setOcupado(null)
-    }
-  }
-
-  const exportarJson = () =>
-    rodar('json', async () => {
-      const dados = await api.exportar()
-      baixarArquivo(JSON.stringify(dados, null, 2), `basketball-practice-${dataLocal(new Date())}.json`, 'application/json')
-    })
-
-  const exportarCsv = () =>
-    rodar('csv', async () => {
-      const sessoes = await api.todasSessoes()
-      baixarArquivo(sessoesParaCsv(sessoes), `sessoes-${dataLocal(new Date())}.csv`, 'text/csv;charset=utf-8')
-    })
-
-  const importar = (f: File) =>
-    rodar('importar', async () => {
-      let dados: unknown
-      try {
-        dados = JSON.parse(await f.text())
-      } catch {
-        throw new Error('O arquivo não é um backup válido (JSON).')
-      }
-      setResultado(await api.importar(dados))
-      recarregarTudo()
-    })
-
-  return (
-    <section className="card form form-solto" id="config-dados">
-      <h2 className="sem-margem">Seus dados</h2>
-      <p className="muted">
-        Baixe um backup completo (JSON) para guardar ou levar para outra conta, ou o histórico de sessões em planilha (CSV).
-      </p>
-      <div className="acoes">
-        <button className="btn" onClick={exportarJson} disabled={!!ocupado}>{ocupado === 'json' ? 'Gerando' : 'Baixar backup (JSON)'}</button>
-        <button className="btn" onClick={exportarCsv} disabled={!!ocupado}>{ocupado === 'csv' ? 'Gerando' : 'Baixar sessões (CSV)'}</button>
-        <button className="btn" onClick={() => arquivo.current?.click()} disabled={!!ocupado}>
-          {ocupado === 'importar' ? 'Importando' : 'Importar backup'}
-        </button>
-        <input
-          ref={arquivo}
-          type="file"
-          accept="application/json,.json"
-          className="escondido"
-          onChange={(e) => {
-            const f = e.target.files?.[0]
-            e.target.value = ''
-            if (f) void importar(f)
-          }}
-        />
-      </div>
-      <p className="meta">A importação soma ao que já existe e pula registros repetidos; importar o mesmo arquivo duas vezes não duplica nada.</p>
-      {erro && <p className="erro" role="alert">{erro}</p>}
-      {resultado && (
-        <p className="sucesso" role="status">
-          Importado: {resultado.created.sessions} sessões, {resultado.created.exercises} exercícios, {resultado.created.workouts} treinos.
-          {resultado.skipped.sessions > 0 && ` ${resultado.skipped.sessions} sessões já existiam.`}
-        </p>
-      )}
-      <hr className="divisor" />
-      <button className="btn" onClick={sair}>Sair da conta</button>
-      {!__DEMO__ && <p className="meta">Sair encerra a sessão em todos os aparelhos.</p>}
-    </section>
-  )
-}
-
-function Conta() {
-  return (
-    <section className="card form form-solto" id="config-conta">
-      <h2 className="sem-margem">Sua conta</h2>
-      <TrocarSenha />
-      <hr className="divisor" />
-      <ExcluirConta />
-    </section>
+    </div>
   )
 }
 
@@ -367,7 +154,7 @@ function ExcluirConta() {
     <form className="form" onSubmit={enviar} noValidate>
       <h3 className="sem-margem">Excluir minha conta</h3>
       <p className="muted">
-        Isto apaga sua conta, sessões e treinos, e não pode ser desfeito. Se quiser guardar uma cópia, baixe o backup antes.
+        Isto apaga sua conta, sessões e treinos, e não pode ser desfeito.
       </p>
       <label>
         Confirme com sua senha
@@ -382,83 +169,5 @@ function ExcluirConta() {
         <button className="btn" type="button" disabled={enviando} onClick={() => { setAberto(false); setSenha(''); setErro(null) }}>Cancelar</button>
       </div>
     </form>
-  )
-}
-
-function Aplicativo() {
-  const podeInstalar = usePodeInstalar()
-  const instalado = rodandoComoApp()
-
-  return (
-    <section className="card form form-solto" id="config-aplicativo">
-      <h2 className="sem-margem">Aplicativo</h2>
-      {instalado ? (
-        <p className="muted">Você está usando o app instalado. ✔</p>
-      ) : podeInstalar ? (
-        <>
-          <p className="muted">Instale o Basketball Practice na tela inicial para abrir direto, em tela cheia, e usar as ferramentas sem internet.</p>
-          <button className="btn btn-primario" onClick={() => void instalar()}>Instalar app</button>
-        </>
-      ) : (
-        <p className="muted">
-          Para instalar: no Android/Chrome, use o menu ⋮ → “Instalar app”; no iPhone/Safari, Compartilhar → “Adicionar à Tela de Início”.
-          O timer, o metrônomo e as calculadoras funcionam mesmo sem internet.
-        </p>
-      )}
-    </section>
-  )
-}
-
-/** Web Push: o servidor manda o lembrete na hora certa, mesmo com o site fechado. */
-function PushNoCelular({ ativo }: { ativo: boolean }) {
-  const [inscrito, setInscrito] = useState<boolean | null>(null)
-  const [ocupado, setOcupado] = useState(false)
-  const [aviso, setAviso] = useState<string | null>(null)
-  const [erro, setErro] = useState<string | null>(null)
-
-  useEffect(() => {
-    if (__DEMO__ || !suportaPush()) return
-    inscricaoAtual().then((i) => setInscrito(!!i), () => setInscrito(false))
-  }, [])
-
-  if (__DEMO__) return <p className="meta">Na demonstração não há servidor, então o lembrete com o app fechado não existe aqui.</p>
-  if (!suportaPush()) return <p className="meta">Este navegador não recebe notificações com o site fechado.</p>
-
-  async function mudar(ligar: boolean) {
-    setOcupado(true)
-    setErro(null)
-    setAviso(null)
-    try {
-      if (ligar) await ativarPush()
-      else await desativarPush()
-      setInscrito(ligar)
-    } catch (e) {
-      setErro((e as Error).message)
-    } finally {
-      setOcupado(false)
-    }
-  }
-
-  async function testar() {
-    setErro(null)
-    try {
-      await testarPush()
-      setAviso('Enviada. Ela chega em alguns segundos.')
-    } catch (e) {
-      setErro((e as Error).message)
-    }
-  }
-
-  return (
-    <div className="push-celular">
-      <label className="check">
-        <input type="checkbox" checked={!!inscrito} disabled={ocupado || inscrito === null} onChange={(e) => void mudar(e.target.checked)} />
-        Avisar neste aparelho mesmo com o app fechado
-      </label>
-      {inscrito && !ativo && <p className="meta">Ligue "Me lembrar de treinar" acima para os lembretes chegarem.</p>}
-      {erro && <p className="erro" role="alert">{erro}</p>}
-      {aviso && <p className="meta" role="status">{aviso}</p>}
-      {inscrito && <button className="chip" type="button" onClick={testar}>Testar no aparelho</button>}
-    </div>
   )
 }

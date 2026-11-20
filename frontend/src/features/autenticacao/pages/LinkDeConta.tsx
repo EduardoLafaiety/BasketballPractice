@@ -1,5 +1,6 @@
+import { Link } from '../../../shared/i18n/links'
 import { useState, type FormEvent } from 'react'
-import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { api, ApiError } from '../../../shared/api/backend'
 import { useAuth } from '../model/auth'
 import Icone from '../../../shared/ui/Icone'

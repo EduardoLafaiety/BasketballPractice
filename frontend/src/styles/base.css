@@ -1190,12 +1190,6 @@ select.input:hover:not(:disabled) { border-color: var(--laranja); }
 .links-legais button:hover { color: var(--laranja-texto); text-decoration: underline; }
 
 /* Fica acima do menu até o visitante responder. */
-.aviso-cookies { position: fixed; inset: auto 1rem 1rem; z-index: 50; display: grid; gap: 0.75rem; width: min(36rem, calc(100% - 2rem)); margin: 0 auto; padding: 1.1rem 1.25rem; border: 2px solid var(--laranja); border-radius: 14px; background: var(--superficie); color: var(--texto); box-shadow: 0 12px 32px rgb(0 0 0 / 0.35); }
-.aviso-cookies p { margin: 0; font-size: 0.85rem; line-height: 1.5; text-transform: none; }
-.aviso-cookies a { color: var(--laranja-texto); }
-.aviso-cookies-atual { color: var(--muted); }
-.aviso-cookies-botoes { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 0.5rem; }
-.aviso-cookies-botoes .btn { flex: 1 1 8rem; }
 .rodape { padding: 0 1.25rem 2rem; }
 
 .legal { min-height: 100vh; min-height: 100dvh; display: grid; align-content: start; gap: 2.5rem; padding: 0.8rem clamp(1.25rem, 4vw, 4rem) 3rem; background: var(--bg); }
@@ -1203,9 +1197,7 @@ select.input:hover:not(:disabled) { border-color: var(--laranja); }
 .legal-texto { width: min(70ch, 100%); margin: 0 auto; }
 .legal-texto h2 { font-size: 1.4rem; margin-top: 2.25rem; }
 /* Texto corrido: sem a maiúscula em cada palavra que o resto do site usa em rótulos curtos. */
-.legal-texto p, .legal-texto li, .legal-rascunho { text-transform: none; }
+.legal-texto p, .legal-texto li { text-transform: none; }
 .legal-texto p, .legal-texto li { line-height: 1.6; overflow-wrap: break-word; hyphens: auto; }
 .legal-texto ul { display: grid; gap: 0.5rem; padding-left: 1.2rem; }
-.legal-rascunho { margin-top: 1.25rem; padding: 1rem 1.25rem; border: 2px solid var(--laranja); border-radius: 14px; line-height: 1.55; }
-.legal-rascunho strong { color: var(--laranja-texto); }
 

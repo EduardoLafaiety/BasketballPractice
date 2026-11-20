@@ -6,6 +6,7 @@ import { HttpError, notFound } from '../../lib/http-error.js'
 import { hashOneTimeToken, newOneTimeToken } from '../../lib/one-time-token.js'
 import { hashPassword, prepareDecoyHash, verifyAgainstDecoy, verifyPassword } from '../../lib/password.js'
 import { signToken } from '../../lib/token.js'
+import { normalizeAvatar } from '../../lib/avatar.js'
 import * as repository from './auth.repository.js'
 import type { UserRow, PendingRegistration } from './auth.repository.js'
 import type { ChangePasswordInput, ConfirmInput, LoginInput, RegisterInput, ResetInput } from './auth.schema.js'
@@ -26,7 +27,7 @@ export interface AuthServiceOptions {
   aoRedefinirSenha?: (email: string) => void
 }
 
-const publicUser = ({ id, name, email, isAdmin, createdAt }: UserRow) => ({ id, name, email, isAdmin, createdAt })
+const publicUser = ({ id, name, email, isAdmin, createdAt, avatarUrl }: UserRow) => ({ id, name, email, isAdmin, createdAt, ...(avatarUrl ? { avatarUrl } : {}) })
 const session = (row: UserRow) => ({ token: signToken(row.id, row.tokenVersion), user: publicUser(row) })
 
 async function assertPassword(row: repository.CredentialRow | undefined, password: string, field: string) {
@@ -133,6 +134,11 @@ export function createAuthService(db: Database, { emails, appUrl, podeEnviar, se
       return publicUser(row)
     },
     async logout(userId: number) { await repository.revokeTokens(db, userId) },
+    async setAvatar(userId: number, image: string | null) {
+      const avatarUrl = image === null ? null : await normalizeAvatar(image)
+      if (!await repository.updateAvatar(db, userId, avatarUrl)) throw notFound('Usuário')
+      return { avatarUrl }
+    },
     async changePassword(userId: number, input: ChangePasswordInput) {
       const passwordHash = await hashPassword(input.newPassword)
       return db.transaction(async (tx) => {

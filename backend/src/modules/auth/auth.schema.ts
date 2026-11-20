@@ -35,6 +35,7 @@ export const forgotSchema = z.object({ email })
 export const resetSchema = z.object({ token: oneTimeToken, password: newPassword })
 export const changeSchema = z.object({ currentPassword: givenPassword, newPassword })
 export const deleteSchema = z.object({ password: givenPassword })
+export const avatarSchema = z.object({ image: z.string().max(350000) }).strict()
 
 export type RegisterInput = z.infer<typeof registerSchema>
 export type LoginInput = z.infer<typeof loginSchema>

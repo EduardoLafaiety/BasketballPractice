@@ -6,15 +6,12 @@ import { AuthProvider } from './features/autenticacao/model/auth'
 import { iniciarPwa } from './shared/lib/pwa'
 import { aplicarMovimento } from './shared/lib/movimento'
 import { aplicarTema, temaSalvo } from './shared/lib/tema'
+import { iniciarIdioma } from './shared/i18n/idioma'
 // Fontes servidas pelo próprio site: sem depender do Google Fonts e funcionando offline no PWA.
 import '@fontsource-variable/big-shoulders-display'
 import '@fontsource-variable/manrope'
 import '@fontsource/instrument-serif/400-italic.css'
 import './styles.css'
-import './styles/controles.css'
-import './styles/refinamento.css'
-import './styles/ajustes.css'
-import './styles/suave.css'
 
 // Subpasta do site (VITE_BASE), ex.: /BasketballPractice no GitHub Pages; "/" no site normal.
 const BASE = import.meta.env.BASE_URL.replace(/\/$/, '') || '/'
@@ -23,7 +20,7 @@ const BASE = import.meta.env.BASE_URL.replace(/\/$/, '') || '/'
 aplicarTema(temaSalvo())
 aplicarMovimento()
 iniciarPwa()
-createRoot(document.getElementById('root')!).render(
+void iniciarIdioma().then(() => createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <BrowserRouter basename={BASE}>
       <AuthProvider>
@@ -31,4 +28,4 @@ createRoot(document.getElementById('root')!).render(
       </AuthProvider>
     </BrowserRouter>
   </StrictMode>,
-)
+))

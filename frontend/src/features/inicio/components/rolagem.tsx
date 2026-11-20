@@ -1,7 +1,8 @@
-// Peças animadas pela rolagem: a bola da abertura, o boneco comandado pela rolagem e os nomes que correm.
-import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
+// Bola da abertura ligada à rolagem e sequências automáticas de exercícios e nomes.
+import { useEffect, useMemo, useRef, type ReactNode } from 'react'
 import { COREOGRAFIAS } from '../../demonstracoes/coreografias'
-import { menosMovimento } from '../../../shared/lib/movimento'
+import { menosMovimento, useAnimacoes } from '../../../shared/lib/movimento'
+import { animarQuandoVisivel } from '../../../shared/lib/quadros-visiveis'
 import { Atleta, Bola, novaBola, novoAtleta } from '../../demonstracoes/Atleta'
 import { pintar, posicionar } from '../../demonstracoes/desenho'
 import { CHAO, instante, preparar } from '../../demonstracoes/motor'
@@ -37,20 +38,15 @@ function progressoDoPino(el: HTMLElement) {
   return limite(-caixa.top / Math.max(1, caixa.height - window.innerHeight))
 }
 
-export interface FiguraApi {
-  total: number
-  /** Desenha o instante t (ms) e devolve o passo em que o exercício está. */
-  desenhar: (t: number) => number
-}
-
-/** Boneco de um exercício do catálogo. Sem `apiRef`, a animação fica em ciclo enquanto estiver na tela. */
-export function Figura({ nome, viewBox = '0 0 680 330', className, apiRef }: { nome: string; viewBox?: string; className?: string; apiRef?: React.MutableRefObject<FiguraApi | null> }) {
+/** Boneco do catálogo em ciclo automático enquanto estiver na tela. */
+export function Figura({ nome, viewBox = '0 0 680 330', className }: { nome: string; viewBox?: string; className?: string }) {
   const coreografia = COREOGRAFIAS[nome]
   const anim = useMemo(() => preparar(coreografia), [coreografia])
   const atleta = useRef(novoAtleta())
   const bola = useRef(novaBola())
   const bola2 = useRef(novaBola())
   const svg = useRef<SVGSVGElement>(null)
+  const { reduzido } = useAnimacoes()
 
   useEffect(() => {
     const desenhar = (t: number) => {
@@ -60,30 +56,14 @@ export function Figura({ nome, viewBox = '0 0 680 330', className, apiRef }: { n
       posicionar(bola2.current, agora.bola2, agora.solo)
       return agora.fase
     }
-    desenhar(anim.total * 0.3)
-    if (apiRef) {
-      apiRef.current = { total: anim.total, desenhar }
-      return () => { apiRef.current = null }
-    }
-    if (menosMovimento() || typeof IntersectionObserver === 'undefined' || !svg.current) return
-
-    let quadro = 0
     let t = anim.total * 0.3
-    let anterior = 0
-    const passo = (agora: number) => {
-      t = (t + Math.min(50, agora - (anterior || agora)) * 0.7) % anim.total
-      anterior = agora
+    desenhar(t)
+    if (reduzido || !svg.current) return
+    return animarQuandoVisivel(svg.current, (_agora, dt) => {
+      t = (t + dt * 0.7) % anim.total
       desenhar(t)
-      quadro = requestAnimationFrame(passo)
-    }
-    const olho = new IntersectionObserver(([item]) => {
-      cancelAnimationFrame(quadro)
-      anterior = 0
-      if (item.isIntersecting) quadro = requestAnimationFrame(passo)
     })
-    olho.observe(svg.current)
-    return () => { olho.disconnect(); cancelAnimationFrame(quadro) }
-  }, [anim, apiRef])
+  }, [anim, reduzido])
 
   const { cena } = coreografia
   return (
@@ -112,7 +92,7 @@ export function Figura({ nome, viewBox = '0 0 680 330', className, apiRef }: { n
 /** Abertura original: bola cresce e gira; as duas linhas abrem para os lados. */
 export function AberturaBola({ titulo, children }: { titulo: ReactNode; children?: ReactNode }) {
   const secao = useRef<HTMLElement>(null)
-  const bola = useRef<SVGSVGElement>(null)
+  const bola = useRef<HTMLImageElement>(null)
   const ultimo = useRef(-1)
   useRolagem(() => {
     if (!secao.current || menosMovimento()) return
@@ -148,65 +128,5 @@ export function FraseRolagem({ texto }: { texto: string }) {
   )
 }
 
-/** Trecho preso em que o boneco anda com a rolagem. */
-export function EscadaRolagem({ nome, titulo, rotulo }: { nome: string; titulo: ReactNode; rotulo: string }) {
-  const secao = useRef<HTMLElement>(null)
-  const regua = useRef<HTMLElement>(null)
-  const figura = useRef<FiguraApi | null>(null)
-  const fases = COREOGRAFIAS[nome].fases
-  const [fase, setFase] = useState(0)
-  const ultimo = useRef(-1)
-  useRolagem(() => {
-    if (!secao.current || !figura.current) return
-    const p = progressoDoPino(secao.current)
-    // Fora do trecho o boneco está parado no começo ou no fim: não redesenha a cada quadro da rolagem.
-    if (p === ultimo.current) return
-    ultimo.current = p
-    setFase(figura.current.desenhar(p * figura.current.total))
-    if (regua.current) regua.current.style.transform = `scaleX(${p})`
-  })
-  return (
-    <section className="escada" ref={secao}>
-      <div className="escada-fixa">
-        <div>
-          <span className="rotulo-forte">{rotulo}</span>
-          <h2 className="escada-titulo">{titulo}</h2>
-          <div className="escada-fase">
-            <strong>{fases[fase].titulo}</strong>
-            <p>{fases[fase].texto}</p>
-          </div>
-          <div className="escada-regua" aria-hidden><i ref={regua} /></div>
-        </div>
-        <Figura nome={nome} apiRef={figura} className="escada-figura" />
-      </div>
-    </section>
-  )
-}
-
-export interface NomeRolagem {
-  nome: string
-  /** Cor do time do jogador; sem ela, o nome fica na cor do texto. */
-  cor?: string
-}
-
-/** Nomes em movimento horizontal automático, sem prender a rolagem da página. */
-export function NomesRolagem({ nomes, titulo, texto }: { nomes: NomeRolagem[]; titulo: ReactNode; texto?: ReactNode }) {
-  const metade = Math.ceil(nomes.length / 2)
-  const linha = (lista: NomeRolagem[]) => [0, 1].map((copia) => (
-    <span className="nomes-grupo" key={copia}>
-      {lista.map((n) => <span key={n.nome} style={n.cor ? ({ '--c': n.cor } as React.CSSProperties) : undefined}>{n.nome}<i>/</i></span>)}
-    </span>
-  ))
-  return (
-    <div className="nomes-pino nomes-automaticos">
-      <div className="nomes-fixo">
-        {titulo}
-        {texto}
-        <div className="nomes-janela" aria-hidden>
-          <div className="nomes-linha" aria-hidden>{linha(nomes.slice(0, metade))}</div>
-          <div className="nomes-linha nomes-contorno" aria-hidden>{linha(nomes.slice(metade))}</div>
-        </div>
-      </div>
-    </div>
-  )
-}
+export { NomesRolagem } from './NomesRolagem'
+export type { NomeRolagem } from './NomesRolagem'

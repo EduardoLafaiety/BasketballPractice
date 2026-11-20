@@ -1,5 +1,7 @@
+import { traduzir } from '../../../shared/i18n/idioma'
+import { Link } from '../../../shared/i18n/links'
 import { useState, type CSSProperties } from 'react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import BarraProgresso from '../../../shared/ui/BarraProgresso'
 import { Carregando, ErroCarga } from '../../../shared/ui/Estado'
 import Icone from '../../../shared/ui/Icone'
@@ -20,16 +22,8 @@ function Progresso({ p }: { p: ResumoPrograma }) {
   )
 }
 
-// Cada foco tem a sua cor; o cartão inteiro é pintado com ela.
-const COR_FOCO: Record<string, string> = {
-  Arremesso: '#ff8a3d',
-  Drible: '#c9a0ff',
-  Fundamentos: '#7db7ff',
-  Defesa: '#7ddc8c',
-  Finalização: '#ffd24a',
-  Passe: '#5fd6d0',
-  Condicionamento: '#ff8fb1',
-}
+// O ângulo áureo distribui cores distintas, inclusive entre programas do mesmo foco.
+const corPrograma = (indice: number) => `hsl(${((indice * 137.507764) % 360).toFixed(4)} 68% 70%)`
 
 const chamada = (p: ResumoPrograma) =>
   !p.status.comecado ? 'Ver o programa' : p.status.concluido ? 'Rever o programa' : p.status.proximoDia ? `Continuar: dia ${p.status.proximoDia}` : 'Continuar'
@@ -44,8 +38,8 @@ export default function Programas() {
         erro ? <ErroCarga erro={erro} tentarDeNovo={recarregar} /> : <Carregando texto="Carregando programas" />
       ) : (
         <div className="programas-grade">
-          {programas.map((p) => (
-            <Link key={p.id} to={`/programas/${p.id}`} className="programa-cartao" style={{ '--c': COR_FOCO[p.foco] ?? '#ff8a3d' } as CSSProperties}>
+          {programas.map((p, indice) => (
+            <Link key={p.id} to={`/programas/${p.id}`} className="programa-cartao" style={{ '--c': corPrograma(indice) } as CSSProperties}>
               <span className="programa-dias-gigante" aria-hidden>{p.totalDias}</span>
               <span className="programa-foco">{p.foco} · {ROTULO_NIVEL[p.nivel]}</span>
               <h2 className="sem-margem">{p.nome}</h2>
@@ -122,14 +116,14 @@ export function ProgramaDetalhe() {
               <button
                 className="btn"
                 disabled={ocupado}
-                onClick={() => window.confirm('Recomeçar do dia 1? O progresso deste programa será apagado.') && acao(() => apiProgramas.comecar(programa.id))}
+                onClick={() => window.confirm(traduzir('Recomeçar do dia 1? O progresso deste programa será apagado.')) && acao(() => apiProgramas.comecar(programa.id))}
               >
                 Recomeçar
               </button>
               <button
                 className="btn"
                 disabled={ocupado}
-                onClick={() => window.confirm('Sair do programa? O progresso será apagado.') && acao(() => apiProgramas.sair(programa.id))}
+                onClick={() => window.confirm(traduzir('Sair do programa? O progresso será apagado.')) && acao(() => apiProgramas.sair(programa.id))}
               >
                 Sair do programa
               </button>

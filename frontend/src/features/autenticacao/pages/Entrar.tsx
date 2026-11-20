@@ -1,5 +1,6 @@
+import { Link } from '../../../shared/i18n/links'
 import { useState, type FormEvent } from 'react'
-import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
+import { Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { ApiError } from '../../../shared/api/backend'
 import { useAuth } from '../model/auth'
 import Icone from '../../../shared/ui/Icone'
@@ -10,7 +11,8 @@ export default function Entrar({ modo, demonstracao = __DEMO__ }: { modo: 'entra
   const { usuario, entrar, cadastrar } = useAuth()
   const navigate = useNavigate()
   const local = useLocation()
-  const destino = (local.state as { de?: string } | null)?.de ?? '/'
+  const plano = new URLSearchParams(local.search).get('plano')
+  const destino = (local.state as { de?: string } | null)?.de ?? (plano === 'mensal' || plano === 'anual' ? `/assinatura?plano=${plano}` : '/')
 
   const [nome, setNome] = useState('')
   const [email, setEmail] = useState('')
@@ -85,11 +87,7 @@ export default function Entrar({ modo, demonstracao = __DEMO__ }: { modo: 'entra
   return (
     <TelaAuth>
       <form className="auth-card" onSubmit={enviar} noValidate>
-        <span className="auth-sobretitulo">{cadastro ? 'Nova conta' : 'De volta à quadra'}</span>
         <h1>{cadastro ? 'Criar conta' : 'Entrar'}</h1>
-        <p className="muted">
-          {cadastro ? 'Monte sua rotina e acompanhe sua evolução.' : 'Bom te ver de volta. Bora pra quadra.'}
-        </p>
 
         {cadastro && (
           <label className="campo">
@@ -110,6 +108,7 @@ export default function Entrar({ modo, demonstracao = __DEMO__ }: { modo: 'entra
           dica={cadastro ? 'Mínimo de 8 caracteres.' : undefined}
           erros={campos.password}
         />
+        {!cadastro && !demonstracao && <div className="auth-recuperar"><Link to="/recuperar-senha" className="link">Esqueci minha senha</Link></div>}
 
         {erro && Object.keys(campos).length === 0 && <p className="erro" role="alert">{erro}</p>}
         {recusado && (
@@ -117,9 +116,9 @@ export default function Entrar({ modo, demonstracao = __DEMO__ }: { modo: 'entra
         )}
 
         {cadastro && (
-          <p className="muted">
+          <p className="muted auth-termos">
             Ao criar a conta, você declara ter lido os <Link to="/termos" className="link">Termos de Uso</Link> e a{' '}
-            <Link to="/privacidade" className="link">Política de Privacidade</Link>.
+            <Link to="/privacidade" className="link">Política de Privacidade</Link> e ter 18 anos ou mais.
           </p>
         )}
 
@@ -140,8 +139,6 @@ export default function Entrar({ modo, demonstracao = __DEMO__ }: { modo: 'entra
               <>Já tem conta? <Link to="/entrar" state={local.state} className="link">Entrar</Link></>
             ) : (
               <>
-                <Link to="/recuperar-senha" className="link">Esqueci minha senha</Link>
-                <br />
                 Ainda não tem conta? <Link to="/cadastro" state={local.state} className="link">Criar conta</Link>
               </>
             )}

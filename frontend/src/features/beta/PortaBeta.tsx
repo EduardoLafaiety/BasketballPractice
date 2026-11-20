@@ -1,5 +1,6 @@
+import { Link } from '../../shared/i18n/links'
 import { useState, type ReactNode } from 'react'
-import { Link, useNavigate, useSearchParams } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import TelaBeta, { VARIANTES, VARIANTE_PADRAO } from './TelaBeta'
 
 export const CHAVE_BETA = 'bp.beta'

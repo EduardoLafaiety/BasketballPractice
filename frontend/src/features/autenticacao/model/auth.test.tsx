@@ -16,7 +16,7 @@ describe('sessão do usuário', () => {
 
     expect(screen.getByRole('status')).toHaveTextContent('Conferindo sua sessão')
     expect(await screen.findByText('Marina')).toBeInTheDocument()
-    expect(await screen.findByRole('heading', { name: 'Configurações' })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: 'Minha conta' })).toBeInTheDocument()
     expect(ultima('GET', '/auth/me')?.headers.Authorization).toBe('Bearer tk-salvo')
   })
 
@@ -160,7 +160,7 @@ describe('falha passageira ao conferir a sessão', () => {
     })
     abrirApp('/configuracoes')
 
-    expect(await screen.findByRole('heading', { name: 'Configurações' })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: 'Minha conta' })).toBeInTheDocument()
     expect(chamadasEu(chamadas)).toBe(1)
     expect(screen.queryByText('Marina')).toBeNull()
     await abrirMenu()
@@ -174,7 +174,7 @@ describe('falha passageira ao conferir a sessão', () => {
     expect(chamadasEu(chamadas)).toBe(3)
     expect(screen.getByText('Marina')).toBeInTheDocument()
     expect(within(menu()).getByRole('link', { name: 'Admin' })).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: 'Configurações' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Minha conta' })).toBeInTheDocument()
 
     await passarEspera()
     expect(chamadasEu(chamadas)).toBe(3)

@@ -1,3 +1,4 @@
+import { traduzir } from '../../../shared/i18n/idioma'
 import { useCallback, useEffect, useState } from 'react'
 import { api, type UsuarioAdmin } from '../../../shared/api/backend'
 import { useAuth } from '../../autenticacao/model/auth'
@@ -36,7 +37,7 @@ export default function Admin() {
     })
 
   const excluir = (u: UsuarioAdmin) => {
-    if (!window.confirm(`Excluir a conta de ${u.name} (${u.email})? Todos os treinos e sessões dela serão apagados.`)) return
+    if (!window.confirm(traduzir(`Excluir a conta de ${u.name} (${u.email})? Todos os treinos e sessões dela serão apagados.`))) return
     agir(u, async () => {
       await api.excluirUsuario(u.id)
       setUsuarios((lista) => lista?.filter((x) => x.id !== u.id) ?? null)

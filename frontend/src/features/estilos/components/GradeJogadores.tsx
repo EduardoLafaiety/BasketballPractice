@@ -1,4 +1,5 @@
-import { Link } from 'react-router-dom'
+import { Link } from '../../../shared/i18n/links'
+
 import type { EstiloResumo, FatiaEstilo } from '../../../shared/types'
 import FotoJogador from './FotoJogador'
 import Icone from '../../../shared/ui/Icone'

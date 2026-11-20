@@ -21,7 +21,7 @@ it('confirma preparação somente após guardar a casca e os arquivos do própri
   const postMessage = vi.fn()
   listeners.message({ data: { tipo: 'PREPARAR_TREINO', urls: ['https://app.exemplo.com/basket/assets/sessao-abc.js'] }, ports: [{ postMessage }], waitUntil: (p: Promise<unknown>) => { tarefa = p } })
   await tarefa
-  expect(cache.addAll).toHaveBeenCalledWith(['/basket/manifest.webmanifest', '/basket/icon.svg', 'https://app.exemplo.com/basket/assets/sessao-abc.js'])
+  expect(cache.addAll).toHaveBeenCalledWith(['/basket/manifest.webmanifest', '/basket/icon.svg', '/basket/favicon-16.png', '/basket/favicon-32.png', '/basket/icon-192.png', '/basket/icon-512.png', '/basket/apple-touch-icon.png', 'https://app.exemplo.com/basket/assets/sessao-abc.js'])
   expect(cache.put.mock.calls.map(([key]) => key)).toEqual(['/basket/index.html', '/basket/'])
   expect(postMessage).toHaveBeenCalledWith({ ok: true })
 })
@@ -76,15 +76,15 @@ it('atualização remove somente versões antigas do cache deste aplicativo', as
   expect(caches.delete.mock.calls).toEqual([['bp-v6']])
 })
 
-it('prepara o treino mesmo com o script do AdSense no HTML: scripts de fora não são guardados nem exigidos', async () => {
+it('prepara o treino mesmo com um script externo no HTML: scripts de fora não são guardados nem exigidos', async () => {
   const { listeners, cache, fetch } = worker()
   fetch.mockResolvedValue(new Response(
-    '<script src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1"></script><script type="module" src="/assets/sessao-abc.js"></script>',
+    '<script src="https://cdn.exemplo.com/externo.js"></script><script type="module" src="/assets/sessao-abc.js"></script>',
   ))
   let tarefa!: Promise<unknown>
   const postMessage = vi.fn()
   listeners.message({ data: { tipo: 'PREPARAR_TREINO', urls: ['https://app.exemplo.com/assets/sessao-abc.js'] }, ports: [{ postMessage }], waitUntil: (p: Promise<unknown>) => { tarefa = p } })
   await tarefa
   expect(postMessage).toHaveBeenCalledWith({ ok: true })
-  expect(cache.addAll.mock.calls[0][0].some((u: string) => u.includes('googlesyndication'))).toBe(false)
+  expect(cache.addAll.mock.calls[0][0].some((u: string) => u.includes('cdn.exemplo.com'))).toBe(false)
 })

@@ -1,3 +1,4 @@
+import { localeAtual } from '../../../shared/i18n/idioma'
 import { useState } from 'react'
 import { api } from '../../../shared/api/backend'
 import { useRecurso } from '../../../shared/data/recursos'
@@ -11,7 +12,7 @@ export default function Historico() {
     {!dados ? erro ? <ErroCarga erro={erro} tentarDeNovo={recarregar} /> : <Carregando texto="Carregando histórico" /> : <>
       <AvisoDesatualizado erro={erro} tentarDeNovo={recarregar} />
       {!dados.length ? <p>Nenhum treino nesta página.</p> : <ol start={pagina * 20 + 1}>
-        {dados.slice(0, 20).map((s) => <li key={s.id}><time dateTime={s.data}>{new Date(s.data).toLocaleString('pt-BR')}</time> — {s.drillNome || 'Treino'} · {s.duracaoMin} min</li>)}
+        {dados.slice(0, 20).map((s) => <li key={s.id}><time dateTime={s.data}>{new Date(s.data).toLocaleString(localeAtual())}</time> — {s.drillNome || 'Treino'} · {s.duracaoMin} min</li>)}
       </ol>}
       <nav className="acoes" aria-label="Páginas do histórico">
         <button className="btn" disabled={pagina === 0 || carregando} onClick={() => setPagina((p) => p - 1)}>Anterior</button>

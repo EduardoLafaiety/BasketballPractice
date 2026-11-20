@@ -1,17 +1,20 @@
+import { Link } from '../../../shared/i18n/links'
 import { useMemo } from 'react'
-import { Link, useSearchParams } from 'react-router-dom'
+import { useSearchParams } from 'react-router-dom'
 import DrillCard from '../components/DrillCard'
 import { CATEGORIAS } from '../components/FormExercicio'
 import { AvisoDesatualizado, Carregando, ErroCarga } from '../../../shared/ui/Estado'
 import { NIVEIS } from '../../../shared/lib/niveis'
 import { useDrills } from '../model/usarExercicios'
 import type { Drill, Nivel } from '../../../shared/types'
+import { traduzir, useIdioma } from '../../../shared/i18n/idioma'
 
 // A posição do catálogo é a progressão do nível; exercícios do atleta ficam no fim.
 const naOrdem = (a: Drill, b: Drill) => (a.ordem ?? Infinity) - (b.ordem ?? Infinity) || 0
 const normalizar = (texto: string) => texto.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLocaleLowerCase('pt-BR').trim()
 
 export default function Treinos() {
+  const idioma = useIdioma()
   const { drills, carregado, erro, recarregar } = useDrills()
   const [parametros, setParametros] = useSearchParams()
   const nivel = NIVEIS.find((n) => n.id === parametros.get('nivel')) ?? NIVEIS[0]
@@ -27,7 +30,7 @@ export default function Treinos() {
 
   const lista = useMemo(() => drills.filter((d) => (!d.nivel || d.nivel === nivel.id)
     && (!fundamento || normalizar(d.categoria) === normalizar(fundamento))
-    && normalizar(d.nome).includes(normalizar(busca))).sort(naOrdem), [drills, nivel.id, fundamento, busca])
+    && normalizar(`${d.nome} ${d.personalizado ? '' : traduzir(d.nome)}`).includes(normalizar(busca))).sort(naOrdem), [drills, nivel.id, fundamento, busca, idioma])
   const aquecimento = lista.filter((d) => d.aquecimento)
   const exercicios = lista.filter((d) => !d.aquecimento)
   const contagem = (id: Nivel) => drills.filter((d) => d.nivel === id && !d.aquecimento).length
@@ -38,7 +41,12 @@ export default function Treinos() {
       <p className="muted">Biblioteca de exercícios para treinar sozinho.</p>
       <div className="acoes-principais"><Link className="btn btn-primario" to="/rotina">Montar minha rotina</Link></div>
 
-      <div className="niveis" role="group" aria-label="Nível">
+      <label className="nivel-mobile">Nível do treino
+        <select className="input" value={nivel.id} onChange={(e) => escolherNivel(e.target.value as Nivel)}>
+          {NIVEIS.map(n => <option key={n.id} value={n.id}>{n.rotulo}{carregado ? ` · ${contagem(n.id)} exercícios` : ''}</option>)}
+        </select>
+      </label>
+      <div className="niveis niveis-desktop" role="group" aria-label="Nível">
         {NIVEIS.map((n) => (
           <button key={n.id} className={`nivel-opcao ${n.id === nivel.id ? 'ativo' : ''}`} aria-pressed={n.id === nivel.id} onClick={() => escolherNivel(n.id)}>
             <strong>{n.rotulo}</strong>
@@ -52,7 +60,7 @@ export default function Treinos() {
           <input className="input" type="search" placeholder="Ex.: bandeja, crossover…" value={busca} onChange={(e) => atualizarFiltro('busca', e.target.value)} />
         </label>
         <label>Fundamento
-          <select className="input" value={fundamento} onChange={(e) => atualizarFiltro('fundamento', e.target.value)}>
+          <select className="input campo-fundamento" value={fundamento} onChange={(e) => atualizarFiltro('fundamento', e.target.value)}>
             <option value="">Todos os fundamentos</option>
             {CATEGORIAS.map((c) => <option key={c} value={c}>{c}</option>)}
           </select>

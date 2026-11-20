@@ -1,4 +1,5 @@
-import { Link } from 'react-router-dom'
+import { Link } from '../../../shared/i18n/links'
+
 
 export default function NaoEncontrada() {
   return (

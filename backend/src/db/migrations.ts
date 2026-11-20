@@ -408,6 +408,30 @@ const migrations: string[] = [
   ALTER TABLE practice_sessions ADD COLUMN client_id uuid;
   CREATE UNIQUE INDEX idx_sessions_client ON practice_sessions(user_id, client_id) WHERE client_id IS NOT NULL;
   `,
+  `
+  CREATE TABLE billing_subscriptions (
+    id uuid PRIMARY KEY,
+    user_id integer NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    plan text NOT NULL CHECK (plan IN ('mensal', 'anual')),
+    mp_id text UNIQUE,
+    status text NOT NULL DEFAULT 'creating',
+    create_started boolean NOT NULL DEFAULT false,
+    checkout_url text,
+    created_at timestamptz NOT NULL DEFAULT now(),
+    updated_at timestamptz NOT NULL DEFAULT now()
+  );
+  CREATE UNIQUE INDEX idx_billing_one_open ON billing_subscriptions(user_id) WHERE status NOT IN ('cancelled', 'failed');
+  CREATE TABLE billing_payments (
+    payment_id text PRIMARY KEY,
+    subscription_id uuid NOT NULL REFERENCES billing_subscriptions(id) ON DELETE CASCADE,
+    invoice_id text NOT NULL UNIQUE,
+    status text NOT NULL,
+    paid_until timestamptz,
+    updated_at timestamptz NOT NULL DEFAULT now()
+  );
+  CREATE INDEX idx_billing_paid ON billing_payments(subscription_id, paid_until);
+  `,
+  `ALTER TABLE users ADD COLUMN avatar_url text CHECK (avatar_url IS NULL OR length(avatar_url) <= 120000);`,
 ]
 
 /** Versão do schema depois de todas as migrações. */

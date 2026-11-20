@@ -85,6 +85,7 @@ export async function request<T>(metodo: string, caminho: string, corpo?: unknow
   if (!resposta.ok) {
     const erro = (dados ?? {}) as { error?: string; details?: ApiError['details'] }
     if (resposta.status === 401 && tokenDoPedido && token === tokenDoPedido) aoExpirar?.()
+    if (resposta.status === 402 && tokenDoPedido && token === tokenDoPedido) window.dispatchEvent(new Event('bp:assinatura-inativa'))
     const mensagem =
       erro.error ?? (resposta.status >= 500 ? 'O servidor não respondeu. Tente de novo.' : `Erro ${resposta.status}`)
     throw new ApiError(resposta.status, mensagem, erro.details)

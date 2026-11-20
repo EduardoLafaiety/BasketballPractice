@@ -13,6 +13,7 @@ import type {
   Sessao,
 } from '../types'
 import type { ComparacaoEvolucao } from '../../../../contracts/evolucao'
+import type { EstadoAssinatura, PlanoAssinatura } from '../../../../contracts/billing'
 
 
 import { request, ApiError } from './http'
@@ -38,6 +39,10 @@ export const fuso = () => `tzOffset=${new Date().getTimezoneOffset()}`
 // ---------- Endpoints ----------
 
 export const api = {
+  assinatura: (signal?: AbortSignal) => request<EstadoAssinatura>('GET', '/billing/status', undefined, { signal }),
+  iniciarAssinatura: (plan: PlanoAssinatura) => request<{ url: string }>('POST', '/billing/checkout', { plan }),
+  atualizarAssinatura: () => request<EstadoAssinatura>('POST', '/billing/refresh'),
+  cancelarAssinatura: () => request<EstadoAssinatura>('POST', '/billing/cancel'),
   comparacao: (dias: number, exercicio = '', signal?: AbortSignal) => request<ComparacaoEvolucao>('GET', `/sessions/comparison?${fuso()}&days=${dias}${exercicio ? `&exerciseId=${encodeURIComponent(exercicio)}` : ''}`, undefined, { signal }),
   cadastrar: (nome: string, email: string, senha: string) =>
     request<{ message: string }>('POST', '/auth/register', { name: nome, email, password: senha }),
@@ -52,6 +57,8 @@ export const api = {
     request<AuthResposta>('PUT', '/auth/password', { currentPassword: atual, newPassword: nova }),
 
   excluirConta: (senha: string) => request<null>('DELETE', '/auth/me', { password: senha }),
+  salvarFoto: (image: string) => request<{ avatarUrl: string }>('PUT', '/auth/avatar', { image }),
+  removerFoto: () => request<{ avatarUrl: null }>('DELETE', '/auth/avatar'),
 
   sair: () => request<null>('POST', '/auth/logout'),
 

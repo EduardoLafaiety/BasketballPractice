@@ -105,11 +105,12 @@ test('excluir a conta em Configurações apaga os dados, sai e libera o e-mail',
   await esperarEmail(email, /Ative sua conta/, 2)
 })
 
-test('os documentos abrem do cadastro e do rodapé, marcados como rascunho', async ({ page, request }) => {
+test('os documentos definitivos abrem do cadastro e do rodapé com contato atualizado', async ({ page, request }) => {
   await page.goto('/cadastro')
   await page.getByRole('link', { name: 'Termos de Uso' }).first().click()
   await expect(page.getByRole('heading', { name: 'Termos de Uso', level: 1 })).toBeVisible()
-  await expect(page.getByRole('note')).toContainText('revisado por um advogado')
+  await expect(page.getByText('Última atualização:', { exact: false })).toBeVisible()
+  await expect(page.getByText(/rascunho/i)).toHaveCount(0)
 
   const { token } = await novaConta(request)
   await entrarCom(page, token)
@@ -123,5 +124,6 @@ test('os documentos abrem do cadastro e do rodapé, marcados como rascunho', asy
   // Clica de verdade: se algo fixo estivesse por cima do rodapé, o clique não chegaria ao link.
   await link.click({ timeout: 5_000 })
   await expect(page.getByRole('heading', { name: 'Política de Privacidade', level: 1 })).toBeVisible()
-  await expect(page.getByRole('note')).toContainText('Rascunho')
+  await expect(page.getByRole('link', { name: 'contatobasketballpractice@gmail.com' }).first()).toHaveAttribute('href', 'mailto:contatobasketballpractice@gmail.com')
+  await expect(page.getByText(/rascunho/i)).toHaveCount(0)
 })

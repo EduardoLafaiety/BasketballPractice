@@ -1,3 +1,4 @@
+import { localeAtual } from '../../shared/i18n/idioma'
 // Líderes da temporada da NBA, por categoria, lidos da API pública da ESPN (aceita chamada direto do
 // navegador, então funciona também na demonstração sem servidor). Guardados por 15 minutos.
 
@@ -80,7 +81,7 @@ export function lerLideres(json: unknown): Lideres {
 }
 
 /** "39,3": uma casa decimal, com vírgula. */
-export const numero = (v: number) => v.toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 })
+export const numero = (v: number) => v.toLocaleString(localeAtual(), { minimumFractionDigits: 1, maximumFractionDigits: 1 })
 
 /** Líderes da temporada; usa o que já foi buscado nos últimos 15 minutos. */
 export const buscarLideres = comValidade(CHAVE, VALIDADE_MS, async () => {

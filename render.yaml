@@ -36,6 +36,16 @@ services:
         sync: false
       - key: APP_URL
         sync: false
+      # Assinaturas: somente segredos de produção do vendedor real, nunca credenciais fictícias.
+      # O backend exige pagamento em NODE_ENV=production mesmo sem BILLING_ENABLED.
+      - key: MP_ACCESS_TOKEN
+        sync: false
+      - key: MP_WEBHOOK_SECRET
+        sync: false
+      - key: MP_COLLECTOR_ID
+        sync: false
+      - key: MP_LIVE_MODE
+        value: 'true'
       - key: EMAIL_FROM
         sync: false
       - key: RESEND_API_KEY

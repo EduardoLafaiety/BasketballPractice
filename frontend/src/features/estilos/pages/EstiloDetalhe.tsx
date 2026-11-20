@@ -1,5 +1,7 @@
+import { traduzir } from '../../../shared/i18n/idioma'
+import { Link } from '../../../shared/i18n/links'
 import { useCallback, useEffect, useState } from 'react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { api, ApiError } from '../../../shared/api/backend'
 import { Carregando, ErroCarga } from '../../../shared/ui/Estado'
 import FotoJogador, { CreditoFoto } from '../components/FotoJogador'
@@ -48,7 +50,7 @@ export default function EstiloDetalhe() {
 
   function usarNaRotina(dia: DiaSemana) {
     const substituir =
-      rotina.rotina[dia].length === 0 || window.confirm(`Substituir os treinos de ${DIAS[dia].toLowerCase()} na rotina?`)
+      rotina.rotina[dia].length === 0 || window.confirm(traduzir(`Substituir os treinos de ${DIAS[dia].toLowerCase()} na rotina?`))
     if (!substituir) return
     rotina.alterarDia(dia, () => estilo!.sessao.map((b) => b.drillId))
     setAviso(`Treino do ${estilo!.nome} colocado na rotina de ${DIAS[dia].toLowerCase()}.`)

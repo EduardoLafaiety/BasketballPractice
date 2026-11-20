@@ -1,5 +1,7 @@
+import { traduzir } from '../../../shared/i18n/idioma'
+import { Link } from '../../../shared/i18n/links'
 import { useMemo, useRef, useState, type CSSProperties } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import Botao from '../../../shared/ui/Botao'
 import Mensagem from '../../../shared/ui/Mensagem'
 import { AvisoDesatualizado, Carregando, ErroCarga } from '../../../shared/ui/Estado'
@@ -85,7 +87,7 @@ export default function Rotina() {
   const aplicarPrevia = async () => {
     if (!previa || salvando) return
     const temRotina = ORDEM.some((d) => rotina[d].length > 0)
-    if (temRotina && !window.confirm('Aplicar a semana gerada? Isso substitui toda a sua rotina semanal.')) return
+    if (temRotina && !window.confirm(traduzir('Aplicar a semana gerada? Isso substitui toda a sua rotina semanal.'))) return
     if (!await aplicarModelo(previaComoRotina(previa), Object.fromEntries(ORDEM.map((d) => [d, (previa[d] ?? []).map((b) => b.minutos)])))) return
     setPrevia(null)
     setAplicada(true)
