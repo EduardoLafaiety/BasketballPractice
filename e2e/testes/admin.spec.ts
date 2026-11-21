@@ -28,6 +28,7 @@ test('o painel admin só aparece depois de a conta virar admin, e vale na hora',
 
   await abrirMenu(page)
   await expect(page.getByRole('link', { name: 'Admin' })).toBeVisible()
+  await page.getByRole('link', { name: 'Admin', exact: true }).click()
   await expect(page.getByRole('heading', { name: 'Gestão de usuários.' })).toBeVisible()
   await page.getByRole('button', { name: /^Administradores/ }).click()
   await page.getByRole('searchbox', { name: 'Buscar por nome ou e-mail' }).fill(email)
