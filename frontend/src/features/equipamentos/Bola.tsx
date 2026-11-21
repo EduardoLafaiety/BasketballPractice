@@ -5,7 +5,7 @@ import { LOGOS_RETRO, type LogoRetro } from './logos-retro'
 
 // Bola em pixel art, réplica da bola de verdade vista de frente, como na foto do produto: a marca na faixa
 // de cima, o logo do time (ou o nome do modelo) na faixa de baixo, e os canais na cor de destaque. O sprite
-// das faixas é desenhado aqui, com 3 pixels por bloco; o logo vem do mesmo lugar dos escudos da aba NBA, em alta resolução. Não usa fotos da Amazon.
+// das faixas é desenhado aqui, com 3 pixels por bloco; o logo vem do mesmo lugar dos escudos da aba NBA, em alta resolução. Não usa fotos do Mercado Livre.
 
 /** Luminância relativa (WCAG) de uma cor #rrggbb. */
 function luminancia(hex: string) {

@@ -78,7 +78,7 @@ test('cadastrar um e-mail que já tem conta não revela isso na tela: o aviso va
   expect(login.status()).toBe(200)
 })
 
-test('Equipamentos abre sem conta (revisão da Amazon); Artigos exige conta e segue disponível para usuários autorizados', async ({ page, request }) => {
+test('Equipamentos abre sem conta; Artigos exige conta e segue disponível para usuários autorizados', async ({ page, request }) => {
   await page.goto('/equipamentos')
   await expect(page).toHaveURL(/\/equipamentos$/)
   await expect(page.getByRole('heading', { name: 'Equipamentos', level: 1 })).toBeVisible()
@@ -88,7 +88,7 @@ test('Equipamentos abre sem conta (revisão da Amazon); Artigos exige conta e se
   await page.addInitScript(t => localStorage.setItem('bp.token', t), token)
   await page.goto('/equipamentos')
   await expect(page.getByRole('heading', { name: 'Equipamentos', level: 1 })).toBeVisible()
-  await expect(page.getByRole('link', { name: /Ver na Amazon/ }).first()).toHaveAttribute('href', /amazon\.com\.br/)
+  await expect(page.getByRole('link', { name: /Ver no Mercado Livre/ }).first()).toHaveAttribute('href', /meli\.la/)
 
   await irPara(page, 'Artigos')
   await expect(page.getByRole('heading', { name: 'Artigos', level: 1 })).toBeVisible()

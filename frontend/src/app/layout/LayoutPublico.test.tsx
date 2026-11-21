@@ -7,14 +7,14 @@ import { abrirApp } from '../../test/renderizar'
 
 vi.mock('../../shared/lib/audio', () => ({ bipe: vi.fn(), vibrar: vi.fn() }))
 
-describe('Página aberta sem conta (revisão da Amazon)', () => {
-  it('Equipamentos abre para o visitante, com os links da Amazon e o convite para entrar', async () => {
+describe('Página aberta sem conta (Mercado Livre)', () => {
+  it('Equipamentos abre para o visitante, com os links do Mercado Livre e o convite para entrar', async () => {
     apiFalsa({})
     abrirApp('/equipamentos')
 
     expect(await screen.findByRole('heading', { name: 'Equipamentos', level: 1 })).toBeInTheDocument()
     expect(screen.getByTestId('caminho')).toHaveTextContent('/equipamentos')
-    expect(screen.getAllByRole('link', { name: /Ver na Amazon/ }).length).toBeGreaterThan(0)
+    expect(screen.getAllByRole('link', { name: /Ver no Mercado Livre/ }).length).toBeGreaterThan(0)
     const topo = within(screen.getByRole('banner'))
     expect(topo.getByRole('link', { name: 'Entrar' })).toHaveAttribute('href', '/entrar')
     expect(topo.getByRole('link', { name: 'Criar conta' })).toHaveAttribute('href', '/cadastro')

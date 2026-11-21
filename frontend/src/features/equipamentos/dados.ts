@@ -1,13 +1,6 @@
-// Conteúdo da aba Equipamentos: bolas de exemplo com link de afiliado da Amazon.
-// Os botões abrem a busca do produto na Amazon, onde ficam o preço, as fotos e a compra.
-// A Amazon não permite copiar preço nem imagem para cá; por isso cada bola é redesenhada em pixel art
+// Conteúdo da aba Equipamentos: bolas com link de afiliado do Mercado Livre (os links estão em produtos-ml.ts).
+// Fotos e preços do Mercado Livre não podem ser copiados para cá; por isso cada bola é redesenhada em pixel art
 // (equipamentos/Bola.tsx), como réplica do modelo de verdade: faixas, canais, marca e o logo do time.
-
-/** Tag do Programa de Associados da Amazon. ID de Associado criado em 20/11/2026 (cadastro em revisão da Amazon). */
-export const TAG_AFILIADO = 'basketpractic-20'
-
-export const linkAmazon = (busca: string) =>
-  `https://www.amazon.com.br/s?k=${encodeURIComponent(busca)}&tag=${TAG_AFILIADO}`
 
 import type { IconeTime } from './icones-times'
 import type { LogoRetro } from './logos-retro'
@@ -102,7 +95,6 @@ export interface BolaMarca {
   emblema?: boolean
   /** O que vem impresso na faixa de baixo, onde as bolas de time levam o logo. */
   modelo: string
-  busca: string
 }
 
 export const TIMES: Time[] = [
@@ -138,8 +130,6 @@ export const TIMES: Time[] = [
   { sigla: 'UTA', cidade: 'Utah', nome: 'Jazz', conferencia: 'oeste', cor: '#002B5C', costura: '#F9A01B', icone: 'nota' },
 ]
 
-export const buscaTime = (t: Time) => `bola basquete Wilson NBA Team Tribute ${t.cidade} ${t.nome}`
-
 const LARANJA = '#D9661F'
 const COURO = '#A8521E'
 const ESCURO = '#1B1B1B'
@@ -158,7 +148,6 @@ export const MARCAS: BolaMarca[] = [
     costura: ESCURO,
     grao: true,
     modelo: 'NBA',
-    busca: 'bola Wilson NBA Official Game Ball',
   },
   {
     id: 'wilson-evolution',
@@ -171,7 +160,6 @@ export const MARCAS: BolaMarca[] = [
     costura: ESCURO,
     grao: true,
     modelo: 'EVOLUTION',
-    busca: 'bola basquete Wilson Evolution',
   },
   {
     id: 'wilson-authentic',
@@ -183,7 +171,6 @@ export const MARCAS: BolaMarca[] = [
     cor: LARANJA,
     costura: ESCURO,
     modelo: 'NBA',
-    busca: 'bola basquete Wilson NBA Authentic indoor outdoor',
   },
   {
     id: 'wilson-drv',
@@ -196,7 +183,6 @@ export const MARCAS: BolaMarca[] = [
     costura: ESCURO,
     canalLargo: true,
     modelo: 'DRV PRO',
-    busca: 'bola basquete Wilson DRV Pro',
   },
   {
     id: 'wilson-all-team-retro',
@@ -212,7 +198,6 @@ export const MARCAS: BolaMarca[] = [
     marcaContorno: '#3B2610',
     marcaTamanho: 27,
     colagem: { onde: 'tudo', passo: 12, adesivos: ADESIVOS_RETRO },
-    busca: 'bola basquete Wilson NBA All Team Retro 7',
   },
   {
     id: 'wilson-all-team',
@@ -227,7 +212,6 @@ export const MARCAS: BolaMarca[] = [
     emblema: true,
     modelo: 'NBA',
     colagem: { onde: 'calotas', passo: 17 },
-    busca: 'bola basquete Wilson NBA All Team 7 vermelho branco azul',
   },
   {
     id: 'spalding-tf1000',
@@ -240,7 +224,6 @@ export const MARCAS: BolaMarca[] = [
     costura: ESCURO,
     grao: true,
     modelo: 'TF-1000',
-    busca: 'bola basquete Spalding TF-1000 Legacy',
   },
   {
     id: 'spalding-tf250',
@@ -252,7 +235,6 @@ export const MARCAS: BolaMarca[] = [
     cor: LARANJA,
     costura: ESCURO,
     modelo: 'TF-250',
-    busca: 'bola basquete Spalding React TF-250',
   },
   {
     id: 'spalding-street',
@@ -265,7 +247,6 @@ export const MARCAS: BolaMarca[] = [
     costura: ESCURO,
     canalLargo: true,
     modelo: 'STREET',
-    busca: 'bola basquete Spalding Street borracha',
   },
   {
     id: 'molten-bg4500',
@@ -279,7 +260,6 @@ export const MARCAS: BolaMarca[] = [
     faixa: CREME,
     grao: true,
     modelo: 'BG4500',
-    busca: 'bola basquete Molten BG4500',
   },
   {
     id: 'molten-gg7x',
@@ -292,6 +272,5 @@ export const MARCAS: BolaMarca[] = [
     costura: ESCURO,
     faixa: CREME,
     modelo: 'GG7X',
-    busca: 'bola basquete Molten GG7X',
   },
 ]

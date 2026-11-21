@@ -8,7 +8,7 @@
 | Assinatura | Exige login; permite escolher plano, verificar pagamento e cancelar renovação. |
 | Início do usuário, treinos/detalhes, rotina, sessão, programas/detalhes, estilos de jogadores, NBA, NBB, alimentação, conquistas, evolução e overall | Conta autenticada e assinatura paga vigente. |
 | Artigos/detalhes | Conta autenticada e assinatura paga vigente. |
-| Equipamentos | **Temporariamente pública** (`/equipamentos`, sem conta), só para a revisão do Programa de Associados da Amazon. A página não chama a API: usa apenas dados do próprio código. Após a aprovação, mover a rota de volta para dentro de `RequerAssinatura` em `App.tsx`, apagar `LayoutPublico.tsx` e restaurar os testes de bloqueio. |
+| Equipamentos | **Temporariamente pública** (`/equipamentos`, sem conta), para quem chega por link e para a análise de afiliados (a prateleira usa só links do Mercado Livre). A página não chama a API: usa apenas dados do próprio código. Após a aprovação, mover a rota de volta para dentro de `RequerAssinatura` em `App.tsx`, apagar `LayoutPublico.tsx` e restaurar os testes de bloqueio. |
 | Configurações, segurança, saída da conta e dados pessoais | Titular autenticado, inclusive sem assinatura, para gerenciamento e exercício de seus direitos. |
 | Administração | Somente administradores confirmados pela API. A isenção é interna, não um plano gratuito oferecido ao cliente. |
 

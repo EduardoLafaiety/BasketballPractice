@@ -1,12 +1,17 @@
 import { useState, type CSSProperties, type ReactNode } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { buscaTime, linkAmazon, MARCAS, TIMES, type Conferencia } from '../dados'
+import { MARCAS, TIMES, type Conferencia } from '../dados'
+import { LINKS_MARCAS, PRODUTOS_TIMES } from '../produtos-ml'
 import Bola, { LADO_DO_LOGO, type Colagem } from '../Bola'
 import { logoPequeno } from '../../nba/escudos'
 import Icone from '../../../shared/ui/Icone'
 
+// Só vão para a prateleira as bolas que têm produto no Mercado Livre.
+const TIMES_COM_BOLA = TIMES.filter((t) => PRODUTOS_TIMES[t.sigla])
+const MARCAS_COM_BOLA = MARCAS.filter((b) => LINKS_MARCAS[b.id])
+
 const ABAS = [
-  { id: 'times', rotulo: 'Bolas da NBA', resumo: `${TIMES.length} bolas nas cores de cada time` },
+  { id: 'times', rotulo: 'Bolas da NBA', resumo: `${TIMES_COM_BOLA.length} bolas nas cores dos times` },
   { id: 'marcas', rotulo: 'Bolas de marca', resumo: 'Wilson, Spalding e Molten' },
 ] as const
 
@@ -38,14 +43,15 @@ function CartaoProduto(p: {
   nome: string
   meta: string
   detalhes: string[]
-  busca: string
+  /** Link de afiliado do produto no Mercado Livre. */
+  href: string
   texto?: string
 }) {
   return (
     <a
       className="card produto"
       style={{ '--c': p.cor } as CSSProperties}
-      href={linkAmazon(p.busca)}
+      href={p.href}
       target="_blank"
       rel="sponsored noopener noreferrer"
     >
@@ -60,7 +66,7 @@ function CartaoProduto(p: {
         {p.detalhes.map((d) => <span key={d}>{d}</span>)}
       </span>
       <span className="cartao-jogador-rodape">
-        Ver na Amazon
+        Ver no Mercado Livre
         <Icone nome="seta" />
       </span>
     </a>
@@ -68,13 +74,13 @@ function CartaoProduto(p: {
 }
 
 
-/** Os 30 times, com busca e filtro de conferência: uma bola de cada. */
+/** Os times com bola no Mercado Livre, com busca e filtro de conferência: uma bola de cada. */
 function Times() {
   const [params, setParams] = useSearchParams()
   const [busca, setBusca] = useState('')
   const conf = CONFERENCIAS.find((c) => c.id === params.get('conf'))?.id ?? 'todas'
   const q = busca.trim().toLowerCase()
-  const lista = TIMES.filter(
+  const lista = TIMES_COM_BOLA.filter(
     (t) => (conf === 'todas' || t.conferencia === conf) && (!q || `${t.cidade} ${t.nome} ${t.sigla}`.toLowerCase().includes(q)),
   )
 
@@ -116,9 +122,9 @@ function Times() {
               }
               tag={`${t.sigla} · ${t.conferencia === 'leste' ? 'Leste' : 'Oeste'}`}
               nome={`${t.cidade} ${t.nome}`}
-              meta="Wilson NBA Team Tribute"
+              meta={`Wilson NBA ${PRODUTOS_TIMES[t.sigla].linha}`}
               detalhes={['Tamanho 7', 'Coleção NBA']}
-              busca={buscaTime(t)}
+              href={PRODUTOS_TIMES[t.sigla].link}
             />
           ))}
         </div>
@@ -130,7 +136,7 @@ function Times() {
 function Marcas() {
   return (
     <div className="grade produtos">
-      {MARCAS.map((b) => (
+      {MARCAS_COM_BOLA.map((b) => (
         <CartaoProduto
           key={b.id}
           cor={b.cor}
@@ -140,7 +146,7 @@ function Marcas() {
           meta={b.material}
           texto={b.texto}
           detalhes={[b.uso, 'Tamanho 7']}
-          busca={b.busca}
+          href={LINKS_MARCAS[b.id]}
         />
       ))}
     </div>
@@ -158,7 +164,7 @@ export default function Equipamentos() {
         Bolas das grandes marcas e de cada time da NBA.
       </p>
       <p className="dieta-aviso">
-        <strong>Os botões abrem a Amazon.</strong> Preço, fotos e compra ficam por lá. Como Associado da Amazon, o Basketball Practice
+        <strong>Os botões abrem o Mercado Livre.</strong> Preço, fotos e compra ficam por lá. Como afiliado do Mercado Livre, o Basketball Practice
         ganha com compras qualificadas, sem custo a mais para você.
       </p>
 

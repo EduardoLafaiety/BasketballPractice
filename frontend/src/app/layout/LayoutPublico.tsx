@@ -9,7 +9,7 @@ import { Carregando } from '../../shared/ui/Estado'
 import LimiteDeErro from '../../shared/ui/LimiteDeErro'
 import Layout from './Layout'
 
-// Só Equipamentos abre sem conta, e apenas durante a revisão do Programa de Associados da Amazon
+// Só Equipamentos abre sem conta (o Mercado Livre e os visitantes veem a prateleira de bolas sem cadastro)
 // (a página só mostra dados do próprio código, sem chamar a API). Depois da aprovação: tirar a rota pública
 // do App.tsx e apagar este layout. Quem já entrou vê o app de sempre; o visitante, só esta página e o convite.
 const PUBLICAS = [

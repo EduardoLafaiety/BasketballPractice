@@ -2,7 +2,8 @@ import { fireEvent, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import { definirToken } from '../../../shared/api/backend'
-import { TAG_AFILIADO, TIMES } from '../dados'
+import { MARCAS, TIMES } from '../dados'
+import { LINKS_MARCAS, PRODUTOS_TIMES } from '../produtos-ml'
 import { ICONES_TIMES } from '../icones-times'
 import { apiFalsa, configFalsa, usuarioFalso } from '../../../test/api-falsa'
 import { abrirApp, abrirMenu } from '../../../test/renderizar'
@@ -23,19 +24,22 @@ describe('Equipamentos', () => {
     expect(within(nav).getByRole('link', { name: /Equipamentos/ })).toHaveAttribute('href', '/equipamentos')
   })
 
-  it('mostra uma bola de cada time, com link de afiliado e o aviso da Amazon', async () => {
+  it('mostra só as bolas que têm produto no Mercado Livre, com link de afiliado e o aviso do programa', async () => {
     abrir('/equipamentos')
-    expect(await screen.findByText(/Como Associado da Amazon/, {}, { timeout: 8000 })).toBeInTheDocument()
+    expect(await screen.findByText(/Como afiliado do Mercado Livre/, {}, { timeout: 8000 })).toBeInTheDocument()
+    expect(screen.queryByText(/Amazon/)).toBeNull()
     expect(TIMES).toHaveLength(30)
+    expect(screen.getAllByRole('link', { name: /Ver no Mercado Livre/ })).toHaveLength(Object.keys(PRODUTOS_TIMES).length)
 
     const lakers = screen.getByRole('link', { name: /Los Angeles Lakers/ })
-    const href = new URL(lakers.getAttribute('href')!)
-    expect(href.hostname).toBe('www.amazon.com.br')
-    expect(href.searchParams.get('tag')).toBe(TAG_AFILIADO)
-    expect(href.searchParams.get('k')).toMatch(/Lakers/)
+    expect(lakers).toHaveAttribute('href', PRODUTOS_TIMES.LAL.link)
+    expect(new URL(lakers.getAttribute('href')!).hostname).toBe('meli.la')
+    expect(lakers).toHaveTextContent('Wilson NBA Team Tribute')
     expect(lakers).toHaveAttribute('target', '_blank')
     expect(lakers).toHaveAttribute('rel', expect.stringContaining('sponsored'))
-    expect(screen.getByRole('link', { name: /Dallas Mavericks/ })).toBeInTheDocument()
+    // Time sem bola no Mercado Livre não aparece na prateleira.
+    expect(screen.queryByRole('link', { name: /Dallas Mavericks/ })).toBeNull()
+    expect(screen.getByRole('link', { name: /Milwaukee Bucks/ })).toHaveTextContent('Wilson NBA Team Alliance')
   })
 
   it('filtra por conferência e pela busca', async () => {
@@ -44,19 +48,30 @@ describe('Equipamentos', () => {
 
     await userEvent.click(screen.getByRole('button', { name: 'Oeste' }))
     expect(screen.queryByRole('link', { name: /Boston Celtics/ })).not.toBeInTheDocument()
-    expect(screen.getAllByRole('link', { name: /Ver na Amazon/ })).toHaveLength(15)
+    expect(screen.getAllByRole('link', { name: /Ver no Mercado Livre/ })).toHaveLength(4)
 
     await userEvent.type(screen.getByRole('searchbox', { name: 'Buscar time' }), 'warriors')
-    expect(screen.getAllByRole('link', { name: /Ver na Amazon/ })).toHaveLength(1)
+    expect(screen.getAllByRole('link', { name: /Ver no Mercado Livre/ })).toHaveLength(1)
     expect(screen.getByRole('link', { name: /Golden State Warriors/ })).toBeInTheDocument()
   })
 
   it('aba de marcas com Wilson, Spalding e Molten', async () => {
     abrir('/equipamentos')
     await userEvent.click(await screen.findByRole('tab', { name: /Bolas de marca/ }))
-    expect(screen.getByRole('link', { name: /NBA Official Game Ball/ })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /NBA Authentic/ })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: /TF-1000 Legacy/ })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: /BG4500/ })).toBeInTheDocument()
+  })
+})
+
+describe('Mercado Livre', () => {
+  it('todo link de afiliado vem do gerador do programa, e nenhuma bola de marca sem link aparece', () => {
+    for (const p of Object.values(PRODUTOS_TIMES)) expect(p.link).toMatch(/^https:\/\/meli\.la\/\w+$/)
+    for (const l of Object.values(LINKS_MARCAS)) expect(l).toMatch(/^https:\/\/meli\.la\/\w+$/)
+    for (const sigla of Object.keys(PRODUTOS_TIMES)) expect(TIMES.some((t) => t.sigla === sigla), sigla).toBe(true)
+    for (const id of Object.keys(LINKS_MARCAS)) expect(MARCAS.some((b) => b.id === id), id).toBe(true)
+    const todos = [...Object.values(PRODUTOS_TIMES).map((p) => p.link), ...Object.values(LINKS_MARCAS)]
+    expect(new Set(todos).size).toBe(todos.length)
   })
 })
 
@@ -76,9 +91,9 @@ describe('bolas de time: réplica da Wilson NBA Team Tribute', () => {
     // Faixa roxa (escura): logo na versão para fundo escuro.
     expect(logo.getAttribute('href')).toBe('https://a.espncdn.com/combiner/i?img=/i/teamlogos/nba/500-dark/lal.png&h=90&w=90')
     // A ESPN abrevia alguns times de outro jeito.
-    const jazz = screen.getByRole('link', { name: /Utah Jazz/ })
-    expect(jazz.querySelector('.bola-logo')!.getAttribute('href')).toContain('/utah.png')
-    expect(document.querySelectorAll('.bola-logo')).toHaveLength(TIMES.length)
+    const gsw = screen.getByRole('link', { name: /Golden State Warriors/ })
+    expect(gsw.querySelector('.bola-logo')!.getAttribute('href')).toContain('/gs.png')
+    expect(document.querySelectorAll('.bola-logo')).toHaveLength(Object.keys(PRODUTOS_TIMES).length)
   })
 
   it('se o logo não carregar, entra o ícone próprio do time', async () => {
@@ -98,7 +113,7 @@ describe('bolas de time: réplica da Wilson NBA Team Tribute', () => {
 })
 
 describe('bolas Wilson NBA All Team', () => {
-  it('a Retro leva os logos retrô redesenhados, e a All Team os logos dos times nas calotas', async () => {
+  it('a Retro leva os logos retrô redesenhados, sem imagens de fora', async () => {
     abrir('/equipamentos')
     await userEvent.click(await screen.findByRole('tab', { name: /Bolas de marca/ }))
     const retro = screen.getByRole('link', { name: /NBA All Team Retro/ })
@@ -109,10 +124,6 @@ describe('bolas Wilson NBA All Team', () => {
     expect(retro.querySelectorAll('image.bola-colagem-logo')).toHaveLength(0)
     expect(retro.querySelector('.bola-nome')).toHaveTextContent('Wilson')
 
-    const todas = screen.getByRole('link', { name: /NBA All Team(?! Retro)/ })
-    const logos = [...todas.querySelectorAll('.bola-colagem-logo')].map((l) => l.getAttribute('href'))
-    expect(new Set(logos).size).toBeGreaterThan(8)
-    expect(logos.every((h) => h!.includes('teamlogos/nba/500/'))).toBe(true)
     expect(screen.getByRole('link', { name: /TF-1000 Legacy/ }).querySelector('.bola-colagem-logo')).toBeNull()
   })
 })
