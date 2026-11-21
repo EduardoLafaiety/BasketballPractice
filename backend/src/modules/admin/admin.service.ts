@@ -4,6 +4,7 @@ import { deleteUser } from '../../db/users.js'
 import { HttpError, notFound } from '../../lib/http-error.js'
 import { hashPassword } from '../../lib/password.js'
 import * as repository from './admin.repository.js'
+import { effectiveAdmin, ownerEmail, ownersOnly } from '../../lib/admin-owners.js'
 
 async function requireAdmin(db: Queryable, actorId: number) {
   if (!await isAdmin(db, actorId)) throw new HttpError(403, 'Acesso restrito a administradores')
@@ -15,7 +16,7 @@ function rejectSelf(actorId: number, id: number, action: string) {
 
 export async function listUsers(db: Queryable, actorId: number) {
   await requireAdmin(db, actorId)
-  return repository.listUsers(db)
+  return (await repository.listUsers(db)).map(user => ({ ...user, isAdmin: effectiveAdmin(user.email, user.isAdmin) }))
 }
 
 export function changeRole(db: Database, actorId: number, id: number, role: boolean) {
@@ -23,6 +24,8 @@ export function changeRole(db: Database, actorId: number, id: number, role: bool
     await lockAdminMembership(tx)
     await requireAdmin(tx, actorId)
     rejectSelf(actorId, id, 'alterar o papel de')
+    const target = await repository.findUserSummary(tx, id)
+    if (target && ownersOnly() && (!ownerEmail(target.email) || !role)) throw new HttpError(403, 'A administração é exclusiva dos dois responsáveis pelo site.')
     if (!await repository.changeRole(tx, id, role)) throw notFound('Usuário')
     return repository.findUserSummary(tx, id)
   })
@@ -33,12 +36,17 @@ export function removeUser(db: Database, actorId: number, id: number) {
     await lockAdminMembership(tx)
     await requireAdmin(tx, actorId)
     rejectSelf(actorId, id, 'excluir')
+    const target = await repository.findUserSummary(tx, id)
+    if (!target) throw notFound('Usuário')
+    if (effectiveAdmin(target.email, target.isAdmin) || ownerEmail(target.email)) throw new HttpError(403, 'As contas dos responsáveis estão protegidas.')
+    await repository.audit(tx, actorId, id, 'deleted')
     if (!await deleteUser(tx, id)) throw notFound('Usuário')
   })
 }
 
 /** Entrada operacional: permite criar o primeiro administrador, sem remover o último. */
 export function setAdminByEmail(db: Database, email: string, role: boolean) {
+  if (ownersOnly() && (!ownerEmail(email) || !role)) throw new HttpError(403, 'A administração é exclusiva dos dois responsáveis pelo site.')
   return db.transaction(async (tx) => {
     await lockAdminMembership(tx)
     const user = await repository.findUserByEmail(tx, email.trim().toLowerCase())
@@ -48,6 +56,45 @@ export function setAdminByEmail(db: Database, email: string, role: boolean) {
     }
     await repository.changeRole(tx, user.id, role)
     return user
+  })
+}
+
+export async function userDetail(db: Queryable, actorId: number, id: number) {
+  await requireAdmin(db, actorId)
+  const user = await repository.findUserSummary(db, id)
+  if (!user) throw notFound('Usuário')
+  return { ...user, isAdmin: effectiveAdmin(user.email, user.isAdmin), audit: await repository.history(db, id) }
+}
+
+export function updateUser(db: Database, actorId: number, id: number, input: { name?: string; blocked?: boolean; isAdmin?: boolean }) {
+  if (input.isAdmin !== undefined) return changeRole(db, actorId, id, input.isAdmin)
+  return db.transaction(async tx => {
+    await lockAdminMembership(tx)
+    await requireAdmin(tx, actorId)
+    const user = await repository.findUserSummary(tx, id)
+    if (!user) throw notFound('Usuário')
+    if (id === actorId || effectiveAdmin(user.email, user.isAdmin) || ownerEmail(user.email)) throw new HttpError(403, 'As contas dos responsáveis estão protegidas.')
+    if (input.name !== undefined && input.name !== user.name) {
+      await repository.updateName(tx, id, input.name)
+      await repository.audit(tx, actorId, id, 'name_changed')
+    }
+    if (input.blocked !== undefined && input.blocked !== user.blocked) {
+      await repository.blockUser(tx, id, input.blocked)
+      await repository.audit(tx, actorId, id, input.blocked ? 'blocked' : 'unblocked')
+    }
+    return repository.findUserSummary(tx, id)
+  })
+}
+
+export function revokeUserSessions(db: Database, actorId: number, id: number) {
+  return db.transaction(async tx => {
+    await lockAdminMembership(tx)
+    await requireAdmin(tx, actorId)
+    const user = await repository.findUserSummary(tx, id)
+    if (!user) throw notFound('Usuário')
+    if (id === actorId || effectiveAdmin(user.email, user.isAdmin) || ownerEmail(user.email)) throw new HttpError(403, 'As contas dos responsáveis estão protegidas.')
+    await repository.revokeSessions(tx, id)
+    await repository.audit(tx, actorId, id, 'sessions_revoked')
   })
 }
 
@@ -61,15 +108,22 @@ export async function createAdminAccount(db: Database, input: { name: string; em
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new HttpError(400, 'E-mail inválido.')
   if (name.length < 2) throw new HttpError(400, 'O nome precisa ter pelo menos 2 letras.')
   if (input.password.length < 10) throw new HttpError(400, 'A senha do administrador precisa ter pelo menos 10 caracteres.')
+  if (ownersOnly() && !ownerEmail(email)) throw new HttpError(403, 'A administração é exclusiva dos dois responsáveis pelo site.')
   return db.transaction(async (tx) => {
     await lockAdminMembership(tx)
     const passwordHash = await hashPassword(input.password)
     const existing = await repository.findUserByEmail(tx, email)
     if (existing) {
       await repository.changeRole(tx, existing.id, true)
-      if (input.redefinirSenha) await repository.replacePassword(tx, existing.id, passwordHash)
+      if (input.redefinirSenha) {
+        await repository.replacePassword(tx, existing.id, passwordHash)
+        await repository.clearResetLinks(tx, existing.id)
+      }
+      await repository.clearPending(tx, email)
       return { id: existing.id, email, criada: false }
     }
-    return { id: await repository.insertAdmin(tx, name, email, passwordHash), email, criada: true }
+    const id = await repository.insertAdmin(tx, name, email, passwordHash)
+    await repository.clearPending(tx, email)
+    return { id, email, criada: true }
   })
 }

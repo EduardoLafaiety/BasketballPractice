@@ -7,6 +7,7 @@ import { hashOneTimeToken, newOneTimeToken } from '../../lib/one-time-token.js'
 import { hashPassword, prepareDecoyHash, verifyAgainstDecoy, verifyPassword } from '../../lib/password.js'
 import { signToken } from '../../lib/token.js'
 import { normalizeAvatar } from '../../lib/avatar.js'
+import { effectiveAdmin, ownerEmail, ownersOnly } from '../../lib/admin-owners.js'
 import * as repository from './auth.repository.js'
 import type { UserRow, PendingRegistration } from './auth.repository.js'
 import type { ChangePasswordInput, ConfirmInput, LoginInput, RegisterInput, ResetInput } from './auth.schema.js'
@@ -27,7 +28,7 @@ export interface AuthServiceOptions {
   aoRedefinirSenha?: (email: string) => void
 }
 
-const publicUser = ({ id, name, email, isAdmin, createdAt, avatarUrl }: UserRow) => ({ id, name, email, isAdmin, createdAt, ...(avatarUrl ? { avatarUrl } : {}) })
+const publicUser = ({ id, name, email, isAdmin, createdAt, avatarUrl }: UserRow) => ({ id, name, email, isAdmin: effectiveAdmin(email, isAdmin), createdAt, ...(avatarUrl ? { avatarUrl } : {}) })
 const session = (row: UserRow) => ({ token: signToken(row.id, row.tokenVersion), user: publicUser(row) })
 
 async function assertPassword(row: repository.CredentialRow | undefined, password: string, field: string) {
@@ -108,7 +109,8 @@ export function createAuthService(db: Database, { emails, appUrl, podeEnviar, se
       return db.transaction(async (tx) => {
         // Não assina a versão nova de uma conta cuja senha mudou durante a verificação.
         const current = await repository.credentialsById(tx, row.id, true)
-        if (!current || current.passwordHash !== row.passwordHash) throw new HttpError(401, 'E-mail ou senha incorretos')
+        if (!current || current.blocked || current.passwordHash !== row.passwordHash) throw new HttpError(401, 'E-mail ou senha incorretos')
+        await repository.recordLogin(tx, current.id)
         return session(current)
       })
     },
@@ -118,13 +120,14 @@ export function createAuthService(db: Database, { emails, appUrl, podeEnviar, se
       const user = await db.transaction(async (tx) => {
         const owner = await repository.resetLinkOwner(tx, tokenHash)
         if (!owner) return undefined
-        await repository.credentialsById(tx, owner.userId, true)
+        const account = await repository.credentialsById(tx, owner.userId, true)
+        if (!account || account.blocked) return undefined
         const link = await repository.consumeResetLink(tx, tokenHash)
         if (!link?.valid) return undefined
         await repository.clearResetLinks(tx, link.userId)
         return repository.updatePassword(tx, link.userId, passwordHash)
       })
-      if (!user) throw invalidLink()
+      if (!user || user.blocked) throw invalidLink()
       aoRedefinirSenha?.(user.email.toLowerCase())
       return session(user)
     },
@@ -157,6 +160,7 @@ export function createAuthService(db: Database, { emails, appUrl, podeEnviar, se
         await lockAdminMembership(tx)
         const row = await repository.credentialsById(tx, userId, true)
         await assertPassword(row, password, 'password')
+        if (row && ownersOnly() && ownerEmail(row.email)) throw new HttpError(403, 'As contas dos responsáveis estão protegidas.')
         const admins = await adminIds(tx)
         if (admins.length === 1 && admins[0].id === userId) {
           throw new HttpError(409, 'Você é o único administrador. Passe o papel a outra conta antes de excluir a sua.')

@@ -1,12 +1,12 @@
 import { one, type Queryable } from '../../db/index.js'
 
 export interface UserRow {
-  id: number; name: string; email: string; isAdmin: boolean; createdAt: Date; tokenVersion: number; avatarUrl: string | null
+  id: number; name: string; email: string; isAdmin: boolean; createdAt: Date; tokenVersion: number; avatarUrl: string | null; blocked: boolean
 }
 export type CredentialRow = UserRow & { passwordHash: string }
 export interface PendingRegistration { name: string; email: string; passwordHash: string }
 
-const USER_COLUMNS = `id, name, email, is_admin AS "isAdmin", created_at AS "createdAt", token_version AS "tokenVersion", avatar_url AS "avatarUrl"`
+const USER_COLUMNS = `id, name, email, is_admin AS "isAdmin", created_at AS "createdAt", token_version AS "tokenVersion", avatar_url AS "avatarUrl", blocked`
 
 export async function updateAvatar(db: Queryable, userId: number, avatarUrl: string | null) {
   return (await db.query('UPDATE users SET avatar_url = $2 WHERE id = $1 RETURNING id', [userId, avatarUrl])).rowCount > 0
@@ -79,3 +79,5 @@ export function updatePassword(tx: Queryable, userId: number, passwordHash: stri
 export async function revokeTokens(db: Queryable, userId: number) {
   await db.query('UPDATE users SET token_version = token_version + 1 WHERE id = $1', [userId])
 }
+
+export const recordLogin = (tx: Queryable, id: number) => tx.query('UPDATE users SET last_login_at = now() WHERE id = $1', [id])

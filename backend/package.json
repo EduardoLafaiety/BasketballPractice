@@ -13,6 +13,7 @@
     "test": "tsx --test --test-concurrency=2 test/*.test.ts",
     "typecheck": "tsc --noEmit",
     "admin": "tsx src/scripts/make-admin.ts",
+    "admin:owners": "tsx src/scripts/provision-admins.ts",
     "admin:criar": "tsx src/scripts/create-admin.ts",
     "db:up": "docker compose up -d --wait",
     "db:down": "docker compose down",

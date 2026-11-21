@@ -1,114 +1,91 @@
 import { screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import { definirToken, type UsuarioAdmin } from '../../../shared/api/backend'
 import { apiFalsa, configFalsa, Resposta, usuarioFalso } from '../../../test/api-falsa'
 import { abrirApp } from '../../../test/renderizar'
 
-const conta = (extra: Partial<UsuarioAdmin>): UsuarioAdmin => ({
-  id: 1,
-  name: 'Marina Silva',
-  email: 'marina@example.com',
-  isAdmin: false,
-  createdAt: '2026-10-01T12:00:00.000Z',
-  workouts: 0,
-  sessions: 0,
-  lastSessionAt: null,
-  ...extra,
-})
-
-const contas = () => [
-  conta({ id: 1, name: 'Marina Silva', email: 'marina@example.com', isAdmin: true }),
-  conta({ id: 2, name: 'Joana Lima', email: 'joana@example.com', workouts: 3, sessions: 12, lastSessionAt: '2026-10-27T21:00:00.000Z' }),
-  conta({ id: 3, name: 'Pedro Alves', email: 'pedro@example.com' }),
-]
-
+const conta = (extra: Partial<UsuarioAdmin>): UsuarioAdmin => ({ id: 1, name: 'Agatha Lafaiety', email: 'agatha.lafaietyy@gmail.com', isAdmin: true, createdAt: '2026-10-01T12:00:00Z', workouts: 0, sessions: 0, lastSessionAt: null, blocked: false, ...extra })
+const contas = () => [conta({}), conta({ id: 2, name: 'Joana Lima', email: 'joana@example.com', isAdmin: false, workouts: 3, sessions: 12, paidUntil: '2099-01-01T00:00:00Z', plan: 'anual' }), conta({ id: 3, name: 'Pedro Alves', email: 'pedro@example.com', isAdmin: false })]
 function abrirPainel(rotas: Parameters<typeof apiFalsa>[0] = {}) {
   definirToken('tk-admin')
-  const api = apiFalsa({
-    'GET /auth/me': usuarioFalso({ id: 1, isAdmin: true }),
-    'GET /settings': configFalsa,
-    'GET /admin/users': contas(),
-    'GET /news': [],
-    ...rotas,
-  })
+  const api = apiFalsa({ 'GET /auth/me': usuarioFalso({ id: 1, isAdmin: true }), 'GET /settings': configFalsa, 'GET /admin/users': contas(), 'GET /admin/users/1': { ...contas()[0], audit: [] }, 'GET /admin/users/2': { ...contas()[1], audit: [] }, 'GET /admin/users/3': { ...contas()[2], audit: [] }, 'GET /news': [], ...rotas })
   abrirApp('/admin')
   return api
 }
+const detalhes = async (name: string) => { await userEvent.click(await screen.findByRole('button', { name: `Ver detalhes de ${name}` })); return screen.findByRole('dialog') }
 
-const cartao = async (nome: string) => (await screen.findByText(nome)).closest('li') as HTMLElement
-
-describe('Painel admin', () => {
-  it('lista as contas com o resumo de uso', async () => {
-    abrirPainel()
-
-    expect(await screen.findByText('3 contas · 1 admin')).toBeInTheDocument()
-    const joana = await cartao('Joana Lima')
-    expect(joana).toHaveTextContent('joana@example.com')
-    expect(joana).toHaveTextContent('3 treinos · 12 sessões · última em')
-  })
-
-  it('não oferece ações na própria conta', async () => {
-    abrirPainel()
-    const eu = await cartao('Marina Silva')
-    expect(eu).toHaveTextContent('(você)')
-    expect(within(eu).queryByRole('button')).toBeNull()
-  })
-
-  it('promove e rebaixa administradores', async () => {
+describe('Gestão de usuários', () => {
+  it('inicia vazia quando há somente os responsáveis e mostra os dois no filtro de administradores', async () => {
     const user = userEvent.setup()
-    const { ultima } = abrirPainel({
-      'PATCH /admin/users/2': (corpo) => conta({ ...contas()[1], isAdmin: (corpo as { isAdmin: boolean }).isAdmin }),
-    })
-    const joana = await cartao('Joana Lima')
-
-    await user.click(within(joana).getByRole('button', { name: 'Tornar admin' }))
-    expect(await within(joana).findByRole('button', { name: 'Remover admin' })).toBeInTheDocument()
-    expect(within(joana).getByText('admin')).toBeInTheDocument()
-    expect(screen.getByText('3 contas · 2 admins')).toBeInTheDocument()
-    expect(ultima('PATCH', '/admin/users/2')?.corpo).toEqual({ isAdmin: true })
-
-    await user.click(within(joana).getByRole('button', { name: 'Remover admin' }))
-    expect(await within(joana).findByRole('button', { name: 'Tornar admin' })).toBeInTheDocument()
-    expect(ultima('PATCH', '/admin/users/2')?.corpo).toEqual({ isAdmin: false })
+    abrirPainel({ 'GET /admin/users': [conta({}), conta({ id: 4, name: 'Eduardo Lopes', email: 'deveducontato@gmail.com' })] })
+    expect(await screen.findByText('Nenhum usuário cadastrado')).toBeInTheDocument()
+    expect(screen.getByText('0 contas encontradas')).toBeInTheDocument()
+    expect(screen.queryByText('Agatha Lafaiety')).toBeNull()
+    expect(screen.queryByText('Eduardo Lopes')).toBeNull()
+    await user.click(screen.getByRole('button', { name: 'Administradores 2' }))
+    expect(screen.getByText('Agatha Lafaiety')).toBeInTheDocument()
+    expect(screen.getByText('Eduardo Lopes')).toBeInTheDocument()
   })
-
-  it('só exclui a conta depois de confirmar', async () => {
-    const user = userEvent.setup()
-    const confirmar = vi.spyOn(window, 'confirm').mockReturnValue(false)
-    const { chamadas } = abrirPainel({ 'DELETE /admin/users/3': new Resposta(204) })
-    const pedro = await cartao('Pedro Alves')
-
-    await user.click(within(pedro).getByRole('button', { name: 'Excluir' }))
-    expect(confirmar).toHaveBeenCalledWith(expect.stringContaining('Pedro Alves (pedro@example.com)'))
-    expect(chamadas.some((c) => c.metodo === 'DELETE')).toBe(false)
-
-    confirmar.mockReturnValue(true)
-    await user.click(within(pedro).getByRole('button', { name: 'Excluir' }))
+  it('busca por nome ou e-mail, filtra assinantes e limpa resultado vazio', async () => {
+    const user = userEvent.setup(); abrirPainel()
+    expect(await screen.findByText('2 contas encontradas')).toBeInTheDocument()
+    await user.type(screen.getByRole('searchbox'), 'PEDRO@')
+    expect(screen.getByText('Pedro Alves')).toBeInTheDocument(); expect(screen.queryByText('Joana Lima')).toBeNull()
+    await user.clear(screen.getByRole('searchbox')); await user.type(screen.getByRole('searchbox'), 'inexistente')
+    expect(screen.getByText('Nenhuma conta encontrada')).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Limpar filtros' }))
+    await user.click(screen.getByRole('button', { name: 'Assinantes 1' }))
+    expect(screen.getByText('Joana Lima')).toBeInTheDocument(); expect(screen.queryByText('Pedro Alves')).toBeNull()
+  })
+  it('protege administradores e não oferece promoção de outras contas', async () => {
+    abrirPainel(); await userEvent.click(await screen.findByRole('button', { name: 'Administradores 1' })); const dialog = await detalhes('Agatha Lafaiety')
+    expect(within(dialog).getByText(/Conta responsável protegida/)).toBeInTheDocument()
+    expect(within(dialog).queryByRole('button', { name: 'Bloquear conta' })).toBeNull()
+    expect(screen.queryByRole('button', { name: /Tornar admin/ })).toBeNull()
+    await userEvent.click(within(dialog).getByRole('button', { name: 'Fechar detalhes' }))
+    expect(screen.queryByRole('dialog')).toBeNull()
+  })
+  it('salva o nome e mostra o histórico', async () => {
+    const user = userEvent.setup(); const { ultima } = abrirPainel({ 'PATCH /admin/users/2': body => ({ ...contas()[1], name: (body as { name: string }).name }), 'GET /admin/users/2': { ...contas()[1], audit: [{ id: 1, action: 'sessions_revoked', actorName: 'Agatha Lafaiety', createdAt: '2026-11-20' }] } })
+    const dialog = await detalhes('Joana Lima')
+    expect(await within(dialog).findByText('Sessões encerradas')).toBeInTheDocument()
+    await user.clear(within(dialog).getByLabelText('Nome')); await user.type(within(dialog).getByLabelText('Nome'), 'Joana Silva')
+    await user.click(within(dialog).getByRole('button', { name: 'Salvar nome' }))
+    await waitFor(() => expect(ultima('PATCH', '/admin/users/2')?.corpo).toEqual({ name: 'Joana Silva' }))
+    expect(await within(dialog).findByRole('heading', { name: 'Joana Silva' })).toBeInTheDocument()
+  })
+  it('bloqueio requer confirmação e mantém o formulário após falha da API', async () => {
+    const user = userEvent.setup(); const { chamadas } = abrirPainel({ 'PATCH /admin/users/3': new Resposta(403, { error: 'Ação recusada' }) })
+    const dialog = await detalhes('Pedro Alves')
+    await user.click(within(dialog).getByRole('button', { name: 'Bloquear conta' }))
+    expect(chamadas.some(c => c.metodo === 'PATCH')).toBe(false)
+    await user.click(within(dialog).getByRole('button', { name: 'Confirmar' }))
+    expect(await within(dialog).findByRole('alert')).toHaveTextContent('Ação recusada')
+    expect(within(dialog).getByRole('button', { name: 'Confirmar' })).toBeEnabled()
+  })
+  it('encerra sessões após confirmação', async () => {
+    const user = userEvent.setup(); const { chamadas } = abrirPainel({ 'POST /admin/users/3/revoke-sessions': new Resposta(204) })
+    const dialog = await detalhes('Pedro Alves')
+    await user.click(within(dialog).getByRole('button', { name: 'Encerrar sessões' }))
+    expect(chamadas.some(c => c.url.pathname.includes('revoke-sessions'))).toBe(false)
+    await user.click(within(dialog).getByRole('button', { name: 'Confirmar' }))
+    expect(await within(dialog).findByRole('status')).toHaveTextContent('Sessões encerradas.')
+  })
+  it('exige o e-mail exato antes de excluir a conta', async () => {
+    const user = userEvent.setup(); abrirPainel({ 'DELETE /admin/users/3': new Resposta(204) })
+    const dialog = await detalhes('Pedro Alves')
+    await user.click(within(dialog).getByRole('button', { name: 'Excluir conta' }))
+    expect(within(dialog).getByRole('button', { name: 'Confirmar' })).toBeDisabled()
+    await user.type(within(dialog).getByLabelText('E-mail para confirmar'), 'pedro@example.com')
+    await user.click(within(dialog).getByRole('button', { name: 'Confirmar' }))
     await waitFor(() => expect(screen.queryByText('Pedro Alves')).toBeNull())
-    expect(screen.getByText('2 contas · 1 admin')).toBeInTheDocument()
+    expect(screen.getByText('1 contas encontradas')).toBeInTheDocument()
   })
-
-  it('mostra o erro quando a API recusa a ação', async () => {
-    const user = userEvent.setup()
-    abrirPainel({ 'PATCH /admin/users/3': new Resposta(403, { error: 'Acesso restrito a administradores' }) })
-    const pedro = await cartao('Pedro Alves')
-
-    await user.click(within(pedro).getByRole('button', { name: 'Tornar admin' }))
-    expect(await screen.findByRole('alert')).toHaveTextContent('Acesso restrito a administradores')
-    expect(within(pedro).getByRole('button', { name: 'Tornar admin' })).toBeEnabled()
-  })
-
-  it('permite tentar de novo quando a lista não carrega', async () => {
-    const user = userEvent.setup()
-    let falhar = true
-    abrirPainel({
-      'GET /admin/users': () => (falhar ? new Resposta(500, { error: 'Erro interno do servidor' }) : contas()),
-    })
-
+  it('permite tentar de novo quando a lista falha', async () => {
+    let falhar = true; abrirPainel({ 'GET /admin/users': () => falhar ? new Resposta(500, { error: 'Erro interno do servidor' }) : contas() })
     expect(await screen.findByRole('alert')).toHaveTextContent('Erro interno do servidor')
-    falhar = false
-    await user.click(screen.getByRole('button', { name: 'Tentar de novo' }))
-    expect(await screen.findByText('3 contas · 1 admin')).toBeInTheDocument()
+    falhar = false; await userEvent.click(screen.getByRole('button', { name: 'Tentar de novo' }))
+    expect(await screen.findByText('2 contas encontradas')).toBeInTheDocument()
   })
 })
