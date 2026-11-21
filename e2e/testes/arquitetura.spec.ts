@@ -4,7 +4,7 @@ import { autorizacao, entrarCom, idDoExercicio, novaConta } from './ajuda'
 test('a rotina preserva a duração planejada na sessão guiada', async ({ page, request }) => {
   const { token } = await novaConta(request)
   const exerciseId = await idDoExercicio(request, token, 'Lance livre')
-  const day = new Date().getDay()
+  const day = await page.evaluate(() => new Date().getDay())
   const response = await request.put('/api/routine', { headers: autorizacao(token), data: {
     days: Array.from({ length: 7 }, (_, i) => ({ day: i, exercises: i === day ? [{ exerciseId, minutes: 4 }] : [] })),
   } })

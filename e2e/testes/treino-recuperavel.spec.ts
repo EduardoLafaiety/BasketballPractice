@@ -58,7 +58,7 @@ test('recupera a sessão após recarregar e envia o treino ao voltar a conexão'
   const { token } = await novaConta(request)
   const exerciseId = await idDoExercicio(request, token, 'Lance livre')
   await entrarCom(page, token)
-  const dia = new Date().getDay()
+  const dia = await page.evaluate(() => new Date().getDay())
   await request.post('/api/workouts', { headers: autorizacao(token), data: {
     name: 'Recuperável', description: `bp-rotina:${dia}`, exercises: [{ exerciseId }],
   } })
