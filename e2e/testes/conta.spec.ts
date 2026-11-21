@@ -88,7 +88,7 @@ test('Equipamentos abre sem conta; Artigos exige conta e segue disponível para 
   await page.addInitScript(t => localStorage.setItem('bp.token', t), token)
   await page.goto('/equipamentos')
   await expect(page.getByRole('heading', { name: 'Equipamentos', level: 1 })).toBeVisible()
-  await expect(page.getByRole('link', { name: /Ver no Mercado Livre/ }).first()).toHaveAttribute('href', /meli\.la/)
+  await expect(page.getByRole('link', { name: /Ver no Mercado Livre/ }).first()).toHaveAttribute('href', /mercadolivre\.com\.br\/social/)
 
   await irPara(page, 'Artigos')
   await expect(page.getByRole('heading', { name: 'Artigos', level: 1 })).toBeVisible()

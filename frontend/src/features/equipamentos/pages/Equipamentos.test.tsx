@@ -33,7 +33,11 @@ describe('Equipamentos', () => {
 
     const lakers = screen.getByRole('link', { name: /Los Angeles Lakers/ })
     expect(lakers).toHaveAttribute('href', PRODUTOS_TIMES.LAL.link)
-    expect(new URL(lakers.getAttribute('href')!).hostname).toBe('meli.la')
+    const url = new URL(lakers.getAttribute('href')!)
+    expect(url.hostname).toBe('www.mercadolivre.com.br')
+    expect(url.pathname).toMatch(/^\/social\//)
+    expect(url.searchParams.get('matt_word')).toBeTruthy()
+    expect(url.searchParams.get('ref')).toBeTruthy()
     expect(lakers).toHaveTextContent('Wilson NBA Team Tribute')
     expect(lakers).toHaveAttribute('target', '_blank')
     expect(lakers).toHaveAttribute('rel', expect.stringContaining('sponsored'))
@@ -66,8 +70,9 @@ describe('Equipamentos', () => {
 
 describe('Mercado Livre', () => {
   it('todo link de afiliado vem do gerador do programa, e nenhuma bola de marca sem link aparece', () => {
-    for (const p of Object.values(PRODUTOS_TIMES)) expect(p.link).toMatch(/^https:\/\/meli\.la\/\w+$/)
-    for (const l of Object.values(LINKS_MARCAS)) expect(l).toMatch(/^https:\/\/meli\.la\/\w+$/)
+    const formato = /^https:\/\/www\.mercadolivre\.com\.br\/social\/\w+\?matt_word=\w+&matt_tool=\d+&forceInApp=true&ref=[\w%.-]+$/
+    for (const p of Object.values(PRODUTOS_TIMES)) expect(p.link).toMatch(formato)
+    for (const l of Object.values(LINKS_MARCAS)) expect(l).toMatch(formato)
     for (const sigla of Object.keys(PRODUTOS_TIMES)) expect(TIMES.some((t) => t.sigla === sigla), sigla).toBe(true)
     for (const id of Object.keys(LINKS_MARCAS)) expect(MARCAS.some((b) => b.id === id), id).toBe(true)
     const todos = [...Object.values(PRODUTOS_TIMES).map((p) => p.link), ...Object.values(LINKS_MARCAS)]
