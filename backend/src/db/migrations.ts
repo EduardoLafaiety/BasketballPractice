@@ -433,6 +433,23 @@ const migrations: string[] = [
   `,
   `ALTER TABLE users ADD COLUMN avatar_url text CHECK (avatar_url IS NULL OR length(avatar_url) <= 120000);`,
   `
+  ALTER TABLE billing_subscriptions ALTER COLUMN user_id DROP NOT NULL;
+  ALTER TABLE billing_subscriptions ADD COLUMN checkout_email text;
+  ALTER TABLE billing_subscriptions ADD COLUMN checkout_key_hash text UNIQUE;
+  ALTER TABLE billing_subscriptions ADD CONSTRAINT billing_checkout_identity CHECK (
+    user_id IS NOT NULL OR (checkout_email IS NOT NULL AND checkout_key_hash IS NOT NULL)
+  );
+  CREATE UNIQUE INDEX idx_billing_guest_open ON billing_subscriptions(lower(checkout_email))
+    WHERE user_id IS NULL AND status NOT IN ('cancelled', 'failed');
+  `,
+  `
+  ALTER TABLE billing_subscriptions ADD COLUMN mode text NOT NULL DEFAULT 'recorrente' CHECK (mode IN ('recorrente','avulso'));
+  DROP INDEX idx_billing_one_open;
+  DROP INDEX idx_billing_guest_open;
+  CREATE UNIQUE INDEX idx_billing_one_open ON billing_subscriptions(user_id) WHERE status NOT IN ('cancelled','failed','completed');
+  CREATE UNIQUE INDEX idx_billing_guest_open ON billing_subscriptions(lower(checkout_email)) WHERE user_id IS NULL AND status NOT IN ('cancelled','failed','completed');
+  `,
+  `
   ALTER TABLE users ADD COLUMN blocked boolean NOT NULL DEFAULT false;
   ALTER TABLE users ADD COLUMN last_login_at timestamptz;
   CREATE TABLE admin_audit (

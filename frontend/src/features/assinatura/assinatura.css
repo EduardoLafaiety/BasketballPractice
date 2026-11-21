@@ -23,3 +23,22 @@
 .assinatura-rodape { display: flex; gap: 24px; flex-wrap: wrap; border-top: 1px solid var(--borda); padding-top: 22px; margin-top: 35px; }
 .assinatura-rodape a, .assinatura-rodape button { display: inline-flex; align-items: center; min-height: 44px; color: var(--muted); background: none; border: 0; padding: 0; font: inherit; font-size: 13px; text-decoration: none; cursor: pointer; }
 @media (max-width: 560px) { .assinatura-pagina { padding-inline: 18px; }.assinatura-marca { font-size: 12px; gap: 8px; }.assinatura-marca img { max-width: 26px; max-height: 26px; }.assinatura-topo.topo { gap: 10px; }.assinatura-conteudo { margin-top: 15px; }.assinatura-planos { grid-template-columns: 1fr; gap: 12px; }.assinatura-planos label { padding: 20px; }.assinatura-planos strong { margin: 12px 0; }.assinatura-estado { align-items: start; flex-direction: column; }.assinatura-gerenciar > .btn { width: 100%; } }
+.compra-conteudo { max-width: 900px; }
+.compra-etapas { display:flex; gap:1.2rem; padding:0; margin:0 0 2rem; list-style:none; color:var(--muted); }
+.compra-etapas li { display:flex; align-items:center; gap:.55rem; font-size:.875rem; }
+.compra-etapas li span { display:grid; place-items:center; width:28px; height:28px; border-radius:50%; background:var(--superficie-2); font-size:.8rem; }
+.compra-etapas li[aria-current] { color:var(--laranja-texto); font-weight:800; }.compra-etapas li[aria-current] span { background:color-mix(in srgb,var(--laranja) 16%,var(--superficie)); }
+.compra-email { display:grid; gap:.6rem; margin:1.5rem 0; padding:1.5rem; border-radius:20px; background:var(--superficie); }.compra-email label { font-weight:800; }.compra-email input { width:100%; min-height:50px; border-radius:12px; font-size:1rem; }.compra-email p { font-size:.875rem; color:var(--muted); margin:0; line-height:1.65; }
+.compra-acesso { display:flex; gap:1rem; flex-wrap:wrap; margin:1.5rem 0; }.compra-acesso .btn { min-height:48px; text-transform:none; letter-spacing:0; }
+.compra-recibo { display:grid; gap:.5rem; background:var(--superficie); padding:1.5rem; border-radius:20px; }.compra-recibo span { font-size:.875rem; color:var(--muted); }.compra-recibo strong { font-size:1.1rem; overflow-wrap:anywhere; }
+.compra-retomar { display:inline-block; margin:1rem 0; color:var(--laranja-texto); }
+@media(max-width:600px) { .compra-etapas { gap:.8rem; }.compra-etapas li { font-size:.8rem; gap:.4rem; }.compra-etapas li span { width:24px; height:24px; }.compra-acesso { flex-direction:column; }.compra-acesso .btn { width:100%; text-align:center; justify-content:center; }.compra-email { padding:1rem; } }
+.compra-formas { border: 0; padding: 0; margin: 2rem 0; display: grid; gap: .75rem; min-width: 0; }
+.compra-formas legend { font-weight: 750; margin-bottom: .9rem; }
+.compra-formas label { display: flex; gap: .9rem; align-items: flex-start; padding: 1.15rem; border: 1px solid var(--borda); border-radius: 1rem; cursor: pointer; }
+.compra-formas label.selecionado { border-color: transparent; background: var(--acao-ativa); box-shadow: inset 3px 0 var(--laranja); }
+.compra-formas input { margin-top: .3rem; accent-color: var(--laranja); flex-shrink: 0; }
+.compra-formas label > span { display: grid; gap: .3rem; min-width: 0; }
+.compra-formas strong { font-size: 1rem; }
+.compra-formas small, .compra-formas > p { font-size: .875rem; line-height: 1.6; color: var(--muted); margin: 0; }
+.compra-formas label:focus-within { outline: 2px solid var(--laranja); outline-offset: 3px; }

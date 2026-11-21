@@ -1,3 +1,4 @@
+import LinkInicio from '../../shared/ui/LinkInicio'
 import LogoBola from '../../shared/ui/LogoBola'
 import Avatar from '../../shared/ui/Avatar'
 import { Link, NavLink } from '../../shared/i18n/links'
@@ -177,9 +178,9 @@ export default function Layout() {
       <a className="pular-conteudo" href="#conteudo">Pular para o conteúdo</a>
       <div className="progresso-pagina" aria-hidden><i ref={barra} /></div>
       <header className="topo">
-        <Link to="/" className="marca" aria-label="Basketball Practice, início" onClick={voltarAoTopo}>
+        <LinkInicio className="marca" aria-label="Basketball Practice, início">
           <LogoBola tamanho={34} />
-        </Link>
+        </LinkInicio>
         {secao && (pathname === '/'
           ? <Link to="/" className="topo-secao" onClick={voltarAoTopo}>Início</Link>
           : <span className="topo-secao">{secao}</span>)}
@@ -241,7 +242,7 @@ export default function Layout() {
       </main>
       <footer className="rodape">
         <div className="rodape-principal">
-          <Link to="/" className="rodape-marca" onClick={voltarAoTopo}><LogoBola tamanho={28} /> Basketball Practice</Link>
+          <LinkInicio className="rodape-marca"><LogoBola tamanho={28} /> Basketball Practice</LinkInicio>
           <nav aria-label="Links do rodapé">
             <Link to="/treinos">Treinos</Link><Link to="/rotina">Rotina</Link><Link to="/evolucao">Evolução</Link>
           </nav>

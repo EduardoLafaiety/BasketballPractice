@@ -69,4 +69,32 @@ it('checkout não aceita HTTP, credenciais embutidas nem domínios que imitam o 
     assert.throws(() => checkoutUrl(url))
   }
   assert.equal(checkoutUrl('https://www.mercadopago.com.br/subscriptions/checkout?preapproval_id=teste'), 'https://www.mercadopago.com.br/subscriptions/checkout?preapproval_id=teste')
+  assert.equal(checkoutUrl('https://www.mercadopago.com.br/checkout/v1/redirect?pref_id=teste','avulso'), 'https://www.mercadopago.com.br/checkout/v1/redirect?pref_id=teste')
+  for (const url of ['http://www.mercadopago.com.br/checkout/v1/redirect', 'https://www.mercadopago.com.br.outro.example/checkout/v1/redirect', 'https://usuario:senha@www.mercadopago.com.br/checkout/v1/redirect', 'https://www.mercadopago.com.br/checkout/v1/redirect/outro']) assert.throws(() => checkoutUrl(url,'avulso'))
+})
+
+it('Checkout Pro cria preferência e consulta o pagamento e pedido no backend com autenticação', async () => {
+  const original = globalThis.fetch
+  const received: {url:URL;init?:RequestInit}[] = []
+  globalThis.fetch = async (input,init) => {
+    const url = new URL(String(input)); received.push({url,init})
+    assert.equal(url.origin,'https://api.mercadopago.com')
+    assert.equal((init?.headers as Record<string,string>).Authorization,'Bearer ficticio')
+    return Response.json(url.pathname === '/v1/payments/search' ? {results:[],paging:{total:0}} : {id:'teste'})
+  }
+  try {
+    const mp=mercadoPago('ficticio')
+    await mp.preference({external_reference:'referencia'},'tentativa-unica')
+    await mp.getPreference('pref/1')
+    await mp.order('pedido/1')
+    await mp.payments('referencia')
+    assert.equal(received[0].url.pathname,'/checkout/preferences')
+    assert.equal(received[0].init?.method,'POST')
+    assert.equal((received[0].init?.headers as Record<string,string>)['X-Idempotency-Key'],'tentativa-unica')
+    assert.equal(received[1].url.pathname,'/checkout/preferences/pref%2F1')
+    assert.equal(received[2].url.pathname,'/merchant_orders/pedido%2F1')
+    assert.equal(received[3].url.searchParams.get('external_reference'),'referencia')
+    globalThis.fetch=async()=>Response.json({results:[],paging:{total:101}})
+    await assert.rejects(mp.payments('referencia'))
+  } finally {globalThis.fetch=original}
 })

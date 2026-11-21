@@ -1,10 +1,24 @@
 import { screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { abrirApp } from '../../test/renderizar'
 import { apiFalsa } from '../../test/api-falsa'
 
 describe('Apresentação pública', () => {
+  it('as logos do header e footer voltam ao topo mesmo na mesma página', async () => {
+    apiFalsa({})
+    const scroll=vi.spyOn(window,'scrollTo').mockImplementation(()=>{})
+    abrirApp('/conheca#planos')
+    const user=userEvent.setup()
+    const marca=within(await screen.findByRole('contentinfo')).getByRole('link',{name:/Basketball Practice/})
+    expect(marca).toHaveAttribute('href','/conheca#inicio')
+    await user.click(marca)
+    expect(screen.getByTestId('caminho')).toHaveTextContent('/conheca')
+    await user.click(within(screen.getByRole('banner')).getByRole('link',{name:'Basketball Practice, início'}))
+    expect(scroll).toHaveBeenCalledTimes(2)
+    expect(scroll).toHaveBeenLastCalledWith({top:0,left:0,behavior:'instant'})
+    scroll.mockRestore()
+  })
   it('abre antes do login e apresenta preços e períodos sem exigir autenticação', async () => {
     apiFalsa({})
     abrirApp('/')

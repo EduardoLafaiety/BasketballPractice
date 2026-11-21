@@ -24,6 +24,26 @@ Forneça o JSON pela entrada padrão de um canal privado do servidor. A ferramen
 
 O arquivo privado local `backend/data/acessos-administradores.md` contém as credenciais geradas. `backend/data/` é ignorado pelo Git. Elas não estão automaticamente instaladas em produção.
 
+### Ativação pelo painel do Render, inclusive no plano gratuito
+
+O Render gratuito não oferece Shell/SSH. O responsável pelo serviço pode executar a ferramenta uma vez durante a inicialização, usando as variáveis privadas que já conectam a API ao banco:
+
+1. Depois de publicar este código, abra o serviço `basketball-practice-api` no Render.
+2. Em Environment, adicione temporariamente `ADMIN_INITIAL_CREDENTIALS`. O valor é o JSON privado com os dois e-mails e senhas, no formato aceito pela ferramenta. Não coloque esse valor no GitHub nem no comando de inicialização.
+3. Altere temporariamente o Start Command para:
+
+```sh
+printf '%s' "$ADMIN_INITIAL_CREDENTIALS" | node dist/scripts/provision-admins.js && npm start
+```
+
+4. Faça o deploy. A ferramenta cria apenas as duas contas responsáveis, preservando os demais usuários, treinos e pagamentos. Verifique no log a mensagem `As duas contas responsáveis estão prontas` e o estado saudável da API.
+5. Remova `ADMIN_INITIAL_CREDENTIALS`, restaure o Start Command para `npm start` e faça novo deploy. Os hashes permanecem no banco; as senhas não precisam ficar no ambiente.
+6. Entre pelo `/entrar` do site e acesse `/admin`. Administradores não precisam pagar.
+
+Se já houver uma conta com senha diferente, a ferramenta interrompe a operação sem trocar senhas ou promover parcialmente contas. Somente se o responsável decidir substituir essas credenciais, acrescente `--reset-existing` ao comando da ferramenta e repita os passos 4 e 5. Isso preserva os registros e invalida sessões antigas dessas duas contas. Não deixe a inicialização com esse parâmetro após a ativação.
+
+Referência: https://render.com/docs/ssh
+
 ## Operações
 
 - Buscar contas por nome/e-mail, filtrar administradores, assinantes, contas sem assinatura ou bloqueadas e consultar detalhes.
