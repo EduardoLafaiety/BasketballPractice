@@ -3,8 +3,8 @@
 // A Amazon não permite copiar preço nem imagem para cá; por isso cada bola é redesenhada em pixel art
 // (equipamentos/Bola.tsx), como réplica do modelo de verdade: faixas, canais, marca e o logo do time.
 
-/** Tag do Programa de Associados da Amazon. Troque pela sua quando a conta for aprovada. */
-export const TAG_AFILIADO = 'seutag-20'
+/** Tag do Programa de Associados da Amazon. ID de Associado criado em 20/11/2026 (cadastro em revisão da Amazon). */
+export const TAG_AFILIADO = 'basketpractic-20'
 
 export const linkAmazon = (busca: string) =>
   `https://www.amazon.com.br/s?k=${encodeURIComponent(busca)}&tag=${TAG_AFILIADO}`
