@@ -5,10 +5,23 @@ import { provisionOwners } from '../src/modules/admin/admin.provision.js'
 import { ADMIN_OWNERS, effectiveAdmin } from '../src/lib/admin-owners.js'
 import { verifyPassword } from '../src/lib/password.js'
 import { criarConta } from './caixa.js'
+import { createAdminAccount } from '../src/modules/admin/admin.service.js'
 
 process.env.ADMIN_OWNERS_ONLY = 'true'
 const credentials = Object.fromEntries(ADMIN_OWNERS.map((owner, i) => [owner.email, `test-only-owner-password-${i}-NOT-PRODUCTION`]))
 const billing = { enabled: true, accessToken: '', webhookSecret: '', collectorId: '', liveMode: false, appUrl: 'http://teste.local' }
+
+it('o comando individual de criação também restringe os e-mails e mantém o acesso sem pagamento do responsável', async () => {
+  const { api, db } = await startApi({ billing })
+  await assert.rejects(createAdminAccount(db, { name:'Outra pessoa',email:'fora-da-lista@example.com',password:'senha-de-teste-segura' }), {status:403})
+  const owner=ADMIN_OWNERS[1]
+  await createAdminAccount(db, {...owner,password:credentials[owner.email]})
+  const login=await api('POST','/auth/login',{email:owner.email,password:credentials[owner.email]})
+  assert.equal(login.status,200)
+  assert.equal(login.body.user.isAdmin,true)
+  assert.equal((await api('GET','/exercises',undefined,login.body.token)).status,200)
+  assert.equal((await api('GET','/admin/users',undefined,login.body.token)).status,200)
+})
 
 it('só os dois responsáveis provisionados acessam a administração e ficam isentos da assinatura', async () => {
   const { api, db, register, caixa } = await startApi({ billing })

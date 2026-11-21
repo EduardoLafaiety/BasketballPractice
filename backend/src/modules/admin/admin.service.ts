@@ -2,6 +2,7 @@ import type { Database, Queryable } from '../../db/index.js'
 import { adminIds, isAdmin, lockAdminMembership } from '../../db/account-access.js'
 import { deleteUser } from '../../db/users.js'
 import { HttpError, notFound } from '../../lib/http-error.js'
+import { hashPassword } from '../../lib/password.js'
 import * as repository from './admin.repository.js'
 import { effectiveAdmin, ownerEmail, ownersOnly } from '../../lib/admin-owners.js'
 
@@ -94,5 +95,35 @@ export function revokeUserSessions(db: Database, actorId: number, id: number) {
     if (id === actorId || effectiveAdmin(user.email, user.isAdmin) || ownerEmail(user.email)) throw new HttpError(403, 'As contas dos responsáveis estão protegidas.')
     await repository.revokeSessions(tx, id)
     await repository.audit(tx, actorId, id, 'sessions_revoked')
+  })
+}
+
+/**
+ * Cria uma conta de administrador já ativa, sem passar por e-mail de confirmação nem pagamento (o admin tem acesso
+ * interno). Se o e-mail já tem conta, ela só recebe o papel de admin; a senha só muda com redefinirSenha.
+ */
+export async function createAdminAccount(db: Database, input: { name: string; email: string; password: string; redefinirSenha?: boolean }) {
+  const email = input.email.trim().toLowerCase()
+  const name = input.name.trim()
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new HttpError(400, 'E-mail inválido.')
+  if (name.length < 2) throw new HttpError(400, 'O nome precisa ter pelo menos 2 letras.')
+  if (input.password.length < 10) throw new HttpError(400, 'A senha do administrador precisa ter pelo menos 10 caracteres.')
+  if (ownersOnly() && !ownerEmail(email)) throw new HttpError(403, 'A administração é exclusiva dos dois responsáveis pelo site.')
+  return db.transaction(async (tx) => {
+    await lockAdminMembership(tx)
+    const passwordHash = await hashPassword(input.password)
+    const existing = await repository.findUserByEmail(tx, email)
+    if (existing) {
+      await repository.changeRole(tx, existing.id, true)
+      if (input.redefinirSenha) {
+        await repository.replacePassword(tx, existing.id, passwordHash)
+        await repository.clearResetLinks(tx, existing.id)
+      }
+      await repository.clearPending(tx, email)
+      return { id: existing.id, email, criada: false }
+    }
+    const id = await repository.insertAdmin(tx, name, email, passwordHash)
+    await repository.clearPending(tx, email)
+    return { id, email, criada: true }
   })
 }
