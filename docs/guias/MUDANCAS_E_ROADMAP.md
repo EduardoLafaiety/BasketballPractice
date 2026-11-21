@@ -140,7 +140,7 @@ A medição usa o relógio do aparelho. Alterações manuais no relógio do sist
 - Menu dividido em quatro grupos: **Treinar**, **Rotina**, **Evolução** e **Explorar**.
 - Treinar reúne início, catálogo, programas e estilos de jogadores.
 - Evolução reúne a comparação de registros, Overall e conquistas.
-- Explorar reúne NBA, NBB, alimentação, equipamentos e artigos.
+- Explorar reúne NBA, NBB, alimentação e artigos. A seção Equipamentos (bolas com links de afiliado) foi removida em 21/11/2026, porque não havia fonte permitida para as fotos dos produtos.
 - Atalho de Evolução na barra inferior do celular.
 - Preservação das rotas existentes e dos acessos aos conteúdos complementares.
 - Ajustes de layout para os grupos do menu e a nova tela de evolução.

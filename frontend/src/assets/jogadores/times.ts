@@ -1,4 +1,4 @@
-// Time de cada jogador da aba Jogue como, pela sigla da tabela de `equipamentos/dados.ts`.
+// Time de cada jogador da aba Jogue como, pela sigla da tabela de `nba/times.ts`.
 // Conferido nos elencos do ESPN em 11/11/2026. Troca de time muda isso: ao conferir de novo, atualize aqui.
 // É o time de agora, não o da foto (a legenda de `fotos.ts` guarda o time de quando ela foi tirada).
 export const TIME_DO_JOGADOR: Record<string, string> = {

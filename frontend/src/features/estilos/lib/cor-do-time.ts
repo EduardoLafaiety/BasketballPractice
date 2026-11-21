@@ -1,5 +1,5 @@
 import { TIME_DO_JOGADOR } from '../../../assets/jogadores/times'
-import { TIMES } from '../../equipamentos/dados'
+import { TIMES } from '../../nba/times'
 
 // Fundo das faixas escuras (`--bg` de `.faixa-escura`).
 const FUNDO = '#1f2019'

@@ -3,7 +3,6 @@ import { lazy, type ComponentType } from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
 import { RequerAdmin, RequerLogin, useAuth } from '../features/autenticacao/model/auth'
 import Layout from './layout/Layout'
-import { LoginOpcional } from './layout/LayoutPublico'
 import Entrar from '../features/autenticacao/pages/Entrar'
 import NaoEncontrada from '../features/navegacao/pages/NaoEncontrada'
 // Páginas soltas e pequenas (chegam por link de e-mail ou do rodapé): vêm junto, sem espera.
@@ -31,7 +30,6 @@ const ClassificacaoNbb = pagina(() => import('../features/nbb/ClassificacaoNbb')
 const EstiloDetalhe = pagina(() => import('../features/estilos/pages/EstiloDetalhe'), 'default', '/jogue-como/:id')
 const Rotina = pagina(() => import('../features/rotina/pages/Rotina'), 'default', '/rotina')
 const Alimentacao = pagina(() => import('../features/alimentacao/pages/Alimentacao'), 'default', '/alimentacao')
-const Equipamentos = pagina(() => import('../features/equipamentos/pages/Equipamentos'), 'default', '/equipamentos')
 const Artigos = pagina(() => import('../features/artigos/pages/Artigos'), 'default', '/artigos')
 const ArtigoDetalhe = pagina(() => import('../features/artigos/pages/Artigos'), 'ArtigoDetalhe', '/artigos/:id')
 const Conquistas = pagina(() => import('../features/evolucao/pages/Conquistas'), 'default', '/conquistas')
@@ -72,10 +70,6 @@ function Rotas() {
       <Route path="confirmar-conta" element={__DEMO__ ? <Navigate to="/entrar" replace /> : <ConfirmarConta />} />
       <Route path="privacidade" element={<PoliticaPrivacidade />} />
       <Route path="termos" element={<TermosDeUso />} />
-      {/* Aberta ao público só durante a revisão da Amazon Associados; depois, voltar para dentro de RequerAssinatura. */}
-      <Route element={<LoginOpcional />}>
-        <Route path="equipamentos" element={<Equipamentos />} />
-      </Route>
       <Route
         element={
           <RequerLogin>

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { FOTOS_JOGADORES } from '../../../assets/jogadores/fotos'
 import { TIME_DO_JOGADOR } from '../../../assets/jogadores/times'
-import { TIMES } from '../../equipamentos/dados'
+import { TIMES } from '../../nba/times'
 import { contraste, corDoJogador, corDoTimeNaFaixa } from './cor-do-time'
 
 describe('cor do time na faixa escura', () => {

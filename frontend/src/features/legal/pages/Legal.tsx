@@ -77,7 +77,7 @@ export function PoliticaPrivacidade() {
         <li><strong>Consentimento, quando aplicável:</strong> habilitar recursos opcionais, como notificações. A autorização pode ser retirada sem impedir os recursos que não dependem dela.</li>
         <li><strong>Exercício regular de direitos:</strong> conservar informações estritamente necessárias à defesa em processos ou ao atendimento de exigências legais.</li>
       </ul>
-      <p>Informações identificáveis da conta e dos treinos não são vendidas a anunciantes nem fornecidas à Amazon para identificar compradores. O simples uso de um campo de texto não representa autorização específica para tratar dados sensíveis.</p>
+      <p>Informações identificáveis da conta e dos treinos não são vendidas a anunciantes nem fornecidas a terceiros para identificar compradores. O simples uso de um campo de texto não representa autorização específica para tratar dados sensíveis.</p>
     </Secao>
     <Secao {...PRIVACIDADE[3]}>
       <p>O navegador guarda dados necessários à sessão, às preferências de aparência e idioma e aos recursos locais. O treino em andamento e as sessões aguardando sincronização podem ficar no aparelho, separados por conta. O site não utiliza cookies de publicidade.</p>
@@ -85,12 +85,12 @@ export function PoliticaPrivacidade() {
       <p>Arquivos em cache permitem carregamento mais rápido e o uso de recursos disponíveis sem conexão. Permissões de notificação podem ser revogadas nas configurações do navegador.</p>
     </Secao>
     <Secao {...PRIVACIDADE[4]}>
-      <p>Como Associado da Amazon, o Basketball Practice ganha com compras qualificadas. Links de Equipamentos podem conter um identificador de afiliado. A compra ocorre no ambiente do vendedor, segundo sua própria política. A plataforma não recebe dados de pagamento ou a identidade de quem comprou por esses links.</p>
+      <p>No momento, o Basketball Practice não exibe links de afiliados nem anúncios de terceiros.</p>
     </Secao>
     <Secao {...PRIVACIDADE[5]}>
       <p>Os fornecedores envolvidos na operação incluem Cloudflare, na entrega do site; Render, na execução da API; Neon, no banco de dados; e Resend, no envio de mensagens transacionais, conforme a infraestrutura utilizada pela versão acessada.</p>
       <p>Na contratação de assinatura, o Mercado Pago recebe os dados necessários ao pagamento e trata essas informações segundo sua própria política. O site envia o e-mail da conta, a referência da assinatura, o plano, valor e periodicidade, e mantém identificadores, estados de pagamento e período de acesso. Números completos de cartão e códigos de segurança são informados no ambiente do Mercado Pago, não nos servidores do Basketball Practice.</p>
-      <p>Serviços de notificação do navegador podem participar da entrega quando o recurso estiver autorizado. A Amazon trata dados das compras realizadas em seu próprio ambiente. O acesso administrativo é restrito às finalidades de operação, suporte e segurança.</p>
+      <p>Serviços de notificação do navegador podem participar da entrega quando o recurso estiver autorizado. O acesso administrativo é restrito às finalidades de operação, suporte e segurança.</p>
       <p>Provedores podem processar informações fora do Brasil. Transferências internacionais devem observar as hipóteses e garantias dos artigos 33 a 36 da LGPD e a regulamentação da ANPD, inclusive os instrumentos contratuais aplicáveis.</p>
       <p>Dados poderão ser compartilhados para cumprir obrigação legal, ordem válida de autoridade competente ou exercício regular de direitos, dentro dos limites aplicáveis.</p>
     </Secao>
@@ -169,8 +169,7 @@ export function TermosDeUso() {
       <p>Imagens de jogadores e outros materiais de terceiros têm créditos e licenças próprios. O Basketball Practice não possui vínculo oficial com jogadores, equipes, NBA, NBB ou outras ligas mencionadas. Referências ao estilo de um atleta não representam endosso ou participação dele no serviço.</p>
     </Secao>
     <Secao {...TERMOS[5]}>
-      <p>A plataforma pode exibir links de afiliados. Como Associado da Amazon, o Basketball Practice ganha com compras qualificadas, sem acrescentar uma cobrança própria ao usuário por utilizar o link.</p>
-      <p>Preços, estoque, pagamento, entrega, garantia e devolução de produtos são definidos pelos vendedores responsáveis. Compras ocorrem fora da plataforma e seguem as condições do ambiente em que forem realizadas.</p>
+      <p>No momento, a plataforma não exibe links de afiliados nem anúncios de terceiros.</p>
       <p>Estatísticas e notícias de fontes externas podem conter atrasos ou imprecisões. Links direcionam a serviços com regras próprias. Essas informações não constituem aconselhamento para apostas ou promessa de desempenho.</p>
     </Secao>
     <Secao {...TERMOS[6]}>

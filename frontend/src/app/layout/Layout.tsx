@@ -30,7 +30,6 @@ const LINKS: { to: string; rotulo: string; fim?: boolean }[] = [
   { to: '/nbb', rotulo: 'NBB' },
   { to: '/rotina', rotulo: 'Rotina' },
   { to: '/alimentacao', rotulo: 'Alimentação' },
-  { to: '/equipamentos', rotulo: 'Equipamentos' },
   { to: '/artigos', rotulo: 'Artigos' },
   { to: '/conquistas', rotulo: 'Conquistas' },
   { to: '/overall', rotulo: 'Overall' },
@@ -201,7 +200,7 @@ export default function Layout() {
           {[
             { titulo: 'Treinar', caminhos: ['/', '/rotina', '/treinos', '/programas', '/jogue-como'] },
             { titulo: 'Evolução', caminhos: ['/overall', '/evolucao', '/conquistas'] },
-            { titulo: 'Explorar', caminhos: ['/nbb', '/artigos', '/alimentacao', '/equipamentos', '/nba'] },
+            { titulo: 'Explorar', caminhos: ['/nbb', '/artigos', '/alimentacao', '/nba'] },
           ].map((grupo) => <section className="nav-grupo" key={grupo.titulo} aria-label={grupo.titulo}>
             <h2>{grupo.titulo}</h2>
             {grupo.caminhos.map((caminho) => {

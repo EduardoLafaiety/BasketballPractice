@@ -1,7 +1,7 @@
 import { localeAtual } from '../../shared/i18n/idioma'
 // Classificação das conferências Leste e Oeste, da API pública da ESPN (aceita chamada direto do
-// navegador). As cores dos times vêm da aba Equipamentos, que já tem os 30 times.
-import { TIMES } from '../equipamentos/dados'
+// navegador). As cores dos times vêm de ./times, que tem os 30 times.
+import { TIMES } from './times'
 import { comValidade } from './cache'
 import { escudos, SIGLA_ESPN, type Escudos } from './escudos'
 

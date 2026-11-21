@@ -78,24 +78,6 @@
 .dieta-quadra-no text { font-family: var(--fonte-display); font-weight: var(--peso-display); font-size: 22px; fill: #111; text-anchor: middle; dominant-baseline: central; }
 @media (max-width: 800px) { .dieta-chamada { grid-template-columns: 1fr; } }
 
-/* Equipamentos: bolas com link de afiliado da Amazon */
-.produtos-abas { grid-template-columns: repeat(3, minmax(0, 1fr)); max-width: 60rem; margin-top: 2rem; }
-@media (max-width: 860px) { .produtos-abas { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-/* Flex em vez de grade: a última linha, quando incompleta, fica centralizada. Mesmas colunas da grade de antes (mín. 230px). */
-.produtos { display: flex; flex-wrap: wrap; justify-content: center; container-type: inline-size; }
-.produtos > .produto { flex: 0 0 100%; min-width: 0; }
-@container (min-width: 476px) { .produtos > .produto { flex-basis: calc((100% - 1rem) / 2); } }
-@container (min-width: 722px) { .produtos > .produto { flex-basis: calc((100% - 2rem) / 3); } }
-@container (min-width: 968px) { .produtos > .produto { flex-basis: calc((100% - 3rem) / 4); } }
-.produto { display: flex; flex-direction: column; gap: 0.35rem; overflow: hidden; padding-top: 0; color: var(--texto); text-decoration: none; border-top: 5px solid var(--c); }
-.produto:hover { border-color: var(--c); }
-.produto h3 { margin: 0; }
-.produto-vitrine { display: grid; place-items: center; margin: 0 -1.25rem 0.6rem; padding: 1.4rem; background: var(--superficie-2); }
-.produto-texto { font-size: 0.88rem; }
-.produto .dieta-foco { margin-bottom: 0; }
-.produto .dieta-foco span:first-child { background: none; border-color: var(--borda); color: inherit; font-weight: 400; }
-@media (max-width: 860px) { .produtos-abas .nivel-opcao:last-child { grid-column: auto; } }
-.produto-vitrine { padding: 1.1rem 1rem 0.6rem; }
 /* Roupas e acessórios: o sprite ocupa o mesmo espaço da bola (176 × 185), com uma sombra em degrau. */
 .bola-nome { font-family: var(--fonte-display); font-weight: 800; letter-spacing: 0.04em; text-transform: none; }
 
