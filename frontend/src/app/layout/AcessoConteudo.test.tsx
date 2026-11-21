@@ -29,10 +29,8 @@ describe('Acesso ao conteúdo da assinatura', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Tentar de novo' }))
     expect(await screen.findByRole('heading', { name: 'Treinos', level: 1 })).toBeInTheDocument()
   })
-  it('assinante confirmado vê equipamentos dentro do aplicativo', async () => {
-    definirToken('tk')
-    apiFalsa({ 'GET /auth/me': { ...usuarioFalso(), billing: { required: true, hasAccess: true, paidUntil: new Date(Date.now() + 86400_000).toISOString() } }, 'GET /settings': configFalsa, 'GET /exercises': [], 'GET /workouts': [] })
+  it('a seção Equipamentos foi removida: o visitante que abre /equipamentos vai ao login', async () => {
     abrirApp('/equipamentos')
-    expect(await screen.findByRole('heading', { name: 'Equipamentos', level: 1 }, { timeout: 8000 })).toBeInTheDocument()
-  }, 10000)
+    expect(await screen.findByTestId('caminho')).toHaveTextContent('/entrar')
+  })
 })

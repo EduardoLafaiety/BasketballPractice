@@ -2,7 +2,7 @@
 
 ## Publicação comercial e acesso
 
-Use o build normal (`npm run build` no frontend), conectado à API real. Em `NODE_ENV=production`, a API exige assinatura independentemente de `BILLING_ENABLED`; chaves ausentes tornam o checkout indisponível e não liberam o conteúdo. Login, cadastro, assinatura, contato, privacidade e termos continuam públicos. Artigos e Equipamentos também exigem acesso pago. O workflow de publicação gratuita da demonstração no GitHub Pages foi removido; `dev:demo` é uma ferramenta local.
+Use o build normal (`npm run build` no frontend), conectado à API real. Em `NODE_ENV=production`, a API exige assinatura independentemente de `BILLING_ENABLED`; chaves ausentes tornam o checkout indisponível e não liberam o conteúdo. Login, cadastro, assinatura, contato, privacidade e termos continuam públicos. Artigos também exigem acesso pago. O workflow de publicação gratuita da demonstração no GitHub Pages foi removido; `dev:demo` é uma ferramenta local.
 
 As credenciais e as etapas de homologação estão em [Mercado Pago](../pagamentos/MERCADO_PAGO.md). Nunca publique o conteúdo de `.env`, `.env.local`, `backend/data/` ou `artifacts/`.
 

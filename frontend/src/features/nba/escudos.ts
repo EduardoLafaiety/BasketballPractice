@@ -1,6 +1,6 @@
 // Escudos dos times no CDN da ESPN, que usa a sigla dela em minúsculas (GS, SA, NY, UTAH…).
 // O "combiner" já entrega a imagem pequena (56 px, nítida em tela retina).
-import { TIMES } from '../equipamentos/dados'
+import { TIMES } from './times'
 
 export interface Escudos {
   /** Versão para fundo claro. */
@@ -18,7 +18,7 @@ const url = (siglaEspn: string, variante: '500' | '500-dark') =>
 
 export const escudos = (siglaEspn: string): Escudos => ({ escudo: url(siglaEspn, '500'), escudoEscuro: url(siglaEspn, '500-dark') })
 
-/** Logo do time (pela sigla do site) bem pequeno, para ser ampliado em blocos na bola de Equipamentos. */
+/** Logo do time (pela sigla do site) bem pequeno, para ser ampliado em blocos. */
 export const logoPequeno = (sigla: string, lado: number) => {
   const espn = (DO_SITE_PARA_ESPN[sigla] ?? sigla).toLowerCase()
   const em = (variante: string) => `https://a.espncdn.com/combiner/i?img=/i/teamlogos/nba/${variante}/${espn}.png&h=${lado}&w=${lado}`

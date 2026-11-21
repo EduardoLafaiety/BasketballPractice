@@ -394,8 +394,6 @@ html[lang='en'] .conteudo .pagina-inicio .abertura-titulo { font-size: clamp(1.3
 .topo-preferencia-erro { position: absolute; right: 0; top: 100%; width: min(280px, 85vw); padding: 1rem; border-radius: 12px; background: var(--superficie); color: var(--texto); box-shadow: var(--sombra); font-size: 0.85rem; }
 @media (max-width: 860px) {
   .topo-preferencias { margin-left: auto; }
-  .app-publico .topo { flex-wrap: wrap; }
-  .app-publico .topo-atalhos-publico { margin-left: auto; }
 }
 .conta-cabecalho h1 { margin: 0.25rem 0 0.5rem; }
 .conta-cabecalho p { margin: 0; }
