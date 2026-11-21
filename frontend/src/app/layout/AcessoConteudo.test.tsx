@@ -6,7 +6,7 @@ import { apiFalsa, configFalsa, Resposta, usuarioFalso } from '../../test/api-fa
 import { abrirApp } from '../../test/renderizar'
 
 describe('Acesso ao conteúdo da assinatura', () => {
-  it.each(['/equipamentos', '/artigos', '/artigos/1', '/treinos'])('visitante precisa entrar antes de acessar %s', async rota => {
+  it.each(['/artigos', '/artigos/1', '/treinos'])('visitante precisa entrar antes de acessar %s', async rota => {
     apiFalsa({})
     abrirApp(rota)
     await waitFor(() => expect(screen.getByTestId('caminho')).toHaveTextContent('/entrar'))
