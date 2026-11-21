@@ -67,8 +67,8 @@ describe('acesso de administrador', () => {
     await abrirMenu()
     const link = within(menu()).getByRole('link', { name: 'Admin' })
     await userEvent.click(link)
-    expect(await screen.findByRole('heading', { name: 'Administração' })).toBeInTheDocument()
-    await waitFor(() => expect(screen.getByText('0 contas · 0 admins')).toBeInTheDocument())
+    expect(await screen.findByRole('heading', { name: /Gestão de usuários/ })).toBeInTheDocument()
+    await waitFor(() => expect(screen.getByText('0 contas encontradas')).toBeInTheDocument())
   })
 })
 
@@ -122,7 +122,7 @@ describe('falha passageira ao conferir a sessão', () => {
     expect(screen.queryByRole('button', { name: 'Tentar de novo' })).toBeNull()
 
     liberar(usuarioFalso({ isAdmin: true }))
-    expect(await screen.findByRole('heading', { name: 'Administração' })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: /Gestão de usuários/ })).toBeInTheDocument()
   })
 
   it('tentar de novo mostra "não encontrada" para quem não é admin', async () => {
@@ -192,7 +192,7 @@ describe('falha passageira ao conferir a sessão', () => {
 
     await screen.findByRole('alert')
     await passarEspera()
-    expect(await screen.findByRole('heading', { name: 'Administração' })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: /Gestão de usuários/ })).toBeInTheDocument()
   })
 
   it('a nova conferência que dá certo apaga o erro guardado', async () => {

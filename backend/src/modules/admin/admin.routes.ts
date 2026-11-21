@@ -2,8 +2,8 @@ import { Router } from 'express'
 import type { Database } from '../../db/index.js'
 import { idParam, parse } from '../../lib/validate.js'
 import { currentUser } from '../../middleware/auth.js'
-import { roleSchema } from './admin.schema.js'
-import { changeRole, listUsers, removeUser } from './admin.service.js'
+import { updateUserSchema } from './admin.schema.js'
+import { updateUser, userDetail, revokeUserSessions, listUsers, removeUser } from './admin.service.js'
 
 export function adminRouter(db: Database) {
   const router = Router()
@@ -12,8 +12,17 @@ export function adminRouter(db: Database) {
   })
   router.patch('/users/:id', async (req, res) => {
     const { id } = parse(idParam, req.params)
-    const { isAdmin } = parse(roleSchema, req.body)
-    res.json(await changeRole(db, currentUser(req), id, isAdmin))
+    const input = parse(updateUserSchema, req.body)
+    res.json(await updateUser(db, currentUser(req), id, input))
+  })
+  router.get('/users/:id', async (req, res) => {
+    const { id } = parse(idParam, req.params)
+    res.json(await userDetail(db, currentUser(req), id))
+  })
+  router.post('/users/:id/revoke-sessions', async (req, res) => {
+    const { id } = parse(idParam, req.params)
+    await revokeUserSessions(db, currentUser(req), id)
+    res.status(204).end()
   })
   router.delete('/users/:id', async (req, res) => {
     const { id } = parse(idParam, req.params)

@@ -67,6 +67,9 @@ export const api = {
   eu: () => request<Usuario>('GET', '/auth/me'),
 
   usuariosAdmin: () => request<UsuarioAdmin[]>('GET', '/admin/users'),
+  usuarioAdmin: (id: number) => request<import('../../../../contracts/api').AdminUserDetail>('GET', `/admin/users/${id}`),
+  atualizarUsuario: (id: number, data: { name?: string; blocked?: boolean }) => request<UsuarioAdmin>('PATCH', `/admin/users/${id}`, data),
+  revogarSessoes: (id: number) => request<null>('POST', `/admin/users/${id}/revoke-sessions`),
   definirAdmin: (id: number, isAdmin: boolean) => request<UsuarioAdmin>('PATCH', `/admin/users/${id}`, { isAdmin }),
   excluirUsuario: (id: number) => request<null>('DELETE', `/admin/users/${id}`),
 

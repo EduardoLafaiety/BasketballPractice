@@ -28,9 +28,12 @@ test('o painel admin só aparece depois de a conta virar admin, e vale na hora',
 
   await abrirMenu(page)
   await expect(page.getByRole('link', { name: 'Admin' })).toBeVisible()
-  await expect(page.getByRole('heading', { name: 'Administração' })).toBeVisible()
-  const propria = page.locator('.admin-usuario').filter({ hasText: email })
-  await expect(propria).toContainText('(você)')
-  // A própria conta não tem botões de tirar o admin nem de excluir (ninguém se tranca para fora).
-  await expect(propria.getByRole('button')).toHaveCount(0)
+  await expect(page.getByRole('heading', { name: 'Gestão de usuários.' })).toBeVisible()
+  await page.getByRole('button', { name: /^Administradores/ }).click()
+  await page.getByRole('searchbox', { name: 'Buscar por nome ou e-mail' }).fill(email)
+  const propria = page.locator('.gestao-linha').filter({ hasText: email })
+  await expect(propria).toContainText('Você')
+  await propria.getByRole('button', { name: /Ver detalhes/ }).click()
+  await expect(page.getByRole('dialog')).toContainText('Conta responsável protegida')
+  await expect(page.getByRole('button', { name: 'Bloquear conta', exact: true })).toHaveCount(0)
 })

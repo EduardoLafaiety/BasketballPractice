@@ -19,8 +19,8 @@ export function localeAtual() { return atual === 'en' ? 'en-US' : 'pt-BR' }
 
 export async function definirIdioma(idioma: Idioma) {
   if (idioma === 'en' && !Object.keys(ingles).length) {
-    const [base, revisao, exercicios, landing, billing] = await Promise.all([import('./en.json'), import('./revisao-en.json'), import('./exercicios-en.json'), import('./landing-en.json'), import('./billing-en.json')])
-    ingles = { ...base.default, ...revisao.default, ...exercicios.default, ...landing.default, ...billing.default }
+    const [base, revisao, exercicios, landing, billing, admin] = await Promise.all([import('./en.json'), import('./revisao-en.json'), import('./exercicios-en.json'), import('./landing-en.json'), import('./billing-en.json'), import('./admin-en.json')])
+    ingles = { ...base.default, ...revisao.default, ...exercicios.default, ...landing.default, ...billing.default, ...admin.default }
     padroes = Object.entries(ingles).filter(([pt]) => /\{\d+\}/.test(pt)).map(([pt, en]) => ({
       regex: new RegExp('^' + pt.split(/\{\d+\}/).map(escapar).join('(.+?)') + '$'),
       traducao: en,

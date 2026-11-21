@@ -17,6 +17,15 @@ export interface UsuarioAdmin extends Usuario {
   workouts: number
   sessions: number
   lastSessionAt: string | null
+  blocked?: boolean
+  lastLoginAt?: string | null
+  paidUntil?: string | null
+  plan?: string | null
+  subscriptionStatus?: string | null
+}
+
+export interface AdminUserDetail extends UsuarioAdmin {
+  audit: { id: number; action: string; actorName: string | null; createdAt: string }[]
 }
 
 export interface AuthResposta {

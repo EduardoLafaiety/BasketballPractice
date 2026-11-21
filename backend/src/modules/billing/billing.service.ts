@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto'
 import type { Database, Queryable } from '../../db/index.js'
 import { HttpError } from '../../lib/http-error.js'
+import { effectiveAdmin } from '../../lib/admin-owners.js'
 import { billingRepository as repo, type Subscription } from './billing.repository.js'
 import { checkoutUrl, mercadoPago, type MercadoPago, type MpInvoice, type MpSubscription } from './mercado-pago.js'
 
@@ -36,7 +37,7 @@ export function createBillingService(db: Database, options: BillingOptions) {
   async function access(userId: number, tx: Queryable = db) {
     if (!options.enabled) return { required: false, hasAccess: true, paidUntil: null }
     const row = await repo.access(tx, userId)
-    return { required: options.enabled, hasAccess: !options.enabled || Boolean(row?.admin) || Boolean(row?.paid_until && new Date(row.paid_until).getTime() > Date.now()), paidUntil: row?.paid_until?.toISOString() ?? null }
+    return { required: options.enabled, hasAccess: !options.enabled || Boolean(row && effectiveAdmin(row.email, row.admin)) || Boolean(row?.paid_until && new Date(row.paid_until).getTime() > Date.now()), paidUntil: row?.paid_until?.toISOString() ?? null }
   }
   function verifySubscription(remote: MpSubscription, local: Subscription) {
     const plan = BILLING_PLANS[local.plan]

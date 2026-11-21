@@ -5,8 +5,8 @@ export type Subscription = { id: string; user_id: number; plan: 'mensal' | 'anua
 export const billingRepository = {
   latest: (tx: Queryable, userId: number) => one<Subscription>(tx, 'SELECT * FROM billing_subscriptions WHERE user_id = $1 ORDER BY created_at DESC, id DESC LIMIT 1', [userId]),
   user: (tx: Queryable, userId: number) => one<{ id: number; email: string }>(tx, 'SELECT id,email FROM users WHERE id = $1 FOR UPDATE', [userId]),
-  access: (tx: Queryable, userId: number) => one<{ admin: boolean; paid_until: Date | null }>(tx,
-    `SELECT u.is_admin AS admin, (SELECT MAX(p.paid_until) FROM billing_payments p JOIN billing_subscriptions s ON s.id = p.subscription_id
+  access: (tx: Queryable, userId: number) => one<{ admin: boolean; email: string; paid_until: Date | null }>(tx,
+    `SELECT u.is_admin AS admin, u.email, (SELECT MAX(p.paid_until) FROM billing_payments p JOIN billing_subscriptions s ON s.id = p.subscription_id
       WHERE s.user_id = u.id AND p.status = 'approved') AS paid_until FROM users u WHERE u.id = $1`, [userId]),
   byProvider: (tx: Queryable, id: string) => one<Subscription>(tx, 'SELECT * FROM billing_subscriptions WHERE mp_id = $1', [id]),
   byReference: (tx: Queryable, id: string) => one<Subscription>(tx, 'SELECT * FROM billing_subscriptions WHERE id::text = $1', [id]),
