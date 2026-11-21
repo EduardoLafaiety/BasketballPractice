@@ -1,6 +1,7 @@
 import { useState, type CSSProperties, type ReactNode } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { buscaTime, linkAmazon, MARCAS, TIMES, type Conferencia } from '../dados'
+import { fotoDe } from '../fotos'
 import Bola, { LADO_DO_LOGO, type Colagem } from '../Bola'
 import { logoPequeno } from '../../nba/escudos'
 import Icone from '../../../shared/ui/Icone'
@@ -30,7 +31,16 @@ function colagemDe(c: (typeof MARCAS)[number]['colagem']): Colagem | undefined {
   return colagens.get(c)
 }
 
+/** A foto real da bola, quando existe; senão, o desenho dela. */
+function Vitrine({ id, nome, desenho }: { id: string; nome: string; desenho: ReactNode }) {
+  const foto = fotoDe(id)
+  if (!foto) return <>{desenho}</>
+  return <img className="produto-foto" src={foto} alt={`Bola ${nome}`} width={176} height={185} loading="lazy" decoding="async" referrerPolicy="no-referrer" />
+}
+
 function CartaoProduto(p: {
+  /** Sigla do time ou id da bola de marca: a chave da foto em fotos.ts. */
+  id: string
   /** A cor do cartão e o desenho da bola. */
   cor: string
   vitrine: ReactNode
@@ -50,7 +60,7 @@ function CartaoProduto(p: {
       rel="sponsored noopener noreferrer"
     >
       <span className="produto-vitrine">
-        {p.vitrine}
+        <Vitrine id={p.id} nome={p.nome} desenho={p.vitrine} />
       </span>
       <span className="tag">{p.tag}</span>
       <h3>{p.nome}</h3>
@@ -102,6 +112,7 @@ function Times() {
           {lista.map((t) => (
             <CartaoProduto
               key={t.sigla}
+              id={t.sigla}
               cor={t.cor}
               vitrine={
                 <Bola
@@ -133,6 +144,7 @@ function Marcas() {
       {MARCAS.map((b) => (
         <CartaoProduto
           key={b.id}
+          id={b.id}
           cor={b.cor}
           vitrine={<Bola frente={b.cor} faixa={b.cor} canal={b.costura} marca={b.marca} modelo={b.modelo} canalLargo={b.canalLargo} faixaClara={b.faixa} grao={b.grao} calota={b.calota} colagem={colagemDe(b.colagem)} marcaCor={b.marcaCor} marcaContorno={b.marcaContorno} marcaTamanho={b.marcaTamanho} emblema={b.emblema} />}
           tag={b.marca}

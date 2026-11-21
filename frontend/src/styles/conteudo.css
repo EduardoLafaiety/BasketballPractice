@@ -91,6 +91,7 @@
 .produto:hover { border-color: var(--c); }
 .produto h3 { margin: 0; }
 .produto-vitrine { display: grid; place-items: center; margin: 0 -1.25rem 0.6rem; padding: 1.4rem; background: var(--superficie-2); }
+.produto-foto { display: block; width: 100%; max-width: 176px; height: auto; aspect-ratio: 176 / 185; object-fit: contain; }
 .produto-texto { font-size: 0.88rem; }
 .produto .dieta-foco { margin-bottom: 0; }
 .produto .dieta-foco span:first-child { background: none; border-color: var(--borda); color: inherit; font-weight: 400; }
