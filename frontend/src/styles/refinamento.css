@@ -168,3 +168,15 @@
   /* No app o menu do celular vira a barra de baixo; no público não há barra, então Entrar continua no topo. */
   .app-publico .topo-menu:not(.topo-cadastro) { display: inline-flex; padding: 0 0.7rem; }
 }
+
+/* Layout público (Equipamentos sem conta, durante a revisão da Amazon): o link, Entrar e Criar conta no topo. */
+.app-publico .topo-menu { margin-left: 0; }
+.app-publico .topo-cadastro { background: var(--laranja); border-color: var(--laranja); color: #111111; }
+.app-publico .topo-cadastro:hover { background: #ffffff; border-color: #111111; }
+@media (max-width: 860px) {
+  .app-publico .topo-atalhos { display: flex; gap: 0; margin-left: auto; }
+  .app-publico .topo-atalhos a { padding: 0.5rem 0.6rem; font-size: 0.8rem; }
+  .app-publico .topo-cadastro { display: none; }
+  /* No app o menu do celular vira a barra de baixo; no público não há barra, então Entrar continua no topo. */
+  .app-publico .topo-menu:not(.topo-cadastro) { display: inline-flex; padding: 0 0.7rem; }
+}

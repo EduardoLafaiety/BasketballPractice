@@ -81,7 +81,7 @@ describe('Assinatura', () => {
     await waitFor(() => expect(screen.getByTestId('caminho')).toHaveTextContent('/assinatura'))
     expect(fake.ultima('GET', '/exercises')).toBeUndefined()
   })
-  it.each(['/treinos', '/treinos/1', '/rotina', '/sessao', '/programas', '/jogue-como', '/nba', '/nbb', '/alimentacao', '/conquistas', '/evolucao', '/overall', '/artigos', '/artigos/1', '/equipamentos'])('bloqueia o acesso direto sem pagamento em %s', async rota => {
+  it.each(['/treinos', '/treinos/1', '/rotina', '/sessao', '/programas', '/jogue-como', '/nba', '/nbb', '/alimentacao', '/conquistas', '/evolucao', '/overall', '/artigos', '/artigos/1'])('bloqueia o acesso direto sem pagamento em %s', async rota => {
     abrir({}, rota)
     await waitFor(() => expect(screen.getByTestId('caminho')).toHaveTextContent('/assinatura'))
   })

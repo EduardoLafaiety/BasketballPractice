@@ -78,11 +78,12 @@ test('cadastrar um e-mail que já tem conta não revela isso na tela: o aviso va
   expect(login.status()).toBe(200)
 })
 
-test('Equipamentos e Artigos exigem conta e continuam disponíveis para usuários autorizados', async ({ page, request }) => {
-  for (const rota of ['/equipamentos', '/artigos']) {
-    await page.goto(rota)
-    await expect(page).toHaveURL(/\/entrar$/)
-  }
+test('Equipamentos abre sem conta (revisão da Amazon); Artigos exige conta e segue disponível para usuários autorizados', async ({ page, request }) => {
+  await page.goto('/equipamentos')
+  await expect(page).toHaveURL(/\/equipamentos$/)
+  await expect(page.getByRole('heading', { name: 'Equipamentos', level: 1 })).toBeVisible()
+  await page.goto('/artigos')
+  await expect(page).toHaveURL(/\/entrar$/)
   const { token } = await novaConta(request)
   await page.addInitScript(t => localStorage.setItem('bp.token', t), token)
   await page.goto('/equipamentos')

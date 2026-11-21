@@ -3,6 +3,7 @@ import { lazy, type ComponentType } from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
 import { RequerAdmin, RequerLogin, useAuth } from '../features/autenticacao/model/auth'
 import Layout from './layout/Layout'
+import { LoginOpcional } from './layout/LayoutPublico'
 import Entrar from '../features/autenticacao/pages/Entrar'
 import NaoEncontrada from '../features/navegacao/pages/NaoEncontrada'
 // Páginas soltas e pequenas (chegam por link de e-mail ou do rodapé): vêm junto, sem espera.
@@ -71,6 +72,10 @@ function Rotas() {
       <Route path="confirmar-conta" element={__DEMO__ ? <Navigate to="/entrar" replace /> : <ConfirmarConta />} />
       <Route path="privacidade" element={<PoliticaPrivacidade />} />
       <Route path="termos" element={<TermosDeUso />} />
+      {/* Aberta ao público só durante a revisão da Amazon Associados; depois, voltar para dentro de RequerAssinatura. */}
+      <Route element={<LoginOpcional />}>
+        <Route path="equipamentos" element={<Equipamentos />} />
+      </Route>
       <Route
         element={
           <RequerLogin>
@@ -79,7 +84,6 @@ function Rotas() {
         }
       >
         <Route element={<RequerAssinatura />}>
-        <Route path="equipamentos" element={<Equipamentos />} />
         <Route path="artigos" element={<Artigos />} />
         <Route path="artigos/:id" element={<ArtigoDetalhe />} />
         <Route path="treinos" element={<Treinos />} />
